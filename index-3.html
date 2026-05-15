@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1A0020">
+<meta name="format-detection" content="telephone=no">
+<title>CryptoMine — ZKP Mining Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+
+  --purple:#7B2FBE; --purple-light:#9D4EDD; --purple-dark:#4A0E8F;
+  --red:#E63946; --red-bright:#FF4D5A; --red-dark:#9B1D24;
+  --gold:#FFD700; --green:#4ade80;
+  --bg:#080010; --surface:rgba(35,8,55,0.98); --border:rgba(200,100,255,0.5);
+  --text:#F5EEFF; --text-dim:#A890CC;
+  /* Larger base font for mobile clarity */
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html, body {
+  width:100%; min-height:100%;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  font-family:'Rajdhani',sans-serif; color:var(--text);
+  overflow-x:hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(200,0,80,0.7) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 70% at 85% 80%, rgba(120,0,220,0.7) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(160,0,150,0.4) 0%, transparent 60%),
+    #1A0020;
+  background-attachment:fixed;
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(157,78,221,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(157,78,221,0.06) 1px,transparent 1px);
+  background-size:40px 40px}
+
+/* scrollbar hidden */
+.tab-content::-webkit-scrollbar { display:none; }
+.tab-content { scrollbar-width:none; }
+
+/* ── SCREENS ── */
+.screen { display:none; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; flex-direction:column; }
+#authScreen { overflow-y:auto; -webkit-overflow-scrolling:touch; }
+
+/* ── AUTH ── */
+#authScreen{align-items:center;justify-content:center;padding:1.5rem;
+  background:radial-gradient(ellipse 100% 70% at 30% 50%,rgba(80,15,160,0.35) 0%,transparent 60%),
+             radial-gradient(ellipse 80% 80% at 70% 50%,rgba(50,10,120,0.25) 0%,transparent 60%)}
+.auth-logo{font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;letter-spacing:4px;text-align:center;
+  margin-bottom:0.3rem;color:#fff;text-shadow:0 0 30px rgba(157,78,221,0.7),0 0 60px rgba(123,47,190,0.4);
+  position:relative;display:inline-block;animation:logo-flicker 8s ease-in-out infinite}
+.auth-logo::before,.auth-logo::after{content:'⛏ CRYPTOMINE';position:absolute;top:0;left:0;right:0;
+  font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;letter-spacing:4px}
+.auth-logo::before{color:var(--red-bright);clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%);animation:glitch1 5s infinite;left:2px}
+.auth-logo::after{color:var(--purple-light);clip-path:polygon(0 60%,100% 60%,100% 78%,0 78%);animation:glitch2 5s infinite;left:-2px}
+@keyframes logo-flicker{0%,93%,95%,100%{opacity:1}94%{opacity:.6}}
+@keyframes glitch1{0%,88%,100%{opacity:0}90%{opacity:.6;transform:translateX(-3px)}}
+@keyframes glitch2{0%,88%,100%{opacity:0}91%{opacity:.5;transform:translateX(3px)}}
+.auth-sub{font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(157,78,221,0.5);
+  letter-spacing:3px;text-align:center;margin-bottom:2rem;display:flex;align-items:center;gap:0.6rem;justify-content:center}
+.auth-sub::before,.auth-sub::after{content:'';width:40px;height:1px;background:rgba(157,78,221,0.3)}
+.auth-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:1.8rem;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(74,14,143,0.2)}
+.auth-card::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--purple-light),var(--red),transparent)}
+.auth-bar{display:flex;align-items:center;gap:0.4rem;margin-bottom:1.4rem;padding-bottom:0.8rem;border-bottom:1px solid rgba(157,78,221,0.1)}
+.auth-bar-dot{width:8px;height:8px;border-radius:50%}
+.auth-bar-dot:nth-child(1){background:#ff5f57}.auth-bar-dot:nth-child(2){background:#febc2e}.auth-bar-dot:nth-child(3){background:#28c840}
+.auth-bar-title{flex:1;text-align:center;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(157,78,221,0.4);letter-spacing:2px}
+.auth-tabs{display:flex;margin-bottom:1.4rem;border-bottom:1px solid rgba(157,78,221,0.15)}
+.auth-tab{flex:1;padding:0.6rem;background:none;border:none;font-family:'Share Tech Mono',monospace;font-size:0.72rem;
+  letter-spacing:2px;color:var(--text-dim);cursor:pointer;transition:all 0.25s;text-transform:uppercase}
+.auth-tab.active{color:var(--purple-light);border-bottom:2px solid var(--purple-light)}
+.auth-form{display:none}.auth-form.active{display:block}
+.form-group{margin-bottom:1rem;position:relative}
+.form-label{display:flex;align-items:center;gap:0.3rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;
+  letter-spacing:2px;color:var(--text-dim);margin-bottom:0.4rem;text-transform:uppercase}
+.form-label::before{content:'//';color:var(--red);opacity:0.7;font-size:0.7rem}
+.form-input{width:100%;padding:0.75rem 0.9rem 0.75rem 2rem;background:rgba(0,0,0,0.3);border:none;
+  border-bottom:1px solid rgba(157,78,221,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;
+  font-size:0.9rem;outline:none;caret-color:var(--purple-light);transition:all 0.3s}
+.form-input:focus{border-bottom-color:var(--purple-light);background:rgba(157,78,221,0.06)}
+.form-input::placeholder{color:rgba(136,119,170,0.35)}
+.field-icon{position:absolute;left:0;bottom:0.75rem;font-size:0.85rem}
+.btn-auth{width:100%;padding:0.9rem;margin-top:0.5rem;background:none;border:1px solid rgba(157,78,221,0.4);
+  color:#fff;font-family:'Orbitron',monospace;font-size:0.72rem;letter-spacing:4px;cursor:pointer;
+  transition:all 0.3s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);position:relative;overflow:hidden}
+.btn-auth::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(123,47,190,0.5),rgba(155,29,36,0.3));opacity:0;transition:opacity 0.3s}
+.btn-auth::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);transition:left 0.5s;transform:skewX(-20deg)}
+.btn-auth:hover::before{opacity:1}.btn-auth:hover::after{left:150%}.btn-auth:hover{border-color:var(--purple-light);letter-spacing:6px}
+.auth-msg{font-family:'Share Tech Mono',monospace;font-size:0.75rem;margin-top:0.8rem;padding:0.5rem 0.8rem;border-radius:4px;display:none}
+.auth-msg.error{color:var(--red-bright);background:rgba(230,57,70,0.08);border-left:2px solid var(--red-bright);display:block}
+.auth-msg.success{color:var(--green);background:rgba(74,222,128,0.08);border-left:2px solid var(--green);display:block}
+.auth-prompt{font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:rgba(157,78,221,0.5);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.3rem}
+.p-cursor{display:inline-block;width:7px;height:0.9em;background:var(--purple-light);animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.auth-footer{display:flex;gap:1.5rem;justify-content:center;margin-top:1.5rem}
+.auth-stat{text-align:center}
+.auth-stat-val{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;color:var(--purple-light)}
+.auth-stat-lbl{font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:0.1rem}
+.auth-footer-div{width:1px;background:rgba(157,78,221,0.2)}
+
+/* ── DASHBOARD ── */
+.nav{display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1rem;position:sticky;top:0;z-index:100;
+  background:rgba(30,0,50,0.97);backdrop-filter:blur(20px);border-bottom:3px solid rgba(200,100,255,0.5);
+  box-shadow:0 2px 20px rgba(74,14,143,0.2)}
+.nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1rem;letter-spacing:2px;color:#fff;
+  text-shadow:0 0 15px rgba(157,78,221,0.5);margin-right:auto}
+.nav-pill{display:flex;align-items:center;gap:0.3rem;padding:0.28rem 0.65rem;border-radius:20px;
+  font-family:'Share Tech Mono',monospace;white-space:nowrap}
+.nav-pill.zkp{background:rgba(157,78,221,0.12);border:1px solid rgba(157,78,221,0.3)}
+.nav-pill.usd{background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25)}
+.np-val{font-size:0.88rem;font-weight:700;color:#fff;font-family:'Orbitron',monospace}
+.np-lbl{font-size:0.65rem;color:rgba(157,78,221,0.8);letter-spacing:1px}
+.nav-pill.usd .np-val{color:var(--gold)}.nav-pill.usd .np-lbl{color:rgba(255,215,0,0.5)}
+.btn-out{padding:0.28rem 0.65rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);
+  border-radius:6px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.52rem;letter-spacing:1px;cursor:pointer}
+/* ── CLICKABLE BUTTON PURPLE RING ── */
+.btn-buy, .btn, .btn-auth, .btn-mine, .btn-detail,
+.bnav, .tu-card, .btn-out, .btn-lang,
+.auth-tab, .filter-btn, .admin-tab,
+.topup-step button, .wb button, .w-stat button {
+  box-shadow: 0 0 0 2px rgba(157,78,221,0.5), 0 0 10px rgba(157,78,221,0.2);
+}
+.btn-buy:hover, .btn:hover, .btn-auth:hover, .btn-mine:hover,
+.btn-detail:hover, .tu-card.sel, .tu-card:hover,
+.topup-step button:hover {
+  box-shadow: 0 0 0 2.5px var(--purple-light), 0 0 18px rgba(157,78,221,0.5);
+}
+.bnav.active {
+  box-shadow: 0 0 0 2px rgba(157,78,221,0.6), 0 0 12px rgba(157,78,221,0.3);
+  border-radius: 10px;
+}
+.btn-mine {
+  box-shadow: 0 0 0 2px rgba(157,78,221,0.6), 0 0 20px rgba(157,78,221,0.3);
+}
+.btn-mine.mining {
+  box-shadow: 0 0 0 2px rgba(230,57,70,0.7), 0 0 20px rgba(230,57,70,0.4);
+}
+.btn-detail {
+  box-shadow: 0 0 0 1.5px rgba(157,78,221,0.45), 0 0 8px rgba(157,78,221,0.15);
+}
+/* ── END BUTTON RING ── */
+.admin-tab{flex:1;min-width:80px;padding:0.6rem 0.5rem;background:none;border:none;border-bottom:2px solid transparent;
+  font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.admin-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.admin-page{display:none}.admin-page.active{display:block}
+.filter-btn{padding:0.3rem 0.75rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:20px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.62rem;cursor:pointer;transition:all 0.2s}
+.filter-btn.active{background:rgba(157,78,221,0.15);border-color:var(--purple-light);color:var(--purple-light)}
+.req-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:0.8rem}
+.req-card.pending{border-color:rgba(255,215,0,0.25)}
+.req-card.approved{border-color:rgba(74,222,128,0.25)}
+.req-card.rejected{border-color:rgba(230,57,70,0.2);opacity:0.7}
+.req-slip{width:100%;max-height:160px;object-fit:contain;border-radius:8px;background:rgba(0,0,0,0.3);margin:0.6rem 0;cursor:pointer}
+.adm-user-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:0.9rem 1rem;margin-bottom:0.6rem}
+
+/* ── LANG ── */
+.lang-group{display:flex;gap:0.2rem}
+.btn-lang{padding:0.25rem 0.5rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);
+  border-radius:5px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.48rem;letter-spacing:1px;cursor:pointer;transition:all 0.2s}
+.btn-lang:hover,.btn-lang.active{background:rgba(157,78,221,0.25);border-color:var(--purple-light);color:var(--purple-light)}
+
+.tab-content{flex:1;overflow-y:auto;padding:1rem 1rem 0.5rem}
+.tab-page{display:none}.tab-page.active{display:block}
+
+.bottom-nav{display:flex;background:rgba(4,0,10,0.97);border-top:1px solid var(--border);
+  backdrop-filter:blur(20px);padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -4px 20px rgba(74,14,143,0.2)}
+.bnav{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.18rem;padding:0.6rem 0.2rem 0.45rem;
+  background:none;border:none;cursor:pointer;transition:all 0.25s;color:#ffffff;
+  font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.5px;text-transform:uppercase}
+.bnav.active{color:var(--red-bright)}.bnav.active svg{filter:drop-shadow(0 0 6px rgba(255,77,90,0.9));stroke:var(--red-bright)}
+.bnav svg{transition:all 0.25s;stroke:#ffffff}
+
+/* ── SHARED ── */
+.sec-title{font-family:'Orbitron',monospace;font-size:0.78rem;letter-spacing:2px;color:#C8B0FF;font-weight:700;
+  text-transform:uppercase;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.7rem}
+.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(157,78,221,0.3),transparent)}
+.btn{padding:0.7rem 1rem;border:none;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.68rem;
+  letter-spacing:2px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);transition:left 0.4s;transform:skewX(-15deg)}
+.btn:hover::after{left:150%}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--red-dark));color:#fff}
+.btn-primary:hover{box-shadow:0 0 18px rgba(157,78,221,0.4);transform:translateY(-1px)}
+.btn-gold{background:linear-gradient(135deg,#78350f,var(--gold));color:#000;font-weight:700}
+.btn-green{background:linear-gradient(135deg,#065f46,var(--green));color:#000;font-weight:700}
+
+/* ── HOME TAB ── */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;margin-bottom:1.1rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc-purple::before{background:linear-gradient(90deg,var(--purple-dark),var(--purple-light))}
+.sc-gold::before{background:linear-gradient(90deg,#78350f,var(--gold))}
+.sc-red::before{background:linear-gradient(90deg,var(--red-dark),var(--red-bright))}
+.sc-green::before{background:linear-gradient(90deg,#064e3b,var(--green))}
+.s-icon{font-size:1.3rem;margin-bottom:0.45rem;display:block}
+.s-lbl{font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:1px;color:#A890CC;margin-bottom:0.3rem}
+.s-val{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900}
+.s-sub{font-family:'Share Tech Mono',monospace;font-size:0.88rem;color:#A890CC;margin-top:0.2rem}
+.sc-purple .s-val{color:var(--purple-light)}.sc-gold .s-val{color:var(--gold)}.sc-red .s-val{color:var(--red-bright)}.sc-green .s-val{color:var(--green)}
+
+/* Mining widget */
+.mine-widget{background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.5);border-radius:16px;padding:1.3rem;
+  margin-bottom:1.1rem;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+.mine-widget::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--purple-light),var(--red),transparent)}
+.coin-wrap{position:relative;width:88px;height:88px;margin-bottom:0.9rem}
+.c-ring{position:absolute;inset:0;border:1.5px dashed rgba(157,78,221,0.2);border-radius:50%;animation:spin-r 8s linear infinite}
+.c-ring2{position:absolute;inset:10px;border:1px dashed rgba(157,78,221,0.12);border-radius:50%;animation:spin-r 5s linear infinite reverse}
+.coin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;
+  background:linear-gradient(135deg,var(--purple-dark),var(--purple-light),#C084FC,var(--purple));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;
+  font-size:1.2rem;font-weight:900;color:#fff;animation:coin-spin 4s linear infinite;box-shadow:0 0 18px rgba(157,78,221,0.6)}
+@keyframes spin-r{to{transform:rotate(360deg)}}
+@keyframes coin-spin{0%{transform:translate(-50%,-50%) rotateY(0deg)}50%{transform:translate(-50%,-50%) rotateY(180deg) scaleX(0.1)}51%{transform:translate(-50%,-50%) rotateY(180deg) scaleX(-0.1)}100%{transform:translate(-50%,-50%) rotateY(360deg)}}
+.pick1{position:absolute;right:-2px;bottom:4px;font-size:1.4rem;transform-origin:90% 90%;animation:sw1 0.7s ease-in-out infinite alternate}
+.pick2{position:absolute;left:-2px;top:4px;font-size:1.1rem;transform-origin:10% 10%;animation:sw2 0.9s ease-in-out infinite alternate;opacity:0.6}
+@keyframes sw1{from{transform:rotate(-25deg)}to{transform:rotate(8deg)}}
+@keyframes sw2{from{transform:rotate(18deg)}to{transform:rotate(-12deg)}}
+.mine-status{font-family:'Share Tech Mono',monospace;font-size:0.95rem;color:var(--text-dim);margin-bottom:0.4rem}
+.mine-rate{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem}
+.mine-rate span{font-size:0.68rem;color:var(--text-dim)}
+.prog-wrap{width:100%;margin-bottom:0.9rem}
+.prog-hd{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.28rem}
+.prog-bar{height:6px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--red));border-radius:3px;transition:width 0.5s linear;position:relative;overflow:hidden}
+.prog-fill::after{content:'';position:absolute;top:0;left:-80%;width:80%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{to{left:200%}}
+.btn-mine{padding:0.85rem 2.5rem;font-family:'Orbitron',monospace;font-size:0.9rem;letter-spacing:2px;cursor:pointer;border:none;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--red-dark));color:#fff;transition:all 0.3s}
+.btn-mine:hover{box-shadow:0 0 18px rgba(157,78,221,0.4)}
+.btn-mine.mining{background:linear-gradient(135deg,var(--red-dark),var(--purple-dark));animation:pulse-m 1s ease-in-out infinite}
+@keyframes pulse-m{0%,100%{box-shadow:0 0 8px rgba(230,57,70,0.3)}50%{box-shadow:0 0 22px rgba(230,57,70,0.6)}}
+
+/* Machines */
+.mach-header{display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1.1rem;
+  background:linear-gradient(135deg,rgba(150,0,200,0.3),rgba(100,0,180,0.2));
+  border:2px solid rgba(200,100,255,0.5);border-radius:14px;margin-bottom:1rem;box-shadow:0 0 20px rgba(150,0,200,0.3)}
+.mach-hdr-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--purple-dark),var(--purple-light));
+  display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(157,78,221,0.4)}
+.mach-hdr-t{font-family:'Orbitron',monospace;font-size:0.92rem;font-weight:900;color:var(--purple-light);letter-spacing:1px}
+.mach-hdr-s{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#A890CC;letter-spacing:1px;margin-top:0.12rem}
+.mach-count{margin-left:auto;font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--green);
+  background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);padding:0.18rem 0.55rem;border-radius:20px}
+
+/* Machine card */
+.mc{background:rgba(40,5,70,0.98);border-radius:16px;padding:1.3rem;margin-bottom:1rem;
+  position:relative;overflow:hidden;border:2px solid rgba(200,100,255,0.45);box-shadow:0 6px 30px rgba(120,0,200,0.3),inset 0 1px 0 rgba(255,255,255,0.05);
+  animation:mc-appear 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
+@keyframes mc-appear{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.mc-free::before    {background:linear-gradient(90deg,#064e3b,var(--green),#064e3b)}
+.mc-mini::before    {background:linear-gradient(90deg,#0c4a6e,#38bdf8,#0c4a6e)}
+.mc-lite::before    {background:linear-gradient(90deg,#831843,#f472b6,#831843)}
+.mc-starter::before {background:linear-gradient(90deg,#064e3b,#22c55e,#064e3b)}
+.mc-basic::before   {background:linear-gradient(90deg,var(--purple-dark),var(--purple-light),var(--purple-dark))}
+.mc-pro::before     {background:linear-gradient(90deg,var(--red-dark),var(--red-bright),var(--red-dark))}
+.mc-vip::before     {background:linear-gradient(90deg,#78350f,var(--gold),#78350f)}
+.mc-top{display:flex;align-items:center;gap:0.85rem;margin-bottom:0.9rem}
+.mc-coin-wrap{position:relative;width:56px;height:56px;flex-shrink:0}
+.mc-ring{position:absolute;inset:0;border:1.5px solid transparent;border-top-color:var(--purple-light);border-radius:50%;animation:spin-r 2s linear infinite}
+.mc-ring2{position:absolute;inset:7px;border:1px dashed rgba(157,78,221,0.18);border-radius:50%;animation:spin-r 3.5s linear infinite reverse}
+.mc-coin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 7px rgba(157,78,221,0.6))}
+.mc-info{flex:1}
+.mc-name{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:0.3rem}
+.mc-hash{font-family:'Share Tech Mono',monospace;font-size:1rem;color:#C8B0FF;margin-bottom:0.4rem}
+.mc-status{display:inline-flex;align-items:center;gap:0.4rem;font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:var(--green);background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.25);padding:0.25rem 0.7rem;border-radius:20px}
+.mc-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px rgba(74,222,128,0.8);animation:blink 1s step-end infinite}
+.btn-detail{background:rgba(157,78,221,0.15);border:1px solid rgba(157,78,221,0.4);border-radius:9px;padding:0.5rem 0.9rem;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:var(--purple-light);flex-shrink:0;transition:all 0.2s;font-weight:700}
+.btn-detail:hover{background:rgba(157,78,221,0.2)}
+.mc-live{background:rgba(20,80,40,0.25);border:2px solid rgba(74,222,128,0.45);border-radius:12px;padding:0.85rem 1rem;margin-bottom:0.9rem;display:flex;align-items:center;justify-content:space-between}
+.mc-live-lbl{font-family:'Share Tech Mono',monospace;font-size:0.95rem;color:#C8B0FF;margin-bottom:0.25rem}
+.mc-live-val{font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:var(--green);text-shadow:0 0 15px rgba(74,222,128,0.5);transition:color 0.3s}
+.mc-live-daily{font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--gold)}
+.mc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.55rem;margin-bottom:0.8rem}
+.mc-stat{background:rgba(60,0,100,0.5);border:2px solid rgba(180,80,255,0.4);border-radius:10px;padding:0.7rem 0.4rem;text-align:center}
+.mc-sv{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;color:var(--green)}
+.mc-sl{font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:#A890CC;margin-top:0.18rem;letter-spacing:0px}
+.mc-prog-hd{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.95rem;color:#C8B0FF;margin-bottom:0.35rem}
+.mc-prog-pct{color:var(--purple-light);font-weight:700;font-size:1rem}
+.mc-prog-bar{height:6px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden}
+.mc-prog-fill{height:100%;border-radius:3px;position:relative;overflow:hidden;transition:width 1s linear}
+.mc-free .mc-prog-fill    {background:linear-gradient(90deg,#064e3b,var(--green))}
+.mc-mini .mc-prog-fill    {background:linear-gradient(90deg,#0c4a6e,#38bdf8)}
+.mc-lite .mc-prog-fill    {background:linear-gradient(90deg,#831843,#f472b6)}
+.mc-starter .mc-prog-fill {background:linear-gradient(90deg,#064e3b,#22c55e)}
+.mc-basic .mc-prog-fill   {background:linear-gradient(90deg,var(--purple-dark),var(--purple-light))}
+.mc-pro .mc-prog-fill     {background:linear-gradient(90deg,var(--red-dark),var(--red-bright))}
+.mc-vip .mc-prog-fill     {background:linear-gradient(90deg,#78350f,var(--gold));box-shadow:0 0 6px rgba(255,215,0,0.3)}
+.mc-prog-fill::after{content:'';position:absolute;top:0;left:-80%;width:80%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);animation:shimmer 2s infinite}
+.mc-days{font-family:'Share Tech Mono',monospace;font-size:0.95rem;color:#A890CC;text-align:right;margin-top:0.3rem}
+
+/* Activity */
+.act-widget{background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.2rem;margin-bottom:1.2rem;box-shadow:0 6px 25px rgba(120,0,200,0.25)}
+.act-list{max-height:200px;overflow-y:auto}
+.act-list::-webkit-scrollbar{width:3px}
+.act-list::-webkit-scrollbar-thumb{background:rgba(157,78,221,0.3);border-radius:2px}
+.act-item{display:flex;align-items:center;gap:0.75rem;padding:0.55rem 0;border-bottom:1px solid rgba(157,78,221,0.07);animation:fade-in 0.3s ease}
+@keyframes fade-in{from{opacity:0;transform:translateX(-7px)}to{opacity:1;transform:none}}
+.act-inf{flex:1}
+.act-txt{font-size:1.05rem;color:#F5EEFF;font-weight:600}
+.act-time{font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:#A890CC}
+.act-amt{font-family:'Share Tech Mono',monospace;font-size:1.05rem;font-weight:700}
+.ap{color:var(--green)}.an{color:var(--red-bright)}
+
+/* ── PACKAGES TAB ── */
+.pkg-bal{display:flex;justify-content:space-between;align-items:center;background:rgba(40,5,70,0.98);
+  border:1px solid var(--border);border-radius:11px;padding:0.85rem 1.1rem;margin-bottom:1.1rem}
+.pkg-bal-l{font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:#A890CC}
+.pkg-bal-v{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;color:var(--gold)}
+.pkg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.8rem;margin-bottom:1.3rem}
+.pkg-card{background:rgba(40,5,70,0.98);border-radius:14px;padding:1.1rem;position:relative;overflow:hidden;
+  transition:transform 0.3s,box-shadow 0.3s;border:1px solid var(--border)}
+.pkg-card:hover{transform:translateY(-3px)}
+.pkg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.pc-free::before    {background:linear-gradient(90deg,#064e3b,var(--green))}.pc-free:hover{box-shadow:0 6px 25px rgba(74,222,128,0.15)}
+.pc-mini::before    {background:linear-gradient(90deg,#0c4a6e,#38bdf8)}.pc-mini:hover{box-shadow:0 6px 25px rgba(56,189,248,0.15)}
+.pc-lite::before    {background:linear-gradient(90deg,#831843,#f472b6)}.pc-lite:hover{box-shadow:0 6px 25px rgba(244,114,182,0.15)}
+.pc-starter::before {background:linear-gradient(90deg,#064e3b,#22c55e)}.pc-starter:hover{box-shadow:0 6px 25px rgba(34,197,94,0.15)}
+.pc-basic::before   {background:linear-gradient(90deg,var(--purple-dark),var(--purple-light))}.pc-basic:hover{box-shadow:0 6px 25px rgba(157,78,221,0.2)}
+.pc-pro::before     {background:linear-gradient(90deg,var(--red-dark),var(--red-bright))}.pc-pro:hover{box-shadow:0 6px 25px rgba(230,57,70,0.2)}
+.pc-vip::before     {background:linear-gradient(90deg,#78350f,var(--gold))}.pc-vip:hover{box-shadow:0 6px 25px rgba(255,215,0,0.15)}
+.pkg-badge{position:absolute;top:0.6rem;right:0.6rem;font-family:'Orbitron',monospace;font-size:0.48rem;
+  letter-spacing:1px;padding:0.18rem 0.45rem;border-radius:20px;font-weight:700}
+.b-free{background:linear-gradient(135deg,#065f46,var(--green));color:#000}
+.b-zkp{background:rgba(157,78,221,0.18);border:1px solid rgba(157,78,221,0.35);color:var(--purple-light)}
+.b-hot{background:var(--red);color:#fff}
+.b-vip{background:linear-gradient(135deg,#78350f,var(--gold));color:#000}
+.pkg-icon{font-size:1.6rem;margin-bottom:0.42rem;display:block}
+.pkg-name{font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:#fff;margin-bottom:0.25rem}
+.pkg-price{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;margin-bottom:0.28rem}
+.pc-free .pkg-price{color:var(--green)}.pc-mini .pkg-price{color:#38bdf8}.pc-lite .pkg-price{color:#f472b6}
+.pc-starter .pkg-price{color:#22c55e}.pc-basic .pkg-price{color:var(--purple-light)}.pc-pro .pkg-price{color:var(--red-bright)}.pc-vip .pkg-price{color:var(--gold)}
+.pkg-profit-line{font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:#C8B0FF;margin-bottom:0.65rem}
+.roi-box{background:rgba(60,0,100,0.4);border:2px solid rgba(180,80,255,0.35);border-radius:10px;padding:0.7rem 0.75rem;margin-bottom:0.7rem}
+.roi-row{display:flex;justify-content:space-between;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.78rem;padding:0.15rem 0}
+.roi-lbl{color:#C8B0FF}.roi-val{color:var(--gold);font-weight:700;font-size:0.82rem}.roi-profit{color:var(--green);font-weight:700;font-size:0.82rem}
+.roi-div{height:1px;background:rgba(157,78,221,0.1);margin:0.25rem 0}
+.pb{font-size:0.5rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);color:var(--green);padding:0.08rem 0.28rem;border-radius:4px;margin-left:0.25rem;font-family:'Orbitron',monospace;letter-spacing:1px}
+.limit-wrap{display:flex;align-items:center;gap:0.3rem;margin-bottom:0.55rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC}
+.ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ldot.used{background:var(--red-bright)}.ldot.avail{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2)}
+.btn-buy{width:100%;padding:0.75rem;border:none;border-radius:9px;font-family:'Orbitron',monospace;font-size:0.78rem;letter-spacing:1px;cursor:pointer;transition:all 0.25s;font-weight:700;position:relative;overflow:hidden}
+.btn-buy::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);transition:left 0.4s;transform:skewX(-15deg)}
+.btn-buy:hover::after{left:150%}.btn-buy:hover{filter:brightness(1.1);transform:scale(1.02)}
+.pc-free .btn-buy    {background:linear-gradient(135deg,#065f46,var(--green));color:#000}
+.pc-mini .btn-buy    {background:linear-gradient(135deg,#0c4a6e,#38bdf8);color:#fff}
+.pc-lite .btn-buy    {background:linear-gradient(135deg,#831843,#f472b6);color:#fff}
+.pc-starter .btn-buy {background:linear-gradient(135deg,#064e3b,#22c55e);color:#fff}
+.pc-basic .btn-buy   {background:linear-gradient(135deg,var(--purple-dark),var(--purple-light));color:#fff}
+.pc-pro .btn-buy     {background:linear-gradient(135deg,var(--red-dark),var(--red-bright));color:#fff}
+.pc-vip .btn-buy     {background:linear-gradient(135deg,#78350f,var(--gold));color:#000}
+.pkg-owned{width:100%;padding:0.55rem;border-radius:7px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--green);border:1px solid rgba(74,222,128,0.25);background:rgba(74,222,128,0.06)}
+.pkg-locked{width:100%;padding:0.55rem;border-radius:7px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);border:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.2)}
+.info-box{background:rgba(80,0,120,0.35);border:2px solid rgba(180,80,255,0.4);border-radius:13px;padding:1rem;margin-bottom:1.3rem}
+.info-box-t{font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:1px;color:var(--purple-light);margin-bottom:0.5rem}
+.info-box-b{font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:#A890CC;line-height:2}
+.ac-card{background:rgba(40,5,70,0.98);border:2px solid rgba(74,222,128,0.45);border-radius:13px;padding:1rem 1.2rem;
+  margin-bottom:0.75rem;display:flex;align-items:center;gap:0.85rem;position:relative}
+.ac-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green);box-shadow:0 0 6px rgba(74,222,128,0.5);border-radius:3px 0 0 3px}
+.ac-info{flex:1}
+.ac-name{font-family:'Orbitron',monospace;font-size:0.92rem;font-weight:700;color:#fff;margin-bottom:0.2rem}
+.ac-meta{font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:#A890CC;margin-bottom:0.4rem}
+.ac-prog{height:3px;background:rgba(255,255,255,0.04);border-radius:2px;overflow:hidden}
+.ac-earn{text-align:right;font-family:'Orbitron',monospace;font-size:0.88rem;font-weight:900;color:var(--green)}
+.ac-earn-l{font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--text-dim);margin-top:0.08rem}
+
+/* ── WALLET TAB ── */
+.wb{background:rgba(40,5,70,0.98);border-radius:15px;padding:1.3rem;margin-bottom:1rem;position:relative;overflow:hidden;border:2px solid rgba(200,100,255,0.45);box-shadow:0 6px 30px rgba(120,0,200,0.25)}
+.wb::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.wb-usd::before{background:linear-gradient(90deg,#78350f,var(--gold))}
+.wb-zkp::before{background:linear-gradient(90deg,var(--purple-dark),var(--green))}
+.wb-head{display:flex;align-items:center;gap:0.65rem;margin-bottom:0.8rem}
+.wb-ibox{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.wb-usd .wb-ibox{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2)}
+.wb-zkp .wb-ibox{background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2)}
+.wb-title{font-family:'Orbitron',monospace;font-size:0.92rem;font-weight:900;color:#fff}
+.wb-sub{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#A890CC;margin-top:0.15rem}
+.wb-live{margin-left:auto;font-family:'Orbitron',monospace;font-size:0.5rem;letter-spacing:1px;color:var(--green);
+  background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.3);padding:0.18rem 0.45rem;border-radius:20px;animation:blink 2s step-end infinite}
+.wb-amt{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;margin-bottom:0.2rem}
+.wb-usd .wb-amt{color:var(--gold)}.wb-zkp .wb-amt{color:var(--green);text-shadow:0 0 12px rgba(74,222,128,0.3)}
+.wb-equiv{font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:#A890CC;margin-bottom:0.85rem}
+.wb-daily{display:flex;align-items:center;gap:0.45rem;background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.12);border-radius:7px;padding:0.55rem 0.75rem;margin-bottom:0.8rem;font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC}
+.wb-dv{color:var(--green);font-weight:700;margin-left:auto}
+.w-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;margin-bottom:1.1rem}
+.w-stat{background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.4);border-radius:13px;padding:1rem;box-shadow:0 4px 15px rgba(120,0,200,0.2)}
+.ws-l{font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:1px;color:#A890CC;margin-bottom:0.4rem}
+.ws-v{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900}
+.ws-s{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#A890CC;margin-top:0.15rem}
+.wv-red{color:var(--red-bright)}.wv-green{color:var(--green)}
+.tx-item{display:flex;justify-content:space-between;align-items:center;padding:0.55rem 0;border-bottom:1px solid rgba(157,78,221,0.07)}
+.tx-d{font-size:0.92rem;color:#F5EEFF}.tx-t{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#A890CC}
+.tx-a{font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700}
+.tp{color:var(--green)}.tn{color:var(--red-bright)}
+
+/* ── TOPUP TAB ── */
+.tu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.65rem;margin-bottom:1.1rem}
+.tu-card{background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.4);border-radius:12px;padding:1rem 0.4rem;text-align:center;cursor:pointer;transition:all 0.22s}
+.tu-card.sel,.tu-card:hover{border-color:#ff44ff;background:rgba(180,0,255,0.2);box-shadow:0 0 16px rgba(200,0,255,0.45)}
+.tu-v{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;color:var(--gold);line-height:1.35}
+.tu-l{font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-top:0.15rem}
+.tu-sum{background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.18);border-radius:9px;padding:0.9rem;margin-bottom:0.9rem;font-family:'Share Tech Mono',monospace;font-size:0.75rem}
+.tu-note{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(157,78,221,0.4);text-align:center;margin-top:0.75rem}
+
+/* ── OVERLAY/POPUP ── */
+.overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;padding:1rem}
+.popup{background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(30,10,65,0.98));border:1px solid rgba(157,78,221,0.4);
+  border-radius:19px;padding:1.7rem;max-width:370px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 0 55px rgba(74,14,143,0.5)}
+.pop-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.3rem}
+.pop-title{font-family:'Orbitron',monospace;font-size:0.88rem;font-weight:900;color:var(--purple-light)}
+.pop-close{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:7px;
+  padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer}
+.pop-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;margin-bottom:1.1rem}
+.pop-stat{background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.1);border-radius:9px;padding:0.75rem}
+.pop-sl{font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.25rem}
+.pop-sv{font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700}
+.pop-live{background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.25);border-radius:11px;padding:0.9rem;margin-bottom:1.1rem;text-align:center}
+.pop-ll{font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.25rem}
+.pop-lv{font-family:'Orbitron',monospace;font-size:1.7rem;font-weight:900;color:var(--green);text-shadow:0 0 14px rgba(74,222,128,0.5)}
+.pop-lu{font-family:'Share Tech Mono',monospace;font-size:0.67rem;color:var(--text-dim);margin-top:0.18rem}
+.roll-from{background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.18);border-radius:9px;padding:0.85rem;margin-bottom:0.85rem}
+.roll-next{background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.22);border-radius:9px;padding:0.85rem;margin-bottom:1.1rem}
+.roll-extra{font-family:'Orbitron',monospace;font-size:1.45rem;font-weight:900;color:var(--green);text-shadow:0 0 10px rgba(74,222,128,0.4);margin-top:0.28rem}
+.roll-btns{display:flex;gap:0.65rem}
+</style>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBXCvCLsPxkXBVLMaO8RISITM2d24pAL-Q",
+    authDomain: "cryptomine-b1f8d.firebaseapp.com",
+    databaseURL: "https://cryptomine-b1f8d-default-rtdb.firebaseio.com",
+    projectId: "cryptomine-b1f8d",
+    storageBucket: "cryptomine-b1f8d.firebasestorage.app",
+    messagingSenderId: "1033995691867",
+    appId: "1:1033995691867:web:9c52c61cd038ff660ddc7e"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  window._db = db;
+</script>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- AUTH -->
+<div class="screen active" id="authScreen">
+  <div class="lang-group" style="position:absolute;top:1rem;right:1rem;">
+    <button class="btn-lang active" id="alTh" onclick="setLang('th')">ไทย</button>
+    <button class="btn-lang" id="alEn" onclick="setLang('en')">EN</button>
+    <button class="btn-lang" id="alLo" onclick="setLang('lo')">ລາວ</button>
+  </div>
+  <div style="text-align:center;margin-bottom:0.3rem">
+    <div class="auth-logo">⛏ CRYPTOMINE</div>
+  </div>
+  <div class="auth-sub">MINE · EARN · DOMINATE</div>
+  <div class="auth-card">
+    <div class="auth-bar">
+      <div class="auth-bar-dot"></div><div class="auth-bar-dot"></div><div class="auth-bar-dot"></div>
+      <div class="auth-bar-title" data-i18n="auth.terminal">SECURE_AUTH_TERMINAL</div>
+    </div>
+    <div class="auth-prompt">
+      <span style="color:var(--red-bright)">root@cryptomine</span><span style="color:rgba(157,78,221,0.5)">:~$</span>
+      <span id="promptTxt"></span><span class="p-cursor"></span>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabL" data-i18n="auth.tab.login" onclick="switchAuthTab('login')">LOGIN</button>
+      <button class="auth-tab" id="tabR" data-i18n="auth.tab.reg" onclick="switchAuthTab('register')">REGISTER</button>
+    </div>
+    <div class="auth-form active" id="loginForm">
+      <div class="form-group">
+        <label class="form-label" data-i18n="auth.lbl.user">USERNAME</label>
+        <div class="field-icon">👤</div>
+        <input class="form-input" id="loginUser" data-i18n-ph="auth.ph.user" type="text" placeholder="enter_username" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="auth.lbl.pass">PASSWORD</label>
+        <div class="field-icon">🔑</div>
+        <input class="form-input" id="loginPass" data-i18n-ph="auth.ph.pass" type="password" placeholder="••••••••">
+      </div>
+      <button class="btn-auth" data-i18n="auth.btn.login" onclick="doLogin()">⚡ AUTHENTICATE</button>
+      <div class="auth-msg" id="loginMsg"></div>
+    </div>
+    <div class="auth-form" id="regForm">
+      <div class="form-group">
+        <label class="form-label">USERNAME</label>
+        <div class="field-icon">👤</div>
+        <input class="form-input" id="regUser" data-i18n-ph="auth.ph.reguser" type="text" placeholder="choose_identity" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="auth.lbl.email">EMAIL</label>
+        <div class="field-icon">📡</div>
+        <input class="form-input" id="regEmail" data-i18n-ph="auth.ph.email" type="email" placeholder="node@network.io">
+      </div>
+      <div class="form-group">
+        <label class="form-label">PASSWORD</label>
+        <div class="field-icon">🔐</div>
+        <input class="form-input" id="regPass" data-i18n-ph="auth.ph.regpass" type="password" placeholder="min 6 chars">
+      </div>
+      <button class="btn-auth" data-i18n="auth.btn.reg" onclick="doRegister()">🚀 CREATE NODE</button>
+      <div class="auth-msg" id="regMsg"></div>
+    </div>
+  </div>
+  <div class="auth-footer">
+    <div class="auth-stat"><div class="auth-stat-val" id="aMiners">2,847</div><div class="auth-stat-lbl" data-i18n="auth.stat.miners">Active Miners</div></div>
+    <div class="auth-footer-div"></div>
+    <div class="auth-stat"><div class="auth-stat-val">142.38</div><div class="auth-stat-lbl" data-i18n="auth.stat.zkp">ZKP Today</div></div>
+    <div class="auth-footer-div"></div>
+    <div class="auth-stat"><div class="auth-stat-val">99.9%</div><div class="auth-stat-lbl" data-i18n="auth.stat.up">Uptime</div></div>
+  </div>
+</div>
+
+<!-- ADMIN SCREEN -->
+<div class="screen" id="adminScreen">
+  <nav class="nav">
+    <div class="nav-logo" style="color:var(--gold);">⚙️ ADMIN</div>
+    <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="adminBadge"></div>
+    <button class="btn-out" style="background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.3);color:var(--gold);" onclick="doAdminLogout()">ออก</button>
+  </nav>
+
+  <!-- Admin tabs -->
+  <div style="display:flex;background:rgba(6,0,14,0.95);border-bottom:1px solid var(--border);overflow-x:auto;">
+    <button class="admin-tab active" id="atn0" onclick="switchAdminTab(0)">💰 เติมเงิน</button>
+    <button class="admin-tab" id="atn1" onclick="switchAdminTab(1)">💱 แลก ZKP</button>
+    <button class="admin-tab" id="atn2" onclick="switchAdminTab(2)">👥 สมาชิก</button>
+    <button class="admin-tab" id="atn3" onclick="switchAdminTab(3)">⚙️ ตั้งค่า</button>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding:1rem;">
+
+    <!-- Tab 0: คำขอเติมเงิน -->
+    <div class="admin-page active" id="apg0">
+      <div class="sec-title">💰 คำขอเติมเงิน</div>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <button onclick="filterReqs('pending')" id="fPending" class="filter-btn active">⏳ รออนุมัติ</button>
+        <button onclick="filterReqs('approved')" id="fApproved" class="filter-btn">✅ อนุมัติแล้ว</button>
+        <button onclick="filterReqs('rejected')" id="fRejected" class="filter-btn">❌ ปฏิเสธ</button>
+        <button onclick="filterReqs('all')" id="fAll" class="filter-btn">📋 ทั้งหมด</button>
+      </div>
+      <div id="adminTopupList"></div>
+    </div>
+
+    <!-- Tab 1: คำขอแลก ZKP -->
+    <div class="admin-page" id="apg1">
+      <div class="sec-title">💱 คำขอแลก ZKP → USD</div>
+      <div id="adminWithdrawList">
+        <div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:2rem;">ยังไม่มีคำขอแลก ZKP</div>
+      </div>
+    </div>
+
+    <!-- Tab 2: รายชื่อสมาชิก -->
+    <div class="admin-page" id="apg2">
+      <div class="sec-title">👥 สมาชิกทั้งหมด</div>
+      <div id="adminUserList"></div>
+    </div>
+
+    <!-- Tab 3: ตั้งค่า -->
+    <div class="admin-page" id="apg3">
+      <div class="sec-title">⚙️ ตั้งค่าระบบ</div>
+
+      <!-- QR Code -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📱 QR Code / PromptPay</div>
+        <div style="text-align:center;margin-bottom:0.8rem;" id="adminQRPreview">
+          <div style="width:160px;height:160px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;">
+            <div style="font-size:2.5rem;">📱</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">ยังไม่มี QR Code</div>
+          </div>
+        </div>
+        <label style="display:block;width:100%;padding:0.65rem;text-align:center;background:linear-gradient(135deg,#78350f,var(--gold));border-radius:8px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#000;margin-bottom:0.4rem;">
+          📷 อัปโหลด QR Code ใหม่
+          <input type="file" accept="image/*" style="display:none" onchange="uploadAdminQR(event)">
+        </label>
+        <button id="delQRBtn" onclick="deleteQR()" style="display:none;width:100%;padding:0.5rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">🗑️ ลบ QR Code</button>
+      </div>
+
+      <!-- เปลี่ยนรหัส Admin -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.8rem;">🔐 เปลี่ยนรหัส Admin</div>
+        <input type="password" id="newAdminPass" placeholder="รหัสใหม่ (อย่างน้อย 6 ตัว)"
+          style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.7rem;">
+        <button onclick="changeAdminPass()" class="btn btn-primary" style="width:100%;">🔐 บันทึกรหัสใหม่</button>
+      </div>
+
+      <!-- Stats -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.8rem;">📊 สถิติระบบ</div>
+        <div id="adminStats"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="screen" id="dashScreen">
+  <nav class="nav">
+    <div class="nav-logo">⛏ CRYPTOMINE</div>
+    <div class="nav-pill zkp"><span>🔷</span><span class="np-val" id="navZkp">0.0000</span><span class="np-lbl">ZKP</span></div>
+    <div class="nav-pill usd"><span>💵</span><span class="np-val" id="navUsd">0.00</span><span class="np-lbl">USD</span></div>
+    <div class="lang-group">
+      <button class="btn-lang active" id="lbTh" onclick="setLang('th')">ไทย</button>
+      <button class="btn-lang" id="lbEn" onclick="setLang('en')">EN</button>
+      <button class="btn-lang" id="lbLo" onclick="setLang('lo')">ລາວ</button>
+    </div>
+    <button class="btn-out" data-i18n="nav.out" onclick="doLogout()">OUT</button>
+    <button class="btn-out" style="background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.3);color:var(--gold);font-size:0.65rem;" onclick="showAdmin()">⚙️</button>
+  </nav>
+
+  <div class="tab-content">
+    <!-- HOME -->
+    <div class="tab-page active" id="pgHome">
+
+      <!-- เครื่องขุดอยู่บนสุด -->
+      <div id="machSec" style="display:none;margin-bottom:1.1rem">
+        <div class="mach-header">
+          <div class="mach-hdr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <div><div class="mach-hdr-t" data-i18n="home.machtitle">⚙️ เครื่องขุดของฉัน</div><div class="mach-hdr-s" data-i18n="home.machsub">ACTIVE MINING RIGS</div></div>
+          <div class="mach-count" id="machCount">0 RIG</div>
+        </div>
+        <div id="machList"></div>
+      </div>
+
+      <!-- ถ้าไม่มีเครื่องขุด แสดงข้อความแนะนำ -->
+      <div id="noMachMsg" style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:1.1rem;">
+        <div style="font-size:2.5rem;margin-bottom:0.6rem;">⛏️</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;margin-bottom:0.4rem;">ยังไม่มีเครื่องขุด</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">ซื้อสัญญาขุดเพื่อเริ่มต้น<br>ขุด ZKP อัตโนมัติ 7 วัน</div>
+        <button onclick="switchTab(1)" class="btn btn-primary" style="padding:0.7rem 1.5rem;font-size:0.8rem;">
+          🛒 ดูสัญญาขุด
+        </button>
+      </div>
+
+      <!-- สถิติ -->
+      <div class="sec-title" data-i18n="home.overview">📊 ภาพรวม</div>
+      <div class="stats-grid">
+        <div class="stat-card sc-purple"><span class="s-icon">⛏️</span><div class="s-lbl" data-i18n="home.hashrate">HASHRATE</div><div class="s-val" id="stHash">0</div><div class="s-sub" data-i18n="home.hashsub">H/s ปัจจุบัน</div></div>
+        <div class="stat-card sc-gold"><span class="s-icon">🔷</span><div class="s-lbl" data-i18n="home.zkptotal">ZKP รวม</div><div class="s-val" id="stTotal">0.0000</div><div class="s-sub">≈ $<span id="stUsd">0.00</span></div></div>
+        <div class="stat-card sc-red"><span class="s-icon">🔥</span><div class="s-lbl" data-i18n="home.sessions">SESSIONS</div><div class="s-val" id="stSess">0</div><div class="s-sub" data-i18n="home.sesssub">ครั้งที่ขุด</div></div>
+        <div class="stat-card sc-green"><span class="s-icon">📈</span><div class="s-lbl" data-i18n="home.success">SUCCESS</div><div class="s-val" id="stSucc">60%</div><div class="s-sub" data-i18n="home.succsub">อัตราสำเร็จ</div></div>
+      </div>
+
+      <!-- Mining widget -->
+      <div class="mine-widget">
+        <div class="sec-title" style="width:100%" data-i18n="home.mining">⛏️ การขุดเหรียญ ZKP</div>
+        <div class="coin-wrap">
+          <div class="c-ring"></div><div class="c-ring2"></div>
+          <div class="coin">Z</div>
+          <div class="pick1">⛏️</div><div class="pick2">⛏️</div>
+        </div>
+        <div class="mine-status" id="mineStatus" data-i18n="home.waiting">⏸ รอการขุด</div>
+        <div class="mine-rate" id="mineRate">0.0000 <span>ZKP/นาที</span></div>
+        <div class="prog-wrap">
+          <div class="prog-hd"><span data-i18n="home.progress">Block Progress</span><span id="progPct">0%</span></div>
+          <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        </div>
+        <button class="btn-mine" id="mineBtn" data-i18n="home.start" onclick="toggleMine()">▶ เริ่มขุด</button>
+      </div>
+      <div class="act-widget">
+        <div class="sec-title" data-i18n="home.activity">📋 กิจกรรมล่าสุด</div>
+        <div class="act-list" id="actList"><div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;"><span data-i18n="home.noact">ยังไม่มีกิจกรรม... เริ่มขุดเพื่อสร้างประวัติ</span></div></div>
+      </div>
+    </div>
+
+    <!-- PACKAGES -->
+    <div class="tab-page" id="pgPkg">
+      <div class="sec-title" data-i18n="pkg.title">⛏️ Cloud Mining Contracts</div>
+      <div class="pkg-bal"><div><div class="pkg-bal-l" data-i18n="pkg.bal">💵 USD คงเหลือ</div></div><div class="pkg-bal-v" id="pkgBal">$0.00</div></div>
+      <div class="pkg-grid" id="pkgGrid"></div>
+      <div class="info-box">
+        <div class="info-box-t" data-i18n="pkg.how">ℹ️ วิธีทำงาน</div>
+        <div class="info-box-b" data-i18n-html="pkg.how.body">1. เติม USD จากผู้ดูแลระบบ<br>2. เลือกสัญญาเช่ากำลังขุด<br>3. ระบบขุด ZKP ให้อัตโนมัติ 7 วัน<br>4. กำไร ZKP โอนเข้ากระเป๋ารางวัล (1 ZKP ≈ $1)</span></div>
+      </div>
+      <div class="sec-title" data-i18n="pkg.active">✅ สัญญาที่ใช้งานอยู่</div>
+      <div id="acList"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;padding:0.6rem 0"><span data-i18n="pkg.noactive">ยังไม่มีสัญญาที่ใช้งานอยู่</span></div></div>
+    </div>
+
+    <!-- WALLET -->
+    <div class="tab-page" id="pgWallet">
+      <div class="sec-title" data-i18n="wal.title">💼 กระเป๋าของฉัน</div>
+      <div class="wb wb-usd">
+        <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USD</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
+        <div class="wb-amt" id="wUsd">0.00</div>
+        <div class="wb-equiv">USD</div>
+        <button class="btn btn-gold" style="width:100%" data-i18n="wal.addUsd" onclick="switchTab(3)">+ เติม USD</button>
+      </div>
+      <div class="wb wb-zkp">
+        <div class="wb-head">
+          <div class="wb-ibox">🔷</div>
+          <div><div class="wb-title" data-i18n="wal.zkp.title">กระเป๋ารางวัล ZKP</div><div class="wb-sub" data-i18n="wal.zkp.sub">กำไรจากสัญญาขุด → แลกกับผู้ดูแล</div></div>
+          <div class="wb-live">LIVE</div>
+        </div>
+        <div class="wb-amt" id="wZkp">0.000000</div>
+        <div class="wb-equiv">≈ $<span id="wZkpUsd">0.000000</span> USD · <span id="wZkpLak">0</span> ກີບ</div>
+        <div class="wb-daily"><span data-i18n="wal.daily">⚡ รับ/วัน:</span><span class="wb-dv"><span id="wDaily">0</span> ZKP · +$<span id="wDailyUsd">0.00</span></span></div>
+        <button class="btn btn-primary" style="width:100%" onclick="showWithdrawPopup()">💱 แจ้งแลกเงิน</button>
+      </div>
+      <div class="w-grid">
+        <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
+        <div class="w-stat"><div class="ws-l" data-i18n="wal.profit">กำไรสะสม</div><div class="ws-v wv-green" id="wProfit">$0.00</div><div class="ws-s" data-i18n="wal.profitsub">USD จากสัญญา</div></div>
+      </div>
+      <div class="sec-title" data-i18n="wal.history">📋 ประวัติธุรกรรม</div>
+      <div id="txHist"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace"><span data-i18n="wal.nohist">ยังไม่มีประวัติ</span></div></div>
+    </div>
+
+    <!-- TOPUP -->
+    <div class="tab-page" id="pgTopup">
+      <div class="sec-title" data-i18n="top.title">💵 เติม USD</div>
+
+      <!-- Step 1: เลือกจำนวน -->
+      <div class="topup-step" id="stepAmount">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);margin-bottom:1rem;">
+          เลือกจำนวนที่ต้องการเติม
+        </div>
+        <div class="tu-grid">
+          <div class="tu-card sel" onclick="selTop(this,10)">
+            <div class="tu-v">227,000 ກີບ</div>
+            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$10 USD</div>
+          </div>
+          <div class="tu-card" onclick="selTop(this,20)">
+            <div class="tu-v">454,000 ກີບ</div>
+            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$20 USD</div>
+          </div>
+          <div class="tu-card" onclick="selTop(this,50)">
+            <div class="tu-v">1,135,000 ກີບ</div>
+            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$50 USD</div>
+          </div>
+          <div class="tu-card" onclick="selTop(this,100)">
+            <div class="tu-v">2,270,000 ກີບ</div>
+            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$100 USD</div>
+          </div>
+          <div class="tu-card" onclick="selTop(this,300)">
+            <div class="tu-v">6,810,000 ກີບ</div>
+            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$300 USD</div>
+          </div>
+          <div class="tu-card" onclick="selTop(this,1000)">
+            <div class="tu-v">22,700,000 ກີບ</div>
+            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$1,000 USD</div>
+          </div>
+          <div class="tu-card" onclick="selTop(this,3000)">
+            <div class="tu-v">68,100,000 ກີບ</div>
+            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$3,000 USD</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goToQR()">
+          ถัดไป → ดู QR Code
+        </button>
+      </div>
+
+      <!-- Step 2: QR Code -->
+      <div class="topup-step" id="stepQR" style="display:none">
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+          <button onclick="backToAmount()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">← กลับ</button>
+          <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--purple-light);">สแกน QR เพื่อโอนเงิน</div>
+        </div>
+
+        <!-- ยอดที่ต้องโอน -->
+        <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.3rem;">ยอดที่ต้องโอน</div>
+          <div id="qrLakAmt" style="font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;color:var(--gold);">2,270,000 ກີບ</div>
+          <div id="qrAmount" style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:rgba(255,215,0,0.6);margin-top:0.15rem;">= $20 USD</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.1rem;">อัตราแลกเปลี่ยน 1 USD = 22,700 ກີບ</div>
+        </div>
+
+        <!-- QR Code image -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:1rem;text-align:center;">
+          <div id="qrImageWrap">
+            <div style="width:200px;height:200px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(157,78,221,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;">
+              <div style="font-size:2.5rem;">📱</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);text-align:center;padding:0 1rem;">QR Code จะแสดงที่นี่<br>Admin ตั้งค่าใน Settings</div>
+            </div>
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(157,78,221,0.5);margin-top:0.8rem;">PromptPay / พร้อมเพย์</div>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%" onclick="goToSlip()">
+          ✅ โอนแล้ว → แนบสลิป
+        </button>
+      </div>
+
+      <!-- Step 3: แนบสลิป -->
+      <div class="topup-step" id="stepSlip" style="display:none">
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+          <button onclick="backToQR()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">← กลับ</button>
+          <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--purple-light);">แนบหลักฐานการโอน</div>
+        </div>
+
+        <!-- ยอด -->
+        <div style="background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);">ยอดเติม</span>
+          <div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;color:var(--green);" id="slipLakAmt">2,270,000 ກີບ</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="slipAmount">= $20 USD</div>
+          </div>
+        </div>
+
+        <!-- อัปโหลดสลิป -->
+        <div style="margin-bottom:1rem;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.5rem;">📎 แนบสลิปการโอนเงิน</div>
+          <label id="slipLabel" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;width:100%;min-height:120px;background:rgba(157,78,221,0.05);border:2px dashed rgba(157,78,221,0.3);border-radius:10px;cursor:pointer;transition:all 0.2s;">
+            <div id="slipPreview" style="text-align:center;padding:1rem;">
+              <div style="font-size:2rem;">🖼️</div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-top:0.3rem;">กดเพื่อเลือกรูปสลิป</div>
+            </div>
+            <input type="file" id="slipFile" accept="image/*" style="display:none" onchange="previewSlip(event)">
+          </label>
+        </div>
+
+        <!-- กรอกยอดโอน -->
+        <div style="margin-bottom:1rem;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.5rem;">💵 ยอดที่โอน (USD)</div>
+          <input type="number" id="slipAmtInput" placeholder="กรอกยอดที่โอน เช่น 100"
+            style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.9rem;outline:none;caret-color:var(--purple-light);">
+        </div>
+
+        <!-- หมายเหตุ -->
+        <div style="margin-bottom:1rem;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.5rem;">📝 หมายเหตุ (ไม่บังคับ)</div>
+          <input type="text" id="slipNote" placeholder="หมายเหตุเพิ่มเติม..."
+            style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.9rem;outline:none;caret-color:var(--purple-light);">
+        </div>
+
+        <button class="btn btn-primary" style="width:100%" onclick="submitSlip()">
+          📤 ส่งหลักฐานการโอน
+        </button>
+      </div>
+
+      <!-- Step 4: รอการอนุมัติ -->
+      <div class="topup-step" id="stepPending" style="display:none">
+        <div style="text-align:center;padding:2rem 1rem;">
+          <div style="font-size:3rem;margin-bottom:1rem;">⏳</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--purple-light);margin-bottom:0.5rem;">รอการอนุมัติ</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.5rem;">ส่งหลักฐานเรียบร้อยแล้ว!<br>Admin จะอนุมัติภายใน 5-15 นาที<br>เงินจะเข้าบัญชีโดยอัตโนมัติ</div>
+        </div>
+
+        <!-- รายการรอดำเนินการ -->
+        <div class="sec-title">📋 คำขอเติมเงิน</div>
+        <div id="pendingList"></div>
+      </div>
+
+      <!-- ประวัติการเติมเงิน -->
+      <div style="margin-top:1.5rem;">
+        <div class="sec-title">📋 ประวัติการเติมเงิน</div>
+        <div id="topupHistory">
+          <div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;">ยังไม่มีประวัติ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="bnav active" id="bn0" onclick="switchTab(0)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg data-i18n-nav="nav.home" data-i18n="nav.home">หน้าหลัก
+    </button>
+    <button class="bnav" id="bn1" onclick="switchTab(1)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg data-i18n-nav="nav.contract" data-i18n="nav.contract">สัญญาขุด
+    </button>
+    <button class="bnav" id="bn2" onclick="switchTab(2)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg data-i18n-nav="nav.wallet" data-i18n="nav.wallet">กระเป๋า
+    </button>
+    <button class="bnav" id="bn3" onclick="switchTab(3)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg data-i18n-nav="nav.topup" data-i18n="nav.topup">เติม USD
+    </button>
+  </nav>
+</div>
+
+<script>
+'use strict';
+// ─── CONFIG ───
+const DEMO_DAY = 86400; // วินาที/วัน (จริง)
+const TICK = 3000;
+const ZKP_RATE = 1.00;
+
+// ─── PACKAGES ───
+const PKGS = {
+  free:    {name:'🎁 Free Trial',price:0,   days:7,profit:1,  daily:1/7,  hr:'5 GH/s', limit:2,cls:'pc-free',   mc:'mc-free',   next:'mini',    nxt:20},
+  mini:    {name:'💡 Mini',      price:20,  days:7,profit:4,  daily:4/7,  hr:'10 GH/s',limit:2,cls:'pc-mini',   mc:'mc-mini',   next:'lite',    nxt:30},
+  lite:    {name:'🔩 Lite',      price:50,  days:7,profit:10, daily:10/7, hr:'10 GH/s',limit:2,cls:'pc-lite',   mc:'mc-lite',   next:'starter', nxt:50},
+  starter: {name:'🌱 Starter',   price:100, days:7,profit:20, daily:20/7, hr:'10 GH/s',limit:2,cls:'pc-starter',mc:'mc-starter',next:'basic',   nxt:200},
+  basic:   {name:'⚡ Basic',     price:300, days:7,profit:60, daily:60/7, hr:'10 GH/s',limit:2,cls:'pc-basic',  mc:'mc-basic',  next:'pro',     nxt:700},
+  pro:     {name:'🔥 Pro',       price:1000,days:7,profit:200,daily:200/7,hr:'10 GH/s',limit:2,cls:'pc-pro',    mc:'mc-pro',    next:'vip',     nxt:2000},
+  vip:     {name:'👑 VIP',       price:3000,days:7,profit:600,daily:600/7,hr:'10 GH/s',limit:2,cls:'pc-vip',    mc:'mc-vip',    next:null,      nxt:0},
+};
+const PKG_ORDER = ['free','mini','lite','starter','basic','pro','vip'];
+
+const COINS = {
+  free:   '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cf" cx="40%" cy="35%"><stop offset="0%" stop-color="#4ade80"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cf)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
+  mini:   '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cm" cx="40%" cy="35%"><stop offset="0%" stop-color="#7dd3fc"/><stop offset="100%" stop-color="#0c4a6e"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cm)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
+  lite:   '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cl" cx="40%" cy="35%"><stop offset="0%" stop-color="#f9a8d4"/><stop offset="100%" stop-color="#831843"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cl)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
+  starter:'<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cs" cx="40%" cy="35%"><stop offset="0%" stop-color="#86efac"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cs)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
+  basic:  '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cb" cx="40%" cy="35%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#4A0E8F"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cb)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
+  pro:    '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cp" cx="40%" cy="35%"><stop offset="0%" stop-color="#fca5a5"/><stop offset="100%" stop-color="#7f1d1d"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cp)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
+  vip:    '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cv" cx="40%" cy="35%"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cv)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="black">Z</text></svg>',
+};
+const ICONS = {free:'🎁',mini:'💡',lite:'🔩',starter:'🌱',basic:'⚡',pro:'🔥',vip:'👑'};
+
+// ─── STORAGE ───
+// ─── FIREBASE STORAGE ───
+let _ud = null;
+function getSess(){return localStorage.getItem('cm_s')||''}
+function setSess(u){localStorage.setItem('cm_s',u)}
+function clrSess(){localStorage.removeItem('cm_s')}
+function getUD(){return _ud;}
+function getU(){const u=getSess();if(!u||!_ud)return{};return{[u]:_ud};}
+function saveU(all){const u=getSess();if(!u)return;if(all[u]){_ud=all[u];window._db.ref('users/'+u).set(all[u]);}}
+function saveUD(d){_ud=d;const u=getSess();if(!u)return;window._db.ref('users/'+u).set(d);}
+function fbGetUser(u){return window._db.ref('users/'+u).once('value').then(s=>s.exists()?s.val():null);}
+
+// ─── AUTH ───
+let ptTimer;
+function switchAuthTab(t){
+  document.getElementById('tabL').classList.toggle('active',t==='login');
+  document.getElementById('tabR').classList.toggle('active',t==='register');
+  document.getElementById('loginForm').classList.toggle('active',t==='login');
+  document.getElementById('regForm').classList.toggle('active',t==='register');
+  typePrompt(t==='login'?'auth --mode=login':'auth --mode=register');
+}
+function typePrompt(txt){
+  const el=document.getElementById('promptTxt');
+  clearTimeout(ptTimer);el.textContent='';let i=0;
+  function tk(){if(i<txt.length){el.textContent+=txt[i++];ptTimer=setTimeout(tk,38+Math.random()*28);}}
+  tk();
+}
+function showMsg(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className='auth-msg '+type}
+function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(!u||!p){showMsg('loginMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return}
+  const btn=document.querySelector('#loginForm .btn-auth');
+  btn.disabled=true;btn.textContent='⏳ กำลังเข้าสู่ระบบ...';
+  fbGetUser(u).then(ud=>{
+    btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';
+    if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return}
+    if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return}
+    _ud=ud;setSess(u);enterDash(u);
+  }).catch(()=>{btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error');});
+}
+function doRegister(){
+  const u=document.getElementById('regUser').value.trim();
+  const e=document.getElementById('regEmail').value.trim();
+  const p=document.getElementById('regPass').value;
+  if(!u||!e||!p){showMsg('regMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return}
+  if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return}
+  const btn=document.querySelector('#regForm .btn-auth');
+  btn.disabled=true;btn.textContent='⏳ กำลังสมัคร...';
+  fbGetUser(u).then(existing=>{
+    if(existing){btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;}
+    const nd={pw:p,email:e,usd:0,zkpReward:0,zkpMine:0,sessions:0,packages:[],txs:[]};
+    window._db.ref('users/'+u).set(nd).then(()=>{
+      btn.disabled=false;btn.textContent='🚀 CREATE NODE';
+      _ud=nd;showMsg('regMsg','✅ สมัครสำเร็จ! กำลังเข้าสู่ระบบ...','success');
+      setTimeout(()=>{setSess(u);enterDash(u)},1000);
+    });
+  }).catch(()=>{btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');});
+}
+function doLogout(){stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
+
+// ─── ENTER DASHBOARD ───
+function enterDash(user){
+  document.getElementById('authScreen').classList.remove('active');
+  document.getElementById('dashScreen').classList.add('active');
+  updateNav();switchTab(0);renderMachines();renderPkgs();
+  startDrip();showToast(t('toast.welcome')+' '+user+'!');
+  setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
+}
+
+// ─── NAVIGATION ───
+const PAGES=['pgHome','pgPkg','pgWallet','pgTopup'];
+function switchTab(i){
+  PAGES.forEach((id,j)=>{document.getElementById(id).classList.toggle('active',i===j);document.getElementById('bn'+j).classList.toggle('active',i===j)});
+  if(i===1)renderPkgs();if(i===2)renderWallet();
+  if(i===3){renderTopupHistory();renderPendingList();}
+}
+
+// ─── MINING ───
+let mineInt=null,mineProg=0,isMining=false;
+function toggleMine(){isMining?stopMine():startMine()}
+function startMine(){
+  isMining=true;
+  const btn=document.getElementById('mineBtn');btn.textContent='⏹ หยุดขุด';btn.classList.add('mining');
+  document.getElementById('mineStatus').textContent='⛏️ กำลังขุดอยู่...';
+  const hr=[90,130,170,200,250][Math.floor(Math.random()*5)];
+  document.getElementById('stHash').textContent=hr;
+  document.getElementById('mineRate').innerHTML=(0.0001*hr/100).toFixed(6)+' <span>ZKP/นาที</span>';
+  mineInt=setInterval(()=>{
+    mineProg+=1.5+Math.random()*2;
+    if(mineProg>=100){
+      mineProg=0;const earned=parseFloat((0.001+Math.random()*0.003).toFixed(6));
+      const ud=getUD();if(!ud)return;
+      ud.zkpMine=(ud.zkpMine||0)+earned;ud.sessions=(ud.sessions||0)+1;
+      saveUD(ud);updateNav();
+      document.getElementById('stTotal').textContent=(ud.zkpMine||0).toFixed(4);
+      document.getElementById('stUsd').textContent=((ud.zkpMine||0)*ZKP_RATE).toFixed(2);
+      document.getElementById('stSess').textContent=ud.sessions;
+      addAct('⛏️','ขุด Block สำเร็จ!','+'+earned.toFixed(4)+' ZKP','ap');
+      showToast(t('toast.mined')+' +'+earned.toFixed(4)+' ZKP');
+    }
+    document.getElementById('progFill').style.width=Math.min(mineProg,100)+'%';
+    document.getElementById('progPct').textContent=Math.floor(Math.min(mineProg,100))+'%';
+  },200);
+}
+function stopMine(){
+  isMining=false;clearInterval(mineInt);mineProg=0;
+  const btn=document.getElementById('mineBtn');btn.textContent='▶ เริ่มขุด';btn.classList.remove('mining');
+  document.getElementById('mineStatus').textContent='⏸ รอการขุด';
+  document.getElementById('mineRate').innerHTML='0.0000 <span>ZKP/นาที</span>';
+  document.getElementById('progFill').style.width='0%';document.getElementById('progPct').textContent='0%';
+  document.getElementById('stHash').textContent='0';
+}
+
+// ─── ACTIVITY ───
+const ACTS=[];
+function addAct(icon,txt,amt,cls){
+  const t=new Date();const ts=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
+  ACTS.unshift({icon,txt,amt,cls,ts});if(ACTS.length>20)ACTS.pop();
+  document.getElementById('actList').innerHTML=ACTS.map(a=>`<div class="act-item"><span style="font-size:1rem">${a.icon}</span><div class="act-inf"><div class="act-txt">${a.txt}</div><div class="act-time">${a.ts}</div></div><div class="act-amt ${a.cls}">${a.amt}</div></div>`).join('');
+}
+
+// ─── PACKAGES ───
+function isUnlocked(key){
+  const ud=getUD();if(!ud)return false;
+  if(key==='free'||key==='mini')return true;
+  const idx=PKG_ORDER.indexOf(key);
+  return (ud.packages||[]).filter(p=>p.key===PKG_ORDER[idx-1]).length>=2;
+}
+function buyPkg(key){
+  const ud=getUD();if(!ud)return;
+  const def=PKGS[key];
+  if(!isUnlocked(key)){showToast(t('toast.locked'));return}
+  const bought=(ud.packages||[]).filter(p=>p.key===key).length;
+  if(bought>=def.limit){showToast(t('toast.full'));return}
+  if((ud.usd||0)<def.price){showToast(t('toast.nousd'));switchTab(3);return}
+  ud.usd=(ud.usd||0)-def.price;
+  if(!ud.packages)ud.packages=[];
+  ud.packages.push({key,price:def.price,days:def.days,daily:def.daily,profit:def.profit,bought:Date.now(),remaining:def.days});
+  if(!ud.txs)ud.txs=[];
+  ud.txs.unshift({desc:'เช่ากำลังขุด '+def.name,amount:-def.price,unit:'USD',time:Date.now()});
+  saveUD(ud);showToast(def.price===0?t('toast.freepkg'):t('toast.startpkg')+' '+def.name+'!');
+  updateNav();startDrip();switchTab(0);
+  setTimeout(()=>{renderMachines();const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);
+  renderPkgs();
+}
+
+function renderPkgs(){
+  const ud=getUD();if(!ud)return;
+  document.getElementById('pkgBal').textContent='$'+(ud.usd||0).toFixed(2);
+  const colors={free:'var(--green)',mini:'#38bdf8',lite:'#f472b6',starter:'#22c55e',basic:'var(--purple-light)',pro:'var(--red-bright)',vip:'var(--gold)'};
+  document.getElementById('pkgGrid').innerHTML=PKG_ORDER.map(key=>{
+    const def=PKGS[key];
+    const bought=(ud.packages||[]).filter(p=>p.key===key).length;
+    const active=(ud.packages||[]).find(p=>p.key===key&&p.remaining>0);
+    const unlocked=isUnlocked(key);const rem=def.limit-bought;
+    let badge='';
+    if(key==='free')badge='<div class="pkg-badge b-free">FREE</div>';
+    else if(key==='pro')badge='<div class="pkg-badge b-hot">+200 ZKP 🔥</div>';
+    else if(key==='vip')badge='<div class="pkg-badge b-vip">+600 ZKP 👑</div>';
+    else badge=`<div class="pkg-badge b-zkp">+${def.profit} ZKP</div>`;
+    const dots=Array.from({length:def.limit},(_,i)=>`<div class="ldot ${i<bought?'used':'avail'}"></div>`).join('');
+    const limitRow=bought>=def.limit?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--red-bright);margin-bottom:0.45rem">✅ ${t('pkg.owned')} (${def.limit}/${def.limit})</div>`:`<div class="limit-wrap">${dots}<span>${t('pkg.more')} ${rem} ${t('pkg.times')}</span></div>`;
+    let btn='';
+    if(!unlocked){const pdef=PKGS[PKG_ORDER[PKG_ORDER.indexOf(key)-1]];const pb=(ud.packages||[]).filter(p=>p.key===PKG_ORDER[PKG_ORDER.indexOf(key)-1]).length;btn=`<div class="pkg-locked">${t('pkg.locked')} ${pdef.name} ${t('pkg.locked2')} (${pb}/2)</div>`;}
+    else if(bought>=def.limit)btn=`<div class="pkg-owned">${t('pkg.owned')}</div>`;
+    else if(active)btn=`<div class="pkg-owned">${t('pkg.digging')} ${rem} ${t('pkg.times')}</div>`;
+    else btn=`<button class="btn-buy" onclick="buyPkg('${key}')">${def.price===0?t('pkg.free'):t('pkg.buy')}</button>`;
+    return `<div class="pkg-card ${def.cls}" style="${!unlocked?'opacity:0.42;filter:grayscale(55%)':''}">
+      ${badge}
+      <div class="pkg-icon">${ICONS[key]}</div>
+      <div class="pkg-name">${def.name}</div>
+      <div class="pkg-price">${def.price>0?'$'+def.price.toLocaleString():'$0'}</div>
+      <div class="pkg-profit-line">${t('pkg.profit')} ${def.profit} ZKP / 7 ${t('pkg.ac.days')} (+20%)</div>
+      <div class="roi-box">
+        <div class="roi-row"><span class="roi-lbl">${t('pkg.roi.profit')}</span><span class="roi-val">+${def.profit} ZKP</span></div>
+        <div class="roi-row"><span class="roi-lbl">${t('pkg.roi.daily')}</span><span class="roi-val">~${def.daily.toFixed(2)} ZKP</span></div>
+        <div class="roi-div"></div>
+        <div class="roi-row"><span class="roi-lbl">${t('pkg.roi.value')}</span><span class="roi-profit">~$${def.profit}.00 <span class="pb">+20%</span></span></div>
+      </div>
+      ${limitRow}<div id="pkbtn_${key}">${btn}</div>
+    </div>`;
+  }).join('');
+  // Active contracts
+  const acs=(ud.packages||[]).filter(p=>p.remaining>0);
+  const acEl=document.getElementById('acList');
+  if(!acs.length){acEl.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;padding:0.6rem 0">ยังไม่มีสัญญาที่ใช้งานอยู่</div>';return}
+  const col={free:'var(--green)',mini:'#38bdf8',lite:'#f472b6',starter:'#22c55e',basic:'var(--purple-light)',pro:'var(--red-bright)',vip:'var(--gold)'};
+  acEl.innerHTML=acs.map(p=>{const def=PKGS[p.key];const pct=Math.round((1-p.remaining/p.days)*100);
+    return `<div class="ac-card"><div class="ac-info"><div class="ac-name">${def.name}</div><div class="ac-meta">${t('pkg.ac.elapsed')} ${(p.days-p.remaining).toFixed(1)} ${t('pkg.ac.days')} · ${t('pkg.ac.remain')} ${Math.max(0,p.remaining).toFixed(1)} ${t('pkg.ac.days')}</div><div class="ac-prog"><div style="width:${pct}%;height:100%;background:${col[p.key]};border-radius:2px"></div></div></div><div><div class="ac-earn">+${def.daily.toFixed(2)}</div><div class="ac-earn-l">ZKP/วัน</div></div></div>`;
+  }).join('');
+}
+
+// ─── MACHINES ───
+function renderMachines(){
+  const ud=getUD();if(!ud)return;
+  const acs=(ud.packages||[]).filter(p=>p.remaining>0);
+  const sec=document.getElementById('machSec');const list=document.getElementById('machList');const cnt=document.getElementById('machCount');
+  const noMsg=document.getElementById('noMachMsg');
+  if(!acs.length){
+    if(sec)sec.style.display='none';
+    if(noMsg)noMsg.style.display='block';
+    return;
+  }
+  if(sec)sec.style.display='block';
+  if(noMsg)noMsg.style.display='none';
+  if(cnt)cnt.textContent=acs.length+(acs.length===1?' RIG':' RIGS');
+  const reward=(ud.zkpReward||0).toFixed(6);
+  list.innerHTML=acs.map((p,i)=>{
+    const def=PKGS[p.key];const pct=Math.round((1-p.remaining/p.days)*100);
+    const earned=(def.profit*((p.days-p.remaining)/p.days)).toFixed(4);
+    return `<div class="mc ${def.mc}">
+      <div class="mc-top">
+        <div class="mc-coin-wrap"><div class="mc-ring"></div><div class="mc-ring2"></div><div class="mc-coin">${COINS[p.key]}</div></div>
+        <div class="mc-info">
+          <div class="mc-name">${def.name}</div>
+          <div class="mc-hash">⚡ ${def.hr} · 7 ${t('home.days')}</div>
+          <div class="mc-status"><div class="mc-dot"></div>${t('home.diggingzkp')}</div>
+        </div>
+        <button class="btn-detail" onclick="showDetail(${i})">${t('home.viewdetail')}</button>
+      </div>
+      <div class="mc-live">
+        <div><div class="mc-live-lbl">${t('home.livezkp')}</div><div class="mc-live-val" id="lv_${i}">${reward}</div></div>
+        <div style="text-align:right"><div class="mc-live-lbl">${t('home.perday')}</div><div class="mc-live-daily">+${def.daily.toFixed(4)}</div></div>
+      </div>
+      <div class="mc-stats">
+        <div class="mc-stat"><div class="mc-sv">${earned}</div><div class="mc-sl">${t('home.mined')}</div></div>
+        <div class="mc-stat"><div class="mc-sv" style="color:var(--gold)">+${def.profit}</div><div class="mc-sl">${t('home.total')}</div></div>
+        <div class="mc-stat"><div class="mc-sv" style="color:var(--red-bright)">${Math.max(0,p.remaining).toFixed(1)}</div><div class="mc-sl">${t('home.daysleft')}</div></div>
+      </div>
+      <div class="mc-prog-hd"><span>${t('home.progress2')}</span><span class="mc-prog-pct">${pct}%</span></div>
+      <div class="mc-prog-bar"><div class="mc-prog-fill" style="width:${pct}%"></div></div>
+      <div class="mc-days">⏱ ${t('home.daysrem')} ${Math.max(0,p.remaining).toFixed(1)} ${t('home.days')}</div>
+    </div>`;
+  }).join('');
+}
+
+function showDetail(idx){
+  const ud=getUD();if(!ud)return;
+  const acs=(ud.packages||[]).filter(p=>p.remaining>0);const p=acs[idx];if(!p)return;
+  const def=PKGS[p.key];const earned=(def.profit*((p.days-p.remaining)/p.days)).toFixed(6);
+  const pct=Math.round((1-p.remaining/p.days)*100);const reward=(ud.zkpReward||0).toFixed(6);
+  const ov=document.createElement('div');ov.className='overlay';
+  ov.innerHTML=`<div class="popup">
+    <div class="pop-hd"><div class="pop-title">⚙️ ${def.name}</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕ ${t('roll.close')}</button></div>
+    <div class="pop-live"><div class="pop-ll">${t('home.livezkp')}</div><div class="pop-lv">${reward}</div><div class="pop-lu">≈ $${(parseFloat(reward)*ZKP_RATE).toFixed(4)} USD</div></div>
+    <div class="pop-grid">
+      ${[[t('det.price'),'$'+def.price.toLocaleString(),'var(--gold)'],[t('det.hash'),def.hr,'var(--purple-light)'],[t('det.contract'),p.days+' '+t('home.days'),'var(--text)'],[t('det.elapsed'),(p.days-p.remaining).toFixed(1)+' '+t('home.days'),'#38bdf8'],[t('det.mined'),earned+' ZKP','var(--green)'],[t('det.target'),'+'+def.profit+' ZKP','var(--gold)'],[t('det.progress'),pct+'%','var(--purple-light)'],[t('det.remain'),Math.max(0,p.remaining).toFixed(1)+' '+t('home.days'),'var(--red-bright)']].map(([l,v,c])=>`<div class="pop-stat"><div class="pop-sl">${l}</div><div class="pop-sv" style="color:${c}">${v}</div></div>`).join('')}
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:1rem">${t('det.bought')} ${new Date(p.bought).toLocaleString('th-TH')}</div>
+    <button class="btn btn-primary" style="width:100%" onclick="this.closest('.overlay').remove();switchTab(2)">${t('det.wallet')}</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+// ─── WALLET ───
+function renderWallet(){
+  const ud=getUD();if(!ud)return;
+  const acs=(ud.packages||[]).filter(p=>p.remaining>0);
+  const dailyZkp=acs.reduce((s,p)=>s+p.daily,0);
+  const totalP=(ud.packages||[]).reduce((s,p)=>{const def=PKGS[p.key];return s+(def.profit*((p.days-p.remaining)/p.days))},0);
+  document.getElementById('wUsd').textContent=(ud.usd||0).toFixed(2);
+  const rw=ud.zkpReward||0;
+  document.getElementById('wZkp').textContent=rw.toFixed(6);
+  document.getElementById('wZkpUsd').textContent=(rw*ZKP_RATE).toFixed(4);
+  const lakEl=document.getElementById('wZkpLak');
+  if(lakEl) lakEl.textContent=Math.round(rw*ZKP_RATE*LAK_RATE).toLocaleString();
+  document.getElementById('wDaily').textContent=dailyZkp.toFixed(4);
+  document.getElementById('wDailyUsd').textContent=(dailyZkp*ZKP_RATE).toFixed(2);
+  document.getElementById('wActive').textContent=acs.length;
+  document.getElementById('wProfit').textContent='$'+totalP.toFixed(2);
+  const txs=ud.txs||[];const txEl=document.getElementById('txHist');
+  if(!txs.length){txEl.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace">${t('wal.nohist')}</div>`;return}
+  txEl.innerHTML=txs.slice(0,10).map(tx=>{
+    const d=new Date(tx.time);const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+    return `<div class="tx-item"><div><div class="tx-d">${tx.desc}</div><div class="tx-t">${t}</div></div><div class="tx-a ${tx.amount>0?'tp':'tn'}">${tx.amount>0?'+':''}${tx.amount} ${tx.unit||'USD'}</div></div>`;
+  }).join('');
+}
+function showWithdrawPopup(){
+  const ud=getUD(); if(!ud) return;
+  const zkp=ud.zkpReward||0;
+  if(zkp<=0){ showToast('⚠️ ยังไม่มี ZKP ในกระเป๋า'); return; }
+  const usdVal=(zkp*ZKP_RATE).toFixed(4);
+  const lakVal=Math.round(zkp*ZKP_RATE*LAK_RATE).toLocaleString();
+  const ov=document.createElement('div'); ov.className='overlay'; ov.id='withdrawOv';
+  ov.innerHTML=`<div class="popup">
+    <div class="pop-hd">
+      <div class="pop-title">💱 แจ้งแลกเงิน</div>
+      <button class="pop-close" onclick="document.getElementById('withdrawOv').remove()">✕ ปิด</button>
+    </div>
+
+    <!-- ยอด ZKP -->
+    <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.3rem;">💰 ZKP ที่จะแลก</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:var(--green);text-shadow:0 0 15px rgba(74,222,128,0.4);">${zkp.toFixed(4)} ZKP</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--gold);margin-top:0.3rem;">≈ $${usdVal} USD</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--gold);margin-top:0.2rem;">${lakVal} ກີບ</div>
+    </div>
+
+    <!-- ข้อมูลรับเงิน -->
+    <div style="margin-bottom:0.8rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.4rem;">🏦 ช่องทางรับเงิน</div>
+      <select id="wdMethod" onchange="toggleWdFields()"
+        style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.7rem;appearance:none;cursor:pointer;">
+        <option value="bank">🏦 โอนบัญชีธนาคาร</option>
+        <option value="promptpay">📱 PromptPay / พร้อมเพย์</option>
+        <option value="bcel">🏧 BCEL (ลาว)</option>
+        <option value="other">💬 อื่นๆ</option>
+      </select>
+    </div>
+
+    <!-- Bank fields -->
+    <div id="wdBankFields">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">ชื่อธนาคาร</div>
+      <input type="text" id="wdBank" placeholder="เช่น กสิกรไทย, ไทยพาณิชย์, BCEL..."
+        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.7rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">เลขบัญชี / เบอร์ PromptPay</div>
+      <input type="text" id="wdAccNo" placeholder="กรอกเลขบัญชีหรือเบอร์โทร"
+        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.7rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">ชื่อเจ้าของบัญชี</div>
+      <input type="text" id="wdAccName" placeholder="ชื่อ-นามสกุล"
+        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.8rem;">
+    </div>
+
+    <!-- หมายเหตุ -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">📝 หมายเหตุ (ไม่บังคับ)</div>
+    <input type="text" id="wdNote" placeholder="หมายเหตุเพิ่มเติม..."
+      style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;">
+
+    <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:8px;padding:0.7rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);line-height:1.7;">
+      ⚠️ หลังส่งคำขอ Admin จะดำเนินการภายใน 24 ชั่วโมง<br>
+      ZKP จะถูกหักจากกระเป๋าหลังได้รับการอนุมัติ
+    </div>
+
+    <button id="wdSubmitBtn" data-zkp="${zkp}" data-usd="${usdVal}" data-lak="${lakVal}"
+      onclick="submitWithdraw()"
+      class="btn btn-primary" style="width:100%;">
+      📤 ยืนยันแจ้งแลกเงิน
+    </button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+function toggleWdFields(){
+  // สามารถเพิ่ม logic แสดง/ซ่อน field ตาม method ได้
+}
+
+function submitWithdraw(){
+  const ud=getUD(); if(!ud) return;
+  const btn=document.getElementById('wdSubmitBtn');
+  const zkpAmt=parseFloat(btn.dataset.zkp);
+  const usdAmt=parseFloat(btn.dataset.usd);
+  const lakAmt=btn.dataset.lak;
+  const method=document.getElementById('wdMethod').value;
+  const bank=document.getElementById('wdBank')?.value.trim()||'';
+  const accNo=document.getElementById('wdAccNo')?.value.trim()||'';
+  const accName=document.getElementById('wdAccName')?.value.trim()||'';
+  const note=document.getElementById('wdNote')?.value.trim()||'';
+
+  if(!accNo){ showToast('⚠️ กรุณากรอกเลขบัญชี/เบอร์'); return; }
+  if(!accName){ showToast('⚠️ กรุณากรอกชื่อเจ้าของบัญชี'); return; }
+
+  const req={
+    id:'wd_'+Date.now(), user:getSess(),
+    zkpAmt, usdAmt, lakAmt,
+    method, bank, accNo, accName, note,
+    time:Date.now(), status:'pending'
+  };
+
+  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
+  ws.push(req); localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
+
+  ud.txs=ud.txs||[];
+  ud.txs.unshift({desc:`💱 แจ้งแลก ${zkpAmt.toFixed(4)} ZKP (รอ Admin อนุมัติ)`,amount:zkpAmt.toFixed(4),unit:'ZKP',time:Date.now()});
+  saveUD(ud);
+
+  document.getElementById('withdrawOv').remove();
+  showToast(`📤 ส่งคำขอแลก ${zkpAmt.toFixed(4)} ZKP ≈ ${lakAmt} ກີບ แล้ว!`);
+  renderWallet();
+}
+
+function doWithdraw(){ showWithdrawPopup(); } // legacy compat
+
+function addTestZkp(){
+  const ud=getUD(); if(!ud) return;
+  ud.zkpReward=(ud.zkpReward||0)+10;
+  ud.txs=ud.txs||[];
+  ud.txs.unshift({desc:'🧪 เพิ่ม ZKP ทดสอบ',amount:10,unit:'ZKP',time:Date.now()});
+  saveUD(ud); updateNav(); renderWallet();
+  showToast('🧪 เพิ่ม 10 ZKP สำหรับทดสอบ');
+}
+
+// ─── TOPUP SYSTEM ───
+const LAK_RATE = 22700; // 1 USD = 22,700 LAK
+let selAmt=10;
+function lakFmt(usd){ return (usd*LAK_RATE).toLocaleString()+' ກີບ'; }
+function selTop(el,amt){
+  document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); selAmt=amt;
+}
+function goToQR(){
+  document.getElementById('stepAmount').style.display='none';
+  document.getElementById('stepQR').style.display='block';
+  document.getElementById('stepSlip').style.display='none';
+  document.getElementById('stepPending').style.display='none';
+  document.getElementById('qrLakAmt').textContent=lakFmt(selAmt);
+  document.getElementById('qrAmount').textContent='= $'+selAmt.toLocaleString()+' USD';
+  // Load QR image if admin set one
+  const qrSrc=localStorage.getItem('cm_qr_image');
+  const wrap=document.getElementById('qrImageWrap');
+  if(qrSrc){
+    wrap.innerHTML=`<img src="${qrSrc}" style="width:200px;height:200px;object-fit:contain;border-radius:8px;background:#fff;padding:8px;margin:0 auto;display:block;">`;
+  }
+}
+function backToAmount(){
+  document.getElementById('stepAmount').style.display='block';
+  document.getElementById('stepQR').style.display='none';
+}
+function goToSlip(){
+  document.getElementById('stepQR').style.display='none';
+  document.getElementById('stepSlip').style.display='block';
+  document.getElementById('slipLakAmt').textContent=lakFmt(selAmt);
+  document.getElementById('slipAmount').textContent='= $'+selAmt.toLocaleString()+' USD';
+  document.getElementById('slipAmtInput').value=selAmt;
+}
+function backToQR(){
+  document.getElementById('stepQR').style.display='block';
+  document.getElementById('stepSlip').style.display='none';
+}
+function previewSlip(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    document.getElementById('slipPreview').innerHTML=`<img src="${ev.target.result}" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain;">`;
+  };
+  reader.readAsDataURL(file);
+}
+function submitSlip(){
+  const ud=getUD(); if(!ud) return;
+  const fileInput=document.getElementById('slipFile');
+  const amt=parseFloat(document.getElementById('slipAmtInput').value);
+  const note=document.getElementById('slipNote').value.trim();
+  if(!fileInput.files[0]){showToast('⚠️ กรุณาแนบสลิปก่อน');return;}
+  if(!amt||amt<=0){showToast('⚠️ กรุณากรอกยอดที่โอน');return;}
+
+  // Resize รูปก่อน save เพื่อไม่ให้ใหญ่เกิน
+  const file=fileInput.files[0];
+  const img=new Image();
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    img.onload=function(){
+      const canvas=document.createElement('canvas');
+      const MAX=600;
+      let w=img.width, h=img.height;
+      if(w>MAX||h>MAX){
+        if(w>h){h=Math.round(h*MAX/w);w=MAX;}
+        else{w=Math.round(w*MAX/h);h=MAX;}
+      }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const compressed=canvas.toDataURL('image/jpeg',0.7);
+
+      try {
+        const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
+        window._db.ref('topup_reqs').push(req);
+        const reqs=JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
+        reqs.push(req);
+        localStorage.setItem('cm_topup_reqs',JSON.stringify(reqs));
+        if(!ud.topupReqs) ud.topupReqs=[];
+        ud.topupReqs.push({id:req.id,amt,note,time:req.time,status:'pending'});
+        saveUD(ud);
+        document.getElementById('stepSlip').style.display='none';
+        document.getElementById('stepPending').style.display='block';
+        renderPendingList();
+        renderTopupHistory();
+        showToast('📤 ส่งหลักฐานเรียบร้อยแล้ว! รอ Admin อนุมัติ');
+      } catch(e) {
+        showToast('❌ รูปใหญ่เกินไป กรุณาใช้รูปที่เล็กกว่านี้');
+      }
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function renderPendingList(){
+  const ud=getUD(); if(!ud) return;
+  const reqs=(ud.topupReqs||[]).filter(r=>r.status==='pending');
+  const el=document.getElementById('pendingList'); if(!el) return;
+  if(!reqs.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ไม่มีคำขอที่รอดำเนินการ</div>';return;}
+  el.innerHTML=reqs.map(r=>{
+    const d=new Date(r.time);
+    return `<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--gold);">${(r.amt*LAK_RATE).toLocaleString()} ກີບ</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${d.toLocaleString('th-TH')}</div>
+        ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${r.note}</div>`:''}
+      </div>
+      <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:0.2rem 0.6rem;font-family:'Orbitron',monospace;font-size:0.5rem;color:var(--gold);">⏳ รออนุมัติ</div>
+    </div>`;
+  }).join('');
+}
+function renderTopupHistory(){
+  const ud=getUD(); if(!ud) return;
+  const reqs=(ud.topupReqs||[]).sort((a,b)=>b.time-a.time);
+  const el=document.getElementById('topupHistory'); if(!el) return;
+  if(!reqs.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ยังไม่มีประวัติ</div>';return;}
+  const statusColor={pending:'var(--gold)',approved:'var(--green)',rejected:'var(--red-bright)'};
+  const statusText={pending:'⏳ รออนุมัติ',approved:'✅ อนุมัติแล้ว',rejected:'❌ ปฏิเสธ'};
+  el.innerHTML=reqs.slice(0,10).map(r=>{
+    const d=new Date(r.time);
+    return `<div class="tx-item">
+      <div><div class="tx-d">เติมเงิน $${r.amt.toLocaleString()} USD</div><div class="tx-t">${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}</div></div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:${statusColor[r.status]||'var(--text-dim)'};">${statusText[r.status]||r.status}</div>
+    </div>`;
+  }).join('');
+}
+function showTopupPendingTab(){
+  document.getElementById('stepAmount').style.display='none';
+  document.getElementById('stepQR').style.display='none';
+  document.getElementById('stepSlip').style.display='none';
+  document.getElementById('stepPending').style.display='block';
+  renderPendingList();
+  renderTopupHistory();
+}
+function doTopup(){ /* legacy - now handled by submitSlip */ }
+
+// ─── DRIP ENGINE ───
+let dripInt=null;const NOTIFIED={};
+function startDrip(){
+  if(dripInt)clearInterval(dripInt);
+  dripInt=setInterval(()=>{
+    const ud=getUD();if(!ud||!ud.packages)return;
+    const now=Date.now();let changed=false;
+    ud.packages.forEach((p,i)=>{
+      if(p.remaining<=0)return;
+      const elapsed=(now-p.bought)/1000;const daysPassed=elapsed/DEMO_DAY;
+      const oldRem=p.remaining;p.remaining=Math.max(0,p.days-daysPassed);
+      const zkpPerTick=p.daily/(DEMO_DAY*1000/TICK);
+      ud.zkpReward=(ud.zkpReward||0)+zkpPerTick;changed=true;
+      if(p.remaining<=0&&oldRem>0){
+        const nk=getSess()+'_'+i+'_'+p.bought;
+        if(!NOTIFIED[nk]){NOTIFIED[nk]=true;const def=PKGS[p.key];const bought=(ud.packages||[]).filter(q=>q.key===p.key).length;
+          setTimeout(()=>{bought>=2?showRollNotif(def):showToast(`${t('toast.expired1')} ${def.name} ${t('toast.expired2')} ${2-bought} ${t('toast.expired3')}`)},500);}
+      }
+    });
+    if(changed){saveUD(ud);updateRewardUI();}
+  },TICK);
+}
+function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
+function updateRewardUI(){
+  const ud=getUD();if(!ud)return;const r=ud.zkpReward||0;
+  document.getElementById('navZkp').textContent=r.toFixed(4);
+  document.querySelectorAll('[id^="lv_"]').forEach(el=>{el.textContent=r.toFixed(6);el.style.color='var(--green)';setTimeout(()=>{el.style.color=''},300)});
+  const wz=document.getElementById('wZkp');if(wz){wz.textContent=r.toFixed(6);document.getElementById('wZkpUsd').textContent=(r*ZKP_RATE).toFixed(4)}
+  renderMachines();
+}
+function showRollNotif(def){
+  const roll=def.next?PKGS[def.next]:null;const ov=document.createElement('div');ov.className='overlay';
+  if(!roll){
+    ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(255,215,0,0.4)"><div style="font-size:2.3rem;margin-bottom:0.8rem">🏆</div><div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.45rem">${t('roll.max')}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.3rem">${t('roll.maxdesc')}</div><button class="btn btn-gold" style="width:100%" onclick="this.closest('.overlay').remove()">✅ รับทราบ</button></div>`;
+  } else {
+    ov.innerHTML=`<div class="popup">
+      <div class="pop-hd"><div class="pop-title">🔔 แพ็กครบ 7 วันแล้ว!</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
+      <div class="roll-from"><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.from')}</div><div style="font-family:'Orbitron',monospace;font-size:0.88rem;font-weight:700;color:#fff">${def.name}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--green);margin-top:0.28rem">${t('roll.done')}</div></div>
+      <div class="roll-next">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.next')}</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.92rem;font-weight:900;color:var(--green)">${roll.name}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);margin-top:0.38rem">${t('roll.old')} <span style="color:var(--red-bright);font-weight:700">$${def.price.toLocaleString()}</span> → ราคาแพ็ก <span style="color:var(--gold);font-weight:700">$${roll.price.toLocaleString()}</span></div>
+        <div style="margin-top:0.65rem;padding-top:0.65rem;border-top:1px solid rgba(74,222,128,0.15)"><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim)">${t('roll.extra')}</div><div class="roll-extra">$${def.nxt.toLocaleString()}</div></div>
+      </div>
+      <div class="roll-btns"><button class="btn btn-primary" style="flex:1" onclick="this.closest('.overlay').remove();switchTab(3)">💵 เติม USD ทันที</button><button class="pop-close" onclick="this.closest('.overlay').remove()">ปิด</button></div>
+    </div>`;
+  }
+  document.body.appendChild(ov);
+}
+
+// ─── ADMIN SCREEN ───
+const ADMIN_PASS_KEY = 'cm_admin_pass';
+function getAdminPass(){ return localStorage.getItem(ADMIN_PASS_KEY)||'admin1234'; }
+
+let currentFilter = 'pending';
+let adminTabIdx = 0;
+
+function showAdmin(){
+  const ov=document.createElement('div');
+  ov.id='adminLoginOv';
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+  ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(255,215,0,0.35);border-radius:18px;padding:1.8rem;max-width:320px;width:100%;box-shadow:0 0 50px rgba(255,215,0,0.1);">
+    <div style="text-align:center;margin-bottom:1.3rem;">
+      <div style="font-size:2rem;margin-bottom:0.4rem;">⚙️</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.88rem;font-weight:900;color:var(--gold);">Admin Panel</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-top:0.25rem;">ใส่รหัส Admin เพื่อเข้าใช้งาน</div>
+    </div>
+    <input type="password" id="adminPassInput" placeholder="รหัส Admin"
+      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(255,215,0,0.35);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:1rem;outline:none;caret-color:var(--gold);margin-bottom:0.6rem;letter-spacing:2px;"
+      onkeydown="if(event.key==='Enter')confirmAdminPass()">
+    <div id="adminPassErr" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--red-bright);margin-bottom:0.8rem;min-height:1.2em;"></div>
+    <div style="display:flex;gap:0.7rem;">
+      <button onclick="confirmAdminPass()"
+        style="flex:1;padding:0.75rem;background:linear-gradient(135deg,#78350f,var(--gold));border:none;border-radius:10px;color:#000;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:700;letter-spacing:1px;cursor:pointer;">
+        🔐 เข้าสู่ระบบ
+      </button>
+      <button onclick="document.getElementById('adminLoginOv').remove()"
+        style="padding:0.75rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
+        ยกเลิก
+      </button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>{ const i=document.getElementById('adminPassInput'); if(i) i.focus(); },200);
+}
+function confirmAdminPass(){
+  const inp=document.getElementById('adminPassInput');
+  const err=document.getElementById('adminPassErr');
+  if(!inp) return;
+  if(inp.value !== getAdminPass()){
+    err.textContent='❌ รหัสไม่ถูกต้อง'; inp.value=''; inp.focus(); return;
+  }
+  document.getElementById('adminLoginOv').remove();
+  document.getElementById('dashScreen').classList.remove('active');
+  document.getElementById('adminScreen').classList.add('active');
+  document.getElementById('adminBadge').textContent='🔑 Admin Mode';
+  switchAdminTab(0); loadAdminQRPreview(); renderAdminStats();
+}
+function doAdminLogout(){
+  document.getElementById('adminScreen').classList.remove('active');
+  document.getElementById('dashScreen').classList.add('active');
+  showToast('👋 ออกจาก Admin Mode');
+}
+function switchAdminTab(i){
+  adminTabIdx = i;
+  ['atn0','atn1','atn2','atn3'].forEach((id,j)=>{
+    document.getElementById(id).classList.toggle('active', i===j);
+  });
+  ['apg0','apg1','apg2','apg3'].forEach((id,j)=>{
+    document.getElementById(id).classList.toggle('active', i===j);
+  });
+  if(i===0) renderAdminTopup(currentFilter);
+  if(i===1) renderAdminWithdraw();
+  if(i===2) renderAdminUsers();
+  if(i===3){ loadAdminQRPreview(); renderAdminStats(); }
+}
+function filterReqs(f){
+  currentFilter = f;
+  ['pending','approved','rejected','all'].forEach(s=>{
+    const el = document.getElementById('f'+s.charAt(0).toUpperCase()+s.slice(1));
+    if(el) el.classList.toggle('active', s===f);
+  });
+  renderAdminTopup(f);
+}
+function renderAdminTopup(filter){
+  const el = document.getElementById('adminTopupList'); if(!el) return;
+  el.innerHTML='<div style="text-align:center;padding:1rem;font-family:monospace;color:#A890CC;">⏳ กำลังโหลด...</div>';
+  window._db.ref('topup_reqs').once('value').then(snap=>{
+    let reqs=[];
+    if(snap.exists()){const d=snap.val();reqs=Object.entries(d).map(([k,v])=>({...v,fbKey:k}));}
+  if(filter !== 'all') reqs = reqs.filter(r=>r.status===filter);
+  reqs.sort((a,b)=>b.time-a.time);
+  if(!reqs.length){
+    el.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:2rem;">ไม่มีรายการ</div>`;
+    return;
+  }
+  const statusColor={pending:'var(--gold)',approved:'var(--green)',rejected:'var(--red-bright)'};
+  const statusText={pending:'⏳ รออนุมัติ',approved:'✅ อนุมัติแล้ว',rejected:'❌ ปฏิเสธ'};
+  el.innerHTML = reqs.map(r=>{
+    const d = new Date(r.time);
+    const timeStr = `${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+    return `<div class="req-card ${r.status}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
+        <div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);">${(r.amt*LAK_RATE).toLocaleString()} ກີບ</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem;">👤 ${r.user} · ${timeStr}</div>
+          ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-top:0.15rem;">📝 ${r.note}</div>`:''}
+        </div>
+        <div style="background:rgba(0,0,0,0.2);border:1px solid ${statusColor[r.status]||'var(--border)'};border-radius:20px;padding:0.2rem 0.55rem;font-family:'Orbitron',monospace;font-size:0.48rem;color:${statusColor[r.status]};">${statusText[r.status]||r.status}</div>
+      </div>
+      ${r.slipImg?`<img src="${r.slipImg}" class="req-slip" onclick="viewSlip('${r.id}')" title="กดเพื่อดูเต็ม">`:'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">ไม่มีสลิป</div>'}
+      ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
+        <button onclick="approveTopup('${r.id}',${r.amt},'${r.user}')" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+        <button onclick="rejectTopup('${r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;">❌ ปฏิเสธ</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+  }).catch(()=>{el.innerHTML='<div style="color:red;text-align:center;padding:1rem;">❌ โหลดไม่ได้</div>';});
+}
+function viewSlip(reqId){
+  const reqs = JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
+  const r = reqs.find(x=>x.id===reqId); if(!r||!r.slipImg) return;
+  const ov = document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;padding:1rem;';
+  ov.innerHTML=`<div style="position:relative;max-width:100%;max-height:90vh;">
+    <button onclick="this.closest('div[style]').remove()" style="position:absolute;top:-40px;right:0;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:1.2rem;padding:0.3rem 0.7rem;border-radius:6px;cursor:pointer;">✕</button>
+    <img src="${r.slipImg}" style="max-width:100%;max-height:85vh;object-fit:contain;border-radius:10px;">
+  </div>`;
+  ov.onclick = e=>{ if(e.target===ov) ov.remove(); };
+  document.body.appendChild(ov);
+}
+function approveTopup(reqId, amt, username){
+  const reqs = JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
+  const req = reqs.find(r=>r.id===reqId); if(!req) return;
+  req.status='approved'; req.approvedAt=Date.now();
+  localStorage.setItem('cm_topup_reqs', JSON.stringify(reqs));
+  const users=getU(); const ud=users[username];
+  if(ud){
+    ud.usd=(ud.usd||0)+amt;
+    ud.topupReqs=(ud.topupReqs||[]).map(r=>r.id===reqId?{...r,status:'approved'}:r);
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({desc:`✅ เติม USD (อนุมัติแล้ว)`,amount:+amt,unit:'USD',time:Date.now()});
+    users[username]=ud; saveU(users);
+  }
+  updateNav(); renderAdminTopup(currentFilter);
+  showToast(`✅ อนุมัติ $${amt.toLocaleString()} USD ให้ ${username} แล้ว!`);
+}
+function rejectTopup(reqId, username){
+  const reqs = JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
+  const req = reqs.find(r=>r.id===reqId); if(!req) return;
+  req.status='rejected'; req.rejectedAt=Date.now();
+  localStorage.setItem('cm_topup_reqs', JSON.stringify(reqs));
+  const users=getU(); const ud=users[username];
+  if(ud){
+    ud.topupReqs=(ud.topupReqs||[]).map(r=>r.id===reqId?{...r,status:'rejected'}:r);
+    users[username]=ud; saveU(users);
+  }
+  renderAdminTopup(currentFilter);
+  showToast(`❌ ปฏิเสธคำขอของ ${username} แล้ว`);
+}
+function renderAdminWithdraw(){
+  const el=document.getElementById('adminWithdrawList'); if(!el) return;
+  const withdraws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
+  if(!withdraws.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ยังไม่มีคำขอแลก ZKP</div>';return;}
+  const methodName={bank:'🏦 โอนบัญชี',promptpay:'📱 PromptPay',bcel:'🏧 BCEL',other:'💬 อื่นๆ'};
+  el.innerHTML=withdraws.sort((a,b)=>b.time-a.time).map(r=>{
+    const d=new Date(r.time);
+    const t2=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+    const lakDisplay = r.lakAmt || Math.round((r.amt||r.zkpAmt||0)*ZKP_RATE*LAK_RATE).toLocaleString();
+    const zkpDisplay = r.zkpAmt || r.amt || 0;
+    return `<div class="req-card ${r.status}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem;">
+        <div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.88rem;color:var(--green);">${parseFloat(zkpDisplay).toFixed(4)} ZKP</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--gold);">${lakDisplay} ກີບ</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">👤 ${r.user} · ${t2}</div>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:${r.status==='pending'?'var(--gold)':r.status==='approved'?'var(--green)':'var(--red-bright)'};">
+          ${r.status==='pending'?'⏳ รออนุมัติ':r.status==='approved'?'✅ จ่ายแล้ว':'❌ ปฏิเสธ'}
+        </div>
+      </div>
+      <!-- ข้อมูลบัญชี -->
+      <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.12);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-bottom:0.3rem;">${methodName[r.method]||'💳 ช่องทางโอน'}</div>
+        ${r.bank?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text);">🏦 ${r.bank}</div>`:''}
+        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;margin-top:0.2rem;">${r.accNo||'-'}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">👤 ${r.accName||'-'}</div>
+        ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.2rem;">📝 ${r.note}</div>`:''}
+      </div>
+      ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;">
+        <button onclick="approveWithdraw('${r.id}','${r.user}',${zkpDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+        <button onclick="rejectWithdraw('${r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+function approveWithdraw(reqId, username, zkpAmt){
+  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
+  const w=ws.find(r=>r.id===reqId); if(!w) return;
+  w.status='approved'; w.approvedAt=Date.now();
+  localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
+  // หัก ZKP จากผู้ใช้
+  const users=getU(); const ud=users[username];
+  if(ud){
+    ud.zkpReward=Math.max(0,(ud.zkpReward||0)-parseFloat(zkpAmt));
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({desc:`✅ แลก ${parseFloat(zkpAmt).toFixed(4)} ZKP สำเร็จ`,amount:-parseFloat(zkpAmt).toFixed(4),unit:'ZKP',time:Date.now()});
+    users[username]=ud; saveU(users);
+  }
+  updateNav(); renderAdminWithdraw();
+  showToast(`✅ อนุมัติแลก ${parseFloat(zkpAmt).toFixed(4)} ZKP ให้ ${username}`);
+}
+function rejectWithdraw(reqId, username){
+  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
+  const w=ws.find(r=>r.id===reqId); if(w) w.status='rejected';
+  localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
+  renderAdminWithdraw(); showToast(`❌ ปฏิเสธคำขอแลก ZKP ของ ${username}`);
+}
+function renderAdminUsers(){
+  const el=document.getElementById('adminUserList'); if(!el) return;
+  const users=getU(); const keys=Object.keys(users);
+  if(!keys.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ยังไม่มีสมาชิก</div>';return;}
+  el.innerHTML=keys.map(u=>{
+    const ud=users[u];
+    const pkgs=(ud.packages||[]).filter(p=>p.remaining>0).length;
+    return `<div class="adm-user-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;">👤 ${u}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${ud.email||''}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
+        <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">USD</div>
+        </div>
+        <div style="background:rgba(74,222,128,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--green);">${(ud.zkpReward||0).toFixed(4)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">ZKP</div>
+        </div>
+        <div style="background:rgba(157,78,221,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--purple-light);">${pkgs}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.4rem;margin-top:0.6rem;">
+        <button onclick="adminAddUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">+ เติม USD</button>
+        <button onclick="adminDeductUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">- หัก USD</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function adminAddUsd(username){
+  const amt=parseFloat(prompt(`เติม USD ให้ ${username} จำนวน:`));
+  if(!amt||amt<=0) return;
+  const users=getU(); const ud=users[username]; if(!ud) return;
+  ud.usd=(ud.usd||0)+amt;
+  ud.txs=ud.txs||[]; ud.txs.unshift({desc:`Admin เติม USD`,amount:+amt,unit:'USD',time:Date.now()});
+  users[username]=ud; saveU(users);
+  updateNav(); renderAdminUsers();
+  showToast(`✅ เติม $${amt} USD ให้ ${username} แล้ว`);
+}
+function adminDeductUsd(username){
+  const amt=parseFloat(prompt(`หัก USD จาก ${username} จำนวน:`));
+  if(!amt||amt<=0) return;
+  const users=getU(); const ud=users[username]; if(!ud) return;
+  ud.usd=Math.max(0,(ud.usd||0)-amt);
+  users[username]=ud; saveU(users);
+  renderAdminUsers(); showToast(`💸 หัก $${amt} USD จาก ${username} แล้ว`);
+}
+function loadAdminQRPreview(){
+  const qrSrc=localStorage.getItem('cm_qr_image');
+  const wrap=document.getElementById('adminQRPreview'); if(!wrap) return;
+  const delBtn=document.getElementById('delQRBtn');
+  if(qrSrc){
+    wrap.innerHTML=`<img src="${qrSrc}" style="width:160px;height:160px;object-fit:contain;border-radius:8px;background:#fff;padding:6px;margin:0 auto;display:block;">`;
+    if(delBtn) delBtn.style.display='block';
+  } else {
+    wrap.innerHTML=`<div style="width:160px;height:160px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;"><div style="font-size:2.5rem;">📱</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">ยังไม่มี QR Code</div></div>`;
+    if(delBtn) delBtn.style.display='none';
+  }
+}
+function deleteQR(){
+  localStorage.removeItem('cm_qr_image');
+  loadAdminQRPreview();
+  showToast('🗑️ ลบ QR Code แล้ว');
+}
+function uploadAdminQR(e){
+  const file=e.target.files[0]; if(!file) return;
+  const img=new Image();
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    img.onload=function(){
+      const canvas=document.createElement('canvas');
+      const MAX=400;
+      let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const compressed=canvas.toDataURL('image/jpeg',0.85);
+      try{
+        localStorage.setItem('cm_qr_image',compressed);
+        loadAdminQRPreview();
+        showToast('✅ อัปโหลด QR Code สำเร็จ!');
+      }catch(err){showToast('❌ รูปใหญ่เกินไป');}
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function changeAdminPass(){
+  const p=document.getElementById('newAdminPass').value;
+  if(!p||p.length<6){showToast('⚠️ รหัสต้องมีอย่างน้อย 6 ตัว');return;}
+  localStorage.setItem(ADMIN_PASS_KEY,p);
+  document.getElementById('newAdminPass').value='';
+  showToast('✅ เปลี่ยนรหัส Admin สำเร็จ');
+}
+function renderAdminStats(){
+  const el=document.getElementById('adminStats'); if(!el) return;
+  const users=getU(); const keys=Object.keys(users);
+  const reqs=JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
+  const totalUsd=keys.reduce((s,u)=>s+(users[u].usd||0),0);
+  const totalZkp=keys.reduce((s,u)=>s+(users[u].zkpReward||0),0);
+  const pending=reqs.filter(r=>r.status==='pending').length;
+  const approved=reqs.filter(r=>r.status==='approved').length;
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;">
+      ${[['👥 สมาชิก',keys.length,'คน','var(--purple-light)'],['💰 รออนุมัติ',pending,'คำขอ','var(--gold)'],['✅ อนุมัติแล้ว',approved,'คำขอ','var(--green)'],['💵 USD ระบบ','$'+totalUsd.toFixed(0),'USD','var(--gold)']].map(([l,v,u,c])=>`
+      <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.1);border-radius:9px;padding:0.7rem;text-align:center;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.3rem;">${l}</div>
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:${c};">${v}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">${u}</div>
+      </div>`).join('')}
+    </div>`;
+}
+function renderAdminPanel(){ showAdmin(); } // legacy compat
+function updateNav(){
+  const ud=getUD();if(!ud)return;
+  document.getElementById('navZkp').textContent=(ud.zkpReward||0).toFixed(4);
+  document.getElementById('navUsd').textContent=(ud.usd||0).toFixed(2);
+  document.getElementById('stTotal').textContent=(ud.zkpMine||0).toFixed(4);
+  document.getElementById('stUsd').textContent=((ud.zkpMine||0)*ZKP_RATE).toFixed(2);
+  document.getElementById('stSess').textContent=(ud.sessions||0);
+  document.getElementById('stSucc').textContent=Math.min(98,60+(ud.sessions||0))+'%';
+}
+
+// ─── TOAST ───
+let toastT;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3000)}
+
+// ─── i18n LANGUAGE SYSTEM ───
+let LANG = localStorage.getItem('cm_lang') || 'th';
+// Reset to Thai if stored value is invalid
+if(!['th','en','lo'].includes(LANG)) LANG = 'th';
+
+const I18N = {
+  th: {
+    // Auth
+    'auth.sub':        'MINE · EARN · DOMINATE',
+    'auth.terminal':   'SECURE_AUTH_TERMINAL',
+    'auth.tab.login':  'LOGIN',
+    'auth.tab.reg':    'REGISTER',
+    'auth.lbl.user':   'USERNAME',
+    'auth.lbl.pass':   'PASSWORD',
+    'auth.lbl.email':  'EMAIL',
+    'auth.btn.login':  '⚡ AUTHENTICATE',
+    'auth.btn.reg':    '🚀 CREATE NODE',
+    'auth.ph.user':    'enter_username',
+    'auth.ph.pass':    '••••••••',
+    'auth.ph.reguser': 'choose_identity',
+    'auth.ph.email':   'node@network.io',
+    'auth.ph.regpass': 'min 6 chars',
+    'auth.stat.miners':'Active Miners',
+    'auth.stat.zkp':   'ZKP Today',
+    'auth.stat.up':    'Uptime',
+    // Nav
+    'nav.out': 'OUT',
+    // Home
+    'home.overview':   '📊 ภาพรวม',
+    'home.hashrate':   'HASHRATE',
+    'home.hashsub':    'H/s ปัจจุบัน',
+    'home.zkptotal':   'ZKP รวม',
+    'home.sessions':   'SESSIONS',
+    'home.sesssub':    'ครั้งที่ขุด',
+    'home.success':    'SUCCESS',
+    'home.succsub':    'อัตราสำเร็จ',
+    'home.mining':     '⛏️ การขุดเหรียญ ZKP',
+    'home.waiting':    '⏸ รอการขุด',
+    'home.digging':    '⛏️ กำลังขุดอยู่...',
+    'home.progress':   'Block Progress',
+    'home.start':      '▶ เริ่มขุด',
+    'home.stop':       '⏹ หยุดขุด',
+    'home.machsub':    'ACTIVE MINING RIGS',
+    'home.activity':   '📋 กิจกรรมล่าสุด',
+    'home.noact':      'ยังไม่มีกิจกรรม... เริ่มขุดเพื่อสร้างประวัติ',
+    'home.machtitle':  '⚙️ เครื่องขุดของฉัน',
+    'home.diggingzkp': 'กำลังขุด ZKP อยู่',
+    'home.livezkp':    '🔷 ZKP กระเป๋ารางวัล (real-time)',
+    'home.perday':     'กำไร/วัน',
+    'home.mined':      'ขุดได้แล้ว',
+    'home.total':      'ZKP รวม',
+    'home.daysleft':   'วันคงเหลือ',
+    'home.progress2':  'ความคืบหน้า',
+    'home.daysrem':    'เหลืออีก',
+    'home.days':       'วัน',
+    'home.viewdetail': 'ดูรายละเอียด',
+    // Packages
+    'pkg.title':       '⛏️ Cloud Mining Contracts',
+    'pkg.bal':         '💵 USD คงเหลือ',
+    'pkg.how':         'ℹ️ วิธีทำงาน',
+    'pkg.how.body':    '<span data-i18n-html="pkg.how.body">1. เติม USD จากผู้ดูแลระบบ<br>2. เลือกสัญญาเช่ากำลังขุด<br>3. ระบบขุด ZKP ให้อัตโนมัติ 7 วัน<br>4. กำไร ZKP โอนเข้ากระเป๋ารางวัล (1 ZKP ≈ $1)</span>',
+    'pkg.active':      '✅ สัญญาที่ใช้งานอยู่',
+    'pkg.noactive':    'ยังไม่มีสัญญาที่ใช้งานอยู่',
+    'pkg.profit':      'กำไร',
+    'pkg.perdays':     'ZKP / 7 วัน (+20%)',
+    'pkg.roi.profit':  '💰 กำไร ZKP',
+    'pkg.roi.daily':   '⚡ ZKP/วัน',
+    'pkg.roi.value':   '📈 มูลค่ากำไร',
+    'pkg.buy':         'เช่ากำลังขุด',
+    'pkg.free':        'รับสิทธิ์ฟรี',
+    'pkg.owned':       '✅ ใช้ครบสิทธิ์แล้ว',
+    'pkg.digging':     '⛏️ กำลังขุด · ซื้อได้อีก',
+    'pkg.times':       'ครั้ง',
+    'pkg.more':        'ซื้อได้อีก',
+    'pkg.locked':      '🔒 ซื้อ',
+    'pkg.locked2':     'ครบ 2 ครั้ง',
+    'pkg.ac.elapsed':  'ผ่านมา',
+    'pkg.ac.remain':   'เหลือ',
+    'pkg.ac.days':     'วัน',
+    // Wallet
+    'wal.title':       '💼 กระเป๋าของฉัน',
+    'wal.usd.title':   'กระเป๋า USD',
+    'wal.usd.sub':     'ใช้สำหรับเช่ากำลังขุดเท่านั้น',
+    'wal.addUsd':      '+ เติม USD',
+    'wal.zkp.title':   'กระเป๋ารางวัล ZKP',
+    'wal.zkp.sub':     'กำไรจากสัญญาขุด → แลกกับผู้ดูแล',
+    'wal.daily':       '⚡ รับ/วัน:',
+    'wal.withdraw':    '💱 แจ้งแลกเงิน',
+    'wal.active':      'สัญญา Active',
+    'wal.activesub':   'สัญญาขุด',
+    'wal.profit':      'กำไรสะสม',
+    'wal.profitsub':   'USD จากสัญญา',
+    'wal.history':     '📋 ประวัติธุรกรรม',
+    'wal.nohist':      'ยังไม่มีประวัติ',
+    // Topup
+    'top.title':       '💵 เติม USD',
+    'top.desc':        'USD ใช้สำหรับ',
+    'top.desc2':       'เช่ากำลังขุด ZKP',
+    'top.desc3':       'เท่านั้น',
+    'top.contact':     'ติดต่อผู้ดูแลระบบเพื่อเติม USD จริง',
+    'top.amount':      'จำนวน USD:',
+    'top.confirm':     '💵 ยืนยันการเติม USD',
+    'top.demo':        '* Demo Mode — เติม USD ฟรีเพื่อทดสอบระบบ',
+    // Bnav
+    'nav.home':        'หน้าหลัก',
+    'nav.contract':    'สัญญาขุด',
+    'nav.wallet':      'กระเป๋า',
+    'nav.topup':       'เติม USD',
+    // Detail popup
+    'det.price':       '💰 ราคาแพ็ก',
+    'det.hash':        '⚡ Hashrate',
+    'det.contract':    '📅 สัญญา',
+    'det.elapsed':     '⏱ ผ่านมา',
+    'det.mined':       '🔷 ขุดได้แล้ว',
+    'det.target':      '🎯 ZKP เป้า',
+    'det.progress':    '📊 คืบหน้า',
+    'det.remain':      '⏳ คงเหลือ',
+    'det.bought':      'ซื้อเมื่อ:',
+    'det.wallet':      '💼 ไปกระเป๋ารางวัล ZKP',
+    // Roll notif
+    'roll.title':      '🔔 แพ็กครบ 7 วันแล้ว!',
+    'roll.from':       'แพ็กที่เพิ่งครบ',
+    'roll.done':       '✅ กำไร ZKP ถูกโอนเข้ากระเป๋าแล้ว',
+    'roll.next':       '🔄 โรลเงินไปแพ็กถัดไป',
+    'roll.old':        'เงินเก่า',
+    'roll.price':      '→ ราคาแพ็ก',
+    'roll.extra':      '💵 จ่ายเพิ่มเพื่อปลดล็อก',
+    'roll.topup':      '💵 เติม USD ทันที',
+    'roll.close':      'ปิด',
+    'roll.max':        'ยินดีด้วย!',
+    'roll.maxdesc':    'คุณถึงแพ็กสูงสุด VIP แล้ว! 🎉',
+    'roll.ok':         '✅ รับทราบ',
+    // Toasts
+    'toast.logout':    '👋 ออกจากระบบแล้ว',
+    'toast.welcome':   '⚡ ยินดีต้อนรับ',
+    'toast.locked':    '🔒 ต้องปลดล็อกก่อน',
+    'toast.full':      '⛔ ใช้ครบสิทธิ์แล้ว',
+    'toast.nousd':     '❌ USD ไม่พอ! กรุณาเติม USD ก่อน',
+    'toast.freepkg':   '🎁 รับสิทธิ์ขุดฟรี!',
+    'toast.startpkg':  '✅ เริ่มสัญญาขุด',
+    'toast.mined':     '🎉 ขุดได้',
+    'toast.topup':     '💰 เติมสำเร็จ!',
+    'toast.withdraw':  '📩 ส่งคำขอแลก',
+    'toast.minzkp':    '⚠️ ต้องมี ZKP อย่างน้อย 1 ZKP',
+    'toast.expired1':  '✅',
+    'toast.expired2':  'ครบ 7 วัน! ซื้ออีก',
+    'toast.expired3':  'ครั้งเพื่อปลดล็อกถัดไป',
+  },
+  en: {
+    'auth.sub':        'MINE · EARN · DOMINATE',
+    'auth.terminal':   'SECURE_AUTH_TERMINAL',
+    'auth.tab.login':  'LOGIN',
+    'auth.tab.reg':    'REGISTER',
+    'auth.lbl.user':   'USERNAME',
+    'auth.lbl.pass':   'PASSWORD',
+    'auth.lbl.email':  'EMAIL',
+    'auth.btn.login':  '⚡ AUTHENTICATE',
+    'auth.btn.reg':    '🚀 CREATE NODE',
+    'auth.ph.user':    'enter_username',
+    'auth.ph.pass':    '••••••••',
+    'auth.ph.reguser': 'choose_identity',
+    'auth.ph.email':   'node@network.io',
+    'auth.ph.regpass': 'min 6 chars',
+    'auth.stat.miners':'Active Miners',
+    'auth.stat.zkp':   'ZKP Today',
+    'auth.stat.up':    'Uptime',
+    'nav.out': 'OUT',
+    'home.overview':   '📊 Overview',
+    'home.hashrate':   'HASHRATE',
+    'home.hashsub':    'Current H/s',
+    'home.zkptotal':   'ZKP Total',
+    'home.sessions':   'SESSIONS',
+    'home.sesssub':    'Mining sessions',
+    'home.success':    'SUCCESS',
+    'home.succsub':    'Success rate',
+    'home.mining':     '⛏️ ZKP Mining',
+    'home.waiting':    '⏸ Waiting',
+    'home.digging':    '⛏️ Mining...',
+    'home.progress':   'Block Progress',
+    'home.start':      '▶ Start Mining',
+    'home.stop':       '⏹ Stop Mining',
+    'home.machsub':    'ACTIVE MINING RIGS',
+    'home.activity':   '📋 Recent Activity',
+    'home.noact':      'No activity yet... Start mining to create history',
+    'home.machtitle':  '⚙️ My Mining Rigs',
+    'home.diggingzkp': 'Mining ZKP...',
+    'home.livezkp':    '🔷 Reward Wallet ZKP (real-time)',
+    'home.perday':     'Profit/Day',
+    'home.mined':      'Mined So Far',
+    'home.total':      'Total ZKP',
+    'home.daysleft':   'Days Left',
+    'home.progress2':  'Progress',
+    'home.daysrem':    'Remaining',
+    'home.days':       'days',
+    'home.viewdetail': 'View Details',
+    'pkg.title':       '⛏️ Cloud Mining Contracts',
+    'pkg.bal':         '💵 USD Balance',
+    'pkg.how':         'ℹ️ How It Works',
+    'pkg.how.body':    '1. Top up USD from admin<br>2. Choose a mining contract<br>3. System mines ZKP automatically for 7 days<br>4. ZKP profit goes to reward wallet (1 ZKP ≈ $1)',
+    'pkg.active':      '✅ Active Contracts',
+    'pkg.noactive':    'No active contracts yet',
+    'pkg.profit':      'Profit',
+    'pkg.perdays':     'ZKP / 7 days (+20%)',
+    'pkg.roi.profit':  '💰 ZKP Profit',
+    'pkg.roi.daily':   '⚡ ZKP/Day',
+    'pkg.roi.value':   '📈 Profit Value',
+    'pkg.buy':         'Rent Mining Power',
+    'pkg.free':        'Get Free Trial',
+    'pkg.owned':       '✅ Limit Reached',
+    'pkg.digging':     '⛏️ Mining · Buy',
+    'pkg.times':       'more time(s)',
+    'pkg.more':        'Buy',
+    'pkg.locked':      '🔒 Buy',
+    'pkg.locked2':     '2 times to unlock',
+    'pkg.ac.elapsed':  'Elapsed',
+    'pkg.ac.remain':   'Remaining',
+    'pkg.ac.days':     'days',
+    'wal.title':       '💼 My Wallet',
+    'wal.usd.title':   'USD Wallet',
+    'wal.usd.sub':     'Used for renting mining power only',
+    'wal.addUsd':      '+ Add USD',
+    'wal.zkp.title':   'ZKP Reward Wallet',
+    'wal.zkp.sub':     'Mining profits → Exchange with admin',
+    'wal.daily':       '⚡ Per Day:',
+    'wal.withdraw':    '💱 Request Exchange',
+    'wal.active':      'Active Contracts',
+    'wal.activesub':   'Mining contracts',
+    'wal.profit':      'Total Profit',
+    'wal.profitsub':   'USD from contracts',
+    'wal.history':     '📋 Transaction History',
+    'wal.nohist':      'No history yet',
+    'top.title':       '💵 Top Up USD',
+    'top.desc':        'USD is used for',
+    'top.desc2':       'Renting ZKP Mining Power',
+    'top.desc3':       'only',
+    'top.contact':     'Contact admin to top up real USD',
+    'top.amount':      'Amount USD:',
+    'top.confirm':     '💵 Confirm Top Up USD',
+    'top.demo':        '* Demo Mode — Free top up for testing',
+    'nav.home':        'Home',
+    'nav.contract':    'Contracts',
+    'nav.wallet':      'Wallet',
+    'nav.topup':       'Top Up',
+    'det.price':       '💰 Package Price',
+    'det.hash':        '⚡ Hashrate',
+    'det.contract':    '📅 Contract',
+    'det.elapsed':     '⏱ Elapsed',
+    'det.mined':       '🔷 Mined So Far',
+    'det.target':      '🎯 ZKP Target',
+    'det.progress':    '📊 Progress',
+    'det.remain':      '⏳ Remaining',
+    'det.bought':      'Purchased:',
+    'det.wallet':      '💼 Go to ZKP Reward Wallet',
+    'roll.title':      '🔔 Package Completed!',
+    'roll.from':       'Completed Package',
+    'roll.done':       '✅ ZKP profit transferred to wallet',
+    'roll.next':       '🔄 Roll to next package',
+    'roll.old':        'Old balance',
+    'roll.price':      '→ Package price',
+    'roll.extra':      '💵 Pay extra to unlock',
+    'roll.topup':      '💵 Top Up Now',
+    'roll.close':      'Close',
+    'roll.max':        'Congratulations!',
+    'roll.maxdesc':    'You reached the highest VIP package! 🎉',
+    'roll.ok':         '✅ OK',
+    'toast.logout':    '👋 Logged out',
+    'toast.welcome':   '⚡ Welcome',
+    'toast.locked':    '🔒 Unlock required',
+    'toast.full':      '⛔ Limit reached',
+    'toast.nousd':     '❌ Insufficient USD! Please top up',
+    'toast.freepkg':   '🎁 Free trial activated!',
+    'toast.startpkg':  '✅ Mining contract started',
+    'toast.mined':     '🎉 Mined',
+    'toast.topup':     '💰 Top up success!',
+    'toast.withdraw':  '📩 Withdraw request sent',
+    'toast.minzkp':    '⚠️ Need at least 1 ZKP',
+    'toast.expired1':  '✅',
+    'toast.expired2':  'completed! Buy',
+    'toast.expired3':  'more time(s) to unlock next',
+  },
+  lo: {
+    'auth.sub':        'ຂຸດ · ໄດ້ຮັບ · ຄອບງໍາ',
+    'auth.terminal':   'SECURE_AUTH_TERMINAL',
+    'auth.tab.login':  'ເຂົ້າສູ່ລະບົບ',
+    'auth.tab.reg':    'ສະໝັກ',
+    'auth.lbl.user':   'ຊື່ຜູ້ໃຊ້',
+    'auth.lbl.pass':   'ລະຫັດຜ່ານ',
+    'auth.lbl.email':  'ອີເມວ',
+    'auth.btn.login':  '⚡ ເຂົ້າສູ່ລະບົບ',
+    'auth.btn.reg':    '🚀 ສ້າງບັນຊີ',
+    'auth.ph.user':    'ປ້ອນຊື່ຜູ້ໃຊ້',
+    'auth.ph.pass':    '••••••••',
+    'auth.ph.reguser': 'ເລືອກຊື່ຜູ້ໃຊ້',
+    'auth.ph.email':   'node@network.io',
+    'auth.ph.regpass': 'ຢ່າງໜ້ອຍ 6 ຕົວ',
+    'auth.stat.miners':'ຜູ້ຂຸດທີ່ໃຊ້ງານ',
+    'auth.stat.zkp':   'ZKP ວັນນີ້',
+    'auth.stat.up':    'ອັບໄທມ໌',
+    'nav.out': 'ອອກ',
+    'home.overview':   '📊 ພາບລວມ',
+    'home.hashrate':   'ແຮດເຣດ',
+    'home.hashsub':    'H/s ປັດຈຸບັນ',
+    'home.zkptotal':   'ZKP ລວມ',
+    'home.sessions':   'ເຊດຊັ່ນ',
+    'home.sesssub':    'ຄັ້ງຂຸດ',
+    'home.success':    'ສຳເລັດ',
+    'home.succsub':    'ອັດຕາສຳເລັດ',
+    'home.mining':     '⛏️ ການຂຸດ ZKP',
+    'home.waiting':    '⏸ ລໍຖ້າ',
+    'home.digging':    '⛏️ ກຳລັງຂຸດ...',
+    'home.progress':   'ຄວາມຄືບໜ້າ Block',
+    'home.start':      '▶ ເລີ່ມຂຸດ',
+    'home.stop':       '⏹ ຢຸດຂຸດ',
+    'home.machsub':    'ACTIVE MINING RIGS',
+    'home.activity':   '📋 ກິດຈະກຳລ່າສຸດ',
+    'home.noact':      'ຍັງບໍ່ມີກິດຈະກຳ... ເລີ່ມຂຸດເພື່ອສ້າງປະຫວັດ',
+    'home.machtitle':  '⚙️ ເຄື່ອງຂຸດຂອງຂ້ອຍ',
+    'home.diggingzkp': 'ກຳລັງຂຸດ ZKP...',
+    'home.livezkp':    '🔷 ກະເປົ໋າລາງວັນ ZKP (real-time)',
+    'home.perday':     'ກຳໄລ/ມື້',
+    'home.mined':      'ຂຸດໄດ້ແລ້ວ',
+    'home.total':      'ZKP ລວມ',
+    'home.daysleft':   'ວັນທີ່ເຫຼືອ',
+    'home.progress2':  'ຄວາມຄືບໜ້າ',
+    'home.daysrem':    'ເຫຼືອ',
+    'home.days':       'ວັນ',
+    'home.viewdetail': 'ເບິ່ງລາຍລະອຽດ',
+    'pkg.title':       '⛏️ ສັນຍາຂຸດ Cloud',
+    'pkg.bal':         '💵 ຍອດ USD',
+    'pkg.how':         'ℹ️ ວິທີເຮັດວຽກ',
+    'pkg.how.body':    '1. ຕື່ມ USD ຈາກຜູ້ດູແລ<br>2. ເລືອກສັນຍາເຊົ່າກຳລັງຂຸດ<br>3. ລະບົບຂຸດ ZKP ໃຫ້ອັດຕະໂນມັດ 7 ວັນ<br>4. ກຳໄລ ZKP ໂອນໃສ່ກະເປົ໋າລາງວັນ (1 ZKP ≈ $1)',
+    'pkg.active':      '✅ ສັນຍາທີ່ໃຊ້ງານ',
+    'pkg.noactive':    'ຍັງບໍ່ມີສັນຍາທີ່ໃຊ້ງານ',
+    'pkg.profit':      'ກຳໄລ',
+    'pkg.perdays':     'ZKP / 7 ວັນ (+20%)',
+    'pkg.roi.profit':  '💰 ກຳໄລ ZKP',
+    'pkg.roi.daily':   '⚡ ZKP/ວັນ',
+    'pkg.roi.value':   '📈 ມູນຄ່າກຳໄລ',
+    'pkg.buy':         'ເຊົ່າກຳລັງຂຸດ',
+    'pkg.free':        'ຮັບສິດທິ໌ຟຣີ',
+    'pkg.owned':       '✅ ໃຊ້ຄົບສິດທິ໌ແລ້ວ',
+    'pkg.digging':     '⛏️ ກຳລັງຂຸດ · ຊື້ໄດ້ອີກ',
+    'pkg.times':       'ຄັ້ງ',
+    'pkg.more':        'ຊື້ໄດ້ອີກ',
+    'pkg.locked':      '🔒 ຊື້',
+    'pkg.locked2':     'ຄົບ 2 ຄັ້ງ',
+    'pkg.ac.elapsed':  'ຜ່ານມາ',
+    'pkg.ac.remain':   'ເຫຼືອ',
+    'pkg.ac.days':     'ວັນ',
+    'wal.title':       '💼 ກະເປົ໋າຂອງຂ້ອຍ',
+    'wal.usd.title':   'ກະເປົ໋າ USD',
+    'wal.usd.sub':     'ໃຊ້ສຳລັບເຊົ່າກຳລັງຂຸດເທົ່ານັ້ນ',
+    'wal.addUsd':      '+ ຕື່ມ USD',
+    'wal.zkp.title':   'ກະເປົ໋າລາງວັນ ZKP',
+    'wal.zkp.sub':     'ກຳໄລຈາກສັນຍາ → ແລກກັບຜູ້ດູແລ',
+    'wal.daily':       '⚡ ຮັບ/ວັນ:',
+    'wal.withdraw':    '💱 ແຈ້ງແລກເງິນ',
+    'wal.active':      'ສັນຍາ Active',
+    'wal.activesub':   'ສັນຍາຂຸດ',
+    'wal.profit':      'ກຳໄລສະສົມ',
+    'wal.profitsub':   'USD ຈາກສັນຍາ',
+    'wal.history':     '📋 ປະຫວັດທຸລະກຳ',
+    'wal.nohist':      'ຍັງບໍ່ມີປະຫວັດ',
+    'top.title':       '💵 ຕື່ມ USD',
+    'top.desc':        'USD ໃຊ້ສຳລັບ',
+    'top.desc2':       'ເຊົ່າກຳລັງຂຸດ ZKP',
+    'top.desc3':       'ເທົ່ານັ້ນ',
+    'top.contact':     'ຕິດຕໍ່ຜູ້ດູແລເພື່ອຕື່ມ USD ຈິງ',
+    'top.amount':      'ຈຳນວນ USD:',
+    'top.confirm':     '💵 ຢືນຢັນຕື່ມ USD',
+    'top.demo':        '* Demo Mode — ຕື່ມ USD ຟຣີເພື່ອທົດສອບ',
+    'nav.home':        'ໜ້າຫຼັກ',
+    'nav.contract':    'ສັນຍາຂຸດ',
+    'nav.wallet':      'ກະເປົ໋າ',
+    'nav.topup':       'ຕື່ມ USD',
+    'det.price':       '💰 ລາຄາແພັກ',
+    'det.hash':        '⚡ Hashrate',
+    'det.contract':    '📅 ສັນຍາ',
+    'det.elapsed':     '⏱ ຜ່ານມາ',
+    'det.mined':       '🔷 ຂຸດໄດ້ແລ້ວ',
+    'det.target':      '🎯 ເປົ້າ ZKP',
+    'det.progress':    '📊 ຄວາມຄືບໜ້າ',
+    'det.remain':      '⏳ ເຫຼືອ',
+    'det.bought':      'ຊື້ເມື່ອ:',
+    'det.wallet':      '💼 ໄປກະເປົ໋າລາງວັນ ZKP',
+    'roll.title':      '🔔 ແພັກຄົບ 7 ວັນແລ້ວ!',
+    'roll.from':       'ແພັກທີ່ຫາກໍຄົບ',
+    'roll.done':       '✅ ກຳໄລ ZKP ໂອນໃສ່ກະເປົ໋າແລ້ວ',
+    'roll.next':       '🔄 ໂຣລເງິນໄປແພັກຕໍ່ໄປ',
+    'roll.old':        'ເງິນເກົ່າ',
+    'roll.price':      '→ ລາຄາແພັກ',
+    'roll.extra':      '💵 ຈ່າຍເພີ່ມເພື່ອປົດລັອກ',
+    'roll.topup':      '💵 ຕື່ມ USD ດຽວນີ້',
+    'roll.close':      'ປິດ',
+    'roll.max':        'ຂໍສະແດງຄວາມຍິນດີ!',
+    'roll.maxdesc':    'ທ່ານຮອດແພັກສູງສຸດ VIP ແລ້ວ! 🎉',
+    'roll.ok':         '✅ ຮັບຊາບ',
+    'toast.logout':    '👋 ອອກຈາກລະບົບແລ້ວ',
+    'toast.welcome':   '⚡ ຍິນດີຕ້ອນຮັບ',
+    'toast.locked':    '🔒 ຕ້ອງປົດລັອກກ່ອນ',
+    'toast.full':      '⛔ ໃຊ້ຄົບສິດທິ໌ແລ້ວ',
+    'toast.nousd':     '❌ USD ບໍ່ພໍ! ກະລຸນາຕື່ມ USD ກ່ອນ',
+    'toast.freepkg':   '🎁 ຮັບສິດທິ໌ຟຣີແລ້ວ!',
+    'toast.startpkg':  '✅ ເລີ່ມສັນຍາຂຸດ',
+    'toast.mined':     '🎉 ຂຸດໄດ້',
+    'toast.topup':     '💰 ຕື່ມສຳເລັດ!',
+    'toast.withdraw':  '📩 ສົ່ງຄຳຂໍແລກ',
+    'toast.minzkp':    '⚠️ ຕ້ອງມີ ZKP ຢ່າງໜ້ອຍ 1 ZKP',
+    'toast.expired1':  '✅',
+    'toast.expired2':  'ຄົບ 7 ວັນ! ຊື້ອີກ',
+    'toast.expired3':  'ຄັ້ງເພື່ອປົດລັອກຕໍ່ໄປ',
+  }
+};
+
+function t(key){ return (I18N[LANG]||I18N['th'])[key] || key; }
+
+function setLang(lang){
+  LANG = lang;
+  localStorage.setItem('cm_lang', LANG);
+  applyLang();
+}
+function toggleLang(){ setLang(LANG==='th'?'en':LANG==='en'?'lo':'th'); }
+
+function applyLang(){
+  // Active button highlight
+  ['Th','En','Lo'].forEach(l=>{
+    const code=l.toLowerCase();
+    ['lb'+l,'al'+l].forEach(id=>{
+      const b=document.getElementById(id);
+      if(b) b.classList.toggle('active',code===LANG);
+    });
+  });
+
+  // data-i18n: update textContent
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const val=t(key);
+    // sec-title has ::after via CSS — only update first text node
+    if(el.classList.contains('sec-title')){
+      let found=false;
+      el.childNodes.forEach(n=>{
+        if(!found && n.nodeType===3){ n.textContent=val; found=true; }
+      });
+      if(!found) el.textContent=val;
+    } else {
+      el.textContent=val;
+    }
+  });
+
+  // data-i18n-html: update innerHTML
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    el.innerHTML=t(el.getAttribute('data-i18n-html'));
+  });
+
+  // data-i18n-ph: update placeholder
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    el.placeholder=t(el.getAttribute('data-i18n-ph'));
+  });
+
+  // Mine button & status (state-dependent)
+  const mb=document.getElementById('mineBtn');
+  if(mb) mb.textContent=isMining?t('home.stop'):t('home.start');
+  const ms=document.getElementById('mineStatus');
+  if(ms&&!isMining) ms.textContent=t('home.waiting');
+
+  // Re-render dynamic content
+  renderMachines();
+  renderPkgs();
+  if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
+}
+
+// ─── INIT ───
+window.addEventListener('load',()=>{
+  // Clear stale language from old version
+  const savedLang = localStorage.getItem('cm_lang');
+  if(savedLang && !['th','en','lo'].includes(savedLang)){
+    localStorage.removeItem('cm_lang');
+    LANG = 'th';
+  }
+  applyLang();
+  const s=getSess();
+  if(s&&getU()[s])enterDash(s);
+  else{
+    typePrompt('auth --mode=login');
+    setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
+  }
+});
+
+</script>
+</body>
+</html>
