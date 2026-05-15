@@ -1584,8 +1584,8 @@ function renderAdminTopup(filter){
       </div>
       ${r.slipImg?`<img src="${r.slipImg}" class="req-slip" onclick="viewSlip('${r.id}')" title="กดเพื่อดูเต็ม">`:'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">ไม่มีสลิป</div>'}
       ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
-        <button onclick="approveTopup('${r.id}',${r.amt},'${r.user}')" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
-        <button onclick="rejectTopup('${r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;">❌ ปฏิเสธ</button>
+        <button onclick="approveTopup('${r.id}',${r.amt},'${r.user}','${r.fbKey||''}')" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+        <button onclick="rejectTopup('${r.id}','${r.user}','${r.fbKey||''}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;">❌ ปฏิเสธ</button>
       </div>`:''}
     </div>`;
   }).join('');
@@ -1603,33 +1603,26 @@ function viewSlip(reqId){
   ov.onclick = e=>{ if(e.target===ov) ov.remove(); };
   document.body.appendChild(ov);
 }
-function approveTopup(reqId, amt, username){
-  const reqs = JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
-  const req = reqs.find(r=>r.id===reqId); if(!req) return;
-  req.status='approved'; req.approvedAt=Date.now();
-  localStorage.setItem('cm_topup_reqs', JSON.stringify(reqs));
-  const users=getU(); const ud=users[username];
-  if(ud){
-    ud.usd=(ud.usd||0)+amt;
-    ud.topupReqs=(ud.topupReqs||[]).map(r=>r.id===reqId?{...r,status:'approved'}:r);
-    ud.txs=ud.txs||[];
-    ud.txs.unshift({desc:`✅ เติม USD (อนุมัติแล้ว)`,amount:+amt,unit:'USD',time:Date.now()});
-    users[username]=ud; saveU(users);
-  }
-  updateNav(); renderAdminTopup(currentFilter);
-  showToast(`✅ อนุมัติ $${amt.toLocaleString()} USD ให้ ${username} แล้ว!`);
+function approveTopup(reqId, amt, username, fbKey){
+  // Update Firebase
+  if(fbKey) window._db.ref('topup_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()});
+  // Add USD to user in Firebase
+  window._db.ref('users/'+username).once('value').then(snap=>{
+    if(snap.exists()){
+      const ud=snap.val();
+      ud.usd=(ud.usd||0)+parseFloat(amt);
+      ud.txs=ud.txs||[];
+      ud.txs.unshift({desc:'✅ เติม USD (อนุมัติแล้ว)',amount:+parseFloat(amt),unit:'USD',time:Date.now()});
+      window._db.ref('users/'+username).set(ud);
+      if(getSess()===username){_ud=ud;updateNav();}
+    }
+  });
+  setTimeout(()=>renderAdminTopup(currentFilter), 1000);
+  showToast(`✅ อนุมัติ $${parseFloat(amt).toLocaleString()} USD ให้ ${username} แล้ว!`);
 }
-function rejectTopup(reqId, username){
-  const reqs = JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
-  const req = reqs.find(r=>r.id===reqId); if(!req) return;
-  req.status='rejected'; req.rejectedAt=Date.now();
-  localStorage.setItem('cm_topup_reqs', JSON.stringify(reqs));
-  const users=getU(); const ud=users[username];
-  if(ud){
-    ud.topupReqs=(ud.topupReqs||[]).map(r=>r.id===reqId?{...r,status:'rejected'}:r);
-    users[username]=ud; saveU(users);
-  }
-  renderAdminTopup(currentFilter);
+function rejectTopup(reqId, username, fbKey){
+  if(fbKey) window._db.ref('topup_reqs/'+fbKey).update({status:'rejected',rejectedAt:Date.now()});
+  setTimeout(()=>renderAdminTopup(currentFilter), 1000);
   showToast(`❌ ปฏิเสธคำขอของ ${username} แล้ว`);
 }
 function renderAdminWithdraw(){
