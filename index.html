@@ -911,28 +911,24 @@ const DEMO_DAY = 86400; // วินาที/วัน (จริง)
 const TICK = 3000;
 const ZKP_RATE = 1.00;
 
-// ─── PACKAGES ───
+// ─── PACKAGES (Subscription รายเดือน 30 วัน) ───
 const PKGS = {
-  free:    {name:'🎁 Free Trial',price:0,   days:7,profit:1,  daily:1/7,  hr:'5 GH/s', limit:2,cls:'pc-free',   mc:'mc-free',   next:'mini',    nxt:20},
-  mini:    {name:'💡 Mini',      price:20,  days:7,profit:4,  daily:4/7,  hr:'10 GH/s',limit:2,cls:'pc-mini',   mc:'mc-mini',   next:'lite',    nxt:30},
-  lite:    {name:'🔩 Lite',      price:50,  days:7,profit:10, daily:10/7, hr:'10 GH/s',limit:2,cls:'pc-lite',   mc:'mc-lite',   next:'starter', nxt:50},
-  starter: {name:'🌱 Starter',   price:100, days:7,profit:20, daily:20/7, hr:'10 GH/s',limit:2,cls:'pc-starter',mc:'mc-starter',next:'basic',   nxt:200},
-  basic:   {name:'⚡ Basic',     price:300, days:7,profit:60, daily:60/7, hr:'10 GH/s',limit:2,cls:'pc-basic',  mc:'mc-basic',  next:'pro',     nxt:700},
-  pro:     {name:'🔥 Pro',       price:1000,days:7,profit:200,daily:200/7,hr:'10 GH/s',limit:2,cls:'pc-pro',    mc:'mc-pro',    next:'vip',     nxt:2000},
-  vip:     {name:'👑 VIP',       price:3000,days:7,profit:600,daily:600/7,hr:'10 GH/s',limit:2,cls:'pc-vip',    mc:'mc-vip',    next:null,      nxt:0},
+  bronze:  {name:'🥉 Bronze',  price:50,   days:30, profit:105,  daily:3.5,   hr:'20 GH/s',  limit:1, cls:'pc-mini',    mc:'mc-mini',    next:'silver',   nxt:150},
+  silver:  {name:'🥈 Silver',  price:200,  days:30, profit:480,  daily:16,    hr:'50 GH/s',  limit:1, cls:'pc-starter', mc:'mc-starter', next:'gold',     nxt:300},
+  gold:    {name:'🥇 Gold',    price:500,  days:30, profit:1350, daily:45,    hr:'120 GH/s', limit:1, cls:'pc-basic',   mc:'mc-basic',   next:'diamond',  nxt:500},
+  diamond: {name:'💎 Diamond', price:1000, days:30, profit:3000, daily:100,   hr:'300 GH/s', limit:1, cls:'pc-pro',     mc:'mc-pro',     next:'vip',      nxt:2000},
+  vip:     {name:'👑 VIP',     price:3000, days:30, profit:10500,daily:350,   hr:'900 GH/s', limit:1, cls:'pc-vip',     mc:'mc-vip',     next:null,       nxt:0},
 };
-const PKG_ORDER = ['free','mini','lite','starter','basic','pro','vip'];
+const PKG_ORDER = ['bronze','silver','gold','diamond','vip'];
 
 const COINS = {
-  free:   '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cf" cx="40%" cy="35%"><stop offset="0%" stop-color="#4ade80"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cf)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
-  mini:   '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cm" cx="40%" cy="35%"><stop offset="0%" stop-color="#7dd3fc"/><stop offset="100%" stop-color="#0c4a6e"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cm)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
-  lite:   '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cl" cx="40%" cy="35%"><stop offset="0%" stop-color="#f9a8d4"/><stop offset="100%" stop-color="#831843"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cl)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
-  starter:'<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cs" cx="40%" cy="35%"><stop offset="0%" stop-color="#86efac"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cs)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
-  basic:  '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cb" cx="40%" cy="35%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#4A0E8F"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cb)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
-  pro:    '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cp" cx="40%" cy="35%"><stop offset="0%" stop-color="#fca5a5"/><stop offset="100%" stop-color="#7f1d1d"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cp)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
-  vip:    '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cv" cx="40%" cy="35%"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cv)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="black">Z</text></svg>',
+  bronze:  '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cbr" cx="40%" cy="35%"><stop offset="0%" stop-color="#fcd9a0"/><stop offset="100%" stop-color="#92400e"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cbr)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
+  silver:  '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="csi" cx="40%" cy="35%"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#475569"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#csi)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
+  gold:    '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cgo" cx="40%" cy="35%"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#92400e"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cgo)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="black">Z</text></svg>',
+  diamond: '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cdi" cx="40%" cy="35%"><stop offset="0%" stop-color="#a5f3fc"/><stop offset="100%" stop-color="#0e7490"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cdi)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
+  vip:     '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cv" cx="40%" cy="35%"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cv)"/><circle cx="19" cy="19" r="13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="black">Z</text></svg>',
 };
-const ICONS = {free:'🎁',mini:'💡',lite:'🔩',starter:'🌱',basic:'⚡',pro:'🔥',vip:'👑'};
+const ICONS = {bronze:'🥉',silver:'🥈',gold:'🥇',diamond:'💎',vip:'👑'};
 
 // ─── STORAGE ───
 // ─── FIREBASE STORAGE ───
@@ -1077,10 +1073,7 @@ function addAct(icon,txt,amt,cls){
 
 // ─── PACKAGES ───
 function isUnlocked(key){
-  const ud=getUD();if(!ud)return false;
-  if(key==='free'||key==='mini')return true;
-  const idx=PKG_ORDER.indexOf(key);
-  return (ud.packages||[]).filter(p=>p.key===PKG_ORDER[idx-1]).length>=2;
+  return true; // ทุกแพ็กซื้อได้เลย ไม่ต้องปลดล็อก
 }
 function buyPkg(key){
   const ud=getUD();if(!ud)return;
@@ -1125,23 +1118,22 @@ function renderPkgs(){
     const active=(ud.packages||[]).find(p=>p.key===key&&p.remaining>0);
     const unlocked=isUnlocked(key);const rem=def.limit-bought;
     let badge='';
-    if(key==='free')badge='<div class="pkg-badge b-free">FREE</div>';
-    else if(key==='pro')badge='<div class="pkg-badge b-hot">+200 ZKP 🔥</div>';
-    else if(key==='vip')badge='<div class="pkg-badge b-vip">+600 ZKP 👑</div>';
-    else badge=`<div class="pkg-badge b-zkp">+${def.profit} ZKP</div>`;
+    if(key==='bronze')badge='<div class="pkg-badge b-zkp">+105 ZKP 🥉</div>';
+    else if(key==='silver')badge='<div class="pkg-badge b-zkp">+480 ZKP 🥈</div>';
+    else if(key==='gold')badge='<div class="pkg-badge b-hot">+1,350 ZKP 🥇</div>';
+    else if(key==='diamond')badge='<div class="pkg-badge b-zkp">+3,000 ZKP 💎</div>';
+    else if(key==='vip')badge='<div class="pkg-badge b-vip">+10,500 ZKP 👑</div>';
     const dots=Array.from({length:def.limit},(_,i)=>`<div class="ldot ${i<bought?'used':'avail'}"></div>`).join('');
-    const limitRow=bought>=def.limit?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--red-bright);margin-bottom:0.45rem">✅ ${t('pkg.owned')} (${def.limit}/${def.limit})</div>`:`<div class="limit-wrap">${dots}<span>${t('pkg.more')} ${rem} ${t('pkg.times')}</span></div>`;
+    const limitRow=bought>=def.limit?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--red-bright);margin-bottom:0.45rem">✅ ${t('pkg.owned')} (${def.limit}/${def.limit})</div>`:`<div class="limit-wrap">${dots}<span>ซื้อได้ ${rem} ครั้ง/เดือน</span></div>`;
     let btn='';
-    if(!unlocked){const pdef=PKGS[PKG_ORDER[PKG_ORDER.indexOf(key)-1]];const pb=(ud.packages||[]).filter(p=>p.key===PKG_ORDER[PKG_ORDER.indexOf(key)-1]).length;btn=`<div class="pkg-locked">${t('pkg.locked')} ${pdef.name} ${t('pkg.locked2')} (${pb}/2)</div>`;}
-    else if(bought>=def.limit)btn=`<div class="pkg-owned">${t('pkg.owned')}</div>`;
-    else if(active)btn=`<div class="pkg-owned">${t('pkg.digging')} ${rem} ${t('pkg.times')}</div>`;
-    else btn=`<button class="btn-buy" onclick="buyPkg('${key}')">${def.price===0?t('pkg.free'):t('pkg.buy')}</button>`;
+    if(bought>=def.limit)btn=`<div class="pkg-owned">✅ Active อยู่แล้ว</div>`;
+    else btn=`<button class="btn-buy" onclick="buyPkg('${key}')">${t('pkg.buy')}</button>`;
     return `<div class="pkg-card ${def.cls}" style="${!unlocked?'opacity:0.42;filter:grayscale(55%)':''}">
       ${badge}
       <div class="pkg-icon">${ICONS[key]}</div>
       <div class="pkg-name">${def.name}</div>
       <div class="pkg-price">${def.price>0?'$'+def.price.toLocaleString():'$0'}</div>
-      <div class="pkg-profit-line">${t('pkg.profit')} ${def.profit} ZKP / 7 ${t('pkg.ac.days')} (+20%)</div>
+      <div class="pkg-profit-line">กำไร ${def.profit} ZKP / 30 วัน · ${def.daily} ZKP/วัน</div>
       <div class="roi-box">
         <div class="roi-row"><span class="roi-lbl">${t('pkg.roi.profit')}</span><span class="roi-val">+${def.profit} ZKP</span></div>
         <div class="roi-row"><span class="roi-lbl">${t('pkg.roi.daily')}</span><span class="roi-val">~${def.daily.toFixed(2)} ZKP</span></div>
