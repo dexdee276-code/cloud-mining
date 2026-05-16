@@ -46,6 +46,56 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .tab-content::-webkit-scrollbar { display:none; }
 .tab-content { scrollbar-width:none; }
 
+/* ── LEADERBOARD ── */
+.lb-pod{display:flex;flex-direction:column;align-items:center;gap:0.3rem;}
+.lb-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;}
+.lb-pod.p1 .lb-avatar{background:linear-gradient(135deg,#78350f,var(--gold));color:#000;width:58px;height:58px;font-size:1.3rem;box-shadow:0 0 20px rgba(255,215,0,0.5);}
+.lb-pod.p2 .lb-avatar{background:linear-gradient(135deg,#374151,#9ca3af);color:#fff;box-shadow:0 0 12px rgba(156,163,175,0.4);}
+.lb-pod.p3 .lb-avatar{background:linear-gradient(135deg,#78350f,#d97706);color:#fff;box-shadow:0 0 12px rgba(217,119,6,0.4);}
+.lb-name{font-family:'Orbitron',monospace;font-size:0.62rem;color:#fff;max-width:70px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lb-val{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--green);}
+.lb-bar{width:60px;border-radius:6px 6px 0 0;}
+.lb-pod.p1 .lb-bar{height:70px;background:linear-gradient(180deg,rgba(255,215,0,0.3),rgba(255,215,0,0.05));border:1px solid rgba(255,215,0,0.3);}
+.lb-pod.p2 .lb-bar{height:50px;background:linear-gradient(180deg,rgba(156,163,175,0.2),rgba(156,163,175,0.05));border:1px solid rgba(156,163,175,0.2);}
+.lb-pod.p3 .lb-bar{height:38px;background:linear-gradient(180deg,rgba(217,119,6,0.2),rgba(217,119,6,0.05));border:1px solid rgba(217,119,6,0.2);}
+.lb-row{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 0.9rem;background:rgba(40,5,70,0.6);border:1px solid rgba(157,78,221,0.15);border-radius:10px;margin-bottom:0.5rem;}
+.lb-row.me{border-color:rgba(157,78,221,0.5);background:rgba(123,47,190,0.2);}
+.lb-rank{font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:900;color:var(--text-dim);width:22px;text-align:center;}
+.lb-row-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:900;background:rgba(157,78,221,0.2);border:1px solid rgba(157,78,221,0.3);color:var(--purple-light);}
+.lb-row-name{font-family:'Orbitron',monospace;font-size:0.78rem;color:#fff;font-weight:700;}
+.lb-row-sub{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.1rem;}
+.lb-row-zkp{font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:900;color:var(--green);text-align:right;}
+.lb-me-badge{font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--purple-light);background:rgba(157,78,221,0.15);border:1px solid rgba(157,78,221,0.3);border-radius:4px;padding:0.1rem 0.3rem;margin-left:0.3rem;}
+
+/* ── PROFILE ── */
+.profile-popup{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);backdrop-filter:blur(12px);display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;}
+.profile-card{background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.5rem;width:100%;max-width:380px;margin:auto;}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--purple-dark),var(--purple-light));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;color:#fff;box-shadow:0 0 20px rgba(157,78,221,0.4);margin:0 auto 0.8rem;}
+.profile-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;margin:1rem 0;}
+.profile-stat{background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.7rem;text-align:center;}
+.ps-val{font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;}
+.ps-lbl{font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--text-dim);margin-top:0.2rem;}
+
+/* ── CHECK-IN ── */
+.checkin-widget{background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.2rem;margin-bottom:1rem;position:relative;overflow:hidden;}
+.checkin-widget::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.checkin-days{display:flex;justify-content:space-between;gap:0.3rem;margin-bottom:1rem;}
+.ci-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.25rem;padding:0.45rem 0.1rem;border-radius:8px;border:1px solid rgba(157,78,221,0.2);background:rgba(0,0,0,0.2);}
+.ci-day.done{background:rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.4);}
+.ci-day.today{background:rgba(255,215,0,0.12);border-color:rgba(255,215,0,0.5);}
+.ci-day.today.done{background:rgba(74,222,128,0.2);border-color:var(--green);}
+.ci-d-num{font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--text-dim);}
+.ci-d-icon{font-size:0.9rem;}
+.ci-d-zkp{font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--gold);}
+.btn-checkin{width:100%;padding:0.9rem;border:none;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all 0.3s;}
+.btn-checkin.ready{background:linear-gradient(135deg,#78350f,var(--gold));color:#000;box-shadow:0 0 20px rgba(255,215,0,0.3);}
+.btn-checkin.done{background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:var(--green);cursor:default;}
+.ci-streak{display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:0.8rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);}
+.ci-streak-val{font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--gold);}
+
+/* ── NOTIFICATION BADGE ── */
+.notif-btn{position:relative;padding:0.28rem 0.55rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:6px;cursor:pointer;font-size:0.9rem;line-height:1;}
+
 /* ── SCREENS ── */
 .screen { display:none; min-height:100vh; position:relative; z-index:1; }
 .screen.active { display:flex; flex-direction:column; }
@@ -533,6 +583,9 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
   </div>
   <span style="margin-left:auto;font-size:0.8rem;color:var(--text-dim);">›</span>
 </div>
+<div style="text-align:center;margin-bottom:0.8rem;">
+  <button onclick="showTerms()" style="background:none;border:none;color:rgba(157,78,221,0.5);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;text-decoration:underline;">📋 ข้อตกลงการใช้งาน & ความเสี่ยง</button>
+</div>
 <div class="auth-footer">
     <div class="auth-stat"><div class="auth-stat-val" id="aMiners">2,847</div><div class="auth-stat-lbl" data-i18n="auth.stat.miners">Active Miners</div></div>
     <div class="auth-footer-div"></div>
@@ -556,6 +609,8 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
     <button class="admin-tab" id="atn1" onclick="switchAdminTab(1)">💱 แลก ZKP</button>
     <button class="admin-tab" id="atn2" onclick="switchAdminTab(2)">👥 สมาชิก</button>
     <button class="admin-tab" id="atn3" onclick="switchAdminTab(3)">⚙️ ตั้งค่า</button>
+    <button class="admin-tab" id="atn4" onclick="switchAdminTab(4)">📊 Dashboard</button>
+    <button class="admin-tab" id="atn5" onclick="switchAdminTab(5)">📢 ประกาศ</button>
   </div>
 
   <div style="flex:1;overflow-y:auto;padding:1rem;">
@@ -583,6 +638,15 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
     <!-- Tab 2: รายชื่อสมาชิก -->
     <div class="admin-page" id="apg2">
       <div class="sec-title">👥 สมาชิกทั้งหมด</div>
+      <!-- ช่องค้นหา -->
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;">
+        <input type="text" id="userSearchInput" placeholder="🔍 ค้นหา username, email..."
+          oninput="filterAdminUsers(this.value)"
+          style="flex:1;padding:0.6rem 0.9rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.25);border-radius:8px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;">
+        <button onclick="filterAdminUsers('');document.getElementById('userSearchInput').value=''"
+          style="padding:0.6rem 0.8rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕</button>
+      </div>
+      <div id="userSearchCount" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.5rem;"></div>
       <div id="adminUserList"></div>
     </div>
 
@@ -615,10 +679,104 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
       </div>
 
       <!-- Stats -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
         <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.8rem;">📊 สถิติระบบ</div>
         <div id="adminStats"></div>
       </div>
+
+      <!-- อัตราแลกเปลี่ยน -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">💱 อัตราแลกเปลี่ยน ZKP → ກີບ</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.4rem;">1 USD = ? ກີບ (ปัจจุบัน: <span id="currentLakRate">22,700</span> ກີບ)</div>
+        <input type="number" id="newLakRate" placeholder="เช่น 22700"
+          style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.9rem;outline:none;margin-bottom:0.7rem;">
+        <button onclick="saveLakRate()" class="btn btn-gold" style="width:100%;">💾 บันทึกอัตราแลกเปลี่ยน</button>
+      </div>
+
+      <!-- Freeze ระบบถอน -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--red-bright);margin-bottom:0.8rem;">🔒 ล็อกระบบถอนเงิน</div>
+        <div id="freezeStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--green);margin-bottom:0.8rem;">✅ ระบบถอนเปิดปกติ</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.8rem;line-height:1.6;">
+          เมื่อล็อก ลูกค้าจะกดแจ้งถอนไม่ได้<br>ใช้ตอนตรวจสอบหรือปิดปรับปรุง
+        </div>
+        <div style="display:flex;gap:0.6rem;">
+          <button onclick="setWithdrawFreeze(true)" id="btnFreeze"
+            style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;">
+            🔒 ล็อกระบบถอน
+          </button>
+          <button onclick="setWithdrawFreeze(false)" id="btnUnfreeze"
+            style="flex:1;padding:0.6rem;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:8px;color:var(--green);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;">
+            🔓 เปิดระบบถอน
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Dashboard -->
+    <div class="admin-page" id="apg4">
+      <div class="sec-title">📊 Dashboard สรุปรายได้</div>
+
+      <!-- ยอดวันนี้ -->
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;margin-bottom:1rem;">
+        <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:0.9rem;text-align:center;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.3rem;">💰 เติมเงินวันนี้</div>
+          <div id="dashTopupToday" style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;color:var(--gold);">$0</div>
+        </div>
+        <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);border-radius:12px;padding:0.9rem;text-align:center;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.3rem;">💱 ถอนวันนี้</div>
+          <div id="dashWithdrawToday" style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;color:var(--green);">0 ZKP</div>
+        </div>
+        <div style="background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.2);border-radius:12px;padding:0.9rem;text-align:center;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.3rem;">👥 สมาชิกทั้งหมด</div>
+          <div id="dashTotalUsers" style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;color:var(--purple-light);">0</div>
+        </div>
+        <div style="background:rgba(230,57,70,0.07);border:1px solid rgba(230,57,70,0.2);border-radius:12px;padding:0.9rem;text-align:center;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.3rem;">⏳ รออนุมัติ</div>
+          <div id="dashPendingCount" style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;color:var(--red-bright);">0</div>
+        </div>
+      </div>
+
+      <!-- กราฟเติมเงิน 7 วัน -->
+      <div class="sec-title" style="font-size:0.78rem;">📈 ยอดเติมเงิน 7 วันล่าสุด</div>
+      <div style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.2rem;margin-bottom:1rem;">
+        <canvas id="dashChart" style="width:100%;height:140px;display:block;"></canvas>
+      </div>
+
+      <!-- Top spenders -->
+      <div class="sec-title" style="font-size:0.78rem;">🏆 Top 5 ยอดซื้อสูงสุด</div>
+      <div id="dashTopSpenders" style="margin-bottom:1rem;"></div>
+
+      <button onclick="renderAdminDashboard()" class="btn btn-primary" style="width:100%;margin-bottom:0.6rem;">🔄 รีเฟรช Dashboard</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+        <button onclick="exportCSV('topup')" class="btn btn-gold" style="font-size:0.65rem;">📥 Export เติมเงิน CSV</button>
+        <button onclick="exportCSV('withdraw')" style="padding:0.7rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:10px;color:var(--green);font-family:'Orbitron',monospace;font-size:0.65rem;cursor:pointer;">📥 Export ถอนเงิน CSV</button>
+      </div>
+    </div>
+
+    <!-- Tab 5: Broadcast -->
+    <div class="admin-page" id="apg5">
+      <div class="sec-title">📢 ส่งประกาศถึง User ทุกคน</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">หัวข้อประกาศ</div>
+        <input type="text" id="bcTitle" placeholder="เช่น ระบบปิดปรับปรุง, โปรโมชั่นใหม่..."
+          style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.8rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">เนื้อหาประกาศ</div>
+        <textarea id="bcBody" placeholder="รายละเอียด..." rows="3"
+          style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:1px solid rgba(255,215,0,0.15);border-radius:8px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;resize:vertical;margin-bottom:0.8rem;"></textarea>
+        <select id="bcType" style="width:100%;padding:0.6rem;background:rgba(0,0,0,0.4);border:1px solid rgba(255,215,0,0.2);border-radius:8px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.75rem;outline:none;margin-bottom:0.8rem;">
+          <option value="info">ℹ️ ทั่วไป</option>
+          <option value="warning">⚠️ คำเตือน</option>
+          <option value="success">✅ ข่าวดี</option>
+          <option value="maintenance">🔧 ปิดปรับปรุง</option>
+        </select>
+        <div style="display:flex;gap:0.5rem;">
+          <button onclick="sendBroadcast()" class="btn btn-gold" style="flex:1;">📢 ส่งประกาศ</button>
+          <button onclick="deleteBroadcast()" style="padding:0.7rem 1rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:10px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">🗑️ ลบ</button>
+        </div>
+      </div>
+      <div class="sec-title" style="margin-top:0.5rem;">📋 ประกาศที่ส่งแล้ว</div>
+      <div id="bcHistory"></div>
     </div>
 
   </div>
@@ -633,11 +791,24 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
       <button class="btn-lang" id="lbEn" onclick="setLang('en')">EN</button>
       <button class="btn-lang" id="lbLo" onclick="setLang('lo')">ລາວ</button>
     </div>
+    <button class="notif-btn" id="notifBtn" onclick="showNotifications()" title="การแจ้งเตือน" style="position:relative;padding:0.28rem 0.55rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:6px;cursor:pointer;font-size:0.9rem;">🔔<span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red-bright);color:#fff;font-family:'Orbitron',monospace;font-size:0.45rem;font-weight:900;min-width:14px;height:14px;border-radius:7px;align-items:center;justify-content:center;padding:0 3px;">0</span></button>
+    <button class="btn-out" style="background:rgba(157,78,221,0.1);border-color:rgba(157,78,221,0.3);color:var(--purple-light);font-size:0.65rem;" onclick="showProfile()">👤</button>
     <button class="btn-out" data-i18n="nav.out" onclick="doLogout()">OUT</button>
     <button class="btn-out" style="background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.3);color:var(--gold);font-size:0.65rem;" onclick="showAdmin()">⚙️</button>
   </nav>
 
   <div class="tab-content">
+    <!-- Broadcast Banner -->
+    <div id="bcBanner" style="display:none;margin:0.5rem 0 0;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;padding:0.8rem 1rem;position:relative;">
+      <div style="display:flex;align-items:flex-start;gap:0.6rem;">
+        <span id="bcBannerIcon" style="font-size:1.1rem;flex-shrink:0;">📢</span>
+        <div style="flex:1;">
+          <div id="bcBannerTitle" style="font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;color:var(--gold);margin-bottom:0.2rem;"></div>
+          <div id="bcBannerBody" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);line-height:1.5;"></div>
+        </div>
+        <button onclick="document.getElementById('bcBanner').style.display='none'" style="background:none;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;flex-shrink:0;">✕</button>
+      </div>
+    </div>
     <!-- HOME -->
     <div class="tab-page active" id="pgHome">
 
@@ -686,6 +857,17 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
         </div>
         <button class="btn-mine" id="mineBtn" data-i18n="home.start" onclick="toggleMine()">▶ เริ่มขุด</button>
       </div>
+      <!-- Daily Check-in -->
+      <div class="checkin-widget" id="checkinWidget">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;color:var(--gold);">📅 Daily Check-in</div>
+          <div class="ci-streak">🔥 Streak <span class="ci-streak-val" id="ciStreak">0</span> วัน</div>
+        </div>
+        <div class="checkin-days" id="ciDays"></div>
+        <button class="btn-checkin ready" id="ciBtn" onclick="doCheckIn()">🎁 เช็คอินวันนี้</button>
+        <div id="ciMsg" style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-top:0.5rem;min-height:1.2em;"></div>
+      </div>
+
       <div class="act-widget">
         <div class="sec-title" data-i18n="home.activity">📋 กิจกรรมล่าสุด</div>
         <div class="act-list" id="actList"><div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;"><span data-i18n="home.noact">ยังไม่มีกิจกรรม... เริ่มขุดเพื่อสร้างประวัติ</span></div></div>
@@ -729,8 +911,54 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
         <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
         <div class="w-stat"><div class="ws-l" data-i18n="wal.profit">กำไรสะสม</div><div class="ws-v wv-green" id="wProfit">$0.00</div><div class="ws-s" data-i18n="wal.profitsub">USD จากสัญญา</div></div>
       </div>
+      <!-- ── ZKP CHART 30 วัน ── -->
+      <div class="sec-title">📈 สถิติส่วนตัว</div>
+      <div style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.2rem;margin-bottom:1rem;">
+        <div style="display:flex;gap:0.4rem;margin-bottom:0.8rem;align-items:center;">
+          <button onclick="setChartRange(7)" id="chartBtn7" class="filter-btn active" style="font-size:0.58rem;padding:0.22rem 0.6rem;">7 วัน</button>
+          <button onclick="setChartRange(30)" id="chartBtn30" class="filter-btn" style="font-size:0.58rem;padding:0.22rem 0.6rem;">30 วัน</button>
+          <div style="flex:1;"></div>
+          <div id="chartTotalLabel" style="font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--green);font-weight:700;">รวม 0.0000 ZKP</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:0.8rem;">
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.5rem;text-align:center;">
+            <div id="chartAvg" style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);">0</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--text-dim);">เฉลี่ย/วัน</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.5rem;text-align:center;">
+            <div id="chartMax" style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);">0</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--text-dim);">สูงสุด/วัน</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.5rem;text-align:center;">
+            <div id="chartActiveDays" style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);">0</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--text-dim);">วันที่ขุด</div>
+          </div>
+        </div>
+        <canvas id="zkpChart" style="width:100%;height:150px;display:block;"></canvas>
+        <div id="chartEmpty" style="display:none;text-align:center;padding:2rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);">ยังไม่มีข้อมูล เริ่มขุดเพื่อดูกราฟ</div>
+      </div>
+
       <div class="sec-title" data-i18n="wal.history">📋 ประวัติธุรกรรม</div>
       <div id="txHist"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace"><span data-i18n="wal.nohist">ยังไม่มีประวัติ</span></div></div>
+
+      <!-- WITHDRAW HISTORY -->
+      <div class="sec-title" style="margin-top:1.2rem;">💱 ประวัติการแลก ZKP</div>
+      <div id="wdHistList" style="margin-bottom:1rem;">
+        <div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">ยังไม่มีประวัติ</div>
+      </div>
+
+      <!-- CHANGE PASSWORD -->
+      <div class="sec-title" style="margin-top:1.2rem;">🔐 เปลี่ยนรหัสผ่าน</div>
+      <div style="background:rgba(40,5,70,0.98);border:2px solid rgba(157,78,221,0.35);border-radius:16px;padding:1.2rem;margin-bottom:1rem;">
+        <input type="password" id="oldPassInput" placeholder="รหัสผ่านปัจจุบัน"
+          style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;caret-color:var(--purple-light);margin-bottom:0.7rem;">
+        <input type="password" id="newPassUserInput" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)"
+          style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;caret-color:var(--purple-light);margin-bottom:0.7rem;">
+        <input type="password" id="confirmPassUserInput" placeholder="ยืนยันรหัสผ่านใหม่"
+          style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;caret-color:var(--purple-light);margin-bottom:0.8rem;">
+        <div id="changePassMsg" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;min-height:1.2em;margin-bottom:0.6rem;"></div>
+        <button onclick="userChangePass()" class="btn btn-primary" style="width:100%;">🔐 บันทึกรหัสผ่านใหม่</button>
+      </div>
 
       <!-- REFERRAL SECTION -->
       <div class="sec-title" style="margin-top:1.2rem;">🎁 ชวนเพื่อน (Referral)</div>
@@ -768,6 +996,29 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
       </div>
     </div>
 
+    <!-- LEADERBOARD -->
+    <div class="tab-page" id="pgLeader">
+      <div class="sec-title">🏆 Leaderboard</div>
+      <div id="lbPodium" style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.3rem;margin-bottom:1rem;">
+        <div style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:1rem;">🥇 อันดับผู้ขุด ZKP สูงสุด</div>
+        <div id="lbTop3" style="display:flex;align-items:flex-end;justify-content:center;gap:0.8rem;">
+          <div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;width:100%;padding:1rem;">⏳ กำลังโหลด...</div>
+        </div>
+      </div>
+      <div class="sec-title" style="font-size:0.78rem;">📋 อันดับทั้งหมด</div>
+      <div id="lbList" style="margin-bottom:4rem;">
+        <div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">⏳ กำลังโหลด...</div>
+      </div>
+      <div id="lbMyRank" style="display:none;position:sticky;bottom:0.5rem;background:rgba(20,5,40,0.97);border:2px solid rgba(157,78,221,0.5);border-radius:12px;padding:0.8rem 1rem;backdrop-filter:blur(10px);">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.3rem;">อันดับของฉัน</div>
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <div id="myRankNo" style="font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:var(--gold);">-</div>
+          <div id="myRankName" style="flex:1;font-family:'Orbitron',monospace;font-size:0.78rem;color:#fff;">-</div>
+          <div id="myRankZkp" style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--green);">0 ZKP</div>
+        </div>
+      </div>
+    </div>
+
     <!-- TOPUP -->
     <div class="tab-page" id="pgTopup">
       <div class="sec-title" data-i18n="top.title">💵 เติม USD</div>
@@ -789,35 +1040,8 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
         </div>
 
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.6rem;">หรือเลือกจากด้านล่าง</div>
-        <div class="tu-grid">
-          <div class="tu-card" onclick="selTop(this,10)">
-            <div class="tu-v">227,000 ກີບ</div>
-            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$10 USD</div>
-          </div>
-          <div class="tu-card" onclick="selTop(this,20)">
-            <div class="tu-v">454,000 ກີບ</div>
-            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$20 USD</div>
-          </div>
-          <div class="tu-card" onclick="selTop(this,50)">
-            <div class="tu-v">1,135,000 ກີບ</div>
-            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$50 USD</div>
-          </div>
-          <div class="tu-card" onclick="selTop(this,100)">
-            <div class="tu-v">2,270,000 ກີບ</div>
-            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$100 USD</div>
-          </div>
-          <div class="tu-card" onclick="selTop(this,300)">
-            <div class="tu-v">6,810,000 ກີບ</div>
-            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$300 USD</div>
-          </div>
-          <div class="tu-card" onclick="selTop(this,1000)">
-            <div class="tu-v">22,700,000 ກີບ</div>
-            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$1,000 USD</div>
-          </div>
-          <div class="tu-card" onclick="selTop(this,3000)">
-            <div class="tu-v">68,100,000 ກີບ</div>
-            <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$3,000 USD</div>
-          </div>
+        <div class="tu-grid" id="tuGrid">
+          <!-- render by JS ตามอัตราแลกเปลี่ยน Firebase -->
         </div>
         <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goToQR()">
           ถัดไป → ดู QR Code
@@ -836,7 +1060,7 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
           <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.3rem;">ยอดที่ต้องโอน</div>
           <div id="qrLakAmt" style="font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;color:var(--gold);">2,270,000 ກີບ</div>
           <div id="qrAmount" style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:rgba(255,215,0,0.6);margin-top:0.15rem;">= $20 USD</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.1rem;">อัตราแลกเปลี่ยน 1 USD = 22,700 ກີບ</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.1rem;">อัตราแลกเปลี่ยน 1 USD = <span id="qrRateDisplay">22,700</span> ກີບ</div>
         </div>
 
         <!-- QR Code image -->
@@ -938,6 +1162,9 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
     <button class="bnav" id="bn3" onclick="switchTab(3)">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg data-i18n-nav="nav.topup" data-i18n="nav.topup">เติม USD
     </button>
+    <button class="bnav" id="bn4" onclick="switchTab(4)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>อันดับ
+    </button>
   </nav>
 </div>
 
@@ -970,6 +1197,29 @@ const ICONS = {bronze:'🥉',silver:'🥈',gold:'🥇',diamond:'💎',vip:'👑'
 // ─── STORAGE ───
 // ─── FIREBASE STORAGE ───
 let _ud = null;
+
+// ── SHA-256 Hash ──
+async function sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── Rate Limit Login ──
+const LOGIN_MAX_FAIL=5, LOGIN_LOCK_MS=60000;
+let _loginFail=0, _loginLockUntil=0;
+
+// ── Session Timeout 30 นาที ──
+const SESSION_TIMEOUT_MS=30*60*1000;
+let _sessionTimer=null;
+function resetSessionTimer(){
+  clearTimeout(_sessionTimer);
+  _sessionTimer=setTimeout(()=>{
+    if(getSess()){doLogout();showToast('⏰ Session หมดอายุ กรุณา Login ใหม่');}
+  },SESSION_TIMEOUT_MS);
+}
+['click','touchstart','keydown'].forEach(ev=>{
+  document.addEventListener(ev,()=>{if(getSess())resetSessionTimer();},{passive:true});
+});
 function getSess(){return localStorage.getItem('cm_s')||''}
 function setSess(u){localStorage.setItem('cm_s',u)}
 function clrSess(){localStorage.removeItem('cm_s')}
@@ -1036,6 +1286,16 @@ function enterDash(user){
   document.getElementById('dashScreen').classList.add('active');
   updateNav();switchTab(0);renderMachines();renderPkgs();
   startDrip();showToast(t('toast.welcome')+' '+user+'!');
+  resetSessionTimer();
+  setTimeout(renderCheckIn, 500);
+  loadBroadcastBanner();
+  listenNotifications();
+  listenAdminBadge();
+  // โหลดอัตราแลกเปลี่ยนจาก Firebase
+  window._db.ref('settings/lak_rate').once('value').then(snap=>{
+    if(snap.exists()) LAK_RATE_LIVE=snap.val();
+    renderTopupCards();
+  });
   setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
 
   // Realtime listener — อัปเดตข้อมูลลูกค้าทันทีเมื่อ Admin แก้ไข
@@ -1068,11 +1328,16 @@ function enterDash(user){
 }
 
 // ─── NAVIGATION ───
-const PAGES=['pgHome','pgPkg','pgWallet','pgTopup'];
+const PAGES=['pgHome','pgPkg','pgWallet','pgTopup','pgLeader'];
 function switchTab(i){
-  PAGES.forEach((id,j)=>{document.getElementById(id).classList.toggle('active',i===j);document.getElementById('bn'+j).classList.toggle('active',i===j)});
-  if(i===1)renderPkgs();if(i===2)renderWallet();
-  if(i===3){renderTopupHistory();renderPendingList();}
+  PAGES.forEach((id,j)=>{
+    document.getElementById(id)?.classList.toggle('active',i===j);
+    document.getElementById('bn'+j)?.classList.toggle('active',i===j);
+  });
+  if(i===1)renderPkgs();
+  if(i===2){renderWallet();setTimeout(renderZkpChart,300);}
+  if(i===3){renderTopupHistory();renderPendingList();renderTopupCards();}
+  if(i===4)renderLeaderboard();
 }
 
 // ─── MINING ───
@@ -1316,8 +1581,234 @@ function showDetail(idx){
 }
 
 // ─── WALLET ───
+// ════════════════════════════════════════
+// กราฟ ZKP 30 วัน
+// ════════════════════════════════════════
+let _chartRange = 7;
+function setChartRange(days){
+  _chartRange = days;
+  ['7','30'].forEach(d=>{
+    const btn=document.getElementById('chartBtn'+d);
+    if(btn) btn.classList.toggle('active', parseInt(d)===days);
+  });
+  renderZkpChart();
+}
+
+function renderZkpChart(){
+  const ud=getUD(); if(!ud) return;
+  const canvas=document.getElementById('zkpChart');
+  const emptyEl=document.getElementById('chartEmpty');
+  const totalLabel=document.getElementById('chartTotalLabel');
+  if(!canvas) return;
+
+  const txs=(ud.txs||[]).filter(tx=>tx.unit==='ZKP'&&parseFloat(tx.amount)>0);
+  const days=_chartRange;
+  const dayMs=86400000;
+  const now=Date.now();
+  const labels=[], values=[];
+
+  for(let i=days-1;i>=0;i--){
+    const dayStart=now-i*dayMs;
+    const d=new Date(dayStart);
+    labels.push(days<=7?(d.getDate()+'/'+(d.getMonth()+1)):(d.getDate()+'/'+(d.getMonth()+1)));
+    const total=txs.filter(tx=>tx.time>=dayStart&&tx.time<dayStart+dayMs)
+      .reduce((s,tx)=>s+parseFloat(tx.amount||0),0);
+    values.push(parseFloat(total.toFixed(6)));
+  }
+
+  const grandTotal=values.reduce((s,v)=>s+v,0);
+  const activeDays=values.filter(v=>v>0).length;
+  const maxVal=Math.max(...values,0);
+  const avgVal=activeDays>0?(grandTotal/activeDays):0;
+
+  if(totalLabel) totalLabel.textContent='รวม '+grandTotal.toFixed(4)+' ZKP';
+  const avgEl=document.getElementById('chartAvg');
+  const maxEl=document.getElementById('chartMax');
+  const activeEl=document.getElementById('chartActiveDays');
+  if(avgEl) avgEl.textContent=avgVal.toFixed(3);
+  if(maxEl) maxEl.textContent=maxVal.toFixed(3);
+  if(activeEl) activeEl.textContent=activeDays+'/'+days;
+
+  if(grandTotal===0){
+    canvas.style.display='none';
+    if(emptyEl) emptyEl.style.display='block';
+    return;
+  }
+  canvas.style.display='block';
+  if(emptyEl) emptyEl.style.display='none';
+
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.getBoundingClientRect().width||canvas.offsetWidth||300;
+  const H=150;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+
+  const padL=36,padR=8,padT=12,padB=28;
+  const cW=W-padL-padR; const cH=H-padT-padB;
+  const barW=Math.max(2,Math.floor(cW/days*0.6));
+  const gap=cW/days;
+  const maxV=maxVal||0.0001;
+
+  // grid
+  ctx.strokeStyle='rgba(157,78,221,0.12)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=padT+cH-(cH/4*i);
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+cW,y);ctx.stroke();
+    ctx.fillStyle='rgba(168,144,204,0.6)';
+    ctx.font='8px monospace'; ctx.textAlign='right';
+    ctx.fillText((maxV/4*i).toFixed(2),padL-3,y+3);
+  }
+
+  // bars
+  values.forEach((v,i)=>{
+    const x=padL+i*gap+(gap-barW)/2;
+    const bH=v>0?Math.max(3,cH*(v/maxV)):0;
+    const y=padT+cH-bH;
+    if(bH>0){
+      const grad=ctx.createLinearGradient(0,y,0,y+bH);
+      grad.addColorStop(0,'rgba(157,78,221,0.95)');
+      grad.addColorStop(1,'rgba(74,14,143,0.6)');
+      ctx.fillStyle=grad;
+      ctx.beginPath(); ctx.roundRect(x,y,barW,bH,2); ctx.fill();
+    }
+    // label วัน (แสดงทุก n วันถ้า 30 วัน)
+    const showLabel = days<=7 || i%(Math.ceil(days/7))===0;
+    if(showLabel){
+      ctx.fillStyle='rgba(168,144,204,0.7)';
+      ctx.font='8px monospace'; ctx.textAlign='center';
+      ctx.fillText(labels[i],x+barW/2,H-4);
+    }
+  });
+}
+
+// ════════════════════════════════════════
+// ค้นหา user ใน Admin
+// ════════════════════════════════════════
+let _allUsers = {};
+function filterAdminUsers(q){
+  const el=document.getElementById('adminUserList'); if(!el) return;
+  const countEl=document.getElementById('userSearchCount');
+  const query=q.toLowerCase().trim();
+  const keys=Object.keys(_allUsers).filter(u=>{
+    if(!query) return true;
+    const ud=_allUsers[u];
+    return u.toLowerCase().includes(query)||(ud.email||'').toLowerCase().includes(query);
+  });
+  if(countEl) countEl.textContent=query?`พบ ${keys.length} จาก ${Object.keys(_allUsers).length} คน`:`สมาชิกทั้งหมด ${keys.length} คน`;
+  renderAdminUserCards(keys);
+}
+
+function renderAdminUserCards(keys){
+  const el=document.getElementById('adminUserList'); if(!el) return;
+  if(!keys.length){
+    el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">ไม่พบ user ที่ค้นหา</div>';
+    return;
+  }
+  el.innerHTML=keys.map(u=>{
+    const ud=_allUsers[u];
+    const pkgs=(ud.packages||[]).filter(p=>p.remaining>0).length;
+    return `<div class="adm-user-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+        <div style="display:flex;align-items:center;gap:0.4rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:${ud.banned?'var(--red-bright)':'#fff'};">👤 ${u}</div>
+          ${ud.banned?'<span style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--red-bright);background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:4px;padding:0.1rem 0.3rem;">🚫 BANNED</span>':''}
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${ud.email||''}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
+        <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">USD</div>
+        </div>
+        <div style="background:rgba(74,222,128,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--green);">${(ud.zkpReward||0).toFixed(4)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">ZKP</div>
+        </div>
+        <div style="background:rgba(157,78,221,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--purple-light);">${pkgs}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap;">
+        <button onclick="adminAddUsd('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">+ USD</button>
+        <button onclick="adminDeductUsd('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">- USD</button>
+        <button onclick="adminResetPass('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:7px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">🔑 Reset</button>
+        <button onclick="adminViewUser('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:7px;color:#38bdf8;font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">🔍 ดู</button>
+        <button onclick="adminToggleBan('${u}',${!!ud.banned})" style="flex:1;min-width:60px;padding:0.45rem;background:${ud.banned?'rgba(74,222,128,0.08)':'rgba(230,57,70,0.08)'};border:1px solid ${ud.banned?'rgba(74,222,128,0.25)':'rgba(230,57,70,0.25)'};border-radius:7px;color:${ud.banned?'var(--green)':'var(--red-bright)'};font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">${ud.banned?'✅ ปลด':'🚫 แบน'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+// Export CSV
+// ════════════════════════════════════════
+function exportCSV(type){
+  const ref = type==='topup' ? 'topup_reqs' : 'withdraw_reqs';
+  const label = type==='topup' ? 'เติมเงิน' : 'ถอนเงิน';
+  showToast('⏳ กำลัง export...');
+  window._db.ref(ref).once('value').then(snap=>{
+    if(!snap.exists()){showToast('❌ ไม่มีข้อมูล');return;}
+    const rows=[];
+    if(type==='topup'){
+      rows.push(['วันที่','ผู้ใช้','จำนวน USD','ยอด ກີບ','หมายเหตุ','สถานะ']);
+      snap.forEach(c=>{
+        const r=c.val();
+        const d=new Date(r.time);
+        const t=`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        rows.push([t,r.user||'',r.amt||0,(r.amt*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString(),r.note||'',r.status||'']);
+      });
+    } else {
+      rows.push(['วันที่','ผู้ใช้','ZKP','ยอด ກີບ','ช่องทาง','เลขบัญชี','ชื่อบัญชี','สถานะ']);
+      snap.forEach(c=>{
+        const r=c.val();
+        const d=new Date(r.time);
+        const t=`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        rows.push([t,r.user||'',r.zkpAmt||0,r.lakAmt||'',r.method||'',r.accNo||'',r.accName||'',r.status||'']);
+      });
+    }
+    // สร้าง CSV
+    const csv='﻿'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('
+');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=`cryptomine_${label}_${new Date().toLocaleDateString('th-TH').replace(/\//g,'-')}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+    showToast(`✅ Export ${label} สำเร็จ!`);
+  });
+}
+
+// ════════════════════════════════════════
+// Admin badge แจ้งเตือนคำขอใหม่
+// ════════════════════════════════════════
+function listenAdminBadge(){
+  // นับ topup pending
+  window._db.ref('topup_reqs').orderByChild('status').equalTo('pending').on('value',snap=>{
+    const count=snap.exists()?snap.numChildren():0;
+    updateAdminBadge(count);
+  });
+}
+function updateAdminBadge(count){
+  let badge=document.getElementById('adminNavBadge');
+  const btn=document.querySelector('button[onclick="showAdmin()"]');
+  if(!btn) return;
+  if(!badge){
+    badge=document.createElement('span');
+    badge.id='adminNavBadge';
+    badge.style.cssText='position:absolute;top:-4px;right:-4px;background:var(--red-bright);color:#fff;font-family:'Orbitron',monospace;font-size:0.45rem;font-weight:900;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;';
+    btn.style.position='relative';
+    btn.appendChild(badge);
+  }
+  badge.textContent=count>9?'9+':count;
+  badge.style.display=count>0?'flex':'none';
+}
+
 function renderWallet(){
   const ud=getUD();if(!ud)return;
+  renderZkpChart();
+  renderWithdrawHistory();
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
   const dailyZkp=acs.reduce((s,p)=>s+p.daily,0);
   const totalP=(ud.packages||[]).reduce((s,p)=>{const def=PKGS[p.key];return s+(def.profit*((p.days-p.remaining)/p.days))},0);
@@ -1326,7 +1817,7 @@ function renderWallet(){
   document.getElementById('wZkp').textContent=rw.toFixed(6);
   document.getElementById('wZkpUsd').textContent=(rw*ZKP_RATE).toFixed(4);
   const lakEl=document.getElementById('wZkpLak');
-  if(lakEl) lakEl.textContent=Math.round(rw*ZKP_RATE*LAK_RATE).toLocaleString();
+  if(lakEl) lakEl.textContent=Math.round(rw*ZKP_RATE*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString();
   document.getElementById('wDaily').textContent=dailyZkp.toFixed(4);
   document.getElementById('wDailyUsd').textContent=(dailyZkp*ZKP_RATE).toFixed(2);
   document.getElementById('wActive').textContent=acs.length;
@@ -1368,17 +1859,56 @@ function showInsufficientZkpPopup(current){
 
 function showWithdrawPopup(){
   const ud=getUD(); if(!ud) return;
+  window._db.ref('settings/withdraw_frozen').once('value').then(snap=>{
+    if(snap.exists()&&snap.val()===true){
+      const ov=document.createElement('div');ov.className='overlay';
+      ov.innerHTML=\`<div class="popup" style="text-align:center;border-color:rgba(230,57,70,0.5);max-width:310px;">
+        <div style="font-size:2.5rem;margin-bottom:0.8rem;">🔒</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--red-bright);margin-bottom:0.6rem;">ระบบถอนปิดชั่วคราว</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">ขณะนี้ระบบถอนเงินถูกระงับชั่วคราว<br>กรุณาติดต่อ Admin หรือรอการแจ้งเตือน</div>
+        <button onclick="this.closest('.overlay').remove()" class="btn btn-primary" style="width:100%;">รับทราบ</button>
+      </div>\`;
+      document.body.appendChild(ov); return;
+    }
+    _doShowWithdrawPopup();
+  }).catch(()=>_doShowWithdrawPopup());
+}
+
+function renderWithdrawHistory(){
+  const el=document.getElementById('wdHistList'); if(!el) return;
+  const u=getSess(); if(!u) return;
+  window._db.ref('withdraw_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
+    if(!snap.exists()){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">ยังไม่มีประวัติ</div>';return;}
+    const items=[];
+    snap.forEach(c=>items.push(c.val()));
+    items.sort((a,b)=>b.time-a.time);
+    el.innerHTML=items.map(r=>{
+      const d=new Date(r.time);
+      const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+      const sc=r.status==='approved'?'var(--green)':r.status==='rejected'?'var(--red-bright)':'var(--gold)';
+      const st=r.status==='approved'?'✅ จ่ายแล้ว':r.status==='rejected'?'❌ ปฏิเสธ':'⏳ รออนุมัติ';
+      return `<div style="background:rgba(40,5,70,0.6);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.8rem;margin-bottom:0.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--green);">${parseFloat(r.zkpAmt||0).toFixed(4)} ZKP</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:${sc};">${st}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);">
+          <span>${r.lakAmt||''} ກີບ</span><span>${t}</span>
+        </div>
+        ${r.accNo?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-top:0.2rem;">${r.accName||''} · ${r.accNo}</div>`:''}
+      </div>`;
+    }).join('');
+  }).catch(()=>{el.innerHTML='<div style="color:var(--red-bright);font-size:0.72rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">❌ โหลดไม่ได้</div>';});
+}
+
+function _doShowWithdrawPopup(){
+  const ud=getUD(); if(!ud) return;
   const zkp=ud.zkpReward||0;
-  if(zkp<=0){
-    showInsufficientZkpPopup(zkp);
-    return;
-  }
-  if(zkp < MIN_WITHDRAW){
-    showInsufficientZkpPopup(zkp);
-    return;
-  }
+  if(zkp<MIN_WITHDRAW){showInsufficientZkpPopup(zkp);return;}
+  // โหลดอัตราแลกเปลี่ยนปัจจุบัน
+  const lakRate = LAK_RATE_LIVE || LAK_RATE;
   const usdVal=(zkp*ZKP_RATE).toFixed(4);
-  const lakVal=Math.round(zkp*ZKP_RATE*LAK_RATE).toLocaleString();
+  const lakVal=Math.round(zkp*ZKP_RATE*lakRate).toLocaleString();
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='withdrawOv';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd">
@@ -1490,21 +2020,32 @@ function addTestZkp(){
 // ─── TOPUP SYSTEM ───
 const LAK_RATE = 22700; // 1 USD = 22,700 LAK
 let selAmt=10;
-function lakFmt(usd){ return (usd*LAK_RATE).toLocaleString()+' ກີບ'; }
+function lakFmt(usd){ const r=LAK_RATE_LIVE||LAK_RATE; return (usd*r).toLocaleString()+' ກີບ'; }
 function onCustomAmt(val){
   const amt = parseFloat(val)||0;
   const lakEl = document.getElementById('customAmtLak');
-  if(lakEl) lakEl.textContent = amt>0 ? '= '+(amt*LAK_RATE).toLocaleString()+' ກີບ' : '= 0 ກີບ';
+  const _lr=LAK_RATE_LIVE||LAK_RATE; if(lakEl) lakEl.textContent = amt>0 ? '= '+(amt*_lr).toLocaleString()+' ກີບ' : '= 0 ກີບ';
   if(amt>0){
     // ล้างการเลือกปุ่ม
     document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
     selAmt = amt;
   }
 }
+function renderTopupCards(){
+  const grid=document.getElementById('tuGrid'); if(!grid) return;
+  const rate=LAK_RATE_LIVE||LAK_RATE;
+  const amounts=[10,20,50,100,300,1000,3000];
+  grid.innerHTML=amounts.map(amt=>`
+    <div class="tu-card" onclick="selTop(this,${amt})">
+      <div class="tu-v">${(amt*rate).toLocaleString()} ກີບ</div>
+      <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$${amt.toLocaleString()} USD</div>
+    </div>
+  `).join('');
+}
+
 function selTop(el,amt){
   document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel'); selAmt=amt;
-  // ล้าง custom input
   const inp = document.getElementById('customAmtInput');
   const lakEl = document.getElementById('customAmtLak');
   if(inp) inp.value='';
@@ -1517,6 +2058,7 @@ function goToQR(){
   document.getElementById('stepPending').style.display='none';
   document.getElementById('qrLakAmt').textContent=lakFmt(selAmt);
   document.getElementById('qrAmount').textContent='= $'+selAmt.toLocaleString()+' USD';
+  const rateEl=document.getElementById('qrRateDisplay'); if(rateEl) rateEl.textContent=(LAK_RATE_LIVE||LAK_RATE).toLocaleString();
   // Load QR image if admin set one
   const wrap=document.getElementById('qrImageWrap');
   wrap.innerHTML='<div style="text-align:center;color:#A890CC;font-family:monospace;font-size:0.7rem;padding:2rem;">⏳ กำลังโหลด QR...</div>';
@@ -1579,9 +2121,7 @@ function submitSlip(){
       try {
         const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
         window._db.ref('topup_reqs').push(req);
-        const reqs=JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
-        reqs.push(req);
-        localStorage.setItem('cm_topup_reqs',JSON.stringify(reqs));
+        // topup_reqs บันทึกใน Firebase แล้ว ไม่จำเป็นต้องเก็บ localStorage
         if(!ud.topupReqs) ud.topupReqs=[];
         ud.topupReqs.push({id:req.id,amt,note,time:req.time,status:'pending'});
         saveUD(ud);
@@ -1607,7 +2147,7 @@ function renderPendingList(){
     const d=new Date(r.time);
     return `<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;">
       <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--gold);">${(r.amt*LAK_RATE).toLocaleString()} ກີບ</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--gold);">${(r.amt*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString()} ກີບ</div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${d.toLocaleString('th-TH')}</div>
         ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${r.note}</div>`:''}
@@ -1813,16 +2353,18 @@ function doAdminLogout(){
 }
 function switchAdminTab(i){
   adminTabIdx = i;
-  ['atn0','atn1','atn2','atn3'].forEach((id,j)=>{
-    document.getElementById(id).classList.toggle('active', i===j);
+  ['atn0','atn1','atn2','atn3','atn4','atn5'].forEach((id,j)=>{
+    document.getElementById(id)?.classList.toggle('active', i===j);
   });
-  ['apg0','apg1','apg2','apg3'].forEach((id,j)=>{
-    document.getElementById(id).classList.toggle('active', i===j);
+  ['apg0','apg1','apg2','apg3','apg4','apg5'].forEach((id,j)=>{
+    document.getElementById(id)?.classList.toggle('active', i===j);
   });
   if(i===0) renderAdminTopup(currentFilter);
   if(i===1) renderAdminWithdraw();
   if(i===2) renderAdminUsers();
-  if(i===3){ loadAdminQRPreview(); renderAdminStats(); }
+  if(i===3){ loadAdminQRPreview(); renderAdminStats(); loadFreezeStatus(); loadLakRate(); }
+  if(i===4) renderAdminDashboard();
+  if(i===5) renderBcHistory();
 }
 function filterReqs(f){
   currentFilter = f;
@@ -1852,7 +2394,7 @@ function renderAdminTopup(filter){
     return `<div class="req-card ${r.status}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
         <div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);">${(r.amt*LAK_RATE).toLocaleString()} ກີບ</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);">${(r.amt*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString()} ກີບ</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem;">👤 ${r.user} · ${timeStr}</div>
           ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-top:0.15rem;">📝 ${r.note}</div>`:''}
@@ -1869,29 +2411,41 @@ function renderAdminTopup(filter){
   }).catch(()=>{el.innerHTML='<div style="color:red;text-align:center;padding:1rem;">❌ โหลดไม่ได้</div>';});
 }
 function viewSlip(reqId){
-  const reqs = JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
-  const r = reqs.find(x=>x.id===reqId); if(!r||!r.slipImg) return;
+  // viewSlip - โหลดจาก Firebase แทน
+  window._db.ref('topup_reqs').orderByChild('id').equalTo(reqId).once('value').then(snap=>{
+    if(!snap.exists()) return;
+    let r=null; snap.forEach(c=>{r=c.val();});
+    if(!r||!r.slipImg) return;
   const ov = document.createElement('div');
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;padding:1rem;';
   ov.innerHTML=`<div style="position:relative;max-width:100%;max-height:90vh;">
     <button onclick="this.closest('div[style]').remove()" style="position:absolute;top:-40px;right:0;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:1.2rem;padding:0.3rem 0.7rem;border-radius:6px;cursor:pointer;">✕</button>
     <img src="${r.slipImg}" style="max-width:100%;max-height:85vh;object-fit:contain;border-radius:10px;">
   </div>`;
-  ov.onclick = e=>{ if(e.target===ov) ov.remove(); };
-  document.body.appendChild(ov);
+    ov.onclick = e=>{ if(e.target===ov) ov.remove(); };
+    document.body.appendChild(ov);
+  });
 }
 function approveTopup(reqId, amt, username, fbKey){
-  // Update Firebase
   if(fbKey) window._db.ref('topup_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()});
-  // Add USD to user in Firebase
-  window._db.ref('users/'+username).once('value').then(snap=>{
-    if(snap.exists()){
-      const ud=snap.val();
-      ud.usd=(ud.usd||0)+parseFloat(amt);
-      ud.txs=ud.txs||[];
-      ud.txs.unshift({desc:'✅ เติม USD (อนุมัติแล้ว)',amount:+parseFloat(amt),unit:'USD',time:Date.now()});
-      window._db.ref('users/'+username).set(ud);
-      if(getSess()===username){_ud=ud;updateNav();}
+  // ใช้ transaction เพิ่ม USD แบบ atomic
+  window._db.ref('users/'+username+'/usd').transaction(cur=>{
+    return parseFloat(((cur||0)+parseFloat(amt)).toFixed(2));
+  }).then(()=>{
+    // บันทึก tx
+    window._db.ref('users/'+username+'/txs').once('value').then(snap=>{
+      const txs=snap.val()||[];
+      const arr=[{desc:`✅ Admin เติม $${parseFloat(amt).toFixed(2)} USD`,amount:+parseFloat(amt),unit:'USD',time:Date.now()},...(Array.isArray(txs)?txs:Object.values(txs))].slice(0,50);
+      window._db.ref('users/'+username+'/txs').set(arr);
+    });
+    // notification
+    window._db.ref('notifications/'+username).push({
+      type:'topup',icon:'💵',title:'เติมเงินสำเร็จ!',
+      body:`$${parseFloat(amt).toFixed(2)} USD เข้ากระเป๋าแล้ว`,
+      time:Date.now(),read:false
+    });
+    if(getSess()===username){
+      window._db.ref('users/'+username+'/usd').once('value').then(s=>{if(_ud)_ud.usd=s.val();updateNav();});
     }
   });
   setTimeout(()=>renderAdminTopup(currentFilter), 1000);
@@ -1913,7 +2467,7 @@ function renderAdminWithdraw(){
     el.innerHTML=withdraws.sort((a,b)=>b.time-a.time).map(r=>{
     const d=new Date(r.time);
     const t2=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-    const lakDisplay = r.lakAmt || Math.round((r.amt||r.zkpAmt||0)*ZKP_RATE*LAK_RATE).toLocaleString();
+    const lakDisplay = r.lakAmt || Math.round((r.amt||r.zkpAmt||0)*ZKP_RATE*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString();
     const zkpDisplay = r.zkpAmt || r.amt || 0;
     return `<div class="req-card ${r.status}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem;">
@@ -1971,6 +2525,19 @@ function rejectWithdraw(fbKey, username){
   });
 }
 function renderAdminUsers(){
+  const el=document.getElementById('adminUserList'); if(!el) return;
+  // โหลดจาก Firebase เพื่อให้ค้นหาได้
+  window._db.ref('users').once('value').then(snap=>{
+    if(!snap.exists()){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:1rem;">ยังไม่มีสมาชิก</div>';return;}
+    _allUsers=snap.val()||{};
+    const q=(document.getElementById('userSearchInput')?.value||'').toLowerCase().trim();
+    const countEl=document.getElementById('userSearchCount');
+    const total=Object.keys(_allUsers).length;
+    if(countEl) countEl.textContent=`สมาชิกทั้งหมด ${total} คน`;
+    filterAdminUsers(q);
+  });
+}
+function _renderAdminUsers_old(){
   const el=document.getElementById('adminUserList'); if(!el) return;
   const users=getU(); const keys=Object.keys(users);
   if(!keys.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ยังไม่มีสมาชิก</div>';return;}
@@ -2070,14 +2637,624 @@ function changeAdminPass(){
   document.getElementById('newAdminPass').value='';
   showToast('✅ เปลี่ยนรหัส Admin สำเร็จ');
 }
+// ════════════════════════════════════════
+// Terms & Conditions
+// ════════════════════════════════════════
+function showTerms(){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;';
+  ov.innerHTML=`
+    <div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.5rem;width:100%;max-width:420px;margin:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:var(--gold);">📋 ข้อตกลงการใช้งาน</div>
+        <button onclick="this.closest('div[style]').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+      </div>
+
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:2;max-height:70vh;overflow-y:auto;padding-right:0.3rem;">
+
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">1. การยอมรับข้อตกลง</div>
+        <p style="margin-bottom:1rem;">การใช้งาน CryptoMine ถือว่าท่านได้อ่าน เข้าใจ และยอมรับข้อตกลงทั้งหมดนี้แล้ว</p>
+
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--red-bright);margin-bottom:0.5rem;">⚠️ 2. ความเสี่ยงที่ต้องรับทราบ</div>
+        <p style="margin-bottom:0.5rem;color:#ffaaaa;">• การลงทุนใน Cloud Mining มีความเสี่ยง อาจสูญเสียเงินต้นได้</p>
+        <p style="margin-bottom:0.5rem;color:#ffaaaa;">• ราคา ZKP อาจมีความผันผวน ผลตอบแทนไม่ได้รับการรับประกัน</p>
+        <p style="margin-bottom:0.5rem;color:#ffaaaa;">• ผลการดำเนินงานในอดีตไม่ได้รับประกันผลในอนาคต</p>
+        <p style="margin-bottom:1rem;color:#ffaaaa;">• ควรลงทุนเฉพาะเงินที่ยอมรับความเสี่ยงได้เท่านั้น</p>
+
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">3. สัญญาขุด</div>
+        <p style="margin-bottom:0.5rem;">• สัญญาขุดมีอายุ 30 วัน นับจากวันที่ซื้อ</p>
+        <p style="margin-bottom:0.5rem;">• ZKP จะถูกสะสมเข้ากระเป๋าอัตโนมัติทุกวัน</p>
+        <p style="margin-bottom:1rem;">• ไม่สามารถยกเลิกสัญญาและขอเงินคืนได้หลังจากซื้อแล้ว</p>
+
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">4. การถอนเงิน</div>
+        <p style="margin-bottom:0.5rem;">• ถอนขั้นต่ำ ${MIN_WITHDRAW} ZKP ต่อครั้ง</p>
+        <p style="margin-bottom:0.5rem;">• Admin จะดำเนินการภายใน 24 ชั่วโมง</p>
+        <p style="margin-bottom:1rem;">• ระบบอาจถูกระงับชั่วคราวเพื่อการตรวจสอบ</p>
+
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">5. ระบบ Referral</div>
+        <p style="margin-bottom:0.5rem;">• รับค่าคอม 10% ZKP ทุกครั้งที่เพื่อนซื้อหรือต่อสัญญา</p>
+        <p style="margin-bottom:1rem;">• ค่าคอมจะโอนเข้ากระเป๋าทันทีเมื่อเพื่อนทำรายการ</p>
+
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">6. การระงับบัญชี</div>
+        <p style="margin-bottom:1rem;">ผู้ดูแลระบบมีสิทธิ์ระงับบัญชีที่พบว่ามีการทุจริต ปลอมแปลงหลักฐาน หรือกระทำผิดข้อตกลง</p>
+
+        <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:0.8rem;margin-top:0.5rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--gold);margin-bottom:0.3rem;">📌 สำคัญ</div>
+          <div style="font-size:0.68rem;line-height:1.8;">CryptoMine เป็นแพลตฟอร์มสำหรับผู้ที่ยอมรับความเสี่ยงในการลงทุนเท่านั้น กรุณาศึกษาข้อมูลให้ครบถ้วนก่อนตัดสินใจลงทุน</div>
+        </div>
+      </div>
+
+      <button onclick="this.closest('div[style]').remove()" class="btn btn-primary" style="width:100%;margin-top:1rem;">✅ รับทราบและยอมรับ</button>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+// ════════════════════════════════════════
+// อัตราแลกเปลี่ยน LAK (โหลดจาก Firebase)
+// ════════════════════════════════════════
+let LAK_RATE_LIVE = 22700;
+function loadLakRate(){
+  window._db.ref('settings/lak_rate').once('value').then(snap=>{
+    if(snap.exists()) LAK_RATE_LIVE = snap.val();
+    else LAK_RATE_LIVE = LAK_RATE;
+    const el=document.getElementById('currentLakRate');
+    if(el) el.textContent=LAK_RATE_LIVE.toLocaleString();
+    const inp=document.getElementById('newLakRate');
+    if(inp) inp.value=LAK_RATE_LIVE;
+  });
+}
+function saveLakRate(){
+  const val=parseInt(document.getElementById('newLakRate').value);
+  if(!val||val<1000){showToast('⚠️ กรุณากรอกอัตราที่ถูกต้อง (อย่างน้อย 1,000)');return;}
+  window._db.ref('settings/lak_rate').set(val).then(()=>{
+    LAK_RATE_LIVE=val;
+    const el=document.getElementById('currentLakRate');
+    if(el) el.textContent=val.toLocaleString();
+    showToast('✅ บันทึกอัตราแลกเปลี่ยน 1 USD = '+val.toLocaleString()+' ກີບ');
+  }).catch(()=>showToast('❌ บันทึกไม่สำเร็จ'));
+}
+
+// ════════════════════════════════════════
+// Freeze ระบบถอน
+// ════════════════════════════════════════
+function loadFreezeStatus(){
+  window._db.ref('settings/withdraw_frozen').once('value').then(snap=>{
+    const frozen=snap.exists()&&snap.val()===true;
+    updateFreezeUI(frozen);
+  });
+}
+function updateFreezeUI(frozen){
+  const el=document.getElementById('freezeStatus');
+  if(el){
+    el.textContent = frozen ? '🔒 ระบบถอนถูกล็อกอยู่' : '✅ ระบบถอนเปิดปกติ';
+    el.style.color = frozen ? 'var(--red-bright)' : 'var(--green)';
+  }
+}
+function setWithdrawFreeze(freeze){
+  const msg=freeze?'ยืนยันล็อกระบบถอน? ลูกค้าจะถอนไม่ได้จนกว่าจะเปิด':'เปิดระบบถอนอีกครั้ง?';
+  if(!confirm(msg)) return;
+  window._db.ref('settings/withdraw_frozen').set(freeze).then(()=>{
+    updateFreezeUI(freeze);
+    showToast(freeze?'🔒 ล็อกระบบถอนแล้ว':'🔓 เปิดระบบถอนแล้ว');
+    // ส่ง broadcast แจ้ง user ถ้าล็อก
+    if(freeze){
+      window._db.ref('broadcast/latest').set({
+        id:'bc_'+Date.now(),title:'ระบบถอนเงินปิดชั่วคราว',
+        body:'ขออภัยในความไม่สะดวก ระบบจะเปิดให้บริการอีกครั้งเร็วๆ นี้',
+        type:'maintenance',icon:'🔧',time:Date.now(),active:true
+      });
+    }
+  });
+}
+
+// ════════════════════════════════════════
+// Admin Dashboard
+// ════════════════════════════════════════
+function renderAdminDashboard(){
+  const todayStart=new Date(); todayStart.setHours(0,0,0,0);
+  const todayTs=todayStart.getTime();
+
+  // โหลดข้อมูล topup วันนี้
+  window._db.ref('topup_reqs').once('value').then(snap=>{
+    let topupToday=0, pendingCount=0;
+    const daily={};
+    if(snap.exists()){
+      snap.forEach(c=>{
+        const r=c.val();
+        if(r.status==='approved' && r.time>=todayTs) topupToday+=r.amt||0;
+        if(r.status==='pending') pendingCount++;
+        // สะสมรายวัน 7 วัน
+        if(r.status==='approved'){
+          const d=new Date(r.time);
+          const key=d.getDate()+'/'+(d.getMonth()+1);
+          daily[key]=(daily[key]||0)+(r.amt||0);
+        }
+      });
+    }
+    const el=document.getElementById('dashTopupToday');
+    if(el) el.textContent='$'+topupToday.toFixed(2);
+    const elP=document.getElementById('dashPendingCount');
+    if(elP) elP.textContent=pendingCount;
+    renderDashChart(daily);
+  });
+
+  // ถอนวันนี้
+  window._db.ref('withdraw_reqs').once('value').then(snap=>{
+    let wdToday=0;
+    if(snap.exists()){
+      snap.forEach(c=>{
+        const r=c.val();
+        if(r.status==='approved' && r.time>=todayTs) wdToday+=parseFloat(r.zkpAmt||0);
+      });
+    }
+    const el=document.getElementById('dashWithdrawToday');
+    if(el) el.textContent=wdToday.toFixed(4)+' ZKP';
+  });
+
+  // สมาชิก + top spenders
+  window._db.ref('users').once('value').then(snap=>{
+    if(!snap.exists()) return;
+    const data=snap.val();
+    const users=Object.entries(data);
+    const elU=document.getElementById('dashTotalUsers');
+    if(elU) elU.textContent=users.length;
+
+    // Top 5 ยอดซื้อสูงสุด
+    const sorted=users.map(([u,d])=>({
+      name:u,
+      spent:(d.packages||[]).reduce((s,p)=>s+(p.price||0),0),
+      pkgs:(d.packages||[]).length
+    })).sort((a,b)=>b.spent-a.spent).slice(0,5);
+
+    const el=document.getElementById('dashTopSpenders');
+    if(el){
+      el.innerHTML=sorted.map((u,i)=>`
+        <div style="display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0.8rem;background:rgba(40,5,70,0.6);border:1px solid rgba(157,78,221,0.15);border-radius:10px;margin-bottom:0.4rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.9rem;color:${i===0?'var(--gold)':i===1?'#9ca3af':'#d97706'};width:22px;">#${i+1}</div>
+          <div style="flex:1;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#fff;">${u.name.slice(0,2)+'*'.repeat(Math.max(0,u.name.length-2))}</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--gold);">$${u.spent.toLocaleString()}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${u.pkgs} แพ็ก</div>
+        </div>
+      `).join('');
+    }
+  });
+}
+
+function renderDashChart(daily){
+  const canvas=document.getElementById('dashChart'); if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth||300; const H=140;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+
+  // สร้าง labels 7 วันล่าสุด
+  const labels=[],values=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(Date.now()-i*86400000);
+    const key=d.getDate()+'/'+(d.getMonth()+1);
+    labels.push(key); values.push(daily[key]||0);
+  }
+  const maxVal=Math.max(...values,1);
+  const padL=32,padR=8,padT=10,padB=28;
+  const cW=W-padL-padR; const cH=H-padT-padB;
+  const barW=Math.floor(cW/7*0.55); const gap=cW/7;
+
+  ctx.strokeStyle='rgba(157,78,221,0.12)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=padT+cH-(cH/4*i);
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+cW,y);ctx.stroke();
+    ctx.fillStyle='rgba(168,144,204,0.7)';
+    ctx.font='9px monospace'; ctx.textAlign='right';
+    ctx.fillText('$'+(maxVal/4*i).toFixed(0),padL-3,y+3);
+  }
+  values.forEach((v,i)=>{
+    const x=padL+i*gap+(gap-barW)/2;
+    const bH=v>0?Math.max(4,cH*(v/maxVal)):2;
+    const y=padT+cH-bH;
+    const grad=ctx.createLinearGradient(0,y,0,y+bH);
+    grad.addColorStop(0,'rgba(255,215,0,0.9)');
+    grad.addColorStop(1,'rgba(157,78,221,0.6)');
+    ctx.fillStyle=grad;
+    ctx.beginPath(); ctx.roundRect(x,y,barW,bH,3); ctx.fill();
+    if(v>0){
+      ctx.fillStyle='rgba(255,255,255,0.85)';
+      ctx.font='7px monospace'; ctx.textAlign='center';
+      ctx.fillText('$'+v.toFixed(0),x+barW/2,y-3);
+    }
+    ctx.fillStyle='rgba(168,144,204,0.8)';
+    ctx.font='9px monospace'; ctx.textAlign='center';
+    ctx.fillText(labels[i],x+barW/2,H-6);
+  });
+}
+
+// ── LOAD BROADCAST BANNER ──
+function loadBroadcastBanner(){
+  window._db.ref('broadcast/latest').once('value').then(snap=>{
+    if(!snap.exists()) return;
+    const m=snap.val(); if(!m||!m.active) return;
+    const banner=document.getElementById('bcBanner'); if(!banner) return;
+    const iconEl=document.getElementById('bcBannerIcon');
+    const titleEl=document.getElementById('bcBannerTitle');
+    const bodyEl=document.getElementById('bcBannerBody');
+    if(iconEl) iconEl.textContent=m.icon||'📢';
+    if(titleEl) titleEl.textContent=m.title||'';
+    if(bodyEl) bodyEl.textContent=m.body||'';
+    const colors={info:'rgba(255,215,0,0.3)',warning:'rgba(230,57,70,0.3)',success:'rgba(74,222,128,0.3)',maintenance:'rgba(157,78,221,0.3)'};
+    banner.style.borderColor=colors[m.type]||colors.info;
+    banner.style.display='block';
+  });
+}
+
+// ── NOTIFICATIONS ──
+let _notifList=[];
+function showNotifications(){
+  _notifList=[]; updateNotifBadge();
+  const ov=document.createElement('div'); ov.id='notifOv';
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;';
+  const u=getSess();
+  window._db.ref('notifications/'+u).orderByChild('time').limitToLast(20).once('value').then(snap=>{
+    const items=[]; if(snap.exists()) snap.forEach(c=>items.unshift(c.val()));
+    ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.5rem;width:100%;max-width:380px;margin:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:#fff;">🔔 การแจ้งเตือน</div>
+        <button onclick="document.getElementById('notifOv').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+      </div>
+      ${items.length?items.map(n=>{
+        const d=new Date(n.time);
+        const t=d.getDate()+'/'+(d.getMonth()+1)+' '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+        const colors={approved:'var(--green)',rejected:'var(--red-bright)',topup:'var(--gold)',info:'var(--purple-light)',referral:'var(--purple-light)'};
+        return \`<div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.8rem;margin-bottom:0.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.2rem;">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:\${colors[n.type]||'#fff'};">\${n.icon||'🔔'} \${n.title}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);">\${t}</div>
+          </div>
+          \${n.body?'<div style="font-family:Share Tech Mono,monospace;font-size:0.68rem;color:var(--text-dim);">'+n.body+'</div>':''}
+        </div>\`;
+      }).join(''):'<div style="text-align:center;padding:2rem;font-family:Share Tech Mono,monospace;font-size:0.72rem;color:var(--text-dim);">ยังไม่มีการแจ้งเตือน</div>'}
+    </div>`;
+    document.body.appendChild(ov);
+    if(snap.exists()) snap.forEach(c=>window._db.ref('notifications/'+u+'/'+c.key+'/read').set(true));
+  });
+}
+function updateNotifBadge(){
+  const badge=document.getElementById('notifBadge'); if(!badge) return;
+  if(_notifList.length>0){badge.textContent=_notifList.length>9?'9+':_notifList.length;badge.style.display='flex';}
+  else badge.style.display='none';
+}
+function listenNotifications(){
+  const u=getSess(); if(!u) return;
+  window._db.ref('notifications/'+u).orderByChild('read').equalTo(false).on('value',snap=>{
+    _notifList=[];
+    if(snap.exists()) snap.forEach(c=>{if(!c.val().read)_notifList.push(c.val());});
+    updateNotifBadge();
+  });
+}
+
+// ── PROFILE ──
+function showProfile(){
+  const ud=getUD(); if(!ud) return;
+  const u=getSess();
+  const initials=u.slice(0,2).toUpperCase();
+  const joined=ud.createdAt?new Date(ud.createdAt).toLocaleDateString('th-TH'):'ไม่ทราบ';
+  const pkgsActive=(ud.packages||[]).filter(p=>p.remaining>0).length;
+  const totalZkp=((ud.zkpReward||0)+(ud.zkpMine||0)).toFixed(4);
+  const streak=ud.checkIn?.streak||0;
+  const ov=document.createElement('div'); ov.className='profile-popup'; ov.id='profileOv';
+  ov.innerHTML=`<div class="profile-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:var(--purple-light);">👤 โปรไฟล์</div>
+      <button onclick="document.getElementById('profileOv').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+    </div>
+    <div class="profile-avatar">${initials}</div>
+    <div style="text-align:center;margin-bottom:0.3rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:#fff;">${u}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-top:0.2rem;">${ud.email||''}</div>
+    </div>
+    <div style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:1rem;">📅 สมัครเมื่อ ${joined}</div>
+    <div class="profile-stat-grid">
+      <div class="profile-stat"><div class="ps-val" style="color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div><div class="ps-lbl">USD คงเหลือ</div></div>
+      <div class="profile-stat"><div class="ps-val" style="color:var(--green);">${totalZkp}</div><div class="ps-lbl">ZKP ทั้งหมด</div></div>
+      <div class="profile-stat"><div class="ps-val" style="color:var(--purple-light);">${pkgsActive}</div><div class="ps-lbl">แพ็ก Active</div></div>
+      <div class="profile-stat"><div class="ps-val" style="color:var(--red-bright);">🔥 ${streak}</div><div class="ps-lbl">Streak วัน</div></div>
+      <div class="profile-stat"><div class="ps-val" style="color:#38bdf8;">${ud.sessions||0}</div><div class="ps-lbl">ครั้งที่ขุด</div></div>
+      <div class="profile-stat"><div class="ps-val" style="color:var(--green);">${ud.refCount||0}</div><div class="ps-lbl">เพื่อนชวนมา</div></div>
+    </div>
+    <button onclick="document.getElementById('profileOv').remove();doLogout();" style="width:100%;padding:0.7rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:10px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.7rem;cursor:pointer;margin-top:0.8rem;">🚪 ออกจากระบบ</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+// ── DAILY CHECK-IN ──
+const CI_REWARDS=[0.5,0.8,1.2,1.5,2.0,2.5,5.0];
+const CI_ICONS=['🎁','⚡','💎','🔥','🚀','👑','🌟'];
+function renderCheckIn(){
+  const ud=getUD(); if(!ud) return;
+  const todayStr=new Date().toDateString();
+  const ci=ud.checkIn||{streak:0,lastDate:'',history:[]};
+  const alreadyDone=ci.lastDate===todayStr;
+  const streak=ci.streak||0;
+  const dayIdx=streak%7;
+  const ciDaysEl=document.getElementById('ciDays');
+  if(ciDaysEl){
+    ciDaysEl.innerHTML=CI_REWARDS.map((r,i)=>{
+      let cls='ci-day';
+      if(i<(alreadyDone?dayIdx:dayIdx)&&i!==(alreadyDone?dayIdx-1:dayIdx)) cls+=' done';
+      if(i===(alreadyDone?dayIdx-1:dayIdx)) cls+=' today'+(alreadyDone?' done':'');
+      return `<div class="${cls}"><div class="ci-d-num">วัน${i+1}</div><div class="ci-d-icon">${(i<dayIdx||(alreadyDone&&i===dayIdx-1))?'✅':CI_ICONS[i]}</div><div class="ci-d-zkp">+${r}</div></div>`;
+    }).join('');
+  }
+  const streakEl=document.getElementById('ciStreak'); if(streakEl) streakEl.textContent=streak;
+  const btn=document.getElementById('ciBtn'); const msg=document.getElementById('ciMsg');
+  if(btn){
+    if(alreadyDone){
+      btn.className='btn-checkin done'; btn.textContent='✅ เช็คอินแล้ววันนี้';
+      if(msg) msg.textContent=`รับไปแล้ว +${CI_REWARDS[(dayIdx-1+7)%7]} ZKP • กลับมาพรุ่งนี้!`;
+    } else {
+      btn.className='btn-checkin ready'; btn.textContent=`🎁 รับ +${CI_REWARDS[dayIdx]} ZKP วันนี้`;
+      if(msg) msg.textContent=streak>0?`🔥 Streak ${streak} วัน!`:'เช็คอินทุกวันรับโบนัสเพิ่ม!';
+    }
+  }
+}
+function doCheckIn(){
+  const ud=getUD(); if(!ud) return;
+  const todayStr=new Date().toDateString();
+  const ci=ud.checkIn||{streak:0,lastDate:'',history:[]};
+  if(ci.lastDate===todayStr){showToast('✅ เช็คอินแล้ววันนี้!');return;}
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  ci.streak=(ci.lastDate===yesterday)?(ci.streak||0)+1:1;
+  ci.lastDate=todayStr;
+  if(!ci.history) ci.history=[];
+  ci.history.unshift({date:todayStr,time:Date.now()});
+  if(ci.history.length>30) ci.history=ci.history.slice(0,30);
+  const dayIdx=(ci.streak-1)%7;
+  const reward=CI_REWARDS[dayIdx];
+  ud.checkIn=ci; ud.zkpReward=(ud.zkpReward||0)+reward;
+  ud.txs=ud.txs||[];
+  ud.txs.unshift({desc:`📅 Daily Check-in วันที่ ${ci.streak} 🔥`,amount:reward,unit:'ZKP',time:Date.now()});
+  saveUD(ud); updateNav(); renderCheckIn();
+  addAct('📅',`Check-in วันที่ ${ci.streak}!`,'+'+reward+' ZKP','ap');
+  showToast(`🎁 Check-in! +${reward} ZKP • Streak ${ci.streak} วัน 🔥`);
+}
+
+// ── _doShowWithdrawPopup (ต่อจาก Freeze check) ──
+// ── LEADERBOARD ──
+function renderLeaderboard(){
+  const top3El=document.getElementById('lbTop3');
+  const listEl=document.getElementById('lbList');
+  const myRankEl=document.getElementById('lbMyRank');
+  if(!top3El||!listEl) return;
+  const me=getSess();
+  top3El.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;width:100%;padding:1rem;">⏳ กำลังโหลด...</div>';
+  listEl.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('users').once('value').then(snap=>{
+    if(!snap.exists()){listEl.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">ยังไม่มีข้อมูล</div>';return;}
+    const data=snap.val();
+    const players=Object.entries(data).map(([u,d])=>({
+      name:u,
+      zkp:parseFloat(((d.zkpReward||0)+(d.zkpMine||0)).toFixed(4)),
+      pkgs:(d.packages||[]).filter(p=>p.remaining>0).length
+    })).filter(p=>p.zkp>0).sort((a,b)=>b.zkp-a.zkp);
+
+    if(!players.length){
+      top3El.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;width:100%;padding:1rem;">ยังไม่มีผู้เล่น</div>';
+      listEl.innerHTML=''; return;
+    }
+
+    const maskName=n=>n.length<=2?n:n.slice(0,2)+'*'.repeat(Math.min(n.length-2,4));
+    const initials=n=>n.slice(0,2).toUpperCase();
+
+    // TOP 3
+    const podOrder=[1,0,2]; const podClass=['p2','p1','p3'];
+    const podH=['50px','70px','38px']; const crowns=['🥈','🥇','🥉'];
+    const podArr=podOrder.map((idx,pi)=>players[idx]?{...players[idx],rank:idx+1,pc:podClass[pi],crown:crowns[pi],barH:podH[pi]}:null).filter(Boolean);
+    top3El.innerHTML=`<div style="display:flex;align-items:flex-end;justify-content:center;gap:0.8rem;width:100%;">
+      ${podArr.map(p=>`<div class="lb-pod ${p.pc}">
+        <div style="font-size:1.3rem;">${p.crown}</div>
+        <div class="lb-avatar">${initials(p.name)}</div>
+        <div class="lb-name">${maskName(p.name)}${p.name===me?'<span class="lb-me-badge">ME</span>':''}</div>
+        <div class="lb-val">+${p.zkp} ZKP</div>
+        <div class="lb-bar" style="height:${p.barH};"></div>
+      </div>`).join('')}
+    </div>`;
+
+    // LIST 4+
+    const rest=players.slice(3);
+    listEl.innerHTML=rest.length?rest.map((p,i)=>`
+      <div class="lb-row ${p.name===me?'me':''}">
+        <div class="lb-rank">#${i+4}</div>
+        <div class="lb-row-avatar">${initials(p.name)}</div>
+        <div style="flex:1;">
+          <div class="lb-row-name">${maskName(p.name)}${p.name===me?'<span class="lb-me-badge">ME</span>':''}</div>
+          <div class="lb-row-sub">${p.pkgs} สัญญา active</div>
+        </div>
+        <div class="lb-row-zkp">${p.zkp} ZKP</div>
+      </div>`).join(''):'<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.65rem;text-align:center;padding:0.8rem;">ยังไม่มีอันดับอื่น</div>';
+
+    // MY RANK
+    const myIdx=players.findIndex(p=>p.name===me);
+    if(myIdx>=0){
+      document.getElementById('myRankNo').textContent='#'+(myIdx+1);
+      document.getElementById('myRankName').textContent=me;
+      document.getElementById('myRankZkp').textContent=players[myIdx].zkp+' ZKP';
+      if(myRankEl) myRankEl.style.display='block';
+    }
+  }).catch(()=>{listEl.innerHTML='<div style="color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">❌ โหลดไม่ได้</div>';});
+}
+
+// ── BROADCAST ──
+function sendBroadcast(){
+  const title=(document.getElementById('bcTitle')?.value||'').trim();
+  const body=(document.getElementById('bcBody')?.value||'').trim();
+  const type=document.getElementById('bcType')?.value||'info';
+  if(!title){showToast('⚠️ กรุณาใส่หัวข้อ');return;}
+  const icons={info:'ℹ️',warning:'⚠️',success:'✅',maintenance:'🔧'};
+  const msg={id:'bc_'+Date.now(),title,body,type,icon:icons[type]||'📢',time:Date.now(),active:true};
+  window._db.ref('broadcast/latest').set(msg).then(()=>{
+    window._db.ref('broadcast/history').push(msg);
+    if(document.getElementById('bcTitle')) document.getElementById('bcTitle').value='';
+    if(document.getElementById('bcBody')) document.getElementById('bcBody').value='';
+    renderBcHistory();
+    showToast('📢 ส่งประกาศสำเร็จ!');
+  }).catch(()=>showToast('❌ ส่งไม่สำเร็จ'));
+}
+function deleteBroadcast(){
+  window._db.ref('broadcast/latest').remove().then(()=>{
+    showToast('🗑️ ลบประกาศแล้ว'); renderBcHistory();
+  });
+}
+function renderBcHistory(){
+  const el=document.getElementById('bcHistory'); if(!el) return;
+  el.innerHTML='<div style="color:var(--text-dim);font-size:0.72rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('broadcast/history').orderByChild('time').limitToLast(10).once('value').then(snap=>{
+    if(!snap.exists()){el.innerHTML='<div style="color:var(--text-dim);font-size:0.72rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">ยังไม่มีประกาศ</div>';return;}
+    const items=[]; snap.forEach(c=>items.unshift({...c.val(),fbKey:c.key}));
+    el.innerHTML=items.map(m=>{
+      const d=new Date(m.time);
+      const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+      return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.9rem;margin-bottom:0.6rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:#fff;">${m.icon} ${m.title}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);">${t}</div>
+        </div>
+        ${m.body?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:1.6;">${m.body}</div>`:''}
+      </div>`;
+    }).join('');
+  });
+}
+
+// ── CHANGE PASSWORD (user) ──
+function userChangePass(){
+  const oldP=document.getElementById('oldPassInput')?.value||'';
+  const newP=document.getElementById('newPassUserInput')?.value||'';
+  const conP=document.getElementById('confirmPassUserInput')?.value||'';
+  const msg=document.getElementById('changePassMsg');
+  const setMsg=(txt,color)=>{if(msg){msg.textContent=txt;msg.style.color=color;}};
+  if(!oldP||!newP||!conP){setMsg('⚠️ กรุณากรอกข้อมูลให้ครบ','var(--red-bright)');return;}
+  if(newP.length<6){setMsg('⚠️ รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัว','var(--red-bright)');return;}
+  if(newP!==conP){setMsg('⚠️ รหัสผ่านใหม่ไม่ตรงกัน','var(--red-bright)');return;}
+  if(oldP===newP){setMsg('⚠️ รหัสผ่านใหม่ต้องต่างจากเดิม','var(--red-bright)');return;}
+  setMsg('⏳ กำลังตรวจสอบ...','var(--text-dim)');
+  const ud=getUD(); if(!ud){setMsg('❌ ไม่พบข้อมูล','var(--red-bright)');return;}
+  sha256(oldP).then(oldHashed=>{
+    const isHashed=ud.pw&&ud.pw.length===64;
+    const match=isHashed?(ud.pw===oldHashed):(ud.pw===oldP);
+    if(!match){setMsg('❌ รหัสผ่านปัจจุบันไม่ถูกต้อง','var(--red-bright)');return;}
+    return sha256(newP).then(newHashed=>{
+      return window._db.ref('users/'+getSess()+'/pw').set(newHashed).then(()=>{
+        ud.pw=newHashed; _ud=ud;
+        document.getElementById('oldPassInput').value='';
+        document.getElementById('newPassUserInput').value='';
+        document.getElementById('confirmPassUserInput').value='';
+        setMsg('✅ เปลี่ยนรหัสผ่านสำเร็จ!','var(--green)');
+        showToast('✅ เปลี่ยนรหัสผ่านสำเร็จ');
+      });
+    });
+  }).catch(()=>setMsg('❌ เกิดข้อผิดพลาด กรุณาลองใหม่','var(--red-bright)'));
+}
+
+// ── ADMIN BAN/UNBAN ──
+function adminToggleBan(username, isBanned){
+  if(!confirm(`${isBanned?'ปลดแบน':'แบน'} "${username}" ?`)) return;
+  window._db.ref('users/'+username+'/banned').set(!isBanned).then(()=>{
+    if(!isBanned){
+      window._db.ref('notifications/'+username).push({
+        type:'info',icon:'🚫',title:'บัญชีถูกระงับ',
+        body:'กรุณาติดต่อผู้ดูแลระบบ',time:Date.now(),read:false
+      });
+    }
+    renderAdminUsers();
+    showToast(`${!isBanned?'🚫 แบน':'✅ ปลดแบน'} ${username} สำเร็จ`);
+  }).catch(()=>showToast('❌ ดำเนินการไม่สำเร็จ'));
+}
+
+// ── ADMIN RESET PASSWORD ──
+function adminResetPass(username){
+  const ov=document.createElement('div');
+  ov.id='resetPassOv';
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+  ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.8rem;max-width:320px;width:100%;">
+    <div style="text-align:center;margin-bottom:1.2rem;">
+      <div style="font-size:1.8rem;">🔑</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:var(--purple-light);">Reset รหัสผ่าน</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);">👤 ${username}</div>
+    </div>
+    <input type="password" id="newPassInput" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)"
+      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.9rem;outline:none;margin-bottom:0.4rem;">
+    <input type="password" id="confirmPassInput" placeholder="ยืนยันรหัสผ่านใหม่"
+      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.9rem;outline:none;margin-bottom:0.6rem;">
+    <div id="resetPassErr" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--red-bright);min-height:1.2em;margin-bottom:0.6rem;"></div>
+    <div style="display:flex;gap:0.6rem;">
+      <button onclick="confirmResetPass('${username}')" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,var(--purple-dark),var(--purple-light));border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.68rem;font-weight:700;cursor:pointer;">✅ บันทึก</button>
+      <button onclick="document.getElementById('resetPassOv').remove()" style="padding:0.75rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ยกเลิก</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>document.getElementById('newPassInput')?.focus(),200);
+}
+function confirmResetPass(username){
+  const newPass=document.getElementById('newPassInput')?.value||'';
+  const confirm=document.getElementById('confirmPassInput')?.value||'';
+  const err=document.getElementById('resetPassErr');
+  if(newPass.length<6){if(err)err.textContent='⚠️ รหัสผ่านต้องมีอย่างน้อย 6 ตัว';return;}
+  if(newPass!==confirm){if(err)err.textContent='⚠️ รหัสผ่านไม่ตรงกัน';return;}
+  if(err)err.textContent='⏳ กำลังบันทึก...';
+  sha256(newPass).then(hashed=>{
+    return window._db.ref('users/'+username+'/pw').set(hashed);
+  }).then(()=>{
+    document.getElementById('resetPassOv')?.remove();
+    showToast(`✅ Reset รหัสผ่านของ ${username} สำเร็จ`);
+  }).catch(()=>{if(err)err.textContent='❌ บันทึกไม่สำเร็จ';});
+}
+
+// ── ADMIN VIEW USER ──
+function adminViewUser(username){
+  window._db.ref('users/'+username).once('value').then(snap=>{
+    if(!snap.exists()){showToast('❌ ไม่พบ user');return;}
+    const ud=snap.val();
+    const pkgsActive=(ud.packages||[]).filter(p=>p.remaining>0);
+    const pkgsAll=ud.packages||[];
+    const txs=(ud.txs||[]).slice(0,8);
+    const ci=ud.checkIn||{};
+    const d=new Date(ud.createdAt||0);
+    const joined=ud.createdAt?`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`:'ไม่ทราบ';
+    const ov=document.createElement('div');
+    ov.id='userDetailOv';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;';
+    ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.5rem;width:100%;max-width:420px;margin:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;">🔍 ${username}</div>
+        <button onclick="document.getElementById('userDetailOv').remove()" style="padding:0.4rem 0.8rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+      </div>
+      <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.9rem;margin-bottom:0.8rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--purple-light);margin-bottom:0.6rem;">📋 ข้อมูลบัญชี</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;">
+          <div style="color:var(--text-dim);">Email</div><div style="color:#fff;">${ud.email||'-'}</div>
+          <div style="color:var(--text-dim);">วันที่สมัคร</div><div style="color:#fff;">${joined}</div>
+          <div style="color:var(--text-dim);">Streak</div><div style="color:var(--gold);">🔥 ${ci.streak||0} วัน</div>
+          <div style="color:var(--text-dim);">Referral</div><div style="color:var(--green);">${ud.refCount||0} คน</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:0.8rem;">
+        <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:0.7rem;text-align:center;"><div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">USD</div></div>
+        <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:0.7rem;text-align:center;"><div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--green);">${(ud.zkpReward||0).toFixed(4)}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">ZKP</div></div>
+        <div style="background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.2);border-radius:8px;padding:0.7rem;text-align:center;"><div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--purple-light);">${pkgsActive.length}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div></div>
+      </div>
+      ${txs.length?`<div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.9rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--purple-light);margin-bottom:0.6rem;">📋 ธุรกรรมล่าสุด</div>
+        ${txs.map(tx=>{const td=new Date(tx.time);const tt=td.getDate()+'/'+(td.getMonth()+1)+' '+td.getHours().toString().padStart(2,'0')+':'+td.getMinutes().toString().padStart(2,'0');return `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid rgba(157,78,221,0.06);font-family:'Share Tech Mono',monospace;font-size:0.65rem;"><span style="color:var(--text-dim);flex:1;">${tx.desc||'-'}</span><span style="color:var(--text-dim);margin:0 0.5rem;">${tt}</span><span style="color:${tx.amount>0?'var(--green)':'var(--red-bright)'};">${tx.amount>0?'+':''}${tx.amount} ${tx.unit||'USD'}</span></div>`;}).join('')}
+      </div>`:''}
+    </div>`;
+    document.body.appendChild(ov);
+  }).catch(()=>showToast('❌ โหลดข้อมูลไม่ได้'));
+}
+
 function renderAdminStats(){
   const el=document.getElementById('adminStats'); if(!el) return;
   const users=getU(); const keys=Object.keys(users);
-  const reqs=JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
   const totalUsd=keys.reduce((s,u)=>s+(users[u].usd||0),0);
   const totalZkp=keys.reduce((s,u)=>s+(users[u].zkpReward||0),0);
-  const pending=reqs.filter(r=>r.status==='pending').length;
-  const approved=reqs.filter(r=>r.status==='approved').length;
+  const pending=0; const approved=0; // โหลดจาก Firebase ใน Dashboard tab
   el.innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;">
       ${[['👥 สมาชิก',keys.length,'คน','var(--purple-light)'],['💰 รออนุมัติ',pending,'คำขอ','var(--gold)'],['✅ อนุมัติแล้ว',approved,'คำขอ','var(--green)'],['💵 USD ระบบ','$'+totalUsd.toFixed(0),'USD','var(--gold)']].map(([l,v,u,c])=>`
