@@ -1528,8 +1528,61 @@ function doTopup(){ /* legacy - now handled by submitSlip */ }
 
 // ─── DRIP ENGINE ───
 let dripInt=null;const NOTIFIED={};
+// ─── คำนวณ ZKP ที่ได้ระหว่างปิดเว็บ ───
+function calcOfflineEarnings(){
+  const ud=getUD(); if(!ud||!ud.packages) return;
+  const now=Date.now();
+  const lastSeen=ud.lastSeen||now;
+  const offlineSec=(now-lastSeen)/1000;
+  if(offlineSec<10) return; // ไม่นับถ้าปิดแป๊บเดียว
+
+  let totalOfflineZkp=0;
+  let changed=false;
+
+  ud.packages.forEach(p=>{
+    if(p.remaining<=0) return;
+    const def=PKGS[p.key]; if(!def) return;
+
+    // คำนวณ ZKP ที่ควรได้ในช่วงออฟไลน์
+    const daysOffline=Math.min(offlineSec/DEMO_DAY, p.remaining);
+    const zkpEarned=def.daily*daysOffline;
+
+    if(zkpEarned>0){
+      totalOfflineZkp+=zkpEarned;
+      // อัปเดต remaining
+      p.remaining=Math.max(0,p.remaining-daysOffline);
+      changed=true;
+    }
+  });
+
+  if(changed && totalOfflineZkp>0){
+    ud.zkpReward=(ud.zkpReward||0)+totalOfflineZkp;
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({
+      desc:`⚡ ขุดระหว่างออฟไลน์ ${Math.round(offlineSec/60)} นาที`,
+      amount:+totalOfflineZkp.toFixed(6),
+      unit:'ZKP',
+      time:now
+    });
+    saveUD(ud);
+    updateRewardUI();
+    showToast(`⚡ ขุดได้ +${totalOfflineZkp.toFixed(4)} ZKP ระหว่างที่คุณออฟไลน์!`);
+  }
+}
+
+// บันทึกเวลาล่าสุดที่ออนไลน์
+function updateLastSeen(){
+  const ud=getUD(); if(!ud) return;
+  ud.lastSeen=Date.now();
+  saveUD(ud);
+}
+
 function startDrip(){
   if(dripInt)clearInterval(dripInt);
+
+  // คำนวณ ZKP ที่ขุดได้ระหว่างปิดเว็บก่อน
+  calcOfflineEarnings();
+
   dripInt=setInterval(()=>{
     const ud=getUD();if(!ud||!ud.packages)return;
     const now=Date.now();let changed=false;
@@ -1542,11 +1595,17 @@ function startDrip(){
       if(p.remaining<=0&&oldRem>0){
         const nk=getSess()+'_'+i+'_'+p.bought;
         if(!NOTIFIED[nk]){NOTIFIED[nk]=true;const def=PKGS[p.key];const bought=(ud.packages||[]).filter(q=>q.key===p.key).length;
-          setTimeout(()=>{bought>=2?showRollNotif(def):showToast(`${t('toast.expired1')} ${def.name} ${t('toast.expired2')} ${2-bought} ${t('toast.expired3')}`)},500);}
+          setTimeout(()=>{showToast(`✅ ${def.name} ครบ 30 วันแล้ว!`)},500);}
       }
     });
-    if(changed){saveUD(ud);updateRewardUI();}
+    if(changed){
+      ud.lastSeen=Date.now();
+      saveUD(ud);updateRewardUI();
+    }
   },TICK);
+
+  // บันทึก lastSeen ทุก 30 วินาที
+  setInterval(updateLastSeen, 30000);
 }
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
 function updateRewardUI(){
