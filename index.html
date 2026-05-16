@@ -51,7 +51,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #authScreen{align-items:center;justify-content:center;padding:1.5rem;
   background:radial-gradient(ellipse 100% 70% at 30% 50%,rgba(80,15,160,0.35) 0%,transparent 60%),
              radial-gradient(ellipse 80% 80% at 70% 50%,rgba(50,10,120,0.25) 0%,transparent 60%)}
-.auth-logo{font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;letter-spacing:4px;text-align:center;
+.auth-logo{font-family:'Orbitron',monospace;font-size:2.6rem;font-weight:900;letter-spacing:4px;text-align:center;
   margin-bottom:0.3rem;color:#fff;text-shadow:0 0 30px rgba(157,78,221,0.7),0 0 60px rgba(123,47,190,0.4);
   position:relative;display:inline-block;animation:logo-flicker 8s ease-in-out infinite}
 .auth-logo::before,.auth-logo::after{content:'⛏ CRYPTOMINE';position:absolute;top:0;left:0;right:0;
@@ -109,14 +109,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nav{display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1rem;position:sticky;top:0;z-index:100;
   background:rgba(30,0,50,0.97);backdrop-filter:blur(20px);border-bottom:3px solid rgba(200,100,255,0.5);
   box-shadow:0 2px 20px rgba(74,14,143,0.2)}
-.nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1rem;letter-spacing:2px;color:#fff;
+.nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.1rem;letter-spacing:2px;color:#fff;
   text-shadow:0 0 15px rgba(157,78,221,0.5);margin-right:auto}
 .nav-pill{display:flex;align-items:center;gap:0.3rem;padding:0.28rem 0.65rem;border-radius:20px;
   font-family:'Share Tech Mono',monospace;white-space:nowrap}
 .nav-pill.zkp{background:rgba(157,78,221,0.12);border:1px solid rgba(157,78,221,0.3)}
 .nav-pill.usd{background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25)}
-.np-val{font-size:0.88rem;font-weight:700;color:#fff;font-family:'Orbitron',monospace}
-.np-lbl{font-size:0.65rem;color:rgba(157,78,221,0.8);letter-spacing:1px}
+.np-val{font-size:0.95rem;font-weight:700;color:#fff;font-family:'Orbitron',monospace}
+.np-lbl{font-size:0.7rem;color:rgba(157,78,221,0.8);letter-spacing:1px}
 .nav-pill.usd .np-val{color:var(--gold)}.nav-pill.usd .np-lbl{color:rgba(255,215,0,0.5)}
 .btn-out{padding:0.28rem 0.65rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);
   border-radius:6px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.52rem;letter-spacing:1px;cursor:pointer}
@@ -173,12 +173,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   backdrop-filter:blur(20px);padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -4px 20px rgba(74,14,143,0.2)}
 .bnav{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.18rem;padding:0.6rem 0.2rem 0.45rem;
   background:none;border:none;cursor:pointer;transition:all 0.25s;color:#ffffff;
-  font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.5px;text-transform:uppercase}
+  font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.5px;text-transform:uppercase}
 .bnav.active{color:var(--red-bright)}.bnav.active svg{filter:drop-shadow(0 0 6px rgba(255,77,90,0.9));stroke:var(--red-bright)}
 .bnav svg{transition:all 0.25s;stroke:#ffffff}
 
 /* ── SHARED ── */
-.sec-title{font-family:'Orbitron',monospace;font-size:0.78rem;letter-spacing:2px;color:#C8B0FF;font-weight:700;
+.sec-title{font-family:'Orbitron',monospace;font-size:0.88rem;letter-spacing:2px;color:#C8B0FF;font-weight:700;
   text-transform:uppercase;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.7rem}
 .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(157,78,221,0.3),transparent)}
 .btn{padding:0.7rem 1rem;border:none;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.68rem;
@@ -200,9 +200,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .sc-red::before{background:linear-gradient(90deg,var(--red-dark),var(--red-bright))}
 .sc-green::before{background:linear-gradient(90deg,#064e3b,var(--green))}
 .s-icon{font-size:1.3rem;margin-bottom:0.45rem;display:block}
-.s-lbl{font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:1px;color:#A890CC;margin-bottom:0.3rem}
-.s-val{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900}
-.s-sub{font-family:'Share Tech Mono',monospace;font-size:0.88rem;color:#A890CC;margin-top:0.2rem}
+.s-lbl{font-family:'Orbitron',monospace;font-size:0.82rem;letter-spacing:1px;color:#A890CC;margin-bottom:0.3rem}
+.s-val{font-family:'Orbitron',monospace;font-size:2.2rem;font-weight:900}
+.s-sub{font-family:'Share Tech Mono',monospace;font-size:0.92rem;color:#A890CC;margin-top:0.2rem}
 .sc-purple .s-val{color:var(--purple-light)}.sc-gold .s-val{color:var(--gold)}.sc-red .s-val{color:var(--red-bright)}.sc-green .s-val{color:var(--green)}
 
 /* Mining widget */
@@ -224,7 +224,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 @keyframes sw1{from{transform:rotate(-25deg)}to{transform:rotate(8deg)}}
 @keyframes sw2{from{transform:rotate(18deg)}to{transform:rotate(-12deg)}}
 .mine-status{font-family:'Share Tech Mono',monospace;font-size:0.95rem;color:var(--text-dim);margin-bottom:0.4rem}
-.mine-rate{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem}
+.mine-rate{font-family:'Orbitron',monospace;font-size:1.7rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem}
 .mine-rate span{font-size:0.68rem;color:var(--text-dim)}
 .prog-wrap{width:100%;margin-bottom:0.9rem}
 .prog-hd{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.28rem}
@@ -232,7 +232,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--red));border-radius:3px;transition:width 0.5s linear;position:relative;overflow:hidden}
 .prog-fill::after{content:'';position:absolute;top:0;left:-80%;width:80%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);animation:shimmer 2s infinite}
 @keyframes shimmer{to{left:200%}}
-.btn-mine{padding:0.85rem 2.5rem;font-family:'Orbitron',monospace;font-size:0.9rem;letter-spacing:2px;cursor:pointer;border:none;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--red-dark));color:#fff;transition:all 0.3s}
+.btn-mine{padding:1rem 3rem;font-family:'Orbitron',monospace;font-size:1rem;letter-spacing:2px;cursor:pointer;border:none;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--red-dark));color:#fff;transition:all 0.3s}
 .btn-mine:hover{box-shadow:0 0 18px rgba(157,78,221,0.4)}
 .btn-mine.mining{background:linear-gradient(135deg,var(--red-dark),var(--purple-dark));animation:pulse-m 1s ease-in-out infinite}
 @keyframes pulse-m{0%,100%{box-shadow:0 0 8px rgba(230,57,70,0.3)}50%{box-shadow:0 0 22px rgba(230,57,70,0.6)}}
@@ -268,7 +268,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mc-ring2{position:absolute;inset:7px;border:1px dashed rgba(157,78,221,0.18);border-radius:50%;animation:spin-r 3.5s linear infinite reverse}
 .mc-coin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 7px rgba(157,78,221,0.6))}
 .mc-info{flex:1}
-.mc-name{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:0.3rem}
+.mc-name{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:0.35rem}
 .mc-hash{font-family:'Share Tech Mono',monospace;font-size:1rem;color:#C8B0FF;margin-bottom:0.4rem}
 .mc-status{display:inline-flex;align-items:center;gap:0.4rem;font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:var(--green);background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.25);padding:0.25rem 0.7rem;border-radius:20px}
 .mc-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px rgba(74,222,128,0.8);animation:blink 1s step-end infinite}
@@ -276,7 +276,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .btn-detail:hover{background:rgba(157,78,221,0.2)}
 .mc-live{background:rgba(20,80,40,0.25);border:2px solid rgba(74,222,128,0.45);border-radius:12px;padding:0.85rem 1rem;margin-bottom:0.9rem;display:flex;align-items:center;justify-content:space-between}
 .mc-live-lbl{font-family:'Share Tech Mono',monospace;font-size:0.95rem;color:#C8B0FF;margin-bottom:0.25rem}
-.mc-live-val{font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:var(--green);text-shadow:0 0 15px rgba(74,222,128,0.5);transition:color 0.3s}
+.mc-live-val{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:var(--green);text-shadow:0 0 15px rgba(74,222,128,0.5);transition:color 0.3s}
 .mc-live-daily{font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--gold)}
 .mc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.55rem;margin-bottom:0.8rem}
 .mc-stat{background:rgba(60,0,100,0.5);border:2px solid rgba(180,80,255,0.4);border-radius:10px;padding:0.7rem 0.4rem;text-align:center}
@@ -333,14 +333,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .b-hot{background:var(--red);color:#fff}
 .b-vip{background:linear-gradient(135deg,#78350f,var(--gold));color:#000}
 .pkg-icon{font-size:1.6rem;margin-bottom:0.42rem;display:block}
-.pkg-name{font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:#fff;margin-bottom:0.25rem}
-.pkg-price{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;margin-bottom:0.28rem}
+.pkg-name{font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:#fff;margin-bottom:0.3rem}
+.pkg-price{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;margin-bottom:0.3rem}
 .pc-free .pkg-price{color:var(--green)}.pc-mini .pkg-price{color:#38bdf8}.pc-lite .pkg-price{color:#f472b6}
 .pc-starter .pkg-price{color:#22c55e}.pc-basic .pkg-price{color:var(--purple-light)}.pc-pro .pkg-price{color:var(--red-bright)}.pc-vip .pkg-price{color:var(--gold)}
 .pkg-profit-line{font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:#C8B0FF;margin-bottom:0.65rem}
 .roi-box{background:rgba(60,0,100,0.4);border:2px solid rgba(180,80,255,0.35);border-radius:10px;padding:0.7rem 0.75rem;margin-bottom:0.7rem}
-.roi-row{display:flex;justify-content:space-between;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.78rem;padding:0.15rem 0}
-.roi-lbl{color:#C8B0FF}.roi-val{color:var(--gold);font-weight:700;font-size:0.82rem}.roi-profit{color:var(--green);font-weight:700;font-size:0.82rem}
+.roi-row{display:flex;justify-content:space-between;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.85rem;padding:0.15rem 0}
+.roi-lbl{color:#C8B0FF}.roi-val{color:var(--gold);font-weight:700;font-size:0.9rem}.roi-profit{color:var(--green);font-weight:700;font-size:0.9rem}
 .roi-div{height:1px;background:rgba(157,78,221,0.1);margin:0.25rem 0}
 .pb{font-size:0.5rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);color:var(--green);padding:0.08rem 0.28rem;border-radius:4px;margin-left:0.25rem;font-family:'Orbitron',monospace;letter-spacing:1px}
 .limit-wrap{display:flex;align-items:center;gap:0.3rem;margin-bottom:0.55rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC}
@@ -384,7 +384,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .wb-sub{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#A890CC;margin-top:0.15rem}
 .wb-live{margin-left:auto;font-family:'Orbitron',monospace;font-size:0.5rem;letter-spacing:1px;color:var(--green);
   background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.3);padding:0.18rem 0.45rem;border-radius:20px;animation:blink 2s step-end infinite}
-.wb-amt{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;margin-bottom:0.2rem}
+.wb-amt{font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;margin-bottom:0.25rem}
 .wb-usd .wb-amt{color:var(--gold)}.wb-zkp .wb-amt{color:var(--green);text-shadow:0 0 12px rgba(74,222,128,0.3)}
 .wb-equiv{font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:#A890CC;margin-bottom:0.85rem}
 .wb-daily{display:flex;align-items:center;gap:0.45rem;background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.12);border-radius:7px;padding:0.55rem 0.75rem;margin-bottom:0.8rem;font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC}
@@ -410,6 +410,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .tu-note{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(157,78,221,0.4);text-align:center;margin-top:0.75rem}
 
 /* ── OVERLAY/POPUP ── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+background:linear-gradient(135deg,rgba(30,10,60,0.98),rgba(50,10,80,0.98));
+border:1px solid rgba(157,78,221,0.5);border-radius:30px;padding:0.8rem 1.5rem;
+font-family:'Orbitron',monospace;font-size:0.78rem;color:#fff;letter-spacing:1px;
+opacity:0;transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;
+box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);
   display:flex;align-items:center;justify-content:center;padding:1rem}
 .popup{background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(30,10,65,0.98));border:1px solid rgba(157,78,221,0.4);
@@ -750,10 +757,22 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <!-- Step 1: เลือกจำนวน -->
       <div class="topup-step" id="stepAmount">
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);margin-bottom:1rem;">
-          เลือกจำนวนที่ต้องการเติม
+          เลือกหรือพิมพ์จำนวนที่ต้องการเติม
         </div>
+
+        <!-- ช่องพิมพ์จำนวนเอง -->
+        <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">💵 พิมพ์จำนวน USD เอง</div>
+          <input type="number" id="customAmtInput" placeholder="เช่น 150, 500, 2000..."
+            min="1"
+            oninput="onCustomAmt(this.value)"
+            style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;outline:none;caret-color:var(--gold);margin-bottom:0.5rem;">
+          <div id="customAmtLak" style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:rgba(255,215,0,0.6);text-align:right;">= 0 ກີບ</div>
+        </div>
+
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.6rem;">หรือเลือกจากด้านล่าง</div>
         <div class="tu-grid">
-          <div class="tu-card sel" onclick="selTop(this,10)">
+          <div class="tu-card" onclick="selTop(this,10)">
             <div class="tu-v">227,000 ກີບ</div>
             <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$10 USD</div>
           </div>
@@ -1357,9 +1376,24 @@ function addTestZkp(){
 const LAK_RATE = 22700; // 1 USD = 22,700 LAK
 let selAmt=10;
 function lakFmt(usd){ return (usd*LAK_RATE).toLocaleString()+' ກີບ'; }
+function onCustomAmt(val){
+  const amt = parseFloat(val)||0;
+  const lakEl = document.getElementById('customAmtLak');
+  if(lakEl) lakEl.textContent = amt>0 ? '= '+(amt*LAK_RATE).toLocaleString()+' ກີບ' : '= 0 ກີບ';
+  if(amt>0){
+    // ล้างการเลือกปุ่ม
+    document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
+    selAmt = amt;
+  }
+}
 function selTop(el,amt){
   document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel'); selAmt=amt;
+  // ล้าง custom input
+  const inp = document.getElementById('customAmtInput');
+  const lakEl = document.getElementById('customAmtLak');
+  if(inp) inp.value='';
+  if(lakEl) lakEl.textContent='= 0 ກີບ';
 }
 function goToQR(){
   document.getElementById('stepAmount').style.display='none';
