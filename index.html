@@ -1025,7 +1025,18 @@ function enterDash(user){
     if(!snap.exists()) return;
     const newData = snap.val();
     const oldUsd = _ud ? (_ud.usd||0) : 0;
-    _ud = newData;
+    const oldZkp = _ud ? (_ud.zkpReward||0) : 0;
+    // อัปเดตเฉพาะ usd และ txs จาก Firebase ไม่ให้เขียนทับ packages และ zkpReward ที่ drip กำลังคำนวณ
+    if(_ud){
+      _ud.usd = newData.usd;
+      _ud.txs = newData.txs;
+      _ud.refCode = newData.refCode;
+      _ud.refBy = newData.refBy;
+      _ud.refCount = newData.refCount;
+      _ud.refEarned = newData.refEarned;
+    } else {
+      _ud = newData;
+    }
     updateNav();
     renderMachines();
     if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
@@ -1586,15 +1597,23 @@ function startDrip(){
   dripInt=setInterval(()=>{
     const ud=getUD();if(!ud||!ud.packages)return;
     const now=Date.now();let changed=false;
+    let zkpTotal=0;
     ud.packages.forEach((p,i)=>{
       if(p.remaining<=0)return;
-      const elapsed=(now-p.bought)/1000;const daysPassed=elapsed/DEMO_DAY;
-      const oldRem=p.remaining;p.remaining=Math.max(0,p.days-daysPassed);
-      const zkpPerTick=p.daily/(DEMO_DAY*1000/TICK);
-      ud.zkpReward=(ud.zkpReward||0)+zkpPerTick;changed=true;
+      const def=PKGS[p.key];if(!def)return;
+      // คำนวณจาก bought timestamp เสมอ (แม่นยำกว่า)
+      const elapsedDays=(now-p.bought)/1000/DEMO_DAY;
+      const newRemaining=Math.max(0,p.days-elapsedDays);
+      const oldRem=p.remaining;
+      p.remaining=newRemaining;
+      // ZKP ต่อ tick
+      const zkpPerTick=def.daily/(DEMO_DAY*1000/TICK);
+      ud.zkpReward=(ud.zkpReward||0)+zkpPerTick;
+      zkpTotal+=zkpPerTick;
+      changed=true;
       if(p.remaining<=0&&oldRem>0){
         const nk=getSess()+'_'+i+'_'+p.bought;
-        if(!NOTIFIED[nk]){NOTIFIED[nk]=true;const def=PKGS[p.key];const bought=(ud.packages||[]).filter(q=>q.key===p.key).length;
+        if(!NOTIFIED[nk]){NOTIFIED[nk]=true;
           setTimeout(()=>{showToast(`✅ ${def.name} ครบ 30 วันแล้ว!`)},500);}
       }
     });
