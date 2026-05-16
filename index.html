@@ -1377,11 +1377,15 @@ function goToQR(){
   document.getElementById('qrLakAmt').textContent=lakFmt(selAmt);
   document.getElementById('qrAmount').textContent='= $'+selAmt.toLocaleString()+' USD';
   // Load QR image if admin set one
-  const qrSrc=localStorage.getItem('cm_qr_image');
   const wrap=document.getElementById('qrImageWrap');
-  if(qrSrc){
-    wrap.innerHTML=`<img src="${qrSrc}" style="width:200px;height:200px;object-fit:contain;border-radius:8px;background:#fff;padding:8px;margin:0 auto;display:block;">`;
-  }
+  wrap.innerHTML='<div style="text-align:center;color:#A890CC;font-family:monospace;font-size:0.7rem;padding:2rem;">⏳ กำลังโหลด QR...</div>';
+  window._db.ref('settings/qr_image').once('value').then(snap=>{
+    if(snap.exists()){
+      wrap.innerHTML=`<img src="${snap.val()}" style="width:200px;height:200px;object-fit:contain;border-radius:8px;background:#fff;padding:8px;margin:0 auto;display:block;">`;
+    } else {
+      wrap.innerHTML='<div style="width:200px;height:200px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(157,78,221,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;"><div style=\"font-size:2.5rem\">📱</div><div style=\"font-family:Share Tech Mono,monospace;font-size:0.65rem;color:#A890CC;text-align:center;padding:0 1rem\">Admin ยังไม่ได้ตั้งค่า QR Code</div></div>';
+    }
+  });
 }
 function backToAmount(){
   document.getElementById('stepAmount').style.display='block';
@@ -1800,19 +1804,20 @@ function adminDeductUsd(username){
   renderAdminUsers(); showToast(`💸 หัก $${amt} USD จาก ${username} แล้ว`);
 }
 function loadAdminQRPreview(){
-  const qrSrc=localStorage.getItem('cm_qr_image');
   const wrap=document.getElementById('adminQRPreview'); if(!wrap) return;
   const delBtn=document.getElementById('delQRBtn');
-  if(qrSrc){
-    wrap.innerHTML=`<img src="${qrSrc}" style="width:160px;height:160px;object-fit:contain;border-radius:8px;background:#fff;padding:6px;margin:0 auto;display:block;">`;
-    if(delBtn) delBtn.style.display='block';
-  } else {
-    wrap.innerHTML=`<div style="width:160px;height:160px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;"><div style="font-size:2.5rem;">📱</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">ยังไม่มี QR Code</div></div>`;
-    if(delBtn) delBtn.style.display='none';
-  }
+  window._db.ref('settings/qr_image').once('value').then(snap=>{
+    if(snap.exists()){
+      wrap.innerHTML=`<img src="${snap.val()}" style="width:160px;height:160px;object-fit:contain;border-radius:8px;background:#fff;padding:6px;margin:0 auto;display:block;">`;
+      if(delBtn) delBtn.style.display='block';
+    } else {
+      wrap.innerHTML=`<div style="width:160px;height:160px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;"><div style="font-size:2.5rem;">📱</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">ยังไม่มี QR Code</div></div>`;
+      if(delBtn) delBtn.style.display='none';
+    }
+  });
 }
 function deleteQR(){
-  localStorage.removeItem('cm_qr_image');
+  window._db.ref('settings/qr_image').remove();
   loadAdminQRPreview();
   showToast('🗑️ ลบ QR Code แล้ว');
 }
@@ -1830,9 +1835,10 @@ function uploadAdminQR(e){
       canvas.getContext('2d').drawImage(img,0,0,w,h);
       const compressed=canvas.toDataURL('image/jpeg',0.85);
       try{
-        localStorage.setItem('cm_qr_image',compressed);
-        loadAdminQRPreview();
-        showToast('✅ อัปโหลด QR Code สำเร็จ!');
+        window._db.ref('settings/qr_image').set(compressed).then(()=>{
+          loadAdminQRPreview();
+          showToast('✅ อัปโหลด QR Code สำเร็จ! ลูกค้าเห็นทันที');
+        }).catch(()=>showToast('❌ อัปโหลดไม่สำเร็จ กรุณาลองใหม่'));
       }catch(err){showToast('❌ รูปใหญ่เกินไป');}
     };
     img.src=ev.target.result;
