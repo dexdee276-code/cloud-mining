@@ -750,15 +750,20 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
             <button onclick="copyRefLink()" style="padding:0.6rem 0.9rem;background:linear-gradient(135deg,var(--purple),var(--red-dark));border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;flex-shrink:0;">📋 Copy</button>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;margin-bottom:0.8rem;">
           <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.8rem;text-align:center;">
             <div id="refCount" style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:var(--gold);">0</div>
             <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-top:0.2rem;">เพื่อนที่ชวนมา</div>
           </div>
           <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);border-radius:10px;padding:0.8rem;text-align:center;">
             <div id="refEarned" style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:var(--green);">0</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-top:0.2rem;">ZKP ที่ได้รับ</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-top:0.2rem;">ZKP รวมที่ได้</div>
           </div>
+        </div>
+        <!-- ประวัติค่าคอม -->
+        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--purple-light);margin-bottom:0.5rem;letter-spacing:1px;">📋 ประวัติค่าคอม</div>
+        <div id="refHistList">
+          <div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-align:center;padding:0.8rem;">⏳ กำลังโหลด...</div>
         </div>
       </div>
     </div>
@@ -1124,31 +1129,83 @@ function buyPkg(key){
   if(!isUnlocked(key)){showToast(t('toast.locked'));return}
   const bought=(ud.packages||[]).filter(p=>p.key===key).length;
   if(bought>=def.limit){showToast(t('toast.full'));return}
-  if((ud.usd||0)<def.price){showToast(t('toast.nousd'));switchTab(3);return}
-  ud.usd=(ud.usd||0)-def.price;
-  if(!ud.packages)ud.packages=[];
-  ud.packages.push({key,price:def.price,days:def.days,daily:def.daily,profit:def.profit,bought:Date.now(),remaining:def.days});
-  if(!ud.txs)ud.txs=[];
-  ud.txs.unshift({desc:'เช่ากำลังขุด '+def.name,amount:-def.price,unit:'USD',time:Date.now()});
-  // Referral bonus 10%
-  if(def.price>0 && ud.refBy){
-    const bonus = parseFloat((def.price*0.10).toFixed(4));
-    window._db.ref('users/'+ud.refBy).once('value').then(snap=>{
-      if(snap.exists()){
-        const ref=snap.val();
-        ref.zkpReward=(ref.zkpReward||0)+bonus;
-        ref.refCount=(ref.refCount||0)+1;
-        ref.refEarned=(ref.refEarned||0)+bonus;
-        ref.txs=ref.txs||[];
-        ref.txs.unshift({desc:'🎁 ค่าคอม Referral จาก '+getSess(),amount:bonus,unit:'ZKP',time:Date.now()});
-        window._db.ref('users/'+ud.refBy).set(ref);
+
+  const u=getSess();
+  showToast('⏳ กำลังตรวจสอบ...');
+
+  // ── ดึงยอด USD จาก Firebase ก่อนเสมอ ──
+  window._db.ref('users/'+u+'/usd').once('value').then(snap=>{
+    const realUsd = snap.exists() ? (snap.val()||0) : 0;
+    if(realUsd < def.price){
+      showToast(t('toast.nousd')+' (มี $'+realUsd.toFixed(2)+' / ต้องการ $'+def.price+')');
+      switchTab(3); return;
+    }
+
+    // ── ใช้ transaction ตัด USD แบบ atomic ──
+    window._db.ref('users/'+u+'/usd').transaction(current=>{
+      const cur = current||0;
+      if(cur < def.price) return; // abort ถ้าไม่พอ
+      return parseFloat((cur - def.price).toFixed(2));
+    }).then(result=>{
+      if(!result.committed){
+        showToast('❌ USD ไม่พอ กรุณาเติม USD ก่อน');
+        switchTab(3); return;
       }
-    });
-  }
-  saveUD(ud);showToast(def.price===0?t('toast.freepkg'):t('toast.startpkg')+' '+def.name+'!');
-  updateNav();startDrip();switchTab(0);
-  setTimeout(()=>{renderMachines();const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);
-  renderPkgs();
+      // ── บันทึก package และ tx ──
+      ud.usd = result.snapshot.val();
+      if(!ud.packages) ud.packages=[];
+      ud.packages.push({key,price:def.price,days:def.days,daily:def.daily,profit:def.profit,bought:Date.now(),remaining:def.days});
+      if(!ud.txs) ud.txs=[];
+      ud.txs.unshift({desc:'⛏️ เช่ากำลังขุด '+def.name,amount:-def.price,unit:'USD',time:Date.now()});
+
+      // ── Referral bonus 10% (ทุกครั้งที่เพื่อนซื้อ/ต่อสัญญา) ──
+      if(def.price>0 && ud.refBy){
+        const bonus=parseFloat((def.price*0.10).toFixed(4));
+        const isRenew=(ud.packages||[]).filter(p=>p.key===key).length>0;
+        window._db.ref('users/'+ud.refBy).once('value').then(snap2=>{
+          if(snap2.exists()){
+            const ref=snap2.val();
+            ref.zkpReward=(ref.zkpReward||0)+bonus;
+            // นับ refCount เฉพาะซื้อครั้งแรก ไม่นับการต่อสัญญา
+            if(!isRenew) ref.refCount=(ref.refCount||0)+1;
+            ref.refEarned=(ref.refEarned||0)+bonus;
+            ref.txs=ref.txs||[];
+            const label=isRenew?'🔄 ค่าคอมต่อสัญญา':'🎁 ค่าคอม Referral';
+            ref.txs.unshift({
+              desc:`${label} ${def.name} จาก ${u}`,
+              amount:bonus,unit:'ZKP',
+              time:Date.now(),
+              type:'referral',
+              from:u,
+              pkg:key,
+              isRenew
+            });
+            window._db.ref('users/'+ud.refBy).set(ref);
+            // บันทึก referral log ใน Firebase แยก
+            window._db.ref('referral_log').push({
+              referrer:ud.refBy, referee:u,
+              pkg:key, price:def.price, bonus,
+              isRenew, time:Date.now()
+            });
+            // แจ้งเตือนผู้แนะนำ
+            window._db.ref('notifications/'+ud.refBy).push({
+              type:'referral',
+              icon: isRenew?'🔄':'🎁',
+              title: isRenew?'ค่าคอมต่อสัญญา!':'ค่าคอม Referral!',
+              body:`${u} ${isRenew?'ต่อสัญญา':'ซื้อ'} ${def.name} → +${bonus} ZKP`,
+              time:Date.now(), read:false
+            });
+          }
+        });
+      }
+
+      saveUD(ud);
+      showToast('✅ เช่า '+def.name+' สำเร็จ! ตัด $'+def.price+' USD แล้ว');
+      updateNav(); startDrip(); switchTab(0);
+      setTimeout(()=>{renderMachines();const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);
+      renderPkgs();
+    }).catch(()=>showToast('❌ เกิดข้อผิดพลาด กรุณาลองใหม่'));
+  }).catch(()=>showToast('❌ เชื่อมต่อไม่ได้ กรุณาลองใหม่'));
 }
 
 function renderPkgs(){
@@ -2518,8 +2575,33 @@ function applyLang(){
 }
 
 // ─── REFERRAL ───
+function renderRefHistory(){
+  const el=document.getElementById('refHistList'); if(!el) return;
+  const u=getSess(); if(!u) return;
+  // ดึงประวัติค่าคอมจาก txs ที่มี type=referral
+  const ud=getUD(); if(!ud) return;
+  const txs=(ud.txs||[]).filter(tx=>tx.type==='referral'||tx.desc?.includes('ค่าคอม'));
+  if(!txs.length){
+    el.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-align:center;padding:0.8rem;">ยังไม่มีประวัติค่าคอม</div>';
+    return;
+  }
+  el.innerHTML=txs.slice(0,10).map(tx=>{
+    const d=new Date(tx.time);
+    const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+    const isRenew=tx.isRenew||tx.desc?.includes('ต่อสัญญา');
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid rgba(157,78,221,0.08);">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#fff;">${tx.desc||'-'}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:0.1rem;">${t} · ${isRenew?'<span style="color:var(--purple-light);">🔄 ต่อสัญญา</span>':'<span style="color:var(--gold);">🎁 ซื้อใหม่</span>'}</div>
+      </div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;color:var(--green);">+${parseFloat(tx.amount||0).toFixed(4)} ZKP</div>
+    </div>`;
+  }).join('');
+}
+
 function renderReferral(){
   const ud=getUD(); if(!ud) return;
+  renderRefHistory();
   const code=ud.refCode||'-';
   const link=window.location.href.split('?')[0]+'?ref='+getSess();
   const el1=document.getElementById('myRefCode');
