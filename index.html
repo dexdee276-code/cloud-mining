@@ -1457,14 +1457,14 @@ function submitSlip(){
   if(!fileInput.files[0]){showToast('⚠️ กรุณาแนบสลิปก่อน');return;}
   if(!amt||amt<=0){showToast('⚠️ กรุณากรอกยอดที่โอน');return;}
 
-  // Resize รูปก่อน save เพื่อไม่ให้ใหญ่เกิน
+  // Resize + compress วนลูปจนขนาดไม่เกิน 300KB
   const file=fileInput.files[0];
   const img=new Image();
   const reader=new FileReader();
   reader.onload=function(ev){
     img.onload=function(){
       const canvas=document.createElement('canvas');
-      const MAX=400;
+      const MAX=500;
       let w=img.width, h=img.height;
       if(w>MAX||h>MAX){
         if(w>h){h=Math.round(h*MAX/w);w=MAX;}
@@ -1472,14 +1472,17 @@ function submitSlip(){
       }
       canvas.width=w; canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      const compressed=canvas.toDataURL('image/jpeg',0.5);
 
-      try {
-        const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
-        window._db.ref('topup_reqs').push(req);
-        const reqs=JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
-        reqs.push(req);
-        localStorage.setItem('cm_topup_reqs',JSON.stringify(reqs));
+      // วนลดคุณภาพจนขนาด base64 ไม่เกิน 300KB
+      let quality=0.6;
+      let compressed=canvas.toDataURL('image/jpeg',quality);
+      while(compressed.length > 300000 && quality > 0.1){
+        quality=Math.round((quality-0.1)*10)/10;
+        compressed=canvas.toDataURL('image/jpeg',quality);
+      }
+
+      const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
+      window._db.ref('topup_reqs').push(req).then(()=>{
         if(!ud.topupReqs) ud.topupReqs=[];
         ud.topupReqs.push({id:req.id,amt,note,time:req.time,status:'pending'});
         saveUD(ud);
@@ -1488,9 +1491,9 @@ function submitSlip(){
         renderPendingList();
         renderTopupHistory();
         showToast('📤 ส่งหลักฐานเรียบร้อยแล้ว! รอ Admin อนุมัติ');
-      } catch(e) {
-        showToast('❌ รูปใหญ่เกินไป กรุณาใช้รูปที่เล็กกว่านี้');
-      }
+      }).catch(e=>{
+        showToast('❌ ส่งไม่สำเร็จ กรุณาลองใหม่ ('+e.message+')');
+      });
     };
     img.src=ev.target.result;
   };
