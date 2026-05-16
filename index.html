@@ -1485,6 +1485,8 @@ function submitSlip(){
       window._db.ref('topup_reqs').push(req).then(()=>{
         if(!ud.topupReqs) ud.topupReqs=[];
         ud.topupReqs.push({id:req.id,amt,note,time:req.time,status:'pending'});
+        if(!ud.txs) ud.txs=[];
+        if(!ud.packages) ud.packages=[];
         saveUD(ud);
         document.getElementById('stepSlip').style.display='none';
         document.getElementById('stepPending').style.display='block';
