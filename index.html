@@ -1282,10 +1282,44 @@ function renderWallet(){
     return `<div class="tx-item"><div><div class="tx-d">${tx.desc}</div><div class="tx-t">${t}</div></div><div class="tx-a ${tx.amount>0?'tp':'tn'}">${tx.amount>0?'+':''}${tx.amount} ${tx.unit||'USD'}</div></div>`;
   }).join('');
 }
+const MIN_WITHDRAW = 50; // ถอนขั้นต่ำ 50 ZKP
+
+function showInsufficientZkpPopup(current){
+  const needed = MIN_WITHDRAW - (current||0);
+  const ov=document.createElement('div'); ov.className='overlay'; ov.id='insufficientOv';
+  ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(230,57,70,0.4);max-width:320px;">
+    <div style="font-size:2.5rem;margin-bottom:0.8rem;">⚠️</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--red-bright);margin-bottom:0.6rem;">ZKP ไม่เพียงพอ</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--text-dim);line-height:1.9;margin-bottom:1.2rem;">
+      ถอนขั้นต่ำ <span style="color:var(--gold);font-weight:700;">${MIN_WITHDRAW} ZKP</span><br>
+      ZKP ของคุณ <span style="color:var(--red-bright);font-weight:700;">${parseFloat(current||0).toFixed(4)} ZKP</span><br>
+      ขาดอีก <span style="color:var(--purple-light);font-weight:700;">${parseFloat(needed).toFixed(4)} ZKP</span>
+    </div>
+    <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:10px;padding:0.8rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);line-height:1.8;text-align:left;">
+      💡 <span style="color:var(--gold);">วิธีสะสม ZKP เพิ่ม:</span><br>
+      ⛏️ ซื้อสัญญาขุดเพื่อรับ ZKP/วัน<br>
+      📅 Check-in ทุกวันรับ ZKP ฟรี<br>
+      👥 ชวนเพื่อนรับค่าคอม 10%
+    </div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.5rem;">
+      <button onclick="document.getElementById('insufficientOv').remove();switchTab(1)" class="btn btn-primary" style="flex:1;">⛏️ ซื้อสัญญาขุด</button>
+      <button onclick="document.getElementById('insufficientOv').remove()" style="padding:0.7rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
 function showWithdrawPopup(){
   const ud=getUD(); if(!ud) return;
   const zkp=ud.zkpReward||0;
-  if(zkp<=0){ showToast('⚠️ ยังไม่มี ZKP ในกระเป๋า'); return; }
+  if(zkp<=0){
+    showInsufficientZkpPopup(zkp);
+    return;
+  }
+  if(zkp < MIN_WITHDRAW){
+    showInsufficientZkpPopup(zkp);
+    return;
+  }
   const usdVal=(zkp*ZKP_RATE).toFixed(4);
   const lakVal=Math.round(zkp*ZKP_RATE*LAK_RATE).toLocaleString();
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='withdrawOv';
@@ -1853,19 +1887,21 @@ function renderAdminWithdraw(){
 }
 function approveWithdraw(fbKey, username, zkpAmt){
   window._db.ref('withdraw_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()}).then(()=>{
-    window._db.ref('users/'+username).once('value').then(snap=>{
-      if(snap.exists()){
-        const ud=snap.val();
-        ud.zkpReward=Math.max(0,(ud.zkpReward||0)-parseFloat(zkpAmt));
-        ud.txs=ud.txs||[];
-        ud.txs.unshift({desc:`✅ แลก ${parseFloat(zkpAmt).toFixed(4)} ZKP สำเร็จ`,amount:-parseFloat(zkpAmt).toFixed(4),unit:'ZKP',time:Date.now()});
-        window._db.ref('users/'+username).set(ud);
-        window._db.ref('notifications/'+username).push({
-          type:'approved',icon:'💰',title:'แลก ZKP สำเร็จ!',
-          body:`${parseFloat(zkpAmt).toFixed(4)} ZKP โอนให้แล้ว`,
-          time:Date.now(),read:false
-        });
-      }
+    // ใช้ transaction เพื่อหัก ZKP แบบ atomic ไม่ทับ drip
+    window._db.ref('users/'+username+'/zkpReward').transaction(current=>{
+      return Math.max(0,(current||0)-parseFloat(zkpAmt));
+    }).then(()=>{
+      // บันทึก tx แยก
+      window._db.ref('users/'+username+'/txs').once('value').then(snap=>{
+        const txs=snap.val()||[];
+        const newTxs=[{desc:`✅ แลก ${parseFloat(zkpAmt).toFixed(4)} ZKP สำเร็จ`,amount:-parseFloat(zkpAmt),unit:'ZKP',time:Date.now()},...(Array.isArray(txs)?txs:Object.values(txs))].slice(0,50);
+        window._db.ref('users/'+username+'/txs').set(newTxs);
+      });
+      window._db.ref('notifications/'+username).push({
+        type:'approved',icon:'💰',title:'แลก ZKP สำเร็จ!',
+        body:`${parseFloat(zkpAmt).toFixed(4)} ZKP โอนให้แล้ว`,
+        time:Date.now(),read:false
+      });
     });
     updateNav(); renderAdminWithdraw();
     showToast(`✅ อนุมัติแลก ${parseFloat(zkpAmt).toFixed(4)} ZKP ให้ ${username}`);
