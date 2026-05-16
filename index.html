@@ -16,7 +16,8 @@
   --red:#E63946; --red-bright:#FF4D5A; --red-dark:#9B1D24;
   --gold:#FFD700; --green:#4ade80;
   --bg:#080010; --surface:rgba(35,8,55,0.98); --border:rgba(200,100,255,0.5);
-  --text:#F5EEFF; --text-dim:#A890CC;
+  --text:#FFFFFF; --text-dim:#D0C8E8;
+  --text-glow:0 0 8px rgba(255,255,255,0.7),0 0 20px rgba(220,180,255,0.4);
   /* Larger base font for mobile clarity */
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
@@ -26,6 +27,7 @@ html, body {
 }
 body{
   font-family:'Rajdhani',sans-serif; color:var(--text);
+  text-shadow:0 0 8px rgba(255,255,255,0.6),0 0 18px rgba(200,160,255,0.3);
   overflow-x:hidden;
   background:
     radial-gradient(ellipse 80% 60% at 15% 20%, rgba(200,0,80,0.7) 0%, transparent 55%),
@@ -1360,8 +1362,8 @@ function submitWithdraw(){
     time:Date.now(), status:'pending'
   };
 
-  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  ws.push(req); localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
+  // บันทึกใน Firebase ให้ Admin เห็นจากทุกเครื่อง
+  window._db.ref('withdraw_reqs').push(req);
 
   ud.txs=ud.txs||[];
   ud.txs.unshift({desc:`💱 แจ้งแลก ${zkpAmt.toFixed(4)} ZKP (รอ Admin อนุมัติ)`,amount:zkpAmt.toFixed(4),unit:'ZKP',time:Date.now()});
@@ -1462,7 +1464,7 @@ function submitSlip(){
   reader.onload=function(ev){
     img.onload=function(){
       const canvas=document.createElement('canvas');
-      const MAX=600;
+      const MAX=400;
       let w=img.width, h=img.height;
       if(w>MAX||h>MAX){
         if(w>h){h=Math.round(h*MAX/w);w=MAX;}
@@ -1470,7 +1472,7 @@ function submitSlip(){
       }
       canvas.width=w; canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      const compressed=canvas.toDataURL('image/jpeg',0.7);
+      const compressed=canvas.toDataURL('image/jpeg',0.5);
 
       try {
         const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
@@ -1800,61 +1802,63 @@ function rejectTopup(reqId, username, fbKey){
 }
 function renderAdminWithdraw(){
   const el=document.getElementById('adminWithdrawList'); if(!el) return;
-  const withdraws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  if(!withdraws.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ยังไม่มีคำขอแลก ZKP</div>';return;}
-  const methodName={bank:'🏦 โอนบัญชี',promptpay:'📱 PromptPay',bcel:'🏧 BCEL',other:'💬 อื่นๆ'};
-  el.innerHTML=withdraws.sort((a,b)=>b.time-a.time).map(r=>{
-    const d=new Date(r.time);
-    const t2=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-    const lakDisplay = r.lakAmt || Math.round((r.amt||r.zkpAmt||0)*ZKP_RATE*LAK_RATE).toLocaleString();
-    const zkpDisplay = r.zkpAmt || r.amt || 0;
-    return `<div class="req-card ${r.status}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem;">
-        <div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.88rem;color:var(--green);">${parseFloat(zkpDisplay).toFixed(4)} ZKP</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--gold);">${lakDisplay} ກີບ</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">👤 ${r.user} · ${t2}</div>
+  el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('withdraw_reqs').once('value').then(snap=>{
+    const data=snap.val()||{};
+    const withdraws=Object.entries(data).map(([fbKey,r])=>({...r,fbKey}));
+    if(!withdraws.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ยังไม่มีคำขอแลก ZKP</div>';return;}
+    const methodName={bank:'🏦 โอนบัญชี',promptpay:'📱 PromptPay',bcel:'🏧 BCEL',other:'💬 อื่นๆ'};
+    el.innerHTML=withdraws.sort((a,b)=>b.time-a.time).map(r=>{
+      const d=new Date(r.time);
+      const t2=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+      const lakDisplay = r.lakAmt || Math.round((r.amt||r.zkpAmt||0)*ZKP_RATE*LAK_RATE).toLocaleString();
+      const zkpDisplay = r.zkpAmt || r.amt || 0;
+      return `<div class="req-card ${r.status}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem;">
+          <div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.88rem;color:var(--green);">${parseFloat(zkpDisplay).toFixed(4)} ZKP</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--gold);">${lakDisplay} ກີບ</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">👤 ${r.user} · ${t2}</div>
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:${r.status==='pending'?'var(--gold)':r.status==='approved'?'var(--green)':'var(--red-bright)'};">
+            ${r.status==='pending'?'⏳ รออนุมัติ':r.status==='approved'?'✅ จ่ายแล้ว':'❌ ปฏิเสธ'}
+          </div>
         </div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:${r.status==='pending'?'var(--gold)':r.status==='approved'?'var(--green)':'var(--red-bright)'};">
-          ${r.status==='pending'?'⏳ รออนุมัติ':r.status==='approved'?'✅ จ่ายแล้ว':'❌ ปฏิเสธ'}
+        <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.12);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-bottom:0.3rem;">${methodName[r.method]||'💳 ช่องทางโอน'}</div>
+          ${r.bank?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text);">🏦 ${r.bank}</div>`:''}
+          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;margin-top:0.2rem;">${r.accNo||'-'}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">👤 ${r.accName||'-'}</div>
+          ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.2rem;">📝 ${r.note}</div>`:''}
         </div>
-      </div>
-      <!-- ข้อมูลบัญชี -->
-      <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.12);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-bottom:0.3rem;">${methodName[r.method]||'💳 ช่องทางโอน'}</div>
-        ${r.bank?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text);">🏦 ${r.bank}</div>`:''}
-        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;margin-top:0.2rem;">${r.accNo||'-'}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">👤 ${r.accName||'-'}</div>
-        ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.2rem;">📝 ${r.note}</div>`:''}
-      </div>
-      ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;">
-        <button onclick="approveWithdraw('${r.id}','${r.user}',${zkpDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
-        <button onclick="rejectWithdraw('${r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
-      </div>`:''}
-    </div>`;
-  }).join('');
+        ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;">
+          <button onclick="approveWithdraw('${r.fbKey}','${r.user}',${zkpDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+          <button onclick="rejectWithdraw('${r.fbKey}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
+        </div>`:''}
+      </div>`;
+    }).join('');
+  });
 }
-function approveWithdraw(reqId, username, zkpAmt){
-  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  const w=ws.find(r=>r.id===reqId); if(!w) return;
-  w.status='approved'; w.approvedAt=Date.now();
-  localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
-  // หัก ZKP จากผู้ใช้
-  const users=getU(); const ud=users[username];
-  if(ud){
-    ud.zkpReward=Math.max(0,(ud.zkpReward||0)-parseFloat(zkpAmt));
-    ud.txs=ud.txs||[];
-    ud.txs.unshift({desc:`✅ แลก ${parseFloat(zkpAmt).toFixed(4)} ZKP สำเร็จ`,amount:-parseFloat(zkpAmt).toFixed(4),unit:'ZKP',time:Date.now()});
-    users[username]=ud; saveU(users);
-  }
-  updateNav(); renderAdminWithdraw();
-  showToast(`✅ อนุมัติแลก ${parseFloat(zkpAmt).toFixed(4)} ZKP ให้ ${username}`);
+function approveWithdraw(fbKey, username, zkpAmt){
+  window._db.ref('withdraw_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()}).then(()=>{
+    window._db.ref('users/'+username).once('value').then(snap=>{
+      if(snap.exists()){
+        const ud=snap.val();
+        ud.zkpReward=Math.max(0,(ud.zkpReward||0)-parseFloat(zkpAmt));
+        ud.txs=ud.txs||[];
+        ud.txs.unshift({desc:`✅ แลก ${parseFloat(zkpAmt).toFixed(4)} ZKP สำเร็จ`,amount:-parseFloat(zkpAmt).toFixed(4),unit:'ZKP',time:Date.now()});
+        window._db.ref('users/'+username).set(ud);
+      }
+    });
+    updateNav(); renderAdminWithdraw();
+    showToast(`✅ อนุมัติแลก ${parseFloat(zkpAmt).toFixed(4)} ZKP ให้ ${username}`);
+  });
 }
-function rejectWithdraw(reqId, username){
-  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  const w=ws.find(r=>r.id===reqId); if(w) w.status='rejected';
-  localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
-  renderAdminWithdraw(); showToast(`❌ ปฏิเสธคำขอแลก ZKP ของ ${username}`);
+function rejectWithdraw(fbKey, username){
+  window._db.ref('withdraw_reqs/'+fbKey).update({status:'rejected',rejectedAt:Date.now()}).then(()=>{
+    renderAdminWithdraw();
+    showToast(`❌ ปฏิเสธคำขอแลก ZKP ของ ${username}`);
+  });
 }
 function renderAdminUsers(){
   const el=document.getElementById('adminUserList'); if(!el) return;
