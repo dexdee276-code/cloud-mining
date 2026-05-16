@@ -1373,8 +1373,8 @@ function submitWithdraw(){
     time:Date.now(), status:'pending'
   };
 
-  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  ws.push(req); localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
+  // บันทึกใน Firebase ให้ Admin เห็นจากทุกเครื่อง
+  window._db.ref('withdraw_reqs').push(req);
 
   ud.txs=ud.txs||[];
   ud.txs.unshift({desc:`💱 แจ้งแลก ${zkpAmt.toFixed(4)} ZKP (รอ Admin อนุมัติ)`,amount:zkpAmt.toFixed(4),unit:'ZKP',time:Date.now()});
@@ -1813,10 +1813,13 @@ function rejectTopup(reqId, username, fbKey){
 }
 function renderAdminWithdraw(){
   const el=document.getElementById('adminWithdrawList'); if(!el) return;
-  const withdraws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  if(!withdraws.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ยังไม่มีคำขอแลก ZKP</div>';return;}
-  const methodName={bank:'🏦 โอนบัญชี',promptpay:'📱 PromptPay',bcel:'🏧 BCEL',other:'💬 อื่นๆ'};
-  el.innerHTML=withdraws.sort((a,b)=>b.time-a.time).map(r=>{
+  el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('withdraw_reqs').once('value').then(snap=>{
+    const data=snap.val()||{};
+    const withdraws=Object.entries(data).map(([fbKey,r])=>({...r,fbKey}));
+    if(!withdraws.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ยังไม่มีคำขอแลก ZKP</div>';return;}
+    const methodName={bank:'🏦 โอนบัญชี',promptpay:'📱 PromptPay',bcel:'🏧 BCEL',other:'💬 อื่นๆ'};
+    el.innerHTML=withdraws.sort((a,b)=>b.time-a.time).map(r=>{
     const d=new Date(r.time);
     const t2=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
     const lakDisplay = r.lakAmt || Math.round((r.amt||r.zkpAmt||0)*ZKP_RATE*LAK_RATE).toLocaleString();
@@ -1841,33 +1844,38 @@ function renderAdminWithdraw(){
         ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.2rem;">📝 ${r.note}</div>`:''}
       </div>
       ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;">
-        <button onclick="approveWithdraw('${r.id}','${r.user}',${zkpDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
-        <button onclick="rejectWithdraw('${r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
+        <button onclick="approveWithdraw('${r.fbKey||r.id}','${r.user}',${zkpDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+        <button onclick="rejectWithdraw('${r.fbKey||r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
       </div>`:''}
     </div>`;
   }).join('');
+  });
 }
-function approveWithdraw(reqId, username, zkpAmt){
-  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  const w=ws.find(r=>r.id===reqId); if(!w) return;
-  w.status='approved'; w.approvedAt=Date.now();
-  localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
-  // หัก ZKP จากผู้ใช้
-  const users=getU(); const ud=users[username];
-  if(ud){
-    ud.zkpReward=Math.max(0,(ud.zkpReward||0)-parseFloat(zkpAmt));
-    ud.txs=ud.txs||[];
-    ud.txs.unshift({desc:`✅ แลก ${parseFloat(zkpAmt).toFixed(4)} ZKP สำเร็จ`,amount:-parseFloat(zkpAmt).toFixed(4),unit:'ZKP',time:Date.now()});
-    users[username]=ud; saveU(users);
-  }
-  updateNav(); renderAdminWithdraw();
-  showToast(`✅ อนุมัติแลก ${parseFloat(zkpAmt).toFixed(4)} ZKP ให้ ${username}`);
+function approveWithdraw(fbKey, username, zkpAmt){
+  window._db.ref('withdraw_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()}).then(()=>{
+    window._db.ref('users/'+username).once('value').then(snap=>{
+      if(snap.exists()){
+        const ud=snap.val();
+        ud.zkpReward=Math.max(0,(ud.zkpReward||0)-parseFloat(zkpAmt));
+        ud.txs=ud.txs||[];
+        ud.txs.unshift({desc:`✅ แลก ${parseFloat(zkpAmt).toFixed(4)} ZKP สำเร็จ`,amount:-parseFloat(zkpAmt).toFixed(4),unit:'ZKP',time:Date.now()});
+        window._db.ref('users/'+username).set(ud);
+        window._db.ref('notifications/'+username).push({
+          type:'approved',icon:'💰',title:'แลก ZKP สำเร็จ!',
+          body:`${parseFloat(zkpAmt).toFixed(4)} ZKP โอนให้แล้ว`,
+          time:Date.now(),read:false
+        });
+      }
+    });
+    updateNav(); renderAdminWithdraw();
+    showToast(`✅ อนุมัติแลก ${parseFloat(zkpAmt).toFixed(4)} ZKP ให้ ${username}`);
+  });
 }
-function rejectWithdraw(reqId, username){
-  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  const w=ws.find(r=>r.id===reqId); if(w) w.status='rejected';
-  localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
-  renderAdminWithdraw(); showToast(`❌ ปฏิเสธคำขอแลก ZKP ของ ${username}`);
+function rejectWithdraw(fbKey, username){
+  window._db.ref('withdraw_reqs/'+fbKey).update({status:'rejected',rejectedAt:Date.now()}).then(()=>{
+    renderAdminWithdraw();
+    showToast(`❌ ปฏิเสธคำขอแลก ZKP ของ ${username}`);
+  });
 }
 function renderAdminUsers(){
   const el=document.getElementById('adminUserList'); if(!el) return;
