@@ -1004,6 +1004,23 @@ function enterDash(user){
   updateNav();switchTab(0);renderMachines();renderPkgs();
   startDrip();showToast(t('toast.welcome')+' '+user+'!');
   setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
+
+  // Realtime listener — อัปเดตข้อมูลลูกค้าทันทีเมื่อ Admin แก้ไข
+  window._db.ref('users/'+user).on('value', snap=>{
+    if(!snap.exists()) return;
+    const newData = snap.val();
+    const oldUsd = _ud ? (_ud.usd||0) : 0;
+    _ud = newData;
+    updateNav();
+    renderMachines();
+    if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
+    if(document.getElementById('pgPkg')?.classList.contains('active')) renderPkgs();
+    // แจ้งเตือนเมื่อเงินเข้า
+    if(newData.usd > oldUsd && oldUsd > 0){
+      const diff = (newData.usd - oldUsd).toFixed(2);
+      showToast('💰 เติมเงินสำเร็จ! +$'+diff+' USD เข้ากระเป๋าแล้ว');
+    }
+  });
 }
 
 // ─── NAVIGATION ───
