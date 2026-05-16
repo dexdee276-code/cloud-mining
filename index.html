@@ -955,7 +955,9 @@ function doRegister(){
   btn.disabled=true;btn.textContent='⏳ กำลังสมัคร...';
   fbGetUser(u).then(existing=>{
     if(existing){btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;}
-    const nd={pw:p,email:e,usd:0,zkpReward:0,zkpMine:0,sessions:0,packages:[],txs:[]};
+    const refCode = u.toUpperCase().slice(0,4) + Math.random().toString(36).slice(2,6).toUpperCase();
+    const refBy = new URLSearchParams(window.location.search).get('ref') || '';
+    const nd={pw:p,email:e,usd:0,zkpReward:0,zkpMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
     window._db.ref('users/'+u).set(nd).then(()=>{
       btn.disabled=false;btn.textContent='🚀 CREATE NODE';
       _ud=nd;showMsg('regMsg','✅ สมัครสำเร็จ! กำลังเข้าสู่ระบบ...','success');
@@ -1045,6 +1047,21 @@ function buyPkg(key){
   ud.packages.push({key,price:def.price,days:def.days,daily:def.daily,profit:def.profit,bought:Date.now(),remaining:def.days});
   if(!ud.txs)ud.txs=[];
   ud.txs.unshift({desc:'เช่ากำลังขุด '+def.name,amount:-def.price,unit:'USD',time:Date.now()});
+  // Referral bonus 10%
+  if(def.price>0 && ud.refBy){
+    const bonus = parseFloat((def.price*0.10).toFixed(4));
+    window._db.ref('users/'+ud.refBy).once('value').then(snap=>{
+      if(snap.exists()){
+        const ref=snap.val();
+        ref.zkpReward=(ref.zkpReward||0)+bonus;
+        ref.refCount=(ref.refCount||0)+1;
+        ref.refEarned=(ref.refEarned||0)+bonus;
+        ref.txs=ref.txs||[];
+        ref.txs.unshift({desc:'🎁 ค่าคอม Referral จาก '+getSess(),amount:bonus,unit:'ZKP',time:Date.now()});
+        window._db.ref('users/'+ud.refBy).set(ref);
+      }
+    });
+  }
   saveUD(ud);showToast(def.price===0?t('toast.freepkg'):t('toast.startpkg')+' '+def.name+'!');
   updateNav();startDrip();switchTab(0);
   setTimeout(()=>{renderMachines();const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);
@@ -1177,6 +1194,7 @@ function renderWallet(){
   document.getElementById('wProfit').textContent='$'+totalP.toFixed(2);
   const txs=ud.txs||[];const txEl=document.getElementById('txHist');
   if(!txs.length){txEl.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace">${t('wal.nohist')}</div>`;return}
+  renderReferral();
   txEl.innerHTML=txs.slice(0,10).map(tx=>{
     const d=new Date(tx.time);const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
     return `<div class="tx-item"><div><div class="tx-d">${tx.desc}</div><div class="tx-t">${t}</div></div><div class="tx-a ${tx.amount>0?'tp':'tn'}">${tx.amount>0?'+':''}${tx.amount} ${tx.unit||'USD'}</div></div>`;
@@ -2285,6 +2303,34 @@ function applyLang(){
   if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
 }
 
+// ─── REFERRAL ───
+function renderReferral(){
+  const ud=getUD(); if(!ud) return;
+  const code=ud.refCode||'-';
+  const link=window.location.href.split('?')[0]+'?ref='+getSess();
+  const el1=document.getElementById('myRefCode');
+  const el2=document.getElementById('myRefLink');
+  const el3=document.getElementById('refCount');
+  const el4=document.getElementById('refEarned');
+  if(el1) el1.textContent=code;
+  if(el2) el2.textContent=link;
+  if(el3) el3.textContent=ud.refCount||0;
+  if(el4) el4.textContent=(ud.refEarned||0).toFixed(4);
+}
+function copyRefLink(){
+  const ud=getUD(); if(!ud) return;
+  const link=window.location.href.split('?')[0]+'?ref='+getSess();
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(link).then(()=>showToast('📋 คัดลอกลิงก์แล้ว!'));
+  } else {
+    const el=document.createElement('textarea');
+    el.value=link; document.body.appendChild(el);
+    el.select(); document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('📋 คัดลอกลิงก์แล้ว!');
+  }
+}
+
 // ─── INIT ───
 window.addEventListener('load',()=>{
   // Clear stale language from old version
@@ -2294,8 +2340,16 @@ window.addEventListener('load',()=>{
     LANG = 'th';
   }
   applyLang();
+  // Check referral param in URL
+  const refParam = new URLSearchParams(window.location.search).get('ref');
+  if(refParam) localStorage.setItem('cm_pending_ref', refParam);
+
   const s=getSess();
-  if(s&&getU()[s])enterDash(s);
+  if(s){
+    fbGetUser(s).then(ud=>{
+      if(ud){_ud=ud;enterDash(s);}
+    });
+  }
   else{
     typePrompt('auth --mode=login');
     setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
