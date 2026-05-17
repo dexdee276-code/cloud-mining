@@ -234,15 +234,16 @@ img, video, iframe, table { max-width:100%; }
 .auth-footer-div{width:1px;background:rgba(157,78,221,0.2)}
 
 /* ── DASHBOARD ── */
-.nav{display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1rem;position:sticky;top:0;z-index:100;
-  background:rgba(30,0,50,0.97);backdrop-filter:blur(20px);border-bottom:3px solid rgba(200,100,255,0.5);
-  box-shadow:0 2px 20px rgba(74,14,143,0.2)}
-.nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.1rem;letter-spacing:2px;color:#fff;
-  text-shadow:0 0 15px rgba(157,78,221,0.5);margin-right:auto}
-.nav-pill{display:flex;align-items:center;gap:0.3rem;padding:0.28rem 0.65rem;border-radius:20px;
-  font-family:'Share Tech Mono',monospace;white-space:nowrap}
-.nav-pill.zkp{background:rgba(157,78,221,0.12);border:1px solid rgba(157,78,221,0.3)}
-.nav-pill.usd{background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25)}
+.nav{display:flex;align-items:center;gap:0.4rem;padding:0.6rem 0.8rem;position:sticky;top:0;z-index:100;
+  background:rgba(10,0,25,0.97);backdrop-filter:blur(20px);border-bottom:2px solid rgba(176,110,255,0.3);
+  box-shadow:0 2px 15px rgba(74,14,143,0.3);flex-wrap:nowrap;min-height:48px;}
+.nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:0.85rem;letter-spacing:1px;color:#fff;
+  white-space:nowrap;flex-shrink:0;
+  text-shadow:0 0 10px rgba(0,255,136,0.4);}
+.nav-pill{display:flex;align-items:center;gap:0.2rem;padding:0.22rem 0.5rem;border-radius:20px;
+  font-family:'Share Tech Mono',monospace;white-space:nowrap;flex-shrink:0;}
+.nav-pill.zkp{background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.25);}
+.nav-pill.usd{background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);}
 .np-val{font-size:0.95rem;font-weight:700;color:#fff;font-family:'Orbitron',monospace}
 .np-lbl{font-size:0.7rem;color:rgba(157,78,221,0.8);letter-spacing:1px}
 .nav-pill.usd .np-val{color:var(--gold)}.nav-pill.usd .np-lbl{color:rgba(255,215,0,0.5)}
@@ -686,15 +687,16 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
 <!-- ADMIN SCREEN -->
 <div class="screen" id="adminScreen">
   <nav class="nav">
-    <div class="nav-logo" style="color:var(--gold);">⚙️ ADMIN</div>
-    <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="adminBadge"></div>
-    <button class="btn-out" style="background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.3);color:var(--gold);" onclick="doAdminLogout()">ออก</button>
+    <div class="nav-logo" style="color:var(--gold);font-size:0.85rem;">⚙️ ADMIN</div>
+    <div style="flex:1;"></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);" id="adminBadge"></div>
+    <button style="padding:0.28rem 0.7rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:6px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;flex-shrink:0;" onclick="doAdminLogout()">✕ ออก</button>
   </nav>
 
   <!-- Admin tabs -->
-  <div style="display:flex;background:rgba(6,0,14,0.95);border-bottom:1px solid var(--border);overflow-x:auto;">
-    <button class="admin-tab active" id="atn0" onclick="switchAdminTab(0)">💰 เติมเงิน</button>
-    <button class="admin-tab" id="atn1" onclick="switchAdminTab(1)">💱 แลก ZKP</button>
+  <div style="display:flex;background:rgba(6,0,14,0.97);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-shrink:0;">
+    <button class="admin-tab active" id="atn0" onclick="switchAdminTab(0)">💰 เติม</button>
+    <button class="admin-tab" id="atn1" onclick="switchAdminTab(1)">💱 แลก</button>
     <button class="admin-tab" id="atn2" onclick="switchAdminTab(2)">👥 สมาชิก</button>
     <button class="admin-tab" id="atn3" onclick="switchAdminTab(3)">⚙️ ตั้งค่า</button>
     <button class="admin-tab" id="atn4" onclick="switchAdminTab(4)">📊 Dashboard</button>
@@ -914,17 +916,12 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
 <div class="screen" id="dashScreen">
   <nav class="nav">
     <div class="nav-logo">⛏ CRYPTOMINE</div>
-    <div class="nav-pill zkp"><span>🔷</span><span class="np-val" id="navZkp">0.0000</span><span class="np-lbl">ZKP</span></div>
-    <div class="nav-pill usd"><span>💵</span><span class="np-val" id="navUsd">0.00</span><span class="np-lbl">USD</span></div>
-    <div class="lang-group">
-      <button class="btn-lang active" id="lbTh" onclick="setLang('th')">ไทย</button>
-      <button class="btn-lang" id="lbEn" onclick="setLang('en')">EN</button>
-      <button class="btn-lang" id="lbLo" onclick="setLang('lo')">ລາວ</button>
-    </div>
-    <button class="notif-btn" id="notifBtn" onclick="showNotifications()" title="การแจ้งเตือน" style="position:relative;padding:0.28rem 0.55rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:6px;cursor:pointer;font-size:0.9rem;">🔔<span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red-bright);color:#fff;font-family:'Orbitron',monospace;font-size:0.45rem;font-weight:900;min-width:14px;height:14px;border-radius:7px;align-items:center;justify-content:center;padding:0 3px;">0</span></button>
-    <button class="btn-out" style="background:rgba(157,78,221,0.1);border-color:rgba(157,78,221,0.3);color:var(--purple-light);font-size:0.65rem;" onclick="showProfile()">👤</button>
-    <button class="btn-out" data-i18n="nav.out" onclick="doLogout()">OUT</button>
-    <button class="btn-out" style="background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.3);color:var(--gold);font-size:0.65rem;" onclick="showAdmin()">⚙️</button>
+    <div style="flex:1;"></div>
+    <div class="nav-pill zkp"><span>🔷</span><span class="np-val" id="navZkp">0.0000</span><span class="np-lbl" style="font-size:0.55rem;">ZKP</span></div>
+    <div class="nav-pill usd"><span>💵</span><span class="np-val" id="navUsd">0.00</span><span class="np-lbl" style="font-size:0.55rem;">USD</span></div>
+    <button class="notif-btn" id="notifBtn" onclick="showNotifications()" style="position:relative;padding:0.28rem 0.5rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:6px;cursor:pointer;font-size:0.85rem;flex-shrink:0;">🔔<span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red-bright);color:#fff;font-family:'Orbitron',monospace;font-size:0.45rem;font-weight:900;min-width:14px;height:14px;border-radius:7px;align-items:center;justify-content:center;padding:0 3px;">0</span></button>
+    <button onclick="showProfile()" style="padding:0.28rem 0.5rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:6px;cursor:pointer;font-size:0.85rem;flex-shrink:0;">👤</button>
+    <button onclick="showAdmin()" style="padding:0.28rem 0.5rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:6px;cursor:pointer;font-size:0.85rem;flex-shrink:0;">⚙️</button>
   </nav>
 
   <div class="tab-content">
