@@ -42,7 +42,17 @@
 }
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
-html,body{width:100%;min-height:100%;-webkit-text-size-adjust:100%;}
+html{
+  width:100%;
+  overflow-x:hidden;
+}
+body{
+  width:100%;
+  max-width:100vw;
+  overflow-x:hidden;
+  overscroll-behavior-x:none;
+  -webkit-text-size-adjust:100%;
+}
 
 /* ── 60% พื้นหลัง Galaxy วิบวับ ── */
 body{
@@ -159,6 +169,10 @@ body::after{
 .screen.active { display:flex; flex-direction:column; }
 #authScreen { overflow-y:auto; -webkit-overflow-scrolling:touch; }
 
+/* ── Global overflow fix ── */
+img, video, iframe, table { max-width:100%; }
+* { box-sizing:border-box; word-break:break-word; }
+
 /* ── AUTH ── */
 #authScreen{align-items:center;justify-content:center;padding:1.5rem;
   background:radial-gradient(ellipse 100% 70% at 30% 50%,rgba(80,15,160,0.35) 0%,transparent 60%),
@@ -209,8 +223,10 @@ body::after{
 .auth-msg.error{color:var(--red-bright);background:rgba(230,57,70,0.08);border-left:2px solid var(--red-bright);display:block}
 .auth-msg.success{color:var(--green);background:rgba(74,222,128,0.08);border-left:2px solid var(--green);display:block}
 .auth-prompt{font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:rgba(157,78,221,0.5);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.3rem}
-.p-cursor{display:inline-block;width:7px;height:0.9em;background:var(--purple-light);animation:blink 1s step-end infinite}
+.p-cursor{display:inline-block;width:7px;height:0.9em;background:var(--green);animation:blink 1s step-end infinite;box-shadow:0 0 6px rgba(0,255,136,0.8);}
 @keyframes blink{50%{opacity:0}}
+
+
 .auth-footer{display:flex;gap:1.5rem;justify-content:center;margin-top:1.5rem}
 .auth-stat{text-align:center}
 .auth-stat-val{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;color:var(--purple-light)}
@@ -278,7 +294,7 @@ body::after{
   border-radius:5px;color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.48rem;letter-spacing:1px;cursor:pointer;transition:all 0.2s}
 .btn-lang:hover,.btn-lang.active{background:rgba(157,78,221,0.25);border-color:var(--purple-light);color:var(--purple-light)}
 
-.tab-content{flex:1;overflow-y:auto;padding:1rem 1rem 5rem 1rem}
+.tab-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:1rem 1rem 5rem 1rem;-webkit-overflow-scrolling:touch;}
 .tab-page{display:none}.tab-page.active{display:block}
 
 .bottom-nav{
@@ -604,14 +620,7 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
   </div>
   <div class="auth-sub">MINE · EARN · DOMINATE</div>
   <div class="auth-card">
-    <div class="auth-bar">
-      <div class="auth-bar-dot"></div><div class="auth-bar-dot"></div><div class="auth-bar-dot"></div>
-      <div class="auth-bar-title" data-i18n="auth.terminal">SECURE_AUTH_TERMINAL</div>
-    </div>
-    <div class="auth-prompt">
-      <span style="color:var(--red-bright)">root@cryptomine</span><span style="color:rgba(157,78,221,0.5)">:~$</span>
-      <span id="promptTxt"></span><span class="p-cursor"></span>
-    </div>
+
     <div class="auth-tabs">
       <button class="auth-tab active" id="tabL" data-i18n="auth.tab.login" onclick="switchAuthTab('login')">LOGIN</button>
       <button class="auth-tab" id="tabR" data-i18n="auth.tab.reg" onclick="switchAuthTab('register')">REGISTER</button>
@@ -647,16 +656,6 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
         <input class="form-input" id="regPass" data-i18n-ph="auth.ph.regpass" type="password" placeholder="min 6 chars">
       </div>
       <button class="btn-auth" data-i18n="auth.btn.reg" onclick="doRegister()">🚀 CREATE NODE</button>
-      <div id="otpSection" style="display:none;margin-top:1rem;">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);text-align:center;margin-bottom:0.6rem;">📧 กรอกรหัส OTP ที่ส่งไปยัง Email ของคุณ</div>
-        <input type="text" id="otpInput" placeholder="000000" maxlength="6"
-          style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:2px solid rgba(157,78,221,0.5);color:var(--text);font-family:'Orbitron',monospace;font-size:1.4rem;outline:none;text-align:center;letter-spacing:10px;margin-bottom:0.6rem;">
-        <div style="display:flex;gap:0.5rem;">
-          <button onclick="verifyOTP()" class="btn-auth" style="flex:1;padding:0.75rem;">✅ ยืนยัน OTP</button>
-          <button onclick="resendOTP()" style="padding:0.75rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;white-space:nowrap;">🔄 ส่งใหม่</button>
-        </div>
-        <div id="otpTimer" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);text-align:center;margin-top:0.5rem;min-height:1.2em;"></div>
-      </div>
       <div class="auth-msg" id="regMsg"></div>
     </div>
   </div>
@@ -1396,7 +1395,7 @@ function switchAuthTab(t){
   document.getElementById('tabR').classList.toggle('active',t==='register');
   document.getElementById('loginForm').classList.toggle('active',t==='login');
   document.getElementById('regForm').classList.toggle('active',t==='register');
-  typePrompt(t==='login'?'auth --mode=login':'auth --mode=register');
+  
 }
 function typePrompt(txt){
   const el=document.getElementById('promptTxt');
@@ -1470,29 +1469,77 @@ let _otpTimerInterval = null;
 function sendOTP(username, email, password){
   _otpCode = Math.floor(100000+Math.random()*900000).toString();
   _otpEmail = email;
-  _otpExpiry = Date.now() + 10*60*1000; // 10 นาที
+  _otpExpiry = Date.now() + 10*60*1000;
   _otpUsername = username;
-  // เก็บ password ชั่วคราวใน memory
   window._pendingRegPass = password;
 
-  showMsg('regMsg','⏳ กำลังส่ง OTP...','');
+  showMsg('regMsg','⏳ กำลังส่ง OTP ไปที่ '+email+'...','');
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-    to_email: email,
-    username: username,
-    otp: _otpCode
+    to_email: email, username: username, otp: _otpCode
   }).then(()=>{
     showMsg('regMsg','','');
-    const sec = document.getElementById('otpSection');
-    const btn = document.querySelector('#regForm .btn-auth');
-    if(sec) sec.style.display='block';
-    if(btn){ btn.disabled=true; btn.style.opacity='0.5'; }
-    showToast('📧 ส่ง OTP ไปที่ '+email+' แล้ว!');
-    startOtpTimer();
-    document.getElementById('otpInput')?.focus();
+    showOtpPopup(email);
   }).catch(err=>{
     showMsg('regMsg','❌ ส่ง OTP ไม่สำเร็จ กรุณาตรวจสอบ Email','error');
     console.error('EmailJS error:', err);
   });
+}
+
+function showOtpPopup(email){
+  // ปิด popup เก่าถ้ามี
+  document.getElementById('otpPopupOv')?.remove();
+
+  const ov = document.createElement('div');
+  ov.id = 'otpPopupOv';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(6,0,15,0.97);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+  ov.innerHTML = `
+    <div style="background:linear-gradient(145deg,rgba(10,2,25,0.99),rgba(20,5,45,0.98));border:1px solid rgba(176,110,255,0.4);border-radius:20px;padding:2rem;width:100%;max-width:360px;text-align:center;">
+
+      <!-- Icon -->
+      <div style="width:70px;height:70px;background:linear-gradient(135deg,rgba(0,255,136,0.15),rgba(176,110,255,0.15));border:2px solid rgba(0,255,136,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-size:2rem;">📧</div>
+
+      <!-- Title -->
+      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:#fff;margin-bottom:0.4rem;">ยืนยันอีเมล</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);margin-bottom:0.3rem;">ส่งรหัส OTP ไปที่</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--green);margin-bottom:1.5rem;">${email}</div>
+
+      <!-- OTP Input -->
+      <div style="margin-bottom:1rem;">
+        <input type="text" id="otpInput" placeholder="_ _ _ _ _ _" maxlength="6" inputmode="numeric"
+          style="width:100%;padding:1rem;background:rgba(0,0,0,0.4);border:2px solid rgba(176,110,255,0.3);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:1.8rem;outline:none;text-align:center;letter-spacing:12px;transition:border 0.3s;"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+          onfocus="this.style.borderColor='rgba(0,255,136,0.6)'"
+          onblur="this.style.borderColor='rgba(176,110,255,0.3)'"
+          onkeydown="if(event.key==='Enter')verifyOTP()">
+      </div>
+
+      <!-- Timer -->
+      <div id="otpTimer" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:1.2rem;min-height:1.2em;">⏱ OTP หมดอายุใน 10:00 นาที</div>
+
+      <!-- Buttons -->
+      <button onclick="verifyOTP()"
+        style="width:100%;padding:0.9rem;background:linear-gradient(135deg,#003d20,#00CC6A,#FFD700);border:none;border-radius:12px;color:#000;font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;letter-spacing:2px;cursor:pointer;margin-bottom:0.7rem;">
+        ✅ ยืนยัน OTP
+      </button>
+
+      <div style="display:flex;gap:0.6rem;">
+        <button onclick="resendOTP()"
+          style="flex:1;padding:0.7rem;background:rgba(176,110,255,0.1);border:1px solid rgba(176,110,255,0.3);border-radius:10px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
+          🔄 ส่งรหัสใหม่
+        </button>
+        <button onclick="document.getElementById('otpPopupOv').remove();const btn=document.querySelector('#regForm .btn-auth');if(btn){btn.disabled=false;btn.style.opacity='1';}"
+          style="flex:1;padding:0.7rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
+          ← กลับ
+        </button>
+      </div>
+
+      <!-- Error msg -->
+      <div id="otpErrMsg" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--red-bright);margin-top:0.8rem;min-height:1.2em;"></div>
+    </div>`;
+
+  document.body.appendChild(ov);
+  startOtpTimer();
+  setTimeout(()=>document.getElementById('otpInput')?.focus(), 300);
 }
 
 function startOtpTimer(){
@@ -1514,12 +1561,22 @@ function startOtpTimer(){
 
 function verifyOTP(){
   const input = (document.getElementById('otpInput')?.value||'').trim();
-  if(!input){showMsg('regMsg','⚠ กรุณากรอก OTP','error');return;}
-  if(Date.now() > _otpExpiry){showMsg('regMsg','❌ OTP หมดอายุแล้ว กด ส่งใหม่','error');return;}
-  if(input !== _otpCode){showMsg('regMsg','❌ OTP ไม่ถูกต้อง กรุณาลองใหม่','error');return;}
-  // OTP ถูกต้อง! สมัครสมาชิกได้เลย
+  const errEl = document.getElementById('otpErrMsg');
+  const setErr = (msg) => { if(errEl) errEl.textContent = msg; };
+
+  if(!input){ setErr('⚠️ กรุณากรอกรหัส OTP 6 หลัก'); return; }
+  if(input.length !== 6){ setErr('⚠️ รหัส OTP ต้องมี 6 หลัก'); return; }
+  if(Date.now() > _otpExpiry){ setErr('❌ OTP หมดอายุแล้ว กด "ส่งรหัสใหม่"'); return; }
+  if(input !== _otpCode){ setErr('❌ OTP ไม่ถูกต้อง กรุณาลองใหม่'); return; }
+
+  // OTP ถูกต้อง!
   clearInterval(_otpTimerInterval);
-  showMsg('regMsg','✅ ยืนยัน OTP สำเร็จ! กำลังสร้างบัญชี...','success');
+  setErr('');
+
+  // แสดง loading
+  const btn = document.querySelector('#otpPopupOv button');
+  if(btn){ btn.textContent='⏳ กำลังสร้างบัญชี...'; btn.disabled=true; }
+
   const u = _otpUsername;
   const e = _otpEmail;
   const p = window._pendingRegPass||'';
@@ -1530,22 +1587,37 @@ function verifyOTP(){
               sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0,createdAt:Date.now()};
     window._db.ref('users/'+u).set(nd).then(()=>{
       window._pendingRegPass=null; _otpCode='';
+      document.getElementById('otpPopupOv')?.remove();
       _ud=nd; setSess(u); enterDash(u);
       showToast('🎉 สมัครสมาชิกสำเร็จ! ยินดีต้อนรับ '+u);
     });
-  });
+  }).catch(()=>setErr('❌ เกิดข้อผิดพลาด กรุณาลองใหม่'));
 }
 
 function resendOTP(){
   if(!_otpUsername||!_otpEmail||!window._pendingRegPass){
-    showMsg('regMsg','⚠ กรุณากรอกข้อมูลใหม่อีกครั้ง','error');
-    const sec=document.getElementById('otpSection');
-    if(sec) sec.style.display='none';
+    document.getElementById('otpPopupOv')?.remove();
     const btn=document.querySelector('#regForm .btn-auth');
     if(btn){btn.disabled=false;btn.style.opacity='1';}
     return;
   }
-  sendOTP(_otpUsername, _otpEmail, window._pendingRegPass);
+  clearInterval(_otpTimerInterval);
+  const errEl=document.getElementById('otpErrMsg');
+  if(errEl) errEl.textContent='⏳ กำลังส่งรหัสใหม่...';
+  // สร้าง OTP ใหม่
+  _otpCode = Math.floor(100000+Math.random()*900000).toString();
+  _otpExpiry = Date.now() + 10*60*1000;
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    to_email:_otpEmail, username:_otpUsername, otp:_otpCode
+  }).then(()=>{
+    if(errEl) errEl.textContent='';
+    startOtpTimer();
+    showToast('📧 ส่งรหัสใหม่ไปที่ '+_otpEmail+' แล้ว!');
+    document.getElementById('otpInput').value='';
+    document.getElementById('otpInput').focus();
+  }).catch(()=>{
+    if(errEl) errEl.textContent='❌ ส่งไม่สำเร็จ กรุณาลองใหม่';
+  });
 }
 function doLogout(){stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
 
@@ -3973,7 +4045,7 @@ const I18N = {
   th: {
     // Auth
     'auth.sub':        'MINE · EARN · DOMINATE',
-    'auth.terminal':   'SECURE_AUTH_TERMINAL',
+    'auth.terminal':   'LUCKY_GOLD_MINE_TERMINAL',
     'auth.tab.login':  'LOGIN',
     'auth.tab.reg':    'REGISTER',
     'auth.lbl.user':   'USERNAME',
@@ -4114,7 +4186,7 @@ const I18N = {
   },
   en: {
     'auth.sub':        'MINE · EARN · DOMINATE',
-    'auth.terminal':   'SECURE_AUTH_TERMINAL',
+    'auth.terminal':   'LUCKY_GOLD_MINE_TERMINAL',
     'auth.tab.login':  'LOGIN',
     'auth.tab.reg':    'REGISTER',
     'auth.lbl.user':   'USERNAME',
@@ -4246,7 +4318,7 @@ const I18N = {
   },
   lo: {
     'auth.sub':        'ຂຸດ · ໄດ້ຮັບ · ຄອບງໍາ',
-    'auth.terminal':   'SECURE_AUTH_TERMINAL',
+    'auth.terminal':   'LUCKY_GOLD_MINE_TERMINAL',
     'auth.tab.login':  'ເຂົ້າສູ່ລະບົບ',
     'auth.tab.reg':    'ສະໝັກ',
     'auth.lbl.user':   'ຊື່ຜູ້ໃຊ້',
@@ -4582,7 +4654,7 @@ window.addEventListener('load',()=>{
     });
   }
   else{
-    typePrompt('auth --mode=login');
+
     setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
   }
 });
