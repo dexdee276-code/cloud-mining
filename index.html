@@ -1246,17 +1246,48 @@ function typePrompt(txt){
 }
 function showMsg(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className='auth-msg '+type}
 function doLogin(){
+  const now=Date.now();
+  if(_loginLockUntil>now){
+    const sec=Math.ceil((_loginLockUntil-now)/1000);
+    showMsg('loginMsg',`🔒 ล็อกชั่วคราว รอ ${sec} วินาที`,'error'); return;
+  }
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value;
   if(!u||!p){showMsg('loginMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return}
   const btn=document.querySelector('#loginForm .btn-auth');
-  btn.disabled=true;btn.textContent='⏳ กำลังเข้าสู่ระบบ...';
-  fbGetUser(u).then(ud=>{
-    btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';
-    if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return}
-    if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return}
-    _ud=ud;setSess(u);enterDash(u);
-  }).catch(()=>{btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error');});
+  btn.disabled=true; btn.textContent='⏳ กำลังเข้าสู่ระบบ...';
+
+  sha256(p).then(hashed=>{
+    return fbGetUser(u).then(ud=>{
+      btn.disabled=false; btn.textContent='⚡ AUTHENTICATE';
+      if(!ud){
+        _loginFail++;
+        if(_loginFail>=LOGIN_MAX_FAIL){_loginLockUntil=Date.now()+LOGIN_LOCK_MS;_loginFail=0;showMsg('loginMsg','🔒 กรอกผิดเกินกำหนด ล็อก 60 วินาที','error');}
+        else showMsg('loginMsg',`❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง (${_loginFail}/${LOGIN_MAX_FAIL})`,'error');
+        return;
+      }
+      if(ud.banned){showMsg('loginMsg','🚫 บัญชีถูกระงับ กรุณาติดต่อ Admin','error');return;}
+      // รองรับทั้ง hash ใหม่ และ plain text เก่า
+      const isHashed = ud.pw && ud.pw.length===64;
+      const match = isHashed ? (ud.pw===hashed) : (ud.pw===p);
+      if(!match){
+        _loginFail++;
+        if(_loginFail>=LOGIN_MAX_FAIL){_loginLockUntil=Date.now()+LOGIN_LOCK_MS;_loginFail=0;showMsg('loginMsg','🔒 กรอกผิดเกินกำหนด ล็อก 60 วินาที','error');}
+        else showMsg('loginMsg',`❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง (${_loginFail}/${LOGIN_MAX_FAIL})`,'error');
+        return;
+      }
+      // อัปเกรด plain text → hash อัตโนมัติ
+      if(!isHashed){
+        ud.pw=hashed;
+        window._db.ref('users/'+u+'/pw').set(hashed);
+      }
+      _loginFail=0; _loginLockUntil=0;
+      _ud=ud; setSess(u); enterDash(u); resetSessionTimer();
+    });
+  }).catch(()=>{
+    btn.disabled=false; btn.textContent='⚡ AUTHENTICATE';
+    showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error');
+  });
 }
 function doRegister(){
   const u=document.getElementById('regUser').value.trim();
@@ -1265,16 +1296,18 @@ function doRegister(){
   if(!u||!e||!p){showMsg('regMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return}
   if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return}
   const btn=document.querySelector('#regForm .btn-auth');
-  btn.disabled=true;btn.textContent='⏳ กำลังสมัคร...';
-  fbGetUser(u).then(existing=>{
-    if(existing){btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;}
-    const refCode = u.toUpperCase().slice(0,4) + Math.random().toString(36).slice(2,6).toUpperCase();
-    const refBy = new URLSearchParams(window.location.search).get('ref') || '';
-    const nd={pw:p,email:e,usd:0,zkpReward:0,zkpMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
-    window._db.ref('users/'+u).set(nd).then(()=>{
-      btn.disabled=false;btn.textContent='🚀 CREATE NODE';
-      _ud=nd;showMsg('regMsg','✅ สมัครสำเร็จ! กำลังเข้าสู่ระบบ...','success');
-      setTimeout(()=>{setSess(u);enterDash(u)},1000);
+  btn.disabled=true; btn.textContent='⏳ กำลังสมัคร...';
+  sha256(p).then(hashed=>{
+    return fbGetUser(u).then(existing=>{
+      if(existing){btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;}
+      const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+      const refBy=new URLSearchParams(window.location.search).get('ref')||'';
+      const nd={pw:hashed,email:e,usd:0,zkpReward:0,zkpMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0,createdAt:Date.now()};
+      window._db.ref('users/'+u).set(nd).then(()=>{
+        btn.disabled=false; btn.textContent='🚀 CREATE NODE';
+        _ud=nd; showMsg('regMsg','✅ สมัครสำเร็จ! กำลังเข้าสู่ระบบ...','success');
+        setTimeout(()=>{setSess(u);enterDash(u);},1000);
+      });
     });
   }).catch(()=>{btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');});
 }
