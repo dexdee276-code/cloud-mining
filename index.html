@@ -593,7 +593,10 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
   <span style="margin-left:auto;font-size:0.8rem;color:var(--text-dim);">›</span>
 </div>
 <div style="text-align:center;margin-bottom:0.8rem;">
-  <button onclick="showTerms()" style="background:none;border:none;color:rgba(157,78,221,0.5);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;text-decoration:underline;">📋 ข้อตกลงการใช้งาน & ความเสี่ยง</button>
+  <div style="display:flex;gap:1rem;justify-content:center;">
+    <button onclick="showTerms()" style="background:none;border:none;color:rgba(157,78,221,0.5);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;text-decoration:underline;">📋 ข้อตกลงการใช้งาน</button>
+    <button onclick="showPrivacy()" style="background:none;border:none;color:rgba(157,78,221,0.5);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;text-decoration:underline;">🔒 Privacy Policy</button>
+  </div>
 </div>
 <div class="auth-footer">
     <div class="auth-stat"><div class="auth-stat-val" id="aMiners">2,847</div><div class="auth-stat-lbl" data-i18n="auth.stat.miners">Active Miners</div></div>
@@ -620,6 +623,7 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
     <button class="admin-tab" id="atn3" onclick="switchAdminTab(3)">⚙️ ตั้งค่า</button>
     <button class="admin-tab" id="atn4" onclick="switchAdminTab(4)">📊 Dashboard</button>
     <button class="admin-tab" id="atn5" onclick="switchAdminTab(5)">📢 ประกาศ</button>
+    <button class="admin-tab" id="atn6" onclick="switchAdminTab(6)">🎫 โปรโมชั่น</button>
   </div>
 
   <div style="flex:1;overflow-y:auto;padding:1rem;">
@@ -761,6 +765,47 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
         <button onclick="exportCSV('topup')" class="btn btn-gold" style="font-size:0.65rem;">📥 Export เติมเงิน CSV</button>
         <button onclick="exportCSV('withdraw')" style="padding:0.7rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:10px;color:var(--green);font-family:'Orbitron',monospace;font-size:0.65rem;cursor:pointer;">📥 Export ถอนเงิน CSV</button>
       </div>
+    </div>
+
+    <!-- Tab 6: Promo Codes -->
+    <div class="admin-page" id="apg6">
+      <div class="sec-title">🎫 จัดการโปรโมชั่นโค้ด</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">➕ สร้างโค้ดใหม่</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.3rem;">ชื่อโค้ด (ตัวพิมพ์ใหญ่)</div>
+        <input type="text" id="promoCodeName" placeholder="เช่น WELCOME50, NEWUSER" maxlength="20"
+          style="width:100%;padding:0.65rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Orbitron',monospace;font-size:0.9rem;outline:none;letter-spacing:2px;text-transform:uppercase;margin-bottom:0.7rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.7rem;">
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.3rem;">ประเภทรางวัล</div>
+            <select id="promoType" style="width:100%;padding:0.6rem;background:rgba(0,0,0,0.4);border:1px solid rgba(255,215,0,0.2);border-radius:8px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.75rem;outline:none;">
+              <option value="zkp">🔷 ZKP ฟรี</option>
+              <option value="usd">💵 USD ฟรี</option>
+              <option value="discount">💰 ส่วนลด %</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.3rem;">จำนวน</div>
+            <input type="number" id="promoValue" placeholder="เช่น 50, 10, 20" min="0"
+              style="width:100%;padding:0.6rem 0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Orbitron',monospace;font-size:0.9rem;outline:none;">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.8rem;">
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.3rem;">ใช้ได้กี่ครั้ง (0=ไม่จำกัด)</div>
+            <input type="number" id="promoLimit" placeholder="0" min="0" value="0"
+              style="width:100%;padding:0.6rem 0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Orbitron',monospace;font-size:0.9rem;outline:none;">
+          </div>
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.3rem;">user ใช้ได้คนละกี่ครั้ง</div>
+            <input type="number" id="promoPerUser" placeholder="1" min="1" value="1"
+              style="width:100%;padding:0.6rem 0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Orbitron',monospace;font-size:0.9rem;outline:none;">
+          </div>
+        </div>
+        <button onclick="createPromoCode()" class="btn btn-gold" style="width:100%;">🎫 สร้างโปรโมชั่นโค้ด</button>
+      </div>
+      <div class="sec-title" style="margin-top:0.5rem;">📋 โค้ดที่มีอยู่</div>
+      <div id="promoList"></div>
     </div>
 
     <!-- Tab 5: Broadcast -->
@@ -1056,7 +1101,17 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
         <div class="tu-grid" id="tuGrid">
           <!-- render by JS ตามอัตราแลกเปลี่ยน Firebase -->
         </div>
-        <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goToQR()">
+        <!-- Promo Code -->
+        <div style="background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.2);border-radius:10px;padding:0.8rem;margin-top:0.8rem;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.4rem;">🎫 มีโปรโมชั่นโค้ดไหม?</div>
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="promoInput" placeholder="กรอกโค้ด เช่น WELCOME50" autocomplete="off"
+              style="flex:1;padding:0.6rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.3);color:var(--text);font-family:'Orbitron',monospace;font-size:0.82rem;outline:none;letter-spacing:2px;text-transform:uppercase;">
+            <button onclick="applyPromoCode()" style="padding:0.6rem 1rem;background:rgba(157,78,221,0.15);border:1px solid rgba(157,78,221,0.4);border-radius:8px;color:var(--purple-light);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;white-space:nowrap;">ใช้โค้ด</button>
+          </div>
+          <div id="promoMsg" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;min-height:1.2em;margin-top:0.4rem;"></div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:0.8rem" onclick="goToQR()">
           ถัดไป → ดู QR Code
         </button>
       </div>
@@ -1959,6 +2014,20 @@ function _doShowWithdrawPopup(){
   const ud=getUD(); if(!ud) return;
   const zkp=ud.zkpReward||0;
   if(zkp<MIN_WITHDRAW){showInsufficientZkpPopup(zkp);return;}
+  // ตรวจ 1 ครั้ง/วัน
+  const todayStr=new Date().toDateString();
+  if(ud.lastWithdrawDate===todayStr){
+    const ov=document.createElement('div');ov.className='overlay';
+    ov.innerHTML=`<div class="popup" style="text-align:center;max-width:310px;">
+      <div style="font-size:2.5rem;margin-bottom:0.8rem;">⏰</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);margin-bottom:0.6rem;">แจ้งแลกได้วันละ 1 ครั้ง</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">
+        คุณได้แจ้งแลกเงินไปแล้ววันนี้<br>กรุณากลับมาใหม่พรุ่งนี้ครับ
+      </div>
+      <button onclick="this.closest('.overlay').remove()" class="btn btn-primary" style="width:100%;">รับทราบ</button>
+    </div>`;
+    document.body.appendChild(ov); return;
+  }
   // โหลดอัตราแลกเปลี่ยนปัจจุบัน
   const lakRate = LAK_RATE_LIVE || LAK_RATE;
   const usdVal=(zkp*ZKP_RATE).toFixed(4);
@@ -2184,6 +2253,8 @@ function submitSlip(){
         renderPendingList();
         renderTopupHistory();
         showToast('📤 ส่งหลักฐานเรียบร้อยแล้ว! รอ Admin อนุมัติ');
+        // ใช้ promo code ถ้ามี
+        if(_appliedPromo) redeemPromoReward(getSess());
       } catch(e) {
         showToast('❌ รูปใหญ่เกินไป กรุณาใช้รูปที่เล็กกว่านี้');
       }
@@ -2424,10 +2495,10 @@ function doAdminLogout(){
 }
 function switchAdminTab(i){
   adminTabIdx = i;
-  ['atn0','atn1','atn2','atn3','atn4','atn5'].forEach((id,j)=>{
+  ['atn0','atn1','atn2','atn3','atn4','atn5','atn6'].forEach((id,j)=>{
     document.getElementById(id)?.classList.toggle('active', i===j);
   });
-  ['apg0','apg1','apg2','apg3','apg4','apg5'].forEach((id,j)=>{
+  ['apg0','apg1','apg2','apg3','apg4','apg5','apg6'].forEach((id,j)=>{
     document.getElementById(id)?.classList.toggle('active', i===j);
   });
   if(i===0) renderAdminTopup(currentFilter);
@@ -2436,6 +2507,7 @@ function switchAdminTab(i){
   if(i===3){ loadAdminQRPreview(); renderAdminStats(); loadFreezeStatus(); loadLakRate(); }
   if(i===4) renderAdminDashboard();
   if(i===5) renderBcHistory();
+  if(i===6) renderPromoList();
 }
 function filterReqs(f){
   currentFilter = f;
@@ -3431,6 +3503,191 @@ function adminViewUser(username){
     </div>`;
     document.body.appendChild(ov);
   }).catch(()=>showToast('❌ โหลดข้อมูลไม่ได้'));
+}
+
+// ════════════════════════════════════════
+// PROMO CODE SYSTEM
+// ════════════════════════════════════════
+let _appliedPromo = null; // โค้ดที่ใช้แล้วในรอบนี้
+
+function applyPromoCode(){
+  const code = (document.getElementById('promoInput')?.value||'').trim().toUpperCase();
+  const msgEl = document.getElementById('promoMsg');
+  const setMsg = (txt, color) => { if(msgEl){msgEl.textContent=txt;msgEl.style.color=color;} };
+  if(!code){ setMsg('⚠️ กรุณากรอกโค้ด','var(--red-bright)'); return; }
+  const u = getSess(); if(!u){ setMsg('⚠️ กรุณา login ก่อน','var(--red-bright)'); return; }
+  setMsg('⏳ กำลังตรวจสอบ...','var(--text-dim)');
+
+  window._db.ref('promo_codes/'+code).once('value').then(snap=>{
+    if(!snap.exists()){ setMsg('❌ ไม่พบโค้ดนี้ หรือโค้ดหมดอายุแล้ว','var(--red-bright)'); return; }
+    const promo = snap.val();
+    if(!promo.active){ setMsg('❌ โค้ดนี้ถูกปิดใช้งานแล้ว','var(--red-bright)'); return; }
+    // ตรวจจำนวนครั้งที่ใช้รวม
+    if(promo.limit > 0 && (promo.usedCount||0) >= promo.limit){
+      setMsg('❌ โค้ดถูกใช้ครบจำนวนแล้ว','var(--red-bright)'); return;
+    }
+    // ตรวจว่า user นี้เคยใช้หรือยัง
+    const userUsed = (promo.usedBy||{})[u.replace(/\./g,'_')]||0;
+    if(userUsed >= (promo.perUser||1)){
+      setMsg('❌ คุณใช้โค้ดนี้ครบแล้ว','var(--red-bright)'); return;
+    }
+    // โค้ดใช้ได้!
+    _appliedPromo = {code, ...promo};
+    const reward = promo.type==='zkp'?`+${promo.value} ZKP ฟรี`:
+                   promo.type==='usd'?`+$${promo.value} USD ฟรี`:
+                   `ส่วนลด ${promo.value}%`;
+    setMsg(`✅ โค้ดสำเร็จ! ได้รับ ${reward}`, 'var(--green)');
+    showToast(`🎫 ใช้โค้ด ${code} สำเร็จ! ${reward}`);
+  }).catch(()=>setMsg('❌ ตรวจสอบไม่ได้ กรุณาลองใหม่','var(--red-bright)'));
+}
+
+function redeemPromoReward(username){
+  if(!_appliedPromo) return;
+  const promo = _appliedPromo;
+  const code = promo.code;
+  const u = username || getSess();
+
+  // ให้รางวัล
+  if(promo.type==='zkp'){
+    window._db.ref('users/'+u+'/zkpReward').once('value').then(snap=>{
+      const cur = snap.exists()?(parseFloat(snap.val())||0):0;
+      window._db.ref('users/'+u+'/zkpReward').set(parseFloat((cur+promo.value).toFixed(6)));
+      window._db.ref('users/'+u+'/txs').once('value').then(s=>{
+        const txs=s.val()||[];
+        const arr=Array.isArray(txs)?txs:Object.values(txs);
+        window._db.ref('users/'+u+'/txs').set([{desc:`🎫 โปรโมชั่น ${code} +${promo.value} ZKP`,amount:promo.value,unit:'ZKP',time:Date.now()},...arr].slice(0,50));
+      });
+    });
+  } else if(promo.type==='usd'){
+    window._db.ref('users/'+u+'/usd').once('value').then(snap=>{
+      const cur = snap.exists()?(parseFloat(snap.val())||0):0;
+      window._db.ref('users/'+u+'/usd').set(parseFloat((cur+promo.value).toFixed(2)));
+    });
+  }
+
+  // บันทึกการใช้งาน
+  const safeU = u.replace(/\./g,'_');
+  window._db.ref('promo_codes/'+code+'/usedCount').transaction(c=>(c||0)+1);
+  window._db.ref('promo_codes/'+code+'/usedBy/'+safeU).transaction(c=>(c||0)+1);
+  window._db.ref('promo_codes/'+code+'/usedLog').push({user:u,time:Date.now()});
+  _appliedPromo = null;
+  if(document.getElementById('promoInput')) document.getElementById('promoInput').value='';
+  if(document.getElementById('promoMsg')) document.getElementById('promoMsg').textContent='';
+}
+
+// Admin: สร้าง/ดู Promo Codes
+function createPromoCode(){
+  const name = (document.getElementById('promoCodeName')?.value||'').trim().toUpperCase();
+  const type = document.getElementById('promoType')?.value||'zkp';
+  const value = parseFloat(document.getElementById('promoValue')?.value||0);
+  const limit = parseInt(document.getElementById('promoLimit')?.value||0);
+  const perUser = parseInt(document.getElementById('promoPerUser')?.value||1);
+  if(!name||name.length<2){ showToast('⚠️ กรุณาตั้งชื่อโค้ดอย่างน้อย 2 ตัว'); return; }
+  if(!value||value<=0){ showToast('⚠️ กรุณากรอกจำนวนรางวัล'); return; }
+  const promo = {name,type,value,limit,perUser,active:true,usedCount:0,createdAt:Date.now()};
+  window._db.ref('promo_codes/'+name).set(promo).then(()=>{
+    document.getElementById('promoCodeName').value='';
+    document.getElementById('promoValue').value='';
+    document.getElementById('promoLimit').value='0';
+    document.getElementById('promoPerUser').value='1';
+    showToast(`✅ สร้างโค้ด ${name} สำเร็จ!`);
+    renderPromoList();
+  }).catch(()=>showToast('❌ สร้างไม่สำเร็จ'));
+}
+
+function renderPromoList(){
+  const el = document.getElementById('promoList'); if(!el) return;
+  el.innerHTML='<div style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;text-align:center;padding:1rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('promo_codes').once('value').then(snap=>{
+    if(!snap.exists()){el.innerHTML='<div style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;text-align:center;padding:1rem;">ยังไม่มีโค้ด</div>';return;}
+    const items=[];
+    snap.forEach(c=>items.push({code:c.key,...c.val()}));
+    const typeLabel = {zkp:'🔷 ZKP',usd:'💵 USD',discount:'💰 ส่วนลด'};
+    el.innerHTML=items.sort((a,b)=>b.createdAt-a.createdAt).map(p=>`
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.9rem;margin-bottom:0.6rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--gold);letter-spacing:2px;">${p.code}</div>
+          <div style="display:flex;gap:0.4rem;align-items:center;">
+            <span style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:${p.active?'var(--green)':'var(--red-bright)'};">${p.active?'✅ เปิด':'❌ ปิด'}</span>
+            <button onclick="togglePromo('${p.code}',${p.active})" style="padding:0.2rem 0.5rem;background:${p.active?'rgba(230,57,70,0.1)':'rgba(74,222,128,0.1)'};border:1px solid ${p.active?'rgba(230,57,70,0.3)':'rgba(74,222,128,0.3)'};border-radius:5px;color:${p.active?'var(--red-bright)':'var(--green)'};font-family:'Share Tech Mono',monospace;font-size:0.55rem;cursor:pointer;">${p.active?'ปิด':'เปิด'}</button>
+            <button onclick="deletePromo('${p.code}')" style="padding:0.2rem 0.5rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:5px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.55rem;cursor:pointer;">ลบ</button>
+          </div>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">
+          ${typeLabel[p.type]||p.type}: <span style="color:#fff;">${p.value}</span> · 
+          ใช้แล้ว <span style="color:var(--purple-light);">${p.usedCount||0}/${p.limit>0?p.limit:'∞'}</span> ครั้ง · 
+          user ละ <span style="color:var(--purple-light);">${p.perUser}</span> ครั้ง
+        </div>
+      </div>`).join('');
+  });
+}
+
+function togglePromo(code, active){
+  window._db.ref('promo_codes/'+code+'/active').set(!active).then(()=>{
+    showToast(`${!active?'✅ เปิด':'❌ ปิด'}โค้ด ${code} แล้ว`);
+    renderPromoList();
+  });
+}
+function deletePromo(code){
+  if(!confirm('ลบโค้ด '+code+' ?')) return;
+  window._db.ref('promo_codes/'+code).remove().then(()=>{
+    showToast('🗑️ ลบโค้ด '+code+' แล้ว'); renderPromoList();
+  });
+}
+
+// ════════════════════════════════════════
+// WITHDRAW ONCE PER DAY
+// ════════════════════════════════════════
+function checkWithdrawLimit(){
+  const ud = getUD(); if(!ud) return Promise.resolve(true);
+  const todayStr = new Date().toDateString();
+  const lastWd = ud.lastWithdrawDate||'';
+  if(lastWd === todayStr){
+    return Promise.resolve(false); // ถอนแล้ววันนี้
+  }
+  return Promise.resolve(true);
+}
+
+// ════════════════════════════════════════
+// PRIVACY POLICY
+// ════════════════════════════════════════
+function showPrivacy(){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;';
+  ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.5rem;width:100%;max-width:420px;margin:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:var(--purple-light);">🔒 Privacy Policy</div>
+      <button onclick="this.closest('div[style]').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:2;max-height:70vh;overflow-y:auto;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">1. ข้อมูลที่เก็บรวบรวม</div>
+      <p style="margin-bottom:1rem;">เราเก็บข้อมูล username, email, ประวัติธุรกรรม และข้อมูลการใช้งานเพื่อให้บริการเท่านั้น</p>
+
+      <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">2. การใช้ข้อมูล</div>
+      <p style="margin-bottom:0.5rem;">• ใช้เพื่อให้บริการแพลตฟอร์ม Cloud Mining</p>
+      <p style="margin-bottom:0.5rem;">• ใช้เพื่อตรวจสอบธุรกรรมและป้องกันการทุจริต</p>
+      <p style="margin-bottom:1rem;">• ไม่ขายหรือแชร์ข้อมูลให้บุคคลที่สาม</p>
+
+      <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">3. ความปลอดภัย</div>
+      <p style="margin-bottom:0.5rem;">• รหัสผ่านถูกเข้ารหัสด้วย SHA-256</p>
+      <p style="margin-bottom:0.5rem;">• ข้อมูลจัดเก็บบน Firebase (Google Cloud)</p>
+      <p style="margin-bottom:1rem;">• มีระบบ Session Timeout เพื่อความปลอดภัย</p>
+
+      <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">4. สิทธิ์ของผู้ใช้</div>
+      <p style="margin-bottom:0.5rem;">• ขอดู แก้ไข หรือลบข้อมูลได้โดยติดต่อ Admin</p>
+      <p style="margin-bottom:1rem;">• มีสิทธิ์ปิดบัญชีได้ตลอดเวลา</p>
+
+      <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">5. คุกกี้และ Storage</div>
+      <p style="margin-bottom:1rem;">เราใช้ localStorage เพื่อจัดเก็บ session login เท่านั้น ไม่มีการติดตามพฤติกรรมการใช้งาน</p>
+
+      <div style="background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.2);border-radius:8px;padding:0.8rem;margin-top:0.5rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--purple-light);margin-bottom:0.3rem;">📌 ติดต่อเรา</div>
+        <div style="font-size:0.68rem;">หากมีคำถามเกี่ยวกับนโยบายความเป็นส่วนตัว กรุณาติดต่อ Admin ผ่านระบบ</div>
+      </div>
+    </div>
+    <button onclick="this.closest('div[style]').remove()" class="btn btn-primary" style="width:100%;margin-top:1rem;">✅ รับทราบ</button>
+  </div>`;
+  document.body.appendChild(ov);
 }
 
 function renderAdminStats(){
