@@ -234,9 +234,9 @@ img, video, iframe, table { max-width:100%; }
 .auth-footer-div{width:1px;background:rgba(157,78,221,0.2)}
 
 /* ── DASHBOARD ── */
-.nav{display:flex;align-items:center;gap:0.4rem;padding:0.6rem 0.8rem;position:sticky;top:0;z-index:100;
+.nav{display:flex;align-items:center;gap:0.4rem;padding:0.6rem 0.8rem;position:sticky;top:0;z-index:200;
   background:rgba(10,0,25,0.97);backdrop-filter:blur(20px);border-bottom:2px solid rgba(176,110,255,0.3);
-  box-shadow:0 2px 15px rgba(74,14,143,0.3);flex-wrap:nowrap;min-height:48px;}
+  box-shadow:0 2px 15px rgba(74,14,143,0.3);flex-wrap:nowrap;min-height:48px;position:relative;}
 .nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:0.85rem;letter-spacing:1px;color:#fff;
   white-space:nowrap;flex-shrink:0;
   text-shadow:0 0 10px rgba(0,255,136,0.4);}
@@ -923,12 +923,22 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
 <div class="screen" id="dashScreen">
   <nav class="nav">
     <div class="nav-logo">⛏ CRYPTOMINE</div>
-    <div style="flex:1;"></div>
-    <div class="nav-pill zkp"><span>🔷</span><span class="np-val" id="navZkp">0.0000</span><span class="np-lbl" style="font-size:0.55rem;">ZKP</span></div>
-    <div class="nav-pill usd"><span>💵</span><span class="np-val" id="navUsd">0.00</span><span class="np-lbl" style="font-size:0.55rem;">USD</span></div>
-    <button class="notif-btn" id="notifBtn" onclick="showNotifications()" style="position:relative;padding:0.28rem 0.5rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:6px;cursor:pointer;font-size:0.85rem;flex-shrink:0;">🔔<span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red-bright);color:#fff;font-family:'Orbitron',monospace;font-size:0.45rem;font-weight:900;min-width:14px;height:14px;border-radius:7px;align-items:center;justify-content:center;padding:0 3px;">0</span></button>
-    <button onclick="showProfile()" style="padding:0.28rem 0.5rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:6px;cursor:pointer;font-size:0.85rem;flex-shrink:0;">👤</button>
-    <button onclick="showAdmin()" style="padding:0.28rem 0.5rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:6px;cursor:pointer;font-size:0.85rem;flex-shrink:0;">⚙️</button>
+    <div style="flex:1;min-width:0.5rem;"></div>
+    <div class="nav-pill zkp"><span>🔷</span><span class="np-val" id="navZkp">0.0000</span><span class="np-lbl" style="font-size:0.5rem;">ZKP</span></div>
+    <div class="nav-pill usd"><span>💵</span><span class="np-val" id="navUsd">0.00</span><span class="np-lbl" style="font-size:0.5rem;">USD</span></div>
+    <button id="navMenuBtn" onclick="toggleNavMenu()" style="position:relative;padding:0.3rem 0.55rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:8px;cursor:pointer;font-size:0.9rem;flex-shrink:0;line-height:1;">☰
+      <span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red-bright);color:#fff;font-family:'Orbitron',monospace;font-size:0.45rem;font-weight:900;min-width:14px;height:14px;border-radius:7px;align-items:center;justify-content:center;padding:0 3px;">0</span>
+    </button>
+    <!-- Dropdown menu -->
+    <div id="navMenuDropdown" style="display:none;position:absolute;top:48px;right:0.8rem;z-index:999;background:rgba(6,0,15,0.99);border:1px solid rgba(176,110,255,0.3);border-radius:12px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,0.7);min-width:160px;">
+      <button onclick="showNotifications();closeNavMenu()" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.8rem 1rem;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">🔔 การแจ้งเตือน</button>
+      <button onclick="showProfile();closeNavMenu()" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.8rem 1rem;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">👤 โปรไฟล์</button>
+      <button onclick="setLang('th');closeNavMenu()" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.8rem 1rem;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">🇹🇭 ภาษาไทย</button>
+      <button onclick="setLang('en');closeNavMenu()" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.8rem 1rem;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">🇬🇧 English</button>
+      <button onclick="setLang('lo');closeNavMenu()" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.8rem 1rem;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">🇱🇦 ລາວ</button>
+      <button onclick="showAdmin();closeNavMenu()" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.8rem 1rem;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">⚙️ Admin Panel</button>
+      <button onclick="doLogout()" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.8rem 1rem;background:none;border:none;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">🚪 ออกจากระบบ</button>
+    </div>
   </nav>
 
   <div class="tab-content">
@@ -2787,6 +2797,25 @@ const ADMIN_MENU_LABELS = [
   '💰 เติมเงิน','💱 แลก ZKP','👥 สมาชิก',
   '⚙️ ตั้งค่า','📊 Dashboard','📢 ประกาศ','🎫 โปรโมชั่น'
 ];
+
+function toggleNavMenu(){
+  const dd = document.getElementById('navMenuDropdown');
+  const isOpen = dd.style.display !== 'none';
+  dd.style.display = isOpen ? 'none' : 'block';
+}
+function closeNavMenu(){
+  const dd = document.getElementById('navMenuDropdown');
+  if(dd) dd.style.display = 'none';
+}
+
+// ปิด nav menu เมื่อคลิกนอก
+document.addEventListener('click', e=>{
+  const dd = document.getElementById('navMenuDropdown');
+  const btn = document.getElementById('navMenuBtn');
+  if(dd && btn && !btn.contains(e.target) && !dd.contains(e.target)){
+    dd.style.display = 'none';
+  }
+});
 
 function toggleAdminMenu(){
   const dd = document.getElementById('adminMenuDropdown');
