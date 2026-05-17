@@ -1174,6 +1174,8 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
 const DEMO_DAY = 86400; // วินาที/วัน (จริง)
 const TICK = 3000;
 const ZKP_RATE = 1.00;
+const LAK_RATE = 22700; // 1 USD = 22,700 LAK (default)
+let LAK_RATE_LIVE = 22700; // โหลดจาก Firebase
 
 // ─── PACKAGES (Subscription รายเดือน 30 วัน) ───
 const PKGS = {
@@ -1522,7 +1524,7 @@ function renderPkgs(){
     else if(key==='diamond')badge='<div class="pkg-badge b-zkp">+3,000 ZKP 💎</div>';
     else if(key==='vip')badge='<div class="pkg-badge b-vip">+10,500 ZKP 👑</div>';
     const dots=Array.from({length:def.limit},(_,i)=>`<div class="ldot ${i<bought?'used':'avail'}"></div>`).join('');
-    const limitRow=bought>=def.limit?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--red-bright);margin-bottom:0.45rem">✅ ${t('pkg.owned')} (${def.limit}/${def.limit})</div>`:`<div class="limit-wrap">${dots}<span>ซื้อได้ ${rem} ครั้ง/เดือน</span></div>`;
+    const limitRow=bought>=def.limit?`<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.58rem;color:var(--red-bright);margin-bottom:0.45rem">✅ ${t('pkg.owned')} (${def.limit}/${def.limit})</div>`:`<div class="limit-wrap">${dots}<span>ซื้อได้ ${rem} ครั้ง/เดือน</span></div>`;
     let btn='';
     if(bought>=def.limit)btn=`<div class="pkg-owned">✅ Active อยู่แล้ว</div>`;
     else btn=`<button class="btn-buy" onclick="buyPkg('${key}')">${t('pkg.buy')}</button>`;
@@ -1607,7 +1609,7 @@ function showDetail(idx){
     <div class="pop-grid">
       ${[[t('det.price'),'$'+def.price.toLocaleString(),'var(--gold)'],[t('det.hash'),def.hr,'var(--purple-light)'],[t('det.contract'),p.days+' '+t('home.days'),'var(--text)'],[t('det.elapsed'),(p.days-p.remaining).toFixed(1)+' '+t('home.days'),'#38bdf8'],[t('det.mined'),earned+' ZKP','var(--green)'],[t('det.target'),'+'+def.profit+' ZKP','var(--gold)'],[t('det.progress'),pct+'%','var(--purple-light)'],[t('det.remain'),Math.max(0,p.remaining).toFixed(1)+' '+t('home.days'),'var(--red-bright)']].map(([l,v,c])=>`<div class="pop-stat"><div class="pop-sl">${l}</div><div class="pop-sv" style="color:${c}">${v}</div></div>`).join('')}
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:1rem">${t('det.bought')} ${new Date(p.bought).toLocaleString('th-TH')}</div>
+    <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:1rem">${t('det.bought')} ${new Date(p.bought).toLocaleString('th-TH')}</div>
     <button class="btn btn-primary" style="width:100%" onclick="this.closest('.overlay').remove();switchTab(2)">${t('det.wallet')}</button>
   </div>`;
   document.body.appendChild(ov);
@@ -1735,7 +1737,7 @@ function filterAdminUsers(q){
 function renderAdminUserCards(keys){
   const el=document.getElementById('adminUserList'); if(!el) return;
   if(!keys.length){
-    el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">ไม่พบ user ที่ค้นหา</div>';
+    el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:1rem;">ไม่พบ user ที่ค้นหา</div>';
     return;
   }
   el.innerHTML=keys.map(u=>{
@@ -1744,31 +1746,31 @@ function renderAdminUserCards(keys){
     return `<div class="adm-user-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
         <div style="display:flex;align-items:center;gap:0.4rem;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:${ud.banned?'var(--red-bright)':'#fff'};">👤 ${u}</div>
-          ${ud.banned?'<span style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--red-bright);background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:4px;padding:0.1rem 0.3rem;">🚫 BANNED</span>':''}
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.8rem;color:${ud.banned?'var(--red-bright)':'#fff'};">👤 ${u}</div>
+          ${ud.banned?'<span style="font-family:\'Share Tech Mono\',monospace;font-size:0.5rem;color:var(--red-bright);background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:4px;padding:0.1rem 0.3rem;">🚫 BANNED</span>':''}
         </div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${ud.email||''}</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);">${ud.email||''}</div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
         <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">USD</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.78rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">USD</div>
         </div>
         <div style="background:rgba(74,222,128,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--green);">${(ud.zkpReward||0).toFixed(4)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">ZKP</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.78rem;color:var(--green);">${(ud.zkpReward||0).toFixed(4)}</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">ZKP</div>
         </div>
         <div style="background:rgba(157,78,221,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--purple-light);">${pkgs}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.78rem;color:var(--purple-light);">${pkgs}</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div>
         </div>
       </div>
       <div style="display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap;">
-        <button onclick="adminAddUsd('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">+ USD</button>
-        <button onclick="adminDeductUsd('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">- USD</button>
-        <button onclick="adminResetPass('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:7px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">🔑 Reset</button>
-        <button onclick="adminViewUser('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:7px;color:#38bdf8;font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">🔍 ดู</button>
-        <button onclick="adminToggleBan('${u}',${!!ud.banned})" style="flex:1;min-width:60px;padding:0.45rem;background:${ud.banned?'rgba(74,222,128,0.08)':'rgba(230,57,70,0.08)'};border:1px solid ${ud.banned?'rgba(74,222,128,0.25)':'rgba(230,57,70,0.25)'};border-radius:7px;color:${ud.banned?'var(--green)':'var(--red-bright)'};font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">${ud.banned?'✅ ปลด':'🚫 แบน'}</button>
+        <button onclick="adminAddUsd('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">+ USD</button>
+        <button onclick="adminDeductUsd('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">- USD</button>
+        <button onclick="adminResetPass('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:7px;color:var(--purple-light);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">🔑 Reset</button>
+        <button onclick="adminViewUser('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:7px;color:#38bdf8;font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">🔍 ดู</button>
+        <button onclick="adminToggleBan('${u}',${!!ud.banned})" style="flex:1;min-width:60px;padding:0.45rem;background:${ud.banned?'rgba(74,222,128,0.08)':'rgba(230,57,70,0.08)'};border:1px solid ${ud.banned?'rgba(74,222,128,0.25)':'rgba(230,57,70,0.25)'};border-radius:7px;color:${ud.banned?'var(--green)':'var(--red-bright)'};font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">${ud.banned?'✅ ปลด':'🚫 แบน'}</button>
       </div>
     </div>`;
   }).join('');
@@ -1802,8 +1804,7 @@ function exportCSV(type){
       });
     }
     // สร้าง CSV
-    const csv='﻿'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('
-');
+    const csv='\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
     const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
@@ -1830,7 +1831,7 @@ function updateAdminBadge(count){
   if(!badge){
     badge=document.createElement('span');
     badge.id='adminNavBadge';
-    badge.style.cssText='position:absolute;top:-4px;right:-4px;background:var(--red-bright);color:#fff;font-family:'Orbitron',monospace;font-size:0.45rem;font-weight:900;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;';
+    badge.style.cssText='position:absolute;top:-4px;right:-4px;background:var(--red-bright);color:#fff;font-family:\'Orbitron\',monospace;font-size:0.45rem;font-weight:900;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;';
     btn.style.position='relative';
     btn.appendChild(badge);
   }
@@ -1856,7 +1857,7 @@ function renderWallet(){
   document.getElementById('wActive').textContent=acs.length;
   document.getElementById('wProfit').textContent='$'+totalP.toFixed(2);
   const txs=ud.txs||[];const txEl=document.getElementById('txHist');
-  if(!txs.length){txEl.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace">${t('wal.nohist')}</div>`;return}
+  if(!txs.length){txEl.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace">${t('wal.nohist')}</div>`;return}
   renderReferral();
   txEl.innerHTML=txs.slice(0,10).map(tx=>{
     const d=new Date(tx.time);const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
@@ -1870,13 +1871,13 @@ function showInsufficientZkpPopup(current){
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='insufficientOv';
   ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(230,57,70,0.4);max-width:320px;">
     <div style="font-size:2.5rem;margin-bottom:0.8rem;">⚠️</div>
-    <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--red-bright);margin-bottom:0.6rem;">ZKP ไม่เพียงพอ</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--text-dim);line-height:1.9;margin-bottom:1.2rem;">
+    <div style="font-family:\'Orbitron\',monospace;font-size:0.9rem;font-weight:900;color:var(--red-bright);margin-bottom:0.6rem;">ZKP ไม่เพียงพอ</div>
+    <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;color:var(--text-dim);line-height:1.9;margin-bottom:1.2rem;">
       ถอนขั้นต่ำ <span style="color:var(--gold);font-weight:700;">${MIN_WITHDRAW} ZKP</span><br>
       ZKP ของคุณ <span style="color:var(--red-bright);font-weight:700;">${parseFloat(current||0).toFixed(4)} ZKP</span><br>
       ขาดอีก <span style="color:var(--purple-light);font-weight:700;">${parseFloat(needed).toFixed(4)} ZKP</span>
     </div>
-    <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:10px;padding:0.8rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);line-height:1.8;text-align:left;">
+    <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:10px;padding:0.8rem;margin-bottom:1rem;font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--text-dim);line-height:1.8;text-align:left;">
       💡 <span style="color:var(--gold);">วิธีสะสม ZKP เพิ่ม:</span><br>
       ⛏️ ซื้อสัญญาขุดเพื่อรับ ZKP/วัน<br>
       📅 Check-in ทุกวันรับ ZKP ฟรี<br>
@@ -1884,7 +1885,7 @@ function showInsufficientZkpPopup(current){
     </div>
     <div style="display:flex;gap:0.6rem;margin-top:0.5rem;">
       <button onclick="document.getElementById('insufficientOv').remove();switchTab(1)" class="btn btn-primary" style="flex:1;">⛏️ ซื้อสัญญาขุด</button>
-      <button onclick="document.getElementById('insufficientOv').remove()" style="padding:0.7rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
+      <button onclick="document.getElementById('insufficientOv').remove()" style="padding:0.7rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
@@ -1895,12 +1896,12 @@ function showWithdrawPopup(){
   window._db.ref('settings/withdraw_frozen').once('value').then(snap=>{
     if(snap.exists()&&snap.val()===true){
       const ov=document.createElement('div');ov.className='overlay';
-      ov.innerHTML=\`<div class="popup" style="text-align:center;border-color:rgba(230,57,70,0.5);max-width:310px;">
+      ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(230,57,70,0.5);max-width:310px;">
         <div style="font-size:2.5rem;margin-bottom:0.8rem;">🔒</div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--red-bright);margin-bottom:0.6rem;">ระบบถอนปิดชั่วคราว</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">ขณะนี้ระบบถอนเงินถูกระงับชั่วคราว<br>กรุณาติดต่อ Admin หรือรอการแจ้งเตือน</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.9rem;font-weight:900;color:var(--red-bright);margin-bottom:0.6rem;">ระบบถอนปิดชั่วคราว</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">ขณะนี้ระบบถอนเงินถูกระงับชั่วคราว<br>กรุณาติดต่อ Admin หรือรอการแจ้งเตือน</div>
         <button onclick="this.closest('.overlay').remove()" class="btn btn-primary" style="width:100%;">รับทราบ</button>
-      </div>\`;
+      </div>`;
       document.body.appendChild(ov); return;
     }
     _doShowWithdrawPopup();
@@ -1911,7 +1912,7 @@ function renderWithdrawHistory(){
   const el=document.getElementById('wdHistList'); if(!el) return;
   const u=getSess(); if(!u) return;
   window._db.ref('withdraw_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
-    if(!snap.exists()){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">ยังไม่มีประวัติ</div>';return;}
+    if(!snap.exists()){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:1rem;">ยังไม่มีประวัติ</div>';return;}
     const items=[];
     snap.forEach(c=>items.push(c.val()));
     items.sort((a,b)=>b.time-a.time);
@@ -1922,16 +1923,16 @@ function renderWithdrawHistory(){
       const st=r.status==='approved'?'✅ จ่ายแล้ว':r.status==='rejected'?'❌ ปฏิเสธ':'⏳ รออนุมัติ';
       return `<div style="background:rgba(40,5,70,0.6);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.8rem;margin-bottom:0.5rem;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--green);">${parseFloat(r.zkpAmt||0).toFixed(4)} ZKP</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:${sc};">${st}</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;color:var(--green);">${parseFloat(r.zkpAmt||0).toFixed(4)} ZKP</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:${sc};">${st}</div>
         </div>
-        <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);">
+        <div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--text-dim);">
           <span>${r.lakAmt||''} ກີບ</span><span>${t}</span>
         </div>
-        ${r.accNo?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-top:0.2rem;">${r.accName||''} · ${r.accNo}</div>`:''}
+        ${r.accNo?`<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--purple-light);margin-top:0.2rem;">${r.accName||''} · ${r.accNo}</div>`:''}
       </div>`;
     }).join('');
-  }).catch(()=>{el.innerHTML='<div style="color:var(--red-bright);font-size:0.72rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">❌ โหลดไม่ได้</div>';});
+  }).catch(()=>{el.innerHTML='<div style="color:var(--red-bright);font-size:0.72rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:1rem;">❌ โหลดไม่ได้</div>';});
 }
 
 function _doShowWithdrawPopup(){
@@ -1951,17 +1952,17 @@ function _doShowWithdrawPopup(){
 
     <!-- ยอด ZKP -->
     <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.3rem;">💰 ZKP ที่จะแลก</div>
-      <div style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:var(--green);text-shadow:0 0 15px rgba(74,222,128,0.4);">${zkp.toFixed(4)} ZKP</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--gold);margin-top:0.3rem;">≈ $${usdVal} USD</div>
-      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--gold);margin-top:0.2rem;">${lakVal} ກີບ</div>
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.3rem;">💰 ZKP ที่จะแลก</div>
+      <div style="font-family:\'Orbitron\',monospace;font-size:1.8rem;font-weight:900;color:var(--green);text-shadow:0 0 15px rgba(74,222,128,0.4);">${zkp.toFixed(4)} ZKP</div>
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;color:var(--gold);margin-top:0.3rem;">≈ $${usdVal} USD</div>
+      <div style="font-family:\'Orbitron\',monospace;font-size:1rem;font-weight:700;color:var(--gold);margin-top:0.2rem;">${lakVal} ກີບ</div>
     </div>
 
     <!-- ข้อมูลรับเงิน -->
     <div style="margin-bottom:0.8rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.4rem;">🏦 ช่องทางรับเงิน</div>
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.4rem;">🏦 ช่องทางรับเงิน</div>
       <select id="wdMethod" onchange="toggleWdFields()"
-        style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.7rem;appearance:none;cursor:pointer;">
+        style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.3);color:var(--text);font-family:\'Share Tech Mono\',monospace;font-size:0.85rem;outline:none;margin-bottom:0.7rem;appearance:none;cursor:pointer;">
         <option value="bank">🏦 โอนบัญชีธนาคาร</option>
         <option value="promptpay">📱 PromptPay / พร้อมเพย์</option>
         <option value="bcel">🏧 BCEL (ลาว)</option>
@@ -1971,23 +1972,23 @@ function _doShowWithdrawPopup(){
 
     <!-- Bank fields -->
     <div id="wdBankFields">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">ชื่อธนาคาร</div>
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">ชื่อธนาคาร</div>
       <input type="text" id="wdBank" placeholder="เช่น กสิกรไทย, ไทยพาณิชย์, BCEL..."
-        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.7rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">เลขบัญชี / เบอร์ PromptPay</div>
+        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:\'Share Tech Mono\',monospace;font-size:0.82rem;outline:none;margin-bottom:0.7rem;">
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">เลขบัญชี / เบอร์ PromptPay</div>
       <input type="text" id="wdAccNo" placeholder="กรอกเลขบัญชีหรือเบอร์โทร"
-        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.7rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">ชื่อเจ้าของบัญชี</div>
+        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:\'Share Tech Mono\',monospace;font-size:0.82rem;outline:none;margin-bottom:0.7rem;">
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">ชื่อเจ้าของบัญชี</div>
       <input type="text" id="wdAccName" placeholder="ชื่อ-นามสกุล"
-        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.8rem;">
+        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:\'Share Tech Mono\',monospace;font-size:0.82rem;outline:none;margin-bottom:0.8rem;">
     </div>
 
     <!-- หมายเหตุ -->
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">📝 หมายเหตุ (ไม่บังคับ)</div>
+    <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">📝 หมายเหตุ (ไม่บังคับ)</div>
     <input type="text" id="wdNote" placeholder="หมายเหตุเพิ่มเติม..."
-      style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;">
+      style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:\'Share Tech Mono\',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;">
 
-    <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:8px;padding:0.7rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);line-height:1.7;">
+    <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:8px;padding:0.7rem;margin-bottom:1rem;font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--text-dim);line-height:1.7;">
       ⚠️ หลังส่งคำขอ Admin จะดำเนินการภายใน 24 ชั่วโมง<br>
       ZKP จะถูกหักจากกระเป๋าหลังได้รับการอนุมัติ
     </div>
@@ -2051,7 +2052,7 @@ function addTestZkp(){
 }
 
 // ─── TOPUP SYSTEM ───
-const LAK_RATE = 22700; // 1 USD = 22,700 LAK
+// LAK_RATE และ LAK_RATE_LIVE ถูก declare ไว้ด้านบนแล้ว
 let selAmt=10;
 function lakFmt(usd){ const r=LAK_RATE_LIVE||LAK_RATE; return (usd*r).toLocaleString()+' ກີບ'; }
 function onCustomAmt(val){
@@ -2180,12 +2181,12 @@ function renderPendingList(){
     const d=new Date(r.time);
     return `<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;">
       <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--gold);">${(r.amt*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString()} ກີບ</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${d.toLocaleString('th-TH')}</div>
-        ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${r.note}</div>`:''}
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;color:var(--gold);">${(r.amt*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString()} ກີບ</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);">${d.toLocaleString('th-TH')}</div>
+        ${r.note?`<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);">${r.note}</div>`:''}
       </div>
-      <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:0.2rem 0.6rem;font-family:'Orbitron',monospace;font-size:0.5rem;color:var(--gold);">⏳ รออนุมัติ</div>
+      <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:0.2rem 0.6rem;font-family:\'Orbitron\',monospace;font-size:0.5rem;color:var(--gold);">⏳ รออนุมัติ</div>
     </div>`;
   }).join('');
 }
@@ -2200,7 +2201,7 @@ function renderTopupHistory(){
     const d=new Date(r.time);
     return `<div class="tx-item">
       <div><div class="tx-d">เติมเงิน $${r.amt.toLocaleString()} USD</div><div class="tx-t">${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}</div></div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:${statusColor[r.status]||'var(--text-dim)'};">${statusText[r.status]||r.status}</div>
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:${statusColor[r.status]||'var(--text-dim)'};">${statusText[r.status]||r.status}</div>
     </div>`;
   }).join('');
 }
@@ -2314,16 +2315,16 @@ function updateRewardUI(){
 function showRollNotif(def){
   const roll=def.next?PKGS[def.next]:null;const ov=document.createElement('div');ov.className='overlay';
   if(!roll){
-    ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(255,215,0,0.4)"><div style="font-size:2.3rem;margin-bottom:0.8rem">🏆</div><div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.45rem">${t('roll.max')}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.3rem">${t('roll.maxdesc')}</div><button class="btn btn-gold" style="width:100%" onclick="this.closest('.overlay').remove()">✅ รับทราบ</button></div>`;
+    ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(255,215,0,0.4)"><div style="font-size:2.3rem;margin-bottom:0.8rem">🏆</div><div style="font-family:\'Orbitron\',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.45rem">${t('roll.max')}</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.3rem">${t('roll.maxdesc')}</div><button class="btn btn-gold" style="width:100%" onclick="this.closest('.overlay').remove()">✅ รับทราบ</button></div>`;
   } else {
     ov.innerHTML=`<div class="popup">
       <div class="pop-hd"><div class="pop-title">🔔 แพ็กครบ 7 วันแล้ว!</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
-      <div class="roll-from"><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.from')}</div><div style="font-family:'Orbitron',monospace;font-size:0.88rem;font-weight:700;color:#fff">${def.name}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--green);margin-top:0.28rem">${t('roll.done')}</div></div>
+      <div class="roll-from"><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.from')}</div><div style="font-family:\'Orbitron\',monospace;font-size:0.88rem;font-weight:700;color:#fff">${def.name}</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;color:var(--green);margin-top:0.28rem">${t('roll.done')}</div></div>
       <div class="roll-next">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.next')}</div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.92rem;font-weight:900;color:var(--green)">${roll.name}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);margin-top:0.38rem">${t('roll.old')} <span style="color:var(--red-bright);font-weight:700">$${def.price.toLocaleString()}</span> → ราคาแพ็ก <span style="color:var(--gold);font-weight:700">$${roll.price.toLocaleString()}</span></div>
-        <div style="margin-top:0.65rem;padding-top:0.65rem;border-top:1px solid rgba(74,222,128,0.15)"><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim)">${t('roll.extra')}</div><div class="roll-extra">$${def.nxt.toLocaleString()}</div></div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.next')}</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.92rem;font-weight:900;color:var(--green)">${roll.name}</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;color:var(--text-dim);margin-top:0.38rem">${t('roll.old')} <span style="color:var(--red-bright);font-weight:700">$${def.price.toLocaleString()}</span> → ราคาแพ็ก <span style="color:var(--gold);font-weight:700">$${roll.price.toLocaleString()}</span></div>
+        <div style="margin-top:0.65rem;padding-top:0.65rem;border-top:1px solid rgba(74,222,128,0.15)"><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim)">${t('roll.extra')}</div><div class="roll-extra">$${def.nxt.toLocaleString()}</div></div>
       </div>
       <div class="roll-btns"><button class="btn btn-primary" style="flex:1" onclick="this.closest('.overlay').remove();switchTab(3)">💵 เติม USD ทันที</button><button class="pop-close" onclick="this.closest('.overlay').remove()">ปิด</button></div>
     </div>`;
@@ -2345,20 +2346,20 @@ function showAdmin(){
   ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(255,215,0,0.35);border-radius:18px;padding:1.8rem;max-width:320px;width:100%;box-shadow:0 0 50px rgba(255,215,0,0.1);">
     <div style="text-align:center;margin-bottom:1.3rem;">
       <div style="font-size:2rem;margin-bottom:0.4rem;">⚙️</div>
-      <div style="font-family:'Orbitron',monospace;font-size:0.88rem;font-weight:900;color:var(--gold);">Admin Panel</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-top:0.25rem;">ใส่รหัส Admin เพื่อเข้าใช้งาน</div>
+      <div style="font-family:\'Orbitron\',monospace;font-size:0.88rem;font-weight:900;color:var(--gold);">Admin Panel</div>
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--text-dim);margin-top:0.25rem;">ใส่รหัส Admin เพื่อเข้าใช้งาน</div>
     </div>
     <input type="password" id="adminPassInput" placeholder="รหัส Admin"
-      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(255,215,0,0.35);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:1rem;outline:none;caret-color:var(--gold);margin-bottom:0.6rem;letter-spacing:2px;"
+      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(255,215,0,0.35);color:var(--text);font-family:\'Share Tech Mono\',monospace;font-size:1rem;outline:none;caret-color:var(--gold);margin-bottom:0.6rem;letter-spacing:2px;"
       onkeydown="if(event.key==='Enter')confirmAdminPass()">
-    <div id="adminPassErr" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--red-bright);margin-bottom:0.8rem;min-height:1.2em;"></div>
+    <div id="adminPassErr" style="font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--red-bright);margin-bottom:0.8rem;min-height:1.2em;"></div>
     <div style="display:flex;gap:0.7rem;">
       <button onclick="confirmAdminPass()"
-        style="flex:1;padding:0.75rem;background:linear-gradient(135deg,#78350f,var(--gold));border:none;border-radius:10px;color:#000;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:700;letter-spacing:1px;cursor:pointer;">
+        style="flex:1;padding:0.75rem;background:linear-gradient(135deg,#78350f,var(--gold));border:none;border-radius:10px;color:#000;font-family:\'Orbitron\',monospace;font-size:0.7rem;font-weight:700;letter-spacing:1px;cursor:pointer;">
         🔐 เข้าสู่ระบบ
       </button>
       <button onclick="document.getElementById('adminLoginOv').remove()"
-        style="padding:0.75rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
+        style="padding:0.75rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;cursor:pointer;">
         ยกเลิก
       </button>
     </div>
@@ -2416,7 +2417,7 @@ function renderAdminTopup(filter){
   if(filter !== 'all') reqs = reqs.filter(r=>r.status===filter);
   reqs.sort((a,b)=>b.time-a.time);
   if(!reqs.length){
-    el.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:2rem;">ไม่มีรายการ</div>`;
+    el.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ไม่มีรายการ</div>`;
     return;
   }
   const statusColor={pending:'var(--gold)',approved:'var(--green)',rejected:'var(--red-bright)'};
@@ -2427,17 +2428,17 @@ function renderAdminTopup(filter){
     return `<div class="req-card ${r.status}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
         <div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);">${(r.amt*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString()} ກີບ</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem;">👤 ${r.user} · ${timeStr}</div>
-          ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-top:0.15rem;">📝 ${r.note}</div>`:''}
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);">${(r.amt*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString()} ກີບ</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem;">👤 ${r.user} · ${timeStr}</div>
+          ${r.note?`<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--purple-light);margin-top:0.15rem;">📝 ${r.note}</div>`:''}
         </div>
-        <div style="background:rgba(0,0,0,0.2);border:1px solid ${statusColor[r.status]||'var(--border)'};border-radius:20px;padding:0.2rem 0.55rem;font-family:'Orbitron',monospace;font-size:0.48rem;color:${statusColor[r.status]};">${statusText[r.status]||r.status}</div>
+        <div style="background:rgba(0,0,0,0.2);border:1px solid ${statusColor[r.status]||'var(--border)'};border-radius:20px;padding:0.2rem 0.55rem;font-family:\'Orbitron\',monospace;font-size:0.48rem;color:${statusColor[r.status]};">${statusText[r.status]||r.status}</div>
       </div>
       ${r.slipImg?`<img src="${r.slipImg}" class="req-slip" onclick="viewSlip('${r.id}')" title="กดเพื่อดูเต็ม">`:'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">ไม่มีสลิป</div>'}
       ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
-        <button onclick="approveTopup('${r.id}',${r.amt},'${r.user}','${r.fbKey||''}')" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
-        <button onclick="rejectTopup('${r.id}','${r.user}','${r.fbKey||''}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;">❌ ปฏิเสธ</button>
+        <button onclick="approveTopup('${r.id}',${r.amt},'${r.user}','${r.fbKey||''}')" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:\'Orbitron\',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+        <button onclick="rejectTopup('${r.id}','${r.user}','${r.fbKey||''}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:\'Orbitron\',monospace;font-size:0.62rem;cursor:pointer;">❌ ปฏิเสธ</button>
       </div>`:''}
     </div>`;
   }).join('');
@@ -2505,25 +2506,25 @@ function renderAdminWithdraw(){
     return `<div class="req-card ${r.status}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem;">
         <div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.88rem;color:var(--green);">${parseFloat(zkpDisplay).toFixed(4)} ZKP</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--gold);">${lakDisplay} ກີບ</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">👤 ${r.user} · ${t2}</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.88rem;color:var(--green);">${parseFloat(zkpDisplay).toFixed(4)} ZKP</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;color:var(--gold);">${lakDisplay} ກີບ</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);">👤 ${r.user} · ${t2}</div>
         </div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:${r.status==='pending'?'var(--gold)':r.status==='approved'?'var(--green)':'var(--red-bright)'};">
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.58rem;color:${r.status==='pending'?'var(--gold)':r.status==='approved'?'var(--green)':'var(--red-bright)'};">
           ${r.status==='pending'?'⏳ รออนุมัติ':r.status==='approved'?'✅ จ่ายแล้ว':'❌ ปฏิเสธ'}
         </div>
       </div>
       <!-- ข้อมูลบัญชี -->
       <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.12);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-bottom:0.3rem;">${methodName[r.method]||'💳 ช่องทางโอน'}</div>
-        ${r.bank?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text);">🏦 ${r.bank}</div>`:''}
-        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;margin-top:0.2rem;">${r.accNo||'-'}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">👤 ${r.accName||'-'}</div>
-        ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.2rem;">📝 ${r.note}</div>`:''}
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--purple-light);margin-bottom:0.3rem;">${methodName[r.method]||'💳 ช่องทางโอน'}</div>
+        ${r.bank?`<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;color:var(--text);">🏦 ${r.bank}</div>`:''}
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.8rem;color:#fff;margin-top:0.2rem;">${r.accNo||'-'}</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--text-dim);">👤 ${r.accName||'-'}</div>
+        ${r.note?`<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.2rem;">📝 ${r.note}</div>`:''}
       </div>
       ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;">
-        <button onclick="approveWithdraw('${r.fbKey||r.id}','${r.user}',${zkpDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
-        <button onclick="rejectWithdraw('${r.fbKey||r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
+        <button onclick="approveWithdraw('${r.fbKey||r.id}','${r.user}',${zkpDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:\'Orbitron\',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+        <button onclick="rejectWithdraw('${r.fbKey||r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:\'Orbitron\',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
       </div>`:''}
     </div>`;
   }).join('');
@@ -2579,26 +2580,26 @@ function _renderAdminUsers_old(){
     const pkgs=(ud.packages||[]).filter(p=>p.remaining>0).length;
     return `<div class="adm-user-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;">👤 ${u}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${ud.email||''}</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.8rem;color:#fff;">👤 ${u}</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);">${ud.email||''}</div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
         <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">USD</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.78rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">USD</div>
         </div>
         <div style="background:rgba(74,222,128,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--green);">${(ud.zkpReward||0).toFixed(4)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">ZKP</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.78rem;color:var(--green);">${(ud.zkpReward||0).toFixed(4)}</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">ZKP</div>
         </div>
         <div style="background:rgba(157,78,221,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--purple-light);">${pkgs}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.78rem;color:var(--purple-light);">${pkgs}</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div>
         </div>
       </div>
       <div style="display:flex;gap:0.4rem;margin-top:0.6rem;">
-        <button onclick="adminAddUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">+ เติม USD</button>
-        <button onclick="adminDeductUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">- หัก USD</button>
+        <button onclick="adminAddUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">+ เติม USD</button>
+        <button onclick="adminDeductUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">- หัก USD</button>
       </div>
     </div>`;
   }).join('');
@@ -2629,7 +2630,7 @@ function loadAdminQRPreview(){
       wrap.innerHTML=`<img src="${snap.val()}" style="width:160px;height:160px;object-fit:contain;border-radius:8px;background:#fff;padding:6px;margin:0 auto;display:block;">`;
       if(delBtn) delBtn.style.display='block';
     } else {
-      wrap.innerHTML=`<div style="width:160px;height:160px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;"><div style="font-size:2.5rem;">📱</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">ยังไม่มี QR Code</div></div>`;
+      wrap.innerHTML=`<div style="width:160px;height:160px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;"><div style="font-size:2.5rem;">📱</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);">ยังไม่มี QR Code</div></div>`;
       if(delBtn) delBtn.style.display='none';
     }
   });
@@ -2679,40 +2680,40 @@ function showTerms(){
   ov.innerHTML=`
     <div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.5rem;width:100%;max-width:420px;margin:auto;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
-        <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:var(--gold);">📋 ข้อตกลงการใช้งาน</div>
-        <button onclick="this.closest('div[style]').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.85rem;font-weight:900;color:var(--gold);">📋 ข้อตกลงการใช้งาน</div>
+        <button onclick="this.closest('div[style]').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
       </div>
 
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:2;max-height:70vh;overflow-y:auto;padding-right:0.3rem;">
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;color:var(--text-dim);line-height:2;max-height:70vh;overflow-y:auto;padding-right:0.3rem;">
 
-        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">1. การยอมรับข้อตกลง</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">1. การยอมรับข้อตกลง</div>
         <p style="margin-bottom:1rem;">การใช้งาน CryptoMine ถือว่าท่านได้อ่าน เข้าใจ และยอมรับข้อตกลงทั้งหมดนี้แล้ว</p>
 
-        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--red-bright);margin-bottom:0.5rem;">⚠️ 2. ความเสี่ยงที่ต้องรับทราบ</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.72rem;color:var(--red-bright);margin-bottom:0.5rem;">⚠️ 2. ความเสี่ยงที่ต้องรับทราบ</div>
         <p style="margin-bottom:0.5rem;color:#ffaaaa;">• การลงทุนใน Cloud Mining มีความเสี่ยง อาจสูญเสียเงินต้นได้</p>
         <p style="margin-bottom:0.5rem;color:#ffaaaa;">• ราคา ZKP อาจมีความผันผวน ผลตอบแทนไม่ได้รับการรับประกัน</p>
         <p style="margin-bottom:0.5rem;color:#ffaaaa;">• ผลการดำเนินงานในอดีตไม่ได้รับประกันผลในอนาคต</p>
         <p style="margin-bottom:1rem;color:#ffaaaa;">• ควรลงทุนเฉพาะเงินที่ยอมรับความเสี่ยงได้เท่านั้น</p>
 
-        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">3. สัญญาขุด</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">3. สัญญาขุด</div>
         <p style="margin-bottom:0.5rem;">• สัญญาขุดมีอายุ 30 วัน นับจากวันที่ซื้อ</p>
         <p style="margin-bottom:0.5rem;">• ZKP จะถูกสะสมเข้ากระเป๋าอัตโนมัติทุกวัน</p>
         <p style="margin-bottom:1rem;">• ไม่สามารถยกเลิกสัญญาและขอเงินคืนได้หลังจากซื้อแล้ว</p>
 
-        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">4. การถอนเงิน</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">4. การถอนเงิน</div>
         <p style="margin-bottom:0.5rem;">• ถอนขั้นต่ำ ${MIN_WITHDRAW} ZKP ต่อครั้ง</p>
         <p style="margin-bottom:0.5rem;">• Admin จะดำเนินการภายใน 24 ชั่วโมง</p>
         <p style="margin-bottom:1rem;">• ระบบอาจถูกระงับชั่วคราวเพื่อการตรวจสอบ</p>
 
-        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">5. ระบบ Referral</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">5. ระบบ Referral</div>
         <p style="margin-bottom:0.5rem;">• รับค่าคอม 10% ZKP ทุกครั้งที่เพื่อนซื้อหรือต่อสัญญา</p>
         <p style="margin-bottom:1rem;">• ค่าคอมจะโอนเข้ากระเป๋าทันทีเมื่อเพื่อนทำรายการ</p>
 
-        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">6. การระงับบัญชี</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">6. การระงับบัญชี</div>
         <p style="margin-bottom:1rem;">ผู้ดูแลระบบมีสิทธิ์ระงับบัญชีที่พบว่ามีการทุจริต ปลอมแปลงหลักฐาน หรือกระทำผิดข้อตกลง</p>
 
         <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:0.8rem;margin-top:0.5rem;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--gold);margin-bottom:0.3rem;">📌 สำคัญ</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.65rem;color:var(--gold);margin-bottom:0.3rem;">📌 สำคัญ</div>
           <div style="font-size:0.68rem;line-height:1.8;">CryptoMine เป็นแพลตฟอร์มสำหรับผู้ที่ยอมรับความเสี่ยงในการลงทุนเท่านั้น กรุณาศึกษาข้อมูลให้ครบถ้วนก่อนตัดสินใจลงทุน</div>
         </div>
       </div>
@@ -2725,7 +2726,6 @@ function showTerms(){
 // ════════════════════════════════════════
 // อัตราแลกเปลี่ยน LAK (โหลดจาก Firebase)
 // ════════════════════════════════════════
-let LAK_RATE_LIVE = 22700;
 function loadLakRate(){
   window._db.ref('settings/lak_rate').once('value').then(snap=>{
     if(snap.exists()) LAK_RATE_LIVE = snap.val();
@@ -2843,10 +2843,10 @@ function renderAdminDashboard(){
     if(el){
       el.innerHTML=sorted.map((u,i)=>`
         <div style="display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0.8rem;background:rgba(40,5,70,0.6);border:1px solid rgba(157,78,221,0.15);border-radius:10px;margin-bottom:0.4rem;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.9rem;color:${i===0?'var(--gold)':i===1?'#9ca3af':'#d97706'};width:22px;">#${i+1}</div>
-          <div style="flex:1;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#fff;">${u.name.slice(0,2)+'*'.repeat(Math.max(0,u.name.length-2))}</div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--gold);">$${u.spent.toLocaleString()}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${u.pkgs} แพ็ก</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.9rem;color:${i===0?'var(--gold)':i===1?'#9ca3af':'#d97706'};width:22px;">#${i+1}</div>
+          <div style="flex:1;font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;color:#fff;">${u.name.slice(0,2)+'*'.repeat(Math.max(0,u.name.length-2))}</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.75rem;color:var(--gold);">$${u.spent.toLocaleString()}</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);">${u.pkgs} แพ็ก</div>
         </div>
       `).join('');
     }
@@ -2930,20 +2930,20 @@ function showNotifications(){
     const items=[]; if(snap.exists()) snap.forEach(c=>items.unshift(c.val()));
     ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.5rem;width:100%;max-width:380px;margin:auto;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
-        <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:#fff;">🔔 การแจ้งเตือน</div>
-        <button onclick="document.getElementById('notifOv').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.85rem;font-weight:900;color:#fff;">🔔 การแจ้งเตือน</div>
+        <button onclick="document.getElementById('notifOv').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
       </div>
       ${items.length?items.map(n=>{
         const d=new Date(n.time);
         const t=d.getDate()+'/'+(d.getMonth()+1)+' '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
         const colors={approved:'var(--green)',rejected:'var(--red-bright)',topup:'var(--gold)',info:'var(--purple-light)',referral:'var(--purple-light)'};
-        return \`<div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.8rem;margin-bottom:0.5rem;">
+        return `<div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.8rem;margin-bottom:0.5rem;">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.2rem;">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:\${colors[n.type]||'#fff'};">\${n.icon||'🔔'} \${n.title}</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);">\${t}</div>
+            <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;color:\${colors[n.type]||'#fff'};">\${n.icon||'🔔'} \${n.title}</div>
+            <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.58rem;color:var(--text-dim);">\${t}</div>
           </div>
           \${n.body?'<div style="font-family:Share Tech Mono,monospace;font-size:0.68rem;color:var(--text-dim);">'+n.body+'</div>':''}
-        </div>\`;
+        </div>`;
       }).join(''):'<div style="text-align:center;padding:2rem;font-family:Share Tech Mono,monospace;font-size:0.72rem;color:var(--text-dim);">ยังไม่มีการแจ้งเตือน</div>'}
     </div>`;
     document.body.appendChild(ov);
@@ -2976,15 +2976,15 @@ function showProfile(){
   const ov=document.createElement('div'); ov.className='profile-popup'; ov.id='profileOv';
   ov.innerHTML=`<div class="profile-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
-      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:var(--purple-light);">👤 โปรไฟล์</div>
-      <button onclick="document.getElementById('profileOv').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+      <div style="font-family:\'Orbitron\',monospace;font-size:0.85rem;font-weight:900;color:var(--purple-light);">👤 โปรไฟล์</div>
+      <button onclick="document.getElementById('profileOv').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
     </div>
     <div class="profile-avatar">${initials}</div>
     <div style="text-align:center;margin-bottom:0.3rem;">
-      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:#fff;">${u}</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-top:0.2rem;">${ud.email||''}</div>
+      <div style="font-family:\'Orbitron\',monospace;font-size:1rem;font-weight:900;color:#fff;">${u}</div>
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--text-dim);margin-top:0.2rem;">${ud.email||''}</div>
     </div>
-    <div style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:1rem;">📅 สมัครเมื่อ ${joined}</div>
+    <div style="text-align:center;font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:1rem;">📅 สมัครเมื่อ ${joined}</div>
     <div class="profile-stat-grid">
       <div class="profile-stat"><div class="ps-val" style="color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div><div class="ps-lbl">USD คงเหลือ</div></div>
       <div class="profile-stat"><div class="ps-val" style="color:var(--green);">${totalZkp}</div><div class="ps-lbl">ZKP ทั้งหมด</div></div>
@@ -2993,7 +2993,7 @@ function showProfile(){
       <div class="profile-stat"><div class="ps-val" style="color:#38bdf8;">${ud.sessions||0}</div><div class="ps-lbl">ครั้งที่ขุด</div></div>
       <div class="profile-stat"><div class="ps-val" style="color:var(--green);">${ud.refCount||0}</div><div class="ps-lbl">เพื่อนชวนมา</div></div>
     </div>
-    <button onclick="document.getElementById('profileOv').remove();doLogout();" style="width:100%;padding:0.7rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:10px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.7rem;cursor:pointer;margin-top:0.8rem;">🚪 ออกจากระบบ</button>
+    <button onclick="document.getElementById('profileOv').remove();doLogout();" style="width:100%;padding:0.7rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:10px;color:var(--red-bright);font-family:\'Orbitron\',monospace;font-size:0.7rem;cursor:pointer;margin-top:0.8rem;">🚪 ออกจากระบบ</button>
   </div>`;
   document.body.appendChild(ov);
 }
@@ -3058,10 +3058,10 @@ function renderLeaderboard(){
   const myRankEl=document.getElementById('lbMyRank');
   if(!top3El||!listEl) return;
   const me=getSess();
-  top3El.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;width:100%;padding:1rem;">⏳ กำลังโหลด...</div>';
-  listEl.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">⏳ กำลังโหลด...</div>';
+  top3El.innerHTML='<div style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;text-align:center;width:100%;padding:1rem;">⏳ กำลังโหลด...</div>';
+  listEl.innerHTML='<div style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">⏳ กำลังโหลด...</div>';
   window._db.ref('users').once('value').then(snap=>{
-    if(!snap.exists()){listEl.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">ยังไม่มีข้อมูล</div>';return;}
+    if(!snap.exists()){listEl.innerHTML='<div style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">ยังไม่มีข้อมูล</div>';return;}
     const data=snap.val();
     const players=Object.entries(data).map(([u,d])=>({
       name:u,
@@ -3070,7 +3070,7 @@ function renderLeaderboard(){
     })).filter(p=>p.zkp>0).sort((a,b)=>b.zkp-a.zkp);
 
     if(!players.length){
-      top3El.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;width:100%;padding:1rem;">ยังไม่มีผู้เล่น</div>';
+      top3El.innerHTML='<div style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;text-align:center;width:100%;padding:1rem;">ยังไม่มีผู้เล่น</div>';
       listEl.innerHTML=''; return;
     }
 
@@ -3102,7 +3102,7 @@ function renderLeaderboard(){
           <div class="lb-row-sub">${p.pkgs} สัญญา active</div>
         </div>
         <div class="lb-row-zkp">${p.zkp} ZKP</div>
-      </div>`).join(''):'<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.65rem;text-align:center;padding:0.8rem;">ยังไม่มีอันดับอื่น</div>';
+      </div>`).join(''):'<div style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;text-align:center;padding:0.8rem;">ยังไม่มีอันดับอื่น</div>';
 
     // MY RANK
     const myIdx=players.findIndex(p=>p.name===me);
@@ -3112,7 +3112,7 @@ function renderLeaderboard(){
       document.getElementById('myRankZkp').textContent=players[myIdx].zkp+' ZKP';
       if(myRankEl) myRankEl.style.display='block';
     }
-  }).catch(()=>{listEl.innerHTML='<div style="color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">❌ โหลดไม่ได้</div>';});
+  }).catch(()=>{listEl.innerHTML='<div style="color:var(--red-bright);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;text-align:center;padding:1.5rem;">❌ โหลดไม่ได้</div>';});
 }
 
 // ── BROADCAST ──
@@ -3138,19 +3138,19 @@ function deleteBroadcast(){
 }
 function renderBcHistory(){
   const el=document.getElementById('bcHistory'); if(!el) return;
-  el.innerHTML='<div style="color:var(--text-dim);font-size:0.72rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">⏳ กำลังโหลด...</div>';
+  el.innerHTML='<div style="color:var(--text-dim);font-size:0.72rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:1rem;">⏳ กำลังโหลด...</div>';
   window._db.ref('broadcast/history').orderByChild('time').limitToLast(10).once('value').then(snap=>{
-    if(!snap.exists()){el.innerHTML='<div style="color:var(--text-dim);font-size:0.72rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:1rem;">ยังไม่มีประกาศ</div>';return;}
+    if(!snap.exists()){el.innerHTML='<div style="color:var(--text-dim);font-size:0.72rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:1rem;">ยังไม่มีประกาศ</div>';return;}
     const items=[]; snap.forEach(c=>items.unshift({...c.val(),fbKey:c.key}));
     el.innerHTML=items.map(m=>{
       const d=new Date(m.time);
       const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
       return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.9rem;margin-bottom:0.6rem;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:#fff;">${m.icon} ${m.title}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);">${t}</div>
+          <div style="font-family:\'Orbitron\',monospace;font-size:0.78rem;color:#fff;">${m.icon} ${m.title}</div>
+          <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.58rem;color:var(--text-dim);">${t}</div>
         </div>
-        ${m.body?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:1.6;">${m.body}</div>`:''}
+        ${m.body?`<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;color:var(--text-dim);line-height:1.6;">${m.body}</div>`:''}
       </div>`;
     }).join('');
   });
@@ -3209,17 +3209,17 @@ function adminResetPass(username){
   ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.8rem;max-width:320px;width:100%;">
     <div style="text-align:center;margin-bottom:1.2rem;">
       <div style="font-size:1.8rem;">🔑</div>
-      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:var(--purple-light);">Reset รหัสผ่าน</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);">👤 ${username}</div>
+      <div style="font-family:\'Orbitron\',monospace;font-size:0.85rem;font-weight:900;color:var(--purple-light);">Reset รหัสผ่าน</div>
+      <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--text-dim);">👤 ${username}</div>
     </div>
     <input type="password" id="newPassInput" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)"
-      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.9rem;outline:none;margin-bottom:0.4rem;">
+      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.4);color:var(--text);font-family:\'Share Tech Mono\',monospace;font-size:0.9rem;outline:none;margin-bottom:0.4rem;">
     <input type="password" id="confirmPassInput" placeholder="ยืนยันรหัสผ่านใหม่"
-      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.9rem;outline:none;margin-bottom:0.6rem;">
-    <div id="resetPassErr" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--red-bright);min-height:1.2em;margin-bottom:0.6rem;"></div>
+      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.4);color:var(--text);font-family:\'Share Tech Mono\',monospace;font-size:0.9rem;outline:none;margin-bottom:0.6rem;">
+    <div id="resetPassErr" style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--red-bright);min-height:1.2em;margin-bottom:0.6rem;"></div>
     <div style="display:flex;gap:0.6rem;">
-      <button onclick="confirmResetPass('${username}')" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,var(--purple-dark),var(--purple-light));border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:0.68rem;font-weight:700;cursor:pointer;">✅ บันทึก</button>
-      <button onclick="document.getElementById('resetPassOv').remove()" style="padding:0.75rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ยกเลิก</button>
+      <button onclick="confirmResetPass('${username}')" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,var(--purple-dark),var(--purple-light));border:none;border-radius:10px;color:#fff;font-family:\'Orbitron\',monospace;font-size:0.68rem;font-weight:700;cursor:pointer;">✅ บันทึก</button>
+      <button onclick="document.getElementById('resetPassOv').remove()" style="padding:0.75rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;cursor:pointer;">ยกเลิก</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
@@ -3256,12 +3256,12 @@ function adminViewUser(username){
     ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;';
     ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.5rem;width:100%;max-width:420px;margin:auto;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
-        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;">🔍 ${username}</div>
-        <button onclick="document.getElementById('userDetailOv').remove()" style="padding:0.4rem 0.8rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.9rem;font-weight:900;color:#fff;">🔍 ${username}</div>
+        <button onclick="document.getElementById('userDetailOv').remove()" style="padding:0.4rem 0.8rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
       </div>
       <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.9rem;margin-bottom:0.8rem;">
-        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--purple-light);margin-bottom:0.6rem;">📋 ข้อมูลบัญชี</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;">
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.65rem;color:var(--purple-light);margin-bottom:0.6rem;">📋 ข้อมูลบัญชี</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;">
           <div style="color:var(--text-dim);">Email</div><div style="color:#fff;">${ud.email||'-'}</div>
           <div style="color:var(--text-dim);">วันที่สมัคร</div><div style="color:#fff;">${joined}</div>
           <div style="color:var(--text-dim);">Streak</div><div style="color:var(--gold);">🔥 ${ci.streak||0} วัน</div>
@@ -3269,13 +3269,13 @@ function adminViewUser(username){
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:0.8rem;">
-        <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:0.7rem;text-align:center;"><div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">USD</div></div>
-        <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:0.7rem;text-align:center;"><div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--green);">${(ud.zkpReward||0).toFixed(4)}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">ZKP</div></div>
-        <div style="background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.2);border-radius:8px;padding:0.7rem;text-align:center;"><div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--purple-light);">${pkgsActive.length}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div></div>
+        <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:0.7rem;text-align:center;"><div style="font-family:\'Orbitron\',monospace;font-size:0.85rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">USD</div></div>
+        <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:0.7rem;text-align:center;"><div style="font-family:\'Orbitron\',monospace;font-size:0.85rem;color:var(--green);">${(ud.zkpReward||0).toFixed(4)}</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">ZKP</div></div>
+        <div style="background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.2);border-radius:8px;padding:0.7rem;text-align:center;"><div style="font-family:\'Orbitron\',monospace;font-size:0.85rem;color:var(--purple-light);">${pkgsActive.length}</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div></div>
       </div>
       ${txs.length?`<div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.15);border-radius:10px;padding:0.9rem;">
-        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--purple-light);margin-bottom:0.6rem;">📋 ธุรกรรมล่าสุด</div>
-        ${txs.map(tx=>{const td=new Date(tx.time);const tt=td.getDate()+'/'+(td.getMonth()+1)+' '+td.getHours().toString().padStart(2,'0')+':'+td.getMinutes().toString().padStart(2,'0');return `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid rgba(157,78,221,0.06);font-family:'Share Tech Mono',monospace;font-size:0.65rem;"><span style="color:var(--text-dim);flex:1;">${tx.desc||'-'}</span><span style="color:var(--text-dim);margin:0 0.5rem;">${tt}</span><span style="color:${tx.amount>0?'var(--green)':'var(--red-bright)'};">${tx.amount>0?'+':''}${tx.amount} ${tx.unit||'USD'}</span></div>`;}).join('')}
+        <div style="font-family:\'Orbitron\',monospace;font-size:0.65rem;color:var(--purple-light);margin-bottom:0.6rem;">📋 ธุรกรรมล่าสุด</div>
+        ${txs.map(tx=>{const td=new Date(tx.time);const tt=td.getDate()+'/'+(td.getMonth()+1)+' '+td.getHours().toString().padStart(2,'0')+':'+td.getMinutes().toString().padStart(2,'0');return `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid rgba(157,78,221,0.06);font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;"><span style="color:var(--text-dim);flex:1;">${tx.desc||'-'}</span><span style="color:var(--text-dim);margin:0 0.5rem;">${tt}</span><span style="color:${tx.amount>0?'var(--green)':'var(--red-bright)'};">${tx.amount>0?'+':''}${tx.amount} ${tx.unit||'USD'}</span></div>`;}).join('')}
       </div>`:''}
     </div>`;
     document.body.appendChild(ov);
@@ -3292,9 +3292,9 @@ function renderAdminStats(){
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;">
       ${[['👥 สมาชิก',keys.length,'คน','var(--purple-light)'],['💰 รออนุมัติ',pending,'คำขอ','var(--gold)'],['✅ อนุมัติแล้ว',approved,'คำขอ','var(--green)'],['💵 USD ระบบ','$'+totalUsd.toFixed(0),'USD','var(--gold)']].map(([l,v,u,c])=>`
       <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.1);border-radius:9px;padding:0.7rem;text-align:center;">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.3rem;">${l}</div>
-        <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:${c};">${v}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">${u}</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.3rem;">${l}</div>
+        <div style="font-family:\'Orbitron\',monospace;font-size:1rem;font-weight:700;color:${c};">${v}</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.52rem;color:var(--text-dim);">${u}</div>
       </div>`).join('')}
     </div>`;
 }
@@ -3792,7 +3792,7 @@ function renderRefHistory(){
   const ud=getUD(); if(!ud) return;
   const txs=(ud.txs||[]).filter(tx=>tx.type==='referral'||tx.desc?.includes('ค่าคอม'));
   if(!txs.length){
-    el.innerHTML='<div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-align:center;padding:0.8rem;">ยังไม่มีประวัติค่าคอม</div>';
+    el.innerHTML='<div style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;text-align:center;padding:0.8rem;">ยังไม่มีประวัติค่าคอม</div>';
     return;
   }
   el.innerHTML=txs.slice(0,10).map(tx=>{
@@ -3801,10 +3801,10 @@ function renderRefHistory(){
     const isRenew=tx.isRenew||tx.desc?.includes('ต่อสัญญา');
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid rgba(157,78,221,0.08);">
       <div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#fff;">${tx.desc||'-'}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:0.1rem;">${t} · ${isRenew?'<span style="color:var(--purple-light);">🔄 ต่อสัญญา</span>':'<span style="color:var(--gold);">🎁 ซื้อใหม่</span>'}</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;color:#fff;">${tx.desc||'-'}</div>
+        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:0.1rem;">${t} · ${isRenew?'<span style="color:var(--purple-light);">🔄 ต่อสัญญา</span>':'<span style="color:var(--gold);">🎁 ซื้อใหม่</span>'}</div>
       </div>
-      <div style="font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;color:var(--green);">+${parseFloat(tx.amount||0).toFixed(4)} ZKP</div>
+      <div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;font-weight:700;color:var(--green);">+${parseFloat(tx.amount||0).toFixed(4)} ZKP</div>
     </div>`;
   }).join('');
 }
