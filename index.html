@@ -693,15 +693,22 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
     <button style="padding:0.28rem 0.7rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:6px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;flex-shrink:0;" onclick="doAdminLogout()">✕ ออก</button>
   </nav>
 
-  <!-- Admin tabs -->
-  <div style="display:flex;background:rgba(6,0,14,0.97);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-shrink:0;">
-    <button class="admin-tab active" id="atn0" onclick="switchAdminTab(0)">💰 เติม</button>
-    <button class="admin-tab" id="atn1" onclick="switchAdminTab(1)">💱 แลก</button>
-    <button class="admin-tab" id="atn2" onclick="switchAdminTab(2)">👥 สมาชิก</button>
-    <button class="admin-tab" id="atn3" onclick="switchAdminTab(3)">⚙️ ตั้งค่า</button>
-    <button class="admin-tab" id="atn4" onclick="switchAdminTab(4)">📊 Dashboard</button>
-    <button class="admin-tab" id="atn5" onclick="switchAdminTab(5)">📢 ประกาศ</button>
-    <button class="admin-tab" id="atn6" onclick="switchAdminTab(6)">🎫 โปรโมชั่น</button>
+  <!-- Admin Menu Dropdown -->
+  <div style="padding:0.6rem 0.8rem;background:rgba(6,0,14,0.97);border-bottom:1px solid var(--border);position:relative;flex-shrink:0;">
+    <button onclick="toggleAdminMenu()" id="adminMenuBtn"
+      style="width:100%;padding:0.7rem 1rem;background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:10px;color:var(--gold);font-family:'Orbitron',monospace;font-size:0.72rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;letter-spacing:1px;">
+      <span id="adminMenuLabel">💰 เติมเงิน</span>
+      <span id="adminMenuArrow" style="transition:transform 0.2s;">▼</span>
+    </button>
+    <div id="adminMenuDropdown" style="display:none;position:absolute;left:0.8rem;right:0.8rem;top:calc(100% - 0.1rem);z-index:500;background:rgba(6,0,14,0.99);border:1px solid rgba(255,215,0,0.25);border-radius:10px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,0.6);">
+      <button onclick="switchAdminTab(0)" class="adm-menu-item active" id="atn0">💰 เติมเงิน</button>
+      <button onclick="switchAdminTab(1)" class="adm-menu-item" id="atn1">💱 แลก ZKP</button>
+      <button onclick="switchAdminTab(2)" class="adm-menu-item" id="atn2">👥 สมาชิก</button>
+      <button onclick="switchAdminTab(3)" class="adm-menu-item" id="atn3">⚙️ ตั้งค่า</button>
+      <button onclick="switchAdminTab(4)" class="adm-menu-item" id="atn4">📊 Dashboard</button>
+      <button onclick="switchAdminTab(5)" class="adm-menu-item" id="atn5">📢 ประกาศ</button>
+      <button onclick="switchAdminTab(6)" class="adm-menu-item" id="atn6">🎫 โปรโมชั่น</button>
+    </div>
   </div>
 
   <div style="flex:1;overflow-y:auto;padding:1rem;">
@@ -2776,14 +2783,39 @@ function doAdminLogout(){
   document.getElementById('dashScreen').classList.add('active');
   showToast('👋 ออกจาก Admin Mode');
 }
+const ADMIN_MENU_LABELS = [
+  '💰 เติมเงิน','💱 แลก ZKP','👥 สมาชิก',
+  '⚙️ ตั้งค่า','📊 Dashboard','📢 ประกาศ','🎫 โปรโมชั่น'
+];
+
+function toggleAdminMenu(){
+  const dd = document.getElementById('adminMenuDropdown');
+  const arrow = document.getElementById('adminMenuArrow');
+  const isOpen = dd.style.display !== 'none';
+  dd.style.display = isOpen ? 'none' : 'block';
+  if(arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function closeAdminMenu(){
+  const dd = document.getElementById('adminMenuDropdown');
+  const arrow = document.getElementById('adminMenuArrow');
+  if(dd) dd.style.display = 'none';
+  if(arrow) arrow.style.transform = '';
+}
+
 function switchAdminTab(i){
   adminTabIdx = i;
+  // อัปเดต label ปุ่ม
+  const label = document.getElementById('adminMenuLabel');
+  if(label) label.textContent = ADMIN_MENU_LABELS[i]||'';
+  // อัปเดต active item
   ['atn0','atn1','atn2','atn3','atn4','atn5','atn6'].forEach((id,j)=>{
     document.getElementById(id)?.classList.toggle('active', i===j);
   });
   ['apg0','apg1','apg2','apg3','apg4','apg5','apg6'].forEach((id,j)=>{
     document.getElementById(id)?.classList.toggle('active', i===j);
   });
+  closeAdminMenu();
   if(i===0) renderAdminTopup(currentFilter);
   if(i===1) renderAdminWithdraw();
   if(i===2) renderAdminUsers();
@@ -4632,6 +4664,13 @@ function triggerInstall(){
   });
 }
 
+window.addEventListener('click', e=>{
+  const dd = document.getElementById('adminMenuDropdown');
+  const btn = document.getElementById('adminMenuBtn');
+  if(dd && btn && !btn.contains(e.target) && !dd.contains(e.target)){
+    closeAdminMenu();
+  }
+});
 window.addEventListener('load',()=>{
   // Clear stale language from old version
   const savedLang = localStorage.getItem('cm_lang');
