@@ -1339,7 +1339,7 @@ function enterDash(user){
     const newData = snap.val();
     const oldUsd = _ud ? (_ud.usd||0) : 0;
     const oldZkp = _ud ? (_ud.zkpReward||0) : 0;
-    // อัปเดตเฉพาะ usd และ txs จาก Firebase ไม่ให้เขียนทับ packages และ zkpReward ที่ drip กำลังคำนวณ
+
     if(_ud){
       _ud.usd = newData.usd;
       _ud.txs = newData.txs;
@@ -1347,6 +1347,11 @@ function enterDash(user){
       _ud.refBy = newData.refBy;
       _ud.refCount = newData.refCount;
       _ud.refEarned = newData.refEarned;
+      // sync zkpReward เมื่อ Admin หักออก (ค่าใน Firebase น้อยกว่า memory)
+      if(newData.zkpReward !== undefined && newData.zkpReward < _ud.zkpReward){
+        _ud.zkpReward = newData.zkpReward;
+        showToast('💱 ZKP ถูกหักแล้ว เหลือ '+parseFloat(newData.zkpReward).toFixed(4)+' ZKP');
+      }
     } else {
       _ud = newData;
     }
@@ -1354,7 +1359,7 @@ function enterDash(user){
     renderMachines();
     if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
     if(document.getElementById('pgPkg')?.classList.contains('active')) renderPkgs();
-    // แจ้งเตือนเมื่อเงินเข้า
+    // แจ้งเตือนเมื่อ USD เข้า
     if(newData.usd > oldUsd && oldUsd > 0){
       const diff = (newData.usd - oldUsd).toFixed(2);
       showToast('💰 เติมเงินสำเร็จ! +$'+diff+' USD เข้ากระเป๋าแล้ว');
@@ -2297,7 +2302,24 @@ function startDrip(){
     });
     if(changed){
       ud.lastSeen=Date.now();
-      saveUD(ud);updateRewardUI();
+      // บันทึกเฉพาะ packages, lastSeen, zkpReward — แต่ตรวจก่อนว่า Firebase มีค่าน้อยกว่า memory ไหม
+      // เพื่อป้องกัน drip เขียนทับหลัง Admin หักออก
+      window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
+        const dbZkp = snap.exists() ? (parseFloat(snap.val())||0) : 0;
+        // ถ้า Firebase ต่ำกว่า memory มากผิดปกติ (> 1 ZKP) แสดงว่า Admin เพิ่งหักออก
+        // ให้ sync memory ตาม Firebase แทนที่จะเขียนทับ
+        if(_ud && dbZkp < _ud.zkpReward - 1){
+          _ud.zkpReward = dbZkp;
+        }
+        // บันทึก zkpReward + packages ไปพร้อมกัน
+        const updates = {
+          zkpReward: _ud ? (_ud.zkpReward||0) : ud.zkpReward,
+          packages: ud.packages,
+          lastSeen: ud.lastSeen
+        };
+        window._db.ref('users/'+getSess()).update(updates);
+      });
+      updateRewardUI();
     }
   },TICK);
 
