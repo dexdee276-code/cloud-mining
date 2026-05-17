@@ -2531,25 +2531,40 @@ function renderAdminWithdraw(){
   });
 }
 function approveWithdraw(fbKey, username, zkpAmt){
-  window._db.ref('withdraw_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()}).then(()=>{
-    // ใช้ transaction เพื่อหัก ZKP แบบ atomic ไม่ทับ drip
-    window._db.ref('users/'+username+'/zkpReward').transaction(current=>{
-      return Math.max(0,(current||0)-parseFloat(zkpAmt));
-    }).then(()=>{
-      // บันทึก tx แยก
-      window._db.ref('users/'+username+'/txs').once('value').then(snap=>{
-        const txs=snap.val()||[];
-        const newTxs=[{desc:`✅ แลก ${parseFloat(zkpAmt).toFixed(4)} ZKP สำเร็จ`,amount:-parseFloat(zkpAmt),unit:'ZKP',time:Date.now()},...(Array.isArray(txs)?txs:Object.values(txs))].slice(0,50);
+  const amt = parseFloat(zkpAmt);
+  // อัปเดตสถานะคำขอก่อน
+  window._db.ref('withdraw_reqs/'+fbKey).update({status:'approved', approvedAt:Date.now()});
+
+  // ดึง zkpReward ปัจจุบันจาก Firebase แล้วหักออก
+  window._db.ref('users/'+username+'/zkpReward').once('value').then(snap=>{
+    const current = snap.exists() ? (parseFloat(snap.val())||0) : 0;
+    const newZkp = Math.max(0, current - amt);
+
+    // เขียนค่าใหม่กลับไป
+    window._db.ref('users/'+username+'/zkpReward').set(newZkp).then(()=>{
+      // บันทึก tx
+      window._db.ref('users/'+username+'/txs').once('value').then(snap2=>{
+        const txs = snap2.val()||[];
+        const arr = Array.isArray(txs) ? txs : Object.values(txs);
+        const newTxs = [{
+          desc:`✅ แลก ${amt.toFixed(4)} ZKP สำเร็จ`,
+          amount:-amt, unit:'ZKP', time:Date.now()
+        }, ...arr].slice(0,50);
         window._db.ref('users/'+username+'/txs').set(newTxs);
       });
+
+      // แจ้งเตือน user
       window._db.ref('notifications/'+username).push({
-        type:'approved',icon:'💰',title:'แลก ZKP สำเร็จ!',
-        body:`${parseFloat(zkpAmt).toFixed(4)} ZKP โอนให้แล้ว`,
-        time:Date.now(),read:false
+        type:'approved', icon:'💰', title:'แลก ZKP สำเร็จ!',
+        body:`${amt.toFixed(4)} ZKP โอนให้แล้ว`,
+        time:Date.now(), read:false
       });
+
+      showToast(`✅ อนุมัติแลก ${amt.toFixed(4)} ZKP ให้ ${username} (เหลือ ${newZkp.toFixed(4)} ZKP)`);
+      renderAdminWithdraw();
     });
-    updateNav(); renderAdminWithdraw();
-    showToast(`✅ อนุมัติแลก ${parseFloat(zkpAmt).toFixed(4)} ZKP ให้ ${username}`);
+  }).catch(err=>{
+    showToast('❌ หัก ZKP ไม่สำเร็จ: '+err.message);
   });
 }
 function rejectWithdraw(fbKey, username){
