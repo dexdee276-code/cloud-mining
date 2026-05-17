@@ -93,6 +93,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .ci-streak{display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:0.8rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);}
 .ci-streak-val{font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--gold);}
 
+/* ── VIP LEVEL ── */
+.vip-badge{display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.6rem;border-radius:20px;font-family:'Orbitron',monospace;font-size:0.55rem;font-weight:900;letter-spacing:1px;}
+.vip-bronze{background:linear-gradient(135deg,#78350f,#d97706);color:#fff;box-shadow:0 0 8px rgba(217,119,6,0.4);}
+.vip-silver{background:linear-gradient(135deg,#374151,#9ca3af);color:#fff;box-shadow:0 0 8px rgba(156,163,175,0.4);}
+.vip-gold{background:linear-gradient(135deg,#78350f,#FFD700);color:#000;box-shadow:0 0 10px rgba(255,215,0,0.5);}
+.vip-diamond{background:linear-gradient(135deg,#0e7490,#a5f3fc);color:#000;box-shadow:0 0 10px rgba(165,243,252,0.5);}
+.vip-vip{background:linear-gradient(135deg,#6d28d9,#FFD700);color:#fff;box-shadow:0 0 12px rgba(255,215,0,0.6);animation:vip-glow 2s ease-in-out infinite;}
+@keyframes vip-glow{0%,100%{box-shadow:0 0 10px rgba(255,215,0,0.5);}50%{box-shadow:0 0 20px rgba(255,215,0,0.9);}}
+
 /* ── NOTIFICATION BADGE ── */
 .notif-btn{position:relative;padding:0.28rem 0.55rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:6px;cursor:pointer;font-size:0.9rem;line-height:1;}
 
@@ -900,12 +909,16 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
         <div class="wb-head">
           <div class="wb-ibox">🔷</div>
           <div><div class="wb-title" data-i18n="wal.zkp.title">กระเป๋ารางวัล ZKP</div><div class="wb-sub" data-i18n="wal.zkp.sub">กำไรจากสัญญาขุด → แลกกับผู้ดูแล</div></div>
+          <div id="userVipBadge" style="margin-left:auto;"></div>
           <div class="wb-live">LIVE</div>
         </div>
         <div class="wb-amt" id="wZkp">0.000000</div>
         <div class="wb-equiv">≈ $<span id="wZkpUsd">0.000000</span> USD · <span id="wZkpLak">0</span> ກີບ</div>
         <div class="wb-daily"><span data-i18n="wal.daily">⚡ รับ/วัน:</span><span class="wb-dv"><span id="wDaily">0</span> ZKP · +$<span id="wDailyUsd">0.00</span></span></div>
-        <button class="btn btn-primary" style="width:100%" onclick="showWithdrawPopup()">💱 แจ้งแลกเงิน</button>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-primary" style="flex:1" onclick="showWithdrawPopup()">💱 แจ้งแลกเงิน</button>
+          <button onclick="copyZkpAddress()" style="padding:0.7rem 0.9rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:10px;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;white-space:nowrap;">📋 Copy</button>
+        </div>
       </div>
       <div class="w-grid">
         <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
@@ -1771,11 +1784,12 @@ function renderAdminUserCards(keys){
         </div>
       </div>
       <div style="display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap;">
-        <button onclick="adminAddUsd('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">+ USD</button>
-        <button onclick="adminDeductUsd('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">- USD</button>
-        <button onclick="adminResetPass('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:7px;color:var(--purple-light);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">🔑 Reset</button>
-        <button onclick="adminViewUser('${u}')" style="flex:1;min-width:60px;padding:0.45rem;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:7px;color:#38bdf8;font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">🔍 ดู</button>
-        <button onclick="adminToggleBan('${u}',${!!ud.banned})" style="flex:1;min-width:60px;padding:0.45rem;background:${ud.banned?'rgba(74,222,128,0.08)':'rgba(230,57,70,0.08)'};border:1px solid ${ud.banned?'rgba(74,222,128,0.25)':'rgba(230,57,70,0.25)'};border-radius:7px;color:${ud.banned?'var(--green)':'var(--red-bright)'};font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">${ud.banned?'✅ ปลด':'🚫 แบน'}</button>
+        <button onclick="adminAddUsd('${u}')" style="flex:1;min-width:55px;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">+ USD</button>
+        <button onclick="adminAddZkp('${u}')" style="flex:1;min-width:55px;padding:0.45rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:7px;color:var(--green);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">+ ZKP</button>
+        <button onclick="adminDeductUsd('${u}')" style="flex:1;min-width:55px;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">- USD</button>
+        <button onclick="adminResetPass('${u}')" style="flex:1;min-width:55px;padding:0.45rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:7px;color:var(--purple-light);font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">🔑</button>
+        <button onclick="adminViewUser('${u}')" style="flex:1;min-width:55px;padding:0.45rem;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:7px;color:#38bdf8;font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">🔍</button>
+        <button onclick="adminToggleBan('${u}',${!!ud.banned})" style="flex:1;min-width:55px;padding:0.45rem;background:${ud.banned?'rgba(74,222,128,0.08)':'rgba(230,57,70,0.08)'};border:1px solid ${ud.banned?'rgba(74,222,128,0.25)':'rgba(230,57,70,0.25)'};border-radius:7px;color:${ud.banned?'var(--green)':'var(--red-bright)'};font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;cursor:pointer;">${ud.banned?'✅':'🚫'}</button>
       </div>
     </div>`;
   }).join('');
@@ -1848,6 +1862,7 @@ function renderWallet(){
   const ud=getUD();if(!ud)return;
   renderZkpChart();
   renderWithdrawHistory();
+  renderVipBadge(ud);
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
   const dailyZkp=acs.reduce((s,p)=>s+p.daily,0);
   const totalP=(ud.packages||[]).reduce((s,p)=>{const def=PKGS[p.key];return s+(def.profit*((p.days-p.remaining)/p.days))},0);
@@ -2641,6 +2656,105 @@ function _renderAdminUsers_old(){
     </div>`;
   }).join('');
 }
+// ── VIP LEVEL SYSTEM ──
+const VIP_LEVELS = [
+  {name:'👑 VIP',    cls:'vip-vip',     min:3000},
+  {name:'💎 Diamond',cls:'vip-diamond', min:1000},
+  {name:'🥇 Gold',   cls:'vip-gold',    min:500},
+  {name:'🥈 Silver', cls:'vip-silver',  min:200},
+  {name:'🥉 Bronze', cls:'vip-bronze',  min:50},
+];
+function getVipLevel(ud){
+  const totalSpent = (ud.packages||[]).reduce((s,p)=>s+(p.price||0), 0);
+  for(const lv of VIP_LEVELS){
+    if(totalSpent >= lv.min) return {...lv, totalSpent};
+  }
+  return {name:'⛏️ Starter', cls:'', totalSpent, min:0};
+}
+function renderVipBadge(ud){
+  const el = document.getElementById('userVipBadge'); if(!el) return;
+  const lv = getVipLevel(ud);
+  if(!lv.cls){el.innerHTML='';return;}
+  el.innerHTML = `<span class="vip-badge ${lv.cls}">${lv.name}</span>`;
+}
+
+// ── COPY ZKP ADDRESS ──
+function copyZkpAddress(){
+  const ud=getUD(); if(!ud) return;
+  const u=getSess(); if(!u) return;
+  const addr='ZKP-'+(ud.refCode||u.toUpperCase());
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(addr).then(()=>showToast('📋 คัดลอก Address: '+addr));
+  } else {
+    const el=document.createElement('textarea');
+    el.value=addr; document.body.appendChild(el);
+    el.select(); document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('📋 คัดลอก Address: '+addr);
+  }
+}
+
+// ── ADMIN ADD ZKP ──
+function adminAddZkp(username){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+  ov.id='addZkpOv';
+  ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(74,222,128,0.4);border-radius:18px;padding:1.8rem;max-width:320px;width:100%;">
+    <div style="text-align:center;margin-bottom:1.2rem;">
+      <div style="font-size:1.8rem;">🔷</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:var(--green);">ส่ง ZKP ให้ User</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-top:0.3rem;">👤 ${username}</div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.4rem;">จำนวน ZKP ที่ต้องการส่ง</div>
+    <input type="number" id="addZkpInput" placeholder="เช่น 10, 50, 100" min="0.0001" step="0.0001"
+      style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(74,222,128,0.4);color:var(--text);font-family:'Orbitron',monospace;font-size:1rem;outline:none;caret-color:var(--green);margin-bottom:0.4rem;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.4rem;">หมายเหตุ (ไม่บังคับ)</div>
+    <input type="text" id="addZkpNote" placeholder="เช่น โบนัสพิเศษ, รางวัล..."
+      style="width:100%;padding:0.65rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(74,222,128,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.8rem;">
+    <div id="addZkpErr" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--red-bright);min-height:1.2em;margin-bottom:0.6rem;"></div>
+    <div style="display:flex;gap:0.6rem;">
+      <button onclick="confirmAddZkp('${username}')" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:10px;color:#000;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:700;cursor:pointer;">✅ ส่ง ZKP</button>
+      <button onclick="document.getElementById('addZkpOv').remove()" style="padding:0.75rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ยกเลิก</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>document.getElementById('addZkpInput')?.focus(),200);
+}
+
+function confirmAddZkp(username){
+  const amt = parseFloat(document.getElementById('addZkpInput')?.value||0);
+  const note = document.getElementById('addZkpNote')?.value.trim()||'Admin ส่ง ZKP';
+  const err = document.getElementById('addZkpErr');
+  if(!amt||amt<=0){if(err)err.textContent='⚠️ กรุณากรอกจำนวน ZKP';return;}
+  if(err)err.textContent='⏳ กำลังส่ง...';
+
+  window._db.ref('users/'+username+'/zkpReward').once('value').then(snap=>{
+    const current = snap.exists()?(parseFloat(snap.val())||0):0;
+    const newZkp = parseFloat((current+amt).toFixed(6));
+    return window._db.ref('users/'+username+'/zkpReward').set(newZkp).then(()=>{
+      // บันทึก tx
+      window._db.ref('users/'+username+'/txs').once('value').then(snap2=>{
+        const txs = snap2.val()||[];
+        const arr = Array.isArray(txs)?txs:Object.values(txs);
+        const newTxs = [{
+          desc:`🎁 ${note} (+${amt.toFixed(4)} ZKP)`,
+          amount:amt, unit:'ZKP', time:Date.now()
+        },...arr].slice(0,50);
+        window._db.ref('users/'+username+'/txs').set(newTxs);
+      });
+      // แจ้งเตือน user
+      window._db.ref('notifications/'+username).push({
+        type:'topup', icon:'🎁', title:'ได้รับ ZKP พิเศษ!',
+        body:`Admin ส่ง ${amt.toFixed(4)} ZKP ให้คุณ (${note})`,
+        time:Date.now(), read:false
+      });
+      document.getElementById('addZkpOv')?.remove();
+      showToast(`✅ ส่ง ${amt.toFixed(4)} ZKP ให้ ${username} สำเร็จ!`);
+      renderAdminUsers();
+    });
+  }).catch(()=>{if(err)err.textContent='❌ เกิดข้อผิดพลาด กรุณาลองใหม่';});
+}
+
 function adminAddUsd(username){
   const amt=parseFloat(prompt(`เติม USD ให้ ${username} จำนวน:`));
   if(!amt||amt<=0) return;
