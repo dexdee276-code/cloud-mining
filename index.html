@@ -1357,8 +1357,8 @@ let LAK_RATE_LIVE = 22700; // โหลดจาก Firebase
 // ─── PACKAGES (Subscription รายเดือน 30 วัน) ───
 const PKGS = {
   starter5:{name:'⚡ Starter5', price:5,    days:7,  profit:3.5,  daily:0.5,   hr:'5 GH/s',   limit:1, cls:'pc-s5',      mc:'mc-s5',      next:'starter15',nxt:15},
-  starter15:{name:'🌟 Starter15',price:15,  days:7,  profit:11.9, daily:1.7,   hr:'10 GH/s',  limit:1, cls:'pc-s15',     mc:'mc-s15',     next:'starter30',nxt:30},
-  starter30:{name:'💡 Starter30',price:30,  days:15, profit:30,   daily:2,     hr:'15 GH/s',  limit:1, cls:'pc-s30',     mc:'mc-s30',     next:'bronze',   nxt:50},
+  starter15:{name:'🌟 Starter15',price:15,  days:14, profit:21,   daily:1.5,   hr:'10 GH/s',  limit:1, cls:'pc-s15',     mc:'mc-s15',     next:'starter30',nxt:30},
+  starter30:{name:'💡 Starter30',price:30,  days:30, profit:60,   daily:2,     hr:'15 GH/s',  limit:1, cls:'pc-s30',     mc:'mc-s30',     next:'bronze',   nxt:50},
   bronze:  {name:'🥉 Bronze',  price:50,   days:30, profit:105,  daily:3.5,   hr:'20 GH/s',  limit:1, cls:'pc-mini',    mc:'mc-mini',    next:'silver',   nxt:150},
   silver:  {name:'🥈 Silver',  price:200,  days:30, profit:390,  daily:13,    hr:'50 GH/s',  limit:1, cls:'pc-starter', mc:'mc-starter', next:'gold',     nxt:300},
   gold:    {name:'🥇 Gold',    price:500,  days:30, profit:960,  daily:32,    hr:'120 GH/s', limit:1, cls:'pc-basic',   mc:'mc-basic',   next:'diamond',  nxt:500},
@@ -2027,19 +2027,6 @@ function renderPkgs(){
       :`<div class="pkg-price" style="color:var(--green);">ฟรี!</div>`;
 
     // รายละเอียดหลัก
-    const totalZkpAll = parseFloat((def.price + def.profit).toFixed(4));
-    const totalReturn = def.price > 0
-      ? `<div style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);border-radius:8px;padding:0.6rem 0.8rem;margin-top:0.5rem;">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">📊 สรุปที่ได้รับทั้งหมด</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem;flex-wrap:wrap;">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">$${def.price} ต้นทุน + ${def.profit} กำไร</div>
-            <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--green);font-weight:900;">= ${totalZkpAll} ZKP</div>
-          </div>
-        </div>`
-      : `<div style="background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:8px;padding:0.5rem 0.8rem;margin-top:0.4rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--green);font-weight:900;">= ${def.profit} ZKP ฟรี!</div>
-        </div>`;
-
     const detailHtml=`
       <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:0.7rem;margin:0.5rem 0;text-align:left;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;">
@@ -2052,7 +2039,6 @@ function renderPkgs(){
           <div style="color:var(--text-dim);">🖥 กำลังขุด</div>
           <div style="color:var(--purple-light);font-weight:700;">${def.hr}</div>
         </div>
-        ${totalReturn}
       </div>`;
 
     // ปุ่ม
