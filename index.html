@@ -4240,12 +4240,13 @@ function checkWithdrawLimit(){
 // ════════════════════════════════════════
 function showHowToPlay(){
   const ov=document.createElement('div');
+  ov.id='howToPlayOv';
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(6,0,15,0.95);backdrop-filter:blur(14px);display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;';
   ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(10,2,25,0.99),rgba(18,4,42,0.98));border:1px solid rgba(0,255,136,0.3);border-radius:18px;padding:1.5rem;width:100%;max-width:420px;margin:auto;">
 
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
       <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--green);">❓ วิธีเล่น CryptoMine</div>
-      <button onclick="this.closest('div[style]').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+      <button onclick="document.getElementById('howToPlayOv').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
     </div>
 
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;line-height:2;max-height:75vh;overflow-y:auto;padding-right:0.3rem;">
@@ -4317,7 +4318,7 @@ function showHowToPlay(){
       </div>
 
     </div>
-    <button onclick="this.closest('div[style]').remove()" class="btn btn-primary" style="width:100%;margin-top:1rem;">✅ เข้าใจแล้ว</button>
+    <button onclick="document.getElementById('howToPlayOv').remove()" class="btn btn-primary" style="width:100%;margin-top:1rem;">✅ เข้าใจแล้ว</button>
   </div>`;
   document.body.appendChild(ov);
 }
@@ -4329,7 +4330,7 @@ function showPrivacy(){
   ov.innerHTML=`<div style="background:linear-gradient(145deg,rgba(20,8,45,0.99),rgba(35,14,65,0.98));border:1px solid rgba(157,78,221,0.4);border-radius:18px;padding:1.5rem;width:100%;max-width:420px;margin:auto;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
       <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:var(--purple-light);">🔒 Privacy Policy</div>
-      <button onclick="this.closest('div[style]').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
+      <button onclick="document.getElementById('howToPlayOv').remove()" style="padding:0.35rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">✕ ปิด</button>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:2;max-height:70vh;overflow-y:auto;">
       <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.5rem;">1. ข้อมูลที่เก็บรวบรวม</div>
