@@ -1506,7 +1506,7 @@ function sendOTP(username, email, password){
 
   showMsg('regMsg','⏳ กำลังส่ง OTP ไปที่ '+email+'...','');
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-    to_email: email, username: username, otp: _otpCode
+    to_email: email, username: username, otp: _otpCode, email: email, name: username
   }).then(()=>{
     showMsg('regMsg','','');
     showOtpPopup(email);
@@ -1639,7 +1639,7 @@ function resendOTP(){
   _otpCode = Math.floor(100000+Math.random()*900000).toString();
   _otpExpiry = Date.now() + 10*60*1000;
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-    to_email:_otpEmail, username:_otpUsername, otp:_otpCode
+    to_email:_otpEmail, username:_otpUsername, otp:_otpCode, email:_otpEmail, name:_otpUsername
   }).then(()=>{
     if(errEl) errEl.textContent='';
     startOtpTimer();
