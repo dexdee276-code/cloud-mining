@@ -2804,26 +2804,21 @@ function updateLastSeen(){
 
 function startDrip(){
   if(dripInt)clearInterval(dripInt);
-
-  // คำนวณ ZKP ที่ขุดได้ระหว่างปิดเว็บก่อน
   calcOfflineEarnings();
 
   dripInt=setInterval(()=>{
     const ud=getUD();if(!ud||!ud.packages)return;
     const now=Date.now();let changed=false;
-    let zkpTotal=0;
+    let zkpPerTickTotal=0;
     ud.packages.forEach((p,i)=>{
       if(p.remaining<=0)return;
       const def=PKGS[p.key];if(!def)return;
-      // คำนวณจาก bought timestamp เสมอ (แม่นยำกว่า)
       const elapsedDays=(now-p.bought)/1000/DEMO_DAY;
       const newRemaining=Math.max(0,p.days-elapsedDays);
       const oldRem=p.remaining;
       p.remaining=newRemaining;
-      // ZKP ต่อ tick
       const zkpPerTick=def.daily/(DEMO_DAY*1000/TICK);
-      ud.zkpReward=(ud.zkpReward||0)+zkpPerTick;
-      zkpTotal+=zkpPerTick;
+      zkpPerTickTotal+=zkpPerTick;
       changed=true;
       if(p.remaining<=0&&oldRem>0){
         const nk=getSess()+'_'+i+'_'+p.bought;
@@ -2833,27 +2828,22 @@ function startDrip(){
     });
     if(changed){
       ud.lastSeen=Date.now();
-      // บันทึกเฉพาะ packages, lastSeen, zkpReward — แต่ตรวจก่อนว่า Firebase มีค่าน้อยกว่า memory ไหม
-      // เพื่อป้องกัน drip เขียนทับหลัง Admin หักออก
+      // อ่าน Firebase แล้วบวก zkpPerTickTotal เข้าไปเสมอ
+      // Admin เพิ่ม/หัก ZKP ได้ถาวร ไม่ถูก drip เขียนทับ
       window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
         const dbZkp = snap.exists() ? (parseFloat(snap.val())||0) : 0;
-        // sync memory ตาม Firebase เสมอถ้าต่างกันเกิน 1 ZKP
-        if(_ud && Math.abs(dbZkp - _ud.zkpReward) > 1){
-          _ud.zkpReward = dbZkp;
-        }
-        // บันทึก zkpReward + packages ไปพร้อมกัน
-        const updates = {
-          zkpReward: _ud ? (_ud.zkpReward||0) : ud.zkpReward,
+        const finalZkp = parseFloat((dbZkp + zkpPerTickTotal).toFixed(6));
+        if(_ud) _ud.zkpReward = finalZkp;
+        window._db.ref('users/'+getSess()).update({
+          zkpReward: finalZkp,
           packages: ud.packages,
           lastSeen: ud.lastSeen
-        };
-        window._db.ref('users/'+getSess()).update(updates);
+        });
       });
       updateRewardUI();
     }
   },TICK);
 
-  // บันทึก lastSeen ทุก 30 วินาที
   setInterval(updateLastSeen, 30000);
 }
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
