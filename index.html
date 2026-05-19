@@ -1487,12 +1487,20 @@ function doRegister(){
   if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return;}
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){showMsg('regMsg','⚠ Email ไม่ถูกต้อง','error');return;}
   const btn=document.querySelector('#regForm .btn-auth');
-  btn.disabled=true; btn.textContent='⏳ กำลังตรวจสอบ...';
+  btn.disabled=true; btn.textContent='⏳ กำลังสมัคร...';
   fbGetUser(u).then(existing=>{
-    btn.disabled=false; btn.textContent='🚀 CREATE NODE';
-    if(existing){showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;}
-    // ส่ง OTP
-    sendOTP(u, e, p);
+    if(existing){btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;}
+    sha256(p).then(hashed=>{
+      const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+      const refBy=new URLSearchParams(window.location.search).get('ref')||'';
+      const nd={pw:hashed,email:e,emailVerified:false,usd:0,zkpReward:0,zkpMine:0,
+                sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0,createdAt:Date.now()};
+      window._db.ref('users/'+u).set(nd).then(()=>{
+        btn.disabled=false; btn.textContent='🚀 CREATE NODE';
+        _ud=nd; setSess(u); enterDash(u);
+        showToast('🎉 สมัครสมาชิกสำเร็จ! ยินดีต้อนรับ '+u);
+      });
+    });
   }).catch(()=>{btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');});
 }
 
