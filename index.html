@@ -1817,10 +1817,9 @@ function enterDash(user){
       _ud.refBy = newData.refBy;
       _ud.refCount = newData.refCount;
       _ud.refEarned = newData.refEarned;
-      // sync zkpReward เมื่อ Admin หักออก (ค่าใน Firebase น้อยกว่า memory)
-      if(newData.zkpReward !== undefined && newData.zkpReward < _ud.zkpReward){
+      // sync zkpReward เมื่อ Admin เพิ่มหรือหักออก
+      if(newData.zkpReward !== undefined && Math.abs(newData.zkpReward - _ud.zkpReward) > 0.5){
         _ud.zkpReward = newData.zkpReward;
-        showToast('💱 ZKP ถูกหักแล้ว เหลือ '+parseFloat(newData.zkpReward).toFixed(4)+' ZKP');
       }
     } else {
       _ud = newData;
@@ -2838,9 +2837,8 @@ function startDrip(){
       // เพื่อป้องกัน drip เขียนทับหลัง Admin หักออก
       window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
         const dbZkp = snap.exists() ? (parseFloat(snap.val())||0) : 0;
-        // ถ้า Firebase ต่ำกว่า memory มากผิดปกติ (> 1 ZKP) แสดงว่า Admin เพิ่งหักออก
-        // ให้ sync memory ตาม Firebase แทนที่จะเขียนทับ
-        if(_ud && dbZkp < _ud.zkpReward - 1){
+        // sync memory ตาม Firebase เสมอถ้าต่างกันเกิน 1 ZKP
+        if(_ud && Math.abs(dbZkp - _ud.zkpReward) > 1){
           _ud.zkpReward = dbZkp;
         }
         // บันทึก zkpReward + packages ไปพร้อมกัน
