@@ -1506,7 +1506,9 @@ function doRegister(){
 }
 
 function showOtpInPage(otp){
+  // ลบ popup เก่าออกก่อน
   document.getElementById('otpPopupOv')?.remove();
+  document.getElementById('howToPlayOv')?.remove();
   const ov=document.createElement('div');
   ov.id='otpPopupOv';
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(6,0,15,0.97);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:1.5rem;';
@@ -1746,8 +1748,8 @@ function verifyOTP(){
   setErr('');
 
   // แสดง loading
-  const btn = document.querySelector('#otpPopupOv button');
-  if(btn){ btn.textContent='⏳ กำลังสร้างบัญชี...'; btn.disabled=true; }
+  const confirmBtn = document.querySelector('#otpPopupOv button');
+  if(confirmBtn){ confirmBtn.textContent='⏳ กำลังสร้างบัญชี...'; confirmBtn.disabled=true; }
 
   const u = _otpUsername;
   const e = _otpEmail;
