@@ -1012,15 +1012,6 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
         <button class="btn-mine" id="mineBtn" data-i18n="home.start" onclick="toggleMine()">▶ เริ่มขุด</button>
       </div>
       <!-- Daily Check-in -->
-      <div class="checkin-widget" id="checkinWidget">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;color:var(--gold);">📅 Daily Check-in</div>
-          <div class="ci-streak">🔥 Streak <span class="ci-streak-val" id="ciStreak">0</span> วัน</div>
-        </div>
-        <div class="checkin-days" id="ciDays"></div>
-        <button class="btn-checkin ready" id="ciBtn" onclick="doCheckIn()">🎁 เช็คอินวันนี้</button>
-        <div id="ciMsg" style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-top:0.5rem;min-height:1.2em;"></div>
-      </div>
 
       <div class="act-widget">
         <div class="sec-title" data-i18n="home.activity">📋 กิจกรรมล่าสุด</div>
@@ -1802,7 +1793,6 @@ function enterDash(user){
   updateNav();switchTab(0);renderMachines();renderPkgs();
   startDrip();showToast(t('toast.welcome')+' '+user+'!');
   resetSessionTimer();
-  setTimeout(renderCheckIn, 500);
   loadBroadcastBanner();
   listenNotifications();
   listenAdminBadge();
@@ -2680,7 +2670,7 @@ function submitSlip(){
   reader.onload=function(ev){
     img.onload=function(){
       const canvas=document.createElement('canvas');
-      const MAX=600;
+      const MAX=800;
       let w=img.width, h=img.height;
       if(w>MAX||h>MAX){
         if(w>h){h=Math.round(h*MAX/w);w=MAX;}
@@ -2688,7 +2678,14 @@ function submitSlip(){
       }
       canvas.width=w; canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      const compressed=canvas.toDataURL('image/jpeg',0.7);
+      // ลด quality ให้เหมาะสมกับขนาด
+      let quality=0.6;
+      let compressed=canvas.toDataURL('image/jpeg',quality);
+      // ถ้ายังใหญ่เกิน 1MB ลด quality อีก
+      while(compressed.length > 1*1024*1024 && quality > 0.1){
+        quality -= 0.1;
+        compressed = canvas.toDataURL('image/jpeg', quality);
+      }
 
       try {
         const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
@@ -3778,56 +3775,7 @@ function showProfile(){
 }
 
 // ── DAILY CHECK-IN ──
-const CI_REWARDS=[0.5,0.8,1.2,1.5,2.0,2.5,5.0];
 const CI_ICONS=['🎁','⚡','💎','🔥','🚀','👑','🌟'];
-function renderCheckIn(){
-  const ud=getUD(); if(!ud) return;
-  const todayStr=new Date().toDateString();
-  const ci=ud.checkIn||{streak:0,lastDate:'',history:[]};
-  const alreadyDone=ci.lastDate===todayStr;
-  const streak=ci.streak||0;
-  const dayIdx=streak%7;
-  const ciDaysEl=document.getElementById('ciDays');
-  if(ciDaysEl){
-    ciDaysEl.innerHTML=CI_REWARDS.map((r,i)=>{
-      let cls='ci-day';
-      if(i<(alreadyDone?dayIdx:dayIdx)&&i!==(alreadyDone?dayIdx-1:dayIdx)) cls+=' done';
-      if(i===(alreadyDone?dayIdx-1:dayIdx)) cls+=' today'+(alreadyDone?' done':'');
-      return `<div class="${cls}"><div class="ci-d-num">วัน${i+1}</div><div class="ci-d-icon">${(i<dayIdx||(alreadyDone&&i===dayIdx-1))?'✅':CI_ICONS[i]}</div><div class="ci-d-zkp">+${r}</div></div>`;
-    }).join('');
-  }
-  const streakEl=document.getElementById('ciStreak'); if(streakEl) streakEl.textContent=streak;
-  const btn=document.getElementById('ciBtn'); const msg=document.getElementById('ciMsg');
-  if(btn){
-    if(alreadyDone){
-      btn.className='btn-checkin done'; btn.textContent='✅ เช็คอินแล้ววันนี้';
-      if(msg) msg.textContent=`รับไปแล้ว +${CI_REWARDS[(dayIdx-1+7)%7]} ZKP • กลับมาพรุ่งนี้!`;
-    } else {
-      btn.className='btn-checkin ready'; btn.textContent=`🎁 รับ +${CI_REWARDS[dayIdx]} ZKP วันนี้`;
-      if(msg) msg.textContent=streak>0?`🔥 Streak ${streak} วัน!`:'เช็คอินทุกวันรับโบนัสเพิ่ม!';
-    }
-  }
-}
-function doCheckIn(){
-  const ud=getUD(); if(!ud) return;
-  const todayStr=new Date().toDateString();
-  const ci=ud.checkIn||{streak:0,lastDate:'',history:[]};
-  if(ci.lastDate===todayStr){showToast('✅ เช็คอินแล้ววันนี้!');return;}
-  const yesterday=new Date(Date.now()-86400000).toDateString();
-  ci.streak=(ci.lastDate===yesterday)?(ci.streak||0)+1:1;
-  ci.lastDate=todayStr;
-  if(!ci.history) ci.history=[];
-  ci.history.unshift({date:todayStr,time:Date.now()});
-  if(ci.history.length>30) ci.history=ci.history.slice(0,30);
-  const dayIdx=(ci.streak-1)%7;
-  const reward=CI_REWARDS[dayIdx];
-  ud.checkIn=ci; ud.zkpReward=(ud.zkpReward||0)+reward;
-  ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:`📅 Daily Check-in วันที่ ${ci.streak} 🔥`,amount:reward,unit:'ZKP',time:Date.now()});
-  saveUD(ud); updateNav(); renderCheckIn();
-  addAct('📅',`Check-in วันที่ ${ci.streak}!`,'+'+reward+' ZKP','ap');
-  showToast(`🎁 Check-in! +${reward} ZKP • Streak ${ci.streak} วัน 🔥`);
-}
 
 // ── _doShowWithdrawPopup (ต่อจาก Freeze check) ──
 // ── LEADERBOARD ──
@@ -4027,7 +3975,7 @@ function adminViewUser(username){
     const pkgsActive=(ud.packages||[]).filter(p=>p.remaining>0);
     const pkgsAll=ud.packages||[];
     const txs=(ud.txs||[]).slice(0,8);
-    const ci=ud.checkIn||{};
+    const ci={};
     const d=new Date(ud.createdAt||0);
     const joined=ud.createdAt?`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`:'ไม่ทราบ';
     const ov=document.createElement('div');
