@@ -601,6 +601,7 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBXCvCLsPxkXBVLMaO8RISITM2d24pAL-Q",
@@ -614,6 +615,7 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   window._db = db;
+  window._auth = firebase.auth();
 </script>
 </head>
 <body>
@@ -1487,21 +1489,120 @@ function doRegister(){
   if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return;}
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){showMsg('regMsg','⚠ Email ไม่ถูกต้อง','error');return;}
   const btn=document.querySelector('#regForm .btn-auth');
-  btn.disabled=true; btn.textContent='⏳ กำลังสมัคร...';
+  btn.disabled=true; btn.textContent='⏳ กำลังตรวจสอบ...';
+
   fbGetUser(u).then(existing=>{
-    if(existing){btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;}
-    sha256(p).then(hashed=>{
-      const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
-      const refBy=new URLSearchParams(window.location.search).get('ref')||'';
-      const nd={pw:hashed,email:e,emailVerified:false,usd:0,zkpReward:0,zkpMine:0,
-                sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0,createdAt:Date.now()};
-      window._db.ref('users/'+u).set(nd).then(()=>{
+    if(existing){
+      btn.disabled=false; btn.textContent='🚀 CREATE NODE';
+      showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error'); return;
+    }
+    // สร้าง Firebase Auth account ชั่วคราว แล้วส่ง verification email
+    btn.textContent='⏳ กำลังส่ง OTP...';
+    window._auth.createUserWithEmailAndPassword(e, p).then(cred=>{
+      // ส่ง verification email
+      return cred.user.sendEmailVerification().then(()=>{
+        // เก็บข้อมูลไว้รอยืนยัน
+        window._pendingReg = {u, e, p, uid: cred.user.uid};
         btn.disabled=false; btn.textContent='🚀 CREATE NODE';
-        _ud=nd; setSess(u); enterDash(u);
-        showToast('🎉 สมัครสมาชิกสำเร็จ! ยินดีต้อนรับ '+u);
+        showMsg('regMsg','','');
+        showFirebaseOtpPopup(e, cred.user);
       });
+    }).catch(err=>{
+      btn.disabled=false; btn.textContent='🚀 CREATE NODE';
+      if(err.code==='auth/email-already-in-use'){
+        showMsg('regMsg','❌ Email นี้ถูกใช้แล้ว','error');
+      } else {
+        showMsg('regMsg','❌ เกิดข้อผิดพลาด: '+err.message,'error');
+      }
     });
-  }).catch(()=>{btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');});
+  }).catch(()=>{
+    btn.disabled=false; btn.textContent='🚀 CREATE NODE';
+    showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');
+  });
+}
+
+function showFirebaseOtpPopup(email, firebaseUser){
+  document.getElementById('otpPopupOv')?.remove();
+  const ov=document.createElement('div');
+  ov.id='otpPopupOv';
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(6,0,15,0.97);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+  ov.innerHTML=`
+    <div style="background:linear-gradient(145deg,rgba(10,2,25,0.99),rgba(20,5,45,0.98));border:1px solid rgba(176,110,255,0.4);border-radius:20px;padding:2rem;width:100%;max-width:360px;text-align:center;">
+      <div style="width:70px;height:70px;background:linear-gradient(135deg,rgba(0,255,136,0.15),rgba(176,110,255,0.15));border:2px solid rgba(0,255,136,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-size:2rem;">📧</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:#fff;margin-bottom:0.4rem;">ยืนยัน Email</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);margin-bottom:0.3rem;">ส่งลิงก์ยืนยันไปที่</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--green);margin-bottom:1.2rem;">${email}</div>
+      <div style="background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:0.8rem;margin-bottom:1.2rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);line-height:1.8;">
+        📩 กรุณาเปิด Email แล้วกดลิงก์ยืนยัน<br>
+        จากนั้นกลับมากด <span style="color:var(--green);">✅ ยืนยันแล้ว</span>
+      </div>
+      <button onclick="checkFirebaseVerified()"
+        style="width:100%;padding:0.9rem;background:linear-gradient(135deg,#003d20,#00CC6A,#FFD700);border:none;border-radius:12px;color:#000;font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;letter-spacing:2px;cursor:pointer;margin-bottom:0.7rem;">
+        ✅ ยืนยันแล้ว
+      </button>
+      <div style="display:flex;gap:0.6rem;">
+        <button onclick="resendFirebaseVerification()"
+          style="flex:1;padding:0.7rem;background:rgba(176,110,255,0.1);border:1px solid rgba(176,110,255,0.3);border-radius:10px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
+          🔄 ส่งใหม่
+        </button>
+        <button onclick="cancelFirebaseReg()"
+          style="flex:1;padding:0.7rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
+          ← กลับ
+        </button>
+      </div>
+      <div id="fbOtpErr" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--red-bright);margin-top:0.8rem;min-height:1.2em;"></div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+function checkFirebaseVerified(){
+  const errEl=document.getElementById('fbOtpErr');
+  const setErr=msg=>{if(errEl)errEl.textContent=msg;};
+  setErr('⏳ กำลังตรวจสอบ...');
+  const user=window._auth.currentUser;
+  if(!user){setErr('❌ กรุณาลองใหม่');return;}
+  // reload user เพื่อเช็คสถานะล่าสุด
+  user.reload().then(()=>{
+    if(window._auth.currentUser.emailVerified){
+      // ยืนยันแล้ว! สร้างบัญชีใน database
+      const reg=window._pendingReg;
+      if(!reg){setErr('❌ ข้อมูลหาย กรุณาสมัครใหม่');return;}
+      setErr('⏳ กำลังสร้างบัญชี...');
+      sha256(reg.p).then(hashed=>{
+        const refCode=reg.u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+        const refBy=new URLSearchParams(window.location.search).get('ref')||'';
+        const nd={pw:hashed,email:reg.e,emailVerified:true,usd:0,zkpReward:0,zkpMine:0,
+                  sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0,createdAt:Date.now()};
+        window._db.ref('users/'+reg.u).set(nd).then(()=>{
+          window._pendingReg=null;
+          document.getElementById('otpPopupOv')?.remove();
+          _ud=nd; setSess(reg.u); enterDash(reg.u);
+          showToast('🎉 สมัครสมาชิกสำเร็จ! ยินดีต้อนรับ '+reg.u);
+        });
+      });
+    } else {
+      setErr('❌ ยังไม่ได้ยืนยัน กรุณาคลิกลิงก์ใน Email ก่อนครับ');
+    }
+  }).catch(()=>setErr('❌ ตรวจสอบไม่ได้ กรุณาลองใหม่'));
+}
+
+function resendFirebaseVerification(){
+  const errEl=document.getElementById('fbOtpErr');
+  const user=window._auth.currentUser;
+  if(!user){if(errEl)errEl.textContent='❌ กรุณาลองใหม่';return;}
+  user.sendEmailVerification().then(()=>{
+    if(errEl)errEl.textContent='';
+    showToast('📧 ส่งลิงก์ยืนยันใหม่แล้วครับ!');
+  }).catch(()=>{if(errEl)errEl.textContent='❌ ส่งไม่สำเร็จ กรุณารอสักครู่';});
+}
+
+function cancelFirebaseReg(){
+  const user=window._auth.currentUser;
+  if(user && !user.emailVerified){
+    user.delete().catch(()=>{});
+  }
+  window._pendingReg=null;
+  document.getElementById('otpPopupOv')?.remove();
 }
 
 let _otpTimerInterval = null;
