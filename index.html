@@ -669,7 +669,7 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
         <div class="field-icon">🔐</div>
         <input class="form-input" id="regPass" data-i18n-ph="auth.ph.regpass" type="password" placeholder="min 6 chars">
       </div>
-      <button class="btn-auth" data-i18n="auth.btn.reg" onclick="doRegister()">🚀 CREATE NODE</button>
+      <button class="btn-auth" data-i18n="auth.btn.reg" id="regBtn" onclick="doRegister()">🚀 CREATE NODE</button>
       <div class="auth-msg" id="regMsg"></div>
     </div>
   </div>
@@ -1489,7 +1489,8 @@ function doRegister(){
   if(!u||!e||!p){showMsg('regMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return;}
   if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return;}
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){showMsg('regMsg','⚠ Email ไม่ถูกต้อง','error');return;}
-  const btn=document.querySelector('#regForm .btn-auth');
+  const btn=document.getElementById('regBtn');
+  if(!btn){showMsg('regMsg','❌ เกิดข้อผิดพลาด กรุณา refresh','error');return;}
   btn.disabled=true; btn.textContent='⏳ กำลังตรวจสอบ...';
   fbGetUser(u).then(existing=>{
     btn.disabled=false; btn.textContent='🚀 CREATE NODE';
@@ -1534,7 +1535,7 @@ function showOtpInPage(otp){
         style="width:100%;padding:0.9rem;background:linear-gradient(135deg,#003d20,#00CC6A,#FFD700);border:none;border-radius:12px;color:#000;font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;letter-spacing:2px;cursor:pointer;margin-bottom:0.7rem;">
         ✅ ยืนยัน
       </button>
-      <button onclick="document.getElementById('otpPopupOv').remove();const btn=document.querySelector('#regForm .btn-auth');if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}"
+      <button onclick="document.getElementById('otpPopupOv').remove();const btn=document.getElementById('regBtn');if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}"
         style="width:100%;padding:0.7rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
         ← กลับ
       </button>
@@ -1698,7 +1699,7 @@ function showOtpPopup(email){
           style="flex:1;padding:0.7rem;background:rgba(176,110,255,0.1);border:1px solid rgba(176,110,255,0.3);border-radius:10px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
           🔄 ส่งรหัสใหม่
         </button>
-        <button onclick="document.getElementById('otpPopupOv').remove();const btn=document.querySelector('#regForm .btn-auth');if(btn){btn.disabled=false;btn.style.opacity='1';}"
+        <button onclick="document.getElementById('otpPopupOv').remove();const btn=document.getElementById('regBtn');if(btn){btn.disabled=false;btn.style.opacity='1';}"
           style="flex:1;padding:0.7rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
           ← กลับ
         </button>
@@ -1768,7 +1769,7 @@ function verifyOTP(){
 function resendOTP(){
   if(!_otpUsername||!_otpEmail||!window._pendingRegPass){
     document.getElementById('otpPopupOv')?.remove();
-    const btn=document.querySelector('#regForm .btn-auth');
+    const btn=document.getElementById('regBtn');
     if(btn){btn.disabled=false;btn.style.opacity='1';}
     return;
   }
