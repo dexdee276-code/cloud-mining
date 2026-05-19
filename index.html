@@ -1490,35 +1490,11 @@ function doRegister(){
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){showMsg('regMsg','⚠ Email ไม่ถูกต้อง','error');return;}
   const btn=document.querySelector('#regForm .btn-auth');
   btn.disabled=true; btn.textContent='⏳ กำลังตรวจสอบ...';
-
   fbGetUser(u).then(existing=>{
-    if(existing){
-      btn.disabled=false; btn.textContent='🚀 CREATE NODE';
-      showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error'); return;
-    }
-    // สร้าง Firebase Auth account ชั่วคราว แล้วส่ง verification email
-    btn.textContent='⏳ กำลังส่ง OTP...';
-    window._auth.createUserWithEmailAndPassword(e, p).then(cred=>{
-      // ส่ง verification email
-      return cred.user.sendEmailVerification().then(()=>{
-        // เก็บข้อมูลไว้รอยืนยัน
-        window._pendingReg = {u, e, p, uid: cred.user.uid};
-        btn.disabled=false; btn.textContent='🚀 CREATE NODE';
-        showMsg('regMsg','','');
-        showFirebaseOtpPopup(e, cred.user);
-      });
-    }).catch(err=>{
-      btn.disabled=false; btn.textContent='🚀 CREATE NODE';
-      if(err.code==='auth/email-already-in-use'){
-        showMsg('regMsg','❌ Email นี้ถูกใช้แล้ว','error');
-      } else {
-        showMsg('regMsg','❌ เกิดข้อผิดพลาด: '+err.message,'error');
-      }
-    });
-  }).catch(()=>{
     btn.disabled=false; btn.textContent='🚀 CREATE NODE';
-    showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');
-  });
+    if(existing){showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;}
+    sendOTP(u, e, p);
+  }).catch(()=>{btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');});
 }
 
 function showFirebaseOtpPopup(email, firebaseUser){
@@ -1614,14 +1590,22 @@ function sendOTP(username, email, password){
   window._pendingRegPass = password;
 
   showMsg('regMsg','⏳ กำลังส่ง OTP ไปที่ '+email+'...','');
-  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-    to_email: email, username: username, otp: _otpCode, email: email, name: username
-  }).then(()=>{
-    showMsg('regMsg','','');
-    showOtpPopup(email);
+
+  fetch('https://cryptomine-otp.dexdee276.workers.dev', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({to_email: email, username: username, otp: _otpCode})
+  }).then(r=>r.json()).then(data=>{
+    if(data.success){
+      showMsg('regMsg','','');
+      showOtpPopup(email);
+    } else {
+      showMsg('regMsg','❌ ส่ง OTP ไม่สำเร็จ กรุณาลองใหม่','error');
+      console.error('Worker error:', data);
+    }
   }).catch(err=>{
     showMsg('regMsg','❌ ส่ง OTP ไม่สำเร็จ กรุณาตรวจสอบ Email','error');
-    console.error('EmailJS error:', err);
+    console.error('Worker error:', err);
   });
 }
 
@@ -1747,14 +1731,20 @@ function resendOTP(){
   // สร้าง OTP ใหม่
   _otpCode = Math.floor(100000+Math.random()*900000).toString();
   _otpExpiry = Date.now() + 10*60*1000;
-  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-    to_email:_otpEmail, username:_otpUsername, otp:_otpCode, email:_otpEmail, name:_otpUsername
-  }).then(()=>{
-    if(errEl) errEl.textContent='';
-    startOtpTimer();
-    showToast('📧 ส่งรหัสใหม่ไปที่ '+_otpEmail+' แล้ว!');
-    document.getElementById('otpInput').value='';
-    document.getElementById('otpInput').focus();
+  fetch('https://cryptomine-otp.dexdee276.workers.dev', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({to_email:_otpEmail, username:_otpUsername, otp:_otpCode})
+  }).then(r=>r.json()).then(data=>{
+    if(data.success){
+      if(errEl) errEl.textContent='';
+      startOtpTimer();
+      showToast('📧 ส่งรหัสใหม่ไปที่ '+_otpEmail+' แล้ว!');
+      document.getElementById('otpInput').value='';
+      document.getElementById('otpInput').focus();
+    } else {
+      if(errEl) errEl.textContent='❌ ส่งไม่สำเร็จ กรุณาลองใหม่';
+    }
   }).catch(()=>{
     if(errEl) errEl.textContent='❌ ส่งไม่สำเร็จ กรุณาลองใหม่';
   });
