@@ -1817,9 +1817,13 @@ function enterDash(user){
       _ud.refBy = newData.refBy;
       _ud.refCount = newData.refCount;
       _ud.refEarned = newData.refEarned;
-      // sync zkpReward จาก Firebase เสมอเมื่อมีการเปลี่ยนแปลง
+      // sync zkpReward จาก Firebase เสมอ
       if(newData.zkpReward !== undefined){
         _ud.zkpReward = parseFloat(newData.zkpReward)||0;
+      }
+      // sync packages จาก Firebase เพื่อให้เครื่องขุดทำงานถูกต้อง
+      if(newData.packages !== undefined){
+        _ud.packages = newData.packages;
       }
     } else {
       _ud = newData;
