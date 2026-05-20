@@ -2853,14 +2853,16 @@ function startDrip(){
     });
     if(changed){
       ud.lastSeen=Date.now();
-      // บวก ZKP เข้า memory ทันที → UI เด้งทันที
-      if(_ud) _ud.zkpReward = parseFloat(((_ud.zkpReward||0) + zkpTotal).toFixed(6));
+      // บวก ZKP เข้า memory ทันที (_ud และ ud ต้องตรงกัน)
+      const newZkp = parseFloat(((ud.zkpReward||0) + zkpTotal).toFixed(6));
+      ud.zkpReward = newZkp;
+      if(_ud) _ud.zkpReward = newZkp;
       updateRewardUI();
       // บันทึก Firebase เฉพาะ zkpReward, packages, lastSeen
-      // ใช้ update() ไม่ใช่ set() เพื่อไม่เขียนทับ field อื่น เช่น usd
+      // ใช้ update() ไม่เขียนทับ usd
       const u=getSess(); if(!u)return;
       window._db.ref('users/'+u).update({
-        zkpReward: _ud ? _ud.zkpReward : (ud.zkpReward||0),
+        zkpReward: newZkp,
         packages: ud.packages,
         lastSeen: ud.lastSeen
       });
