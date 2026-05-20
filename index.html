@@ -2854,20 +2854,28 @@ function startDrip(){
     });
     if(changed && zkpPerTickTotal>0){
       const u=getSess(); if(!u)return;
-      // บวก ZKP เข้า memory ก่อนเลย UI จะอัปเดตทันที
+      // บวก ZKP เข้า memory ทันที
       if(_ud) _ud.zkpReward = parseFloat(((_ud.zkpReward||0) + zkpPerTickTotal).toFixed(6));
       updateRewardUI();
-      // บันทึก Firebase แบบ transaction ป้องกัน race condition
+      // บันทึก zkpReward ลง Firebase แบบ transaction
       window._db.ref('users/'+u+'/zkpReward').transaction(current=>{
         const base = (current===null||current===undefined) ? 0 : (parseFloat(current)||0);
         return parseFloat((base + zkpPerTickTotal).toFixed(6));
       });
-      // update packages และ lastSeen
+    }
+    // บันทึก packages และ lastSeen ทุก 10 tick เท่านั้น
+    if(changed){
       ud.lastSeen=Date.now();
-      if(_ud) _ud.packages = ud.packages;
-      window._db.ref('users/'+u).update({
-        packages:ud.packages, lastSeen:ud.lastSeen
-      });
+      if(!window._dripSaveCnt) window._dripSaveCnt=0;
+      window._dripSaveCnt++;
+      if(window._dripSaveCnt>=10){
+        window._dripSaveCnt=0;
+        const u=getSess(); if(u){
+          window._db.ref('users/'+u).update({
+            packages:ud.packages, lastSeen:ud.lastSeen
+          });
+        }
+      }
     }
   },TICK);
 
