@@ -1818,13 +1818,9 @@ function enterDash(user){
       _ud.refBy = newData.refBy;
       _ud.refCount = newData.refCount;
       _ud.refEarned = newData.refEarned;
-      // sync zkpReward จาก Firebase เสมอ
-      if(newData.zkpReward !== undefined){
+      // sync zkpReward เมื่อ Admin หัก (Firebase น้อยกว่า memory เกิน 1 ZKP)
+      if(newData.zkpReward !== undefined && Math.abs(newData.zkpReward - (_ud.zkpReward||0)) > 1){
         _ud.zkpReward = parseFloat(newData.zkpReward)||0;
-      }
-      // sync packages จาก Firebase เพื่อให้เครื่องขุดทำงานถูกต้อง
-      if(newData.packages !== undefined){
-        _ud.packages = newData.packages;
       }
     } else {
       _ud = newData;
@@ -2831,11 +2827,10 @@ function updateLastSeen(){
 function startDrip(){
   if(dripInt)clearInterval(dripInt);
   calcOfflineEarnings();
-
   dripInt=setInterval(()=>{
     const ud=getUD();if(!ud||!ud.packages)return;
     const now=Date.now();let changed=false;
-    let zkpPerTickTotal=0;
+    let zkpTotal=0;
     ud.packages.forEach((p,i)=>{
       if(p.remaining<=0)return;
       const def=PKGS[p.key];if(!def)return;
@@ -2844,41 +2839,33 @@ function startDrip(){
       const oldRem=p.remaining;
       p.remaining=newRemaining;
       const zkpPerTick=def.daily/(DEMO_DAY*1000/TICK);
-      zkpPerTickTotal+=zkpPerTick;
+      ud.zkpReward=(ud.zkpReward||0)+zkpPerTick;
+      zkpTotal+=zkpPerTick;
       changed=true;
       if(p.remaining<=0&&oldRem>0){
         const nk=getSess()+'_'+i+'_'+p.bought;
         if(!NOTIFIED[nk]){NOTIFIED[nk]=true;
-          setTimeout(()=>{showToast(`✅ ${def.name} ครบแล้ว!`)},500);}
+          setTimeout(()=>{showToast('✅ '+def.name+' ครบแล้ว!')},500);}
       }
     });
-    if(changed && zkpPerTickTotal>0){
-      const u=getSess(); if(!u)return;
-      // บวก ZKP เข้า memory ทันที
-      if(_ud) _ud.zkpReward = parseFloat(((_ud.zkpReward||0) + zkpPerTickTotal).toFixed(6));
-      updateRewardUI();
-      // บันทึก zkpReward ลง Firebase แบบ transaction
-      window._db.ref('users/'+u+'/zkpReward').transaction(current=>{
-        const base = (current===null||current===undefined) ? 0 : (parseFloat(current)||0);
-        return parseFloat((base + zkpPerTickTotal).toFixed(6));
-      });
-    }
-    // บันทึก packages และ lastSeen ทุก 10 tick เท่านั้น
     if(changed){
       ud.lastSeen=Date.now();
-      if(!window._dripSaveCnt) window._dripSaveCnt=0;
-      window._dripSaveCnt++;
-      if(window._dripSaveCnt>=10){
-        window._dripSaveCnt=0;
-        const u=getSess(); if(u){
-          window._db.ref('users/'+u).update({
-            packages:ud.packages, lastSeen:ud.lastSeen
-          });
-        }
-      }
+      // อ่าน zkpReward จาก Firebase แล้วบวก zkpTotal เข้าไป
+      // ป้องกัน Admin เพิ่ม/หัก ZKP แล้วถูกเขียนทับ
+      window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
+        const dbZkp=snap.exists()?(parseFloat(snap.val())||0):0;
+        const finalZkp=parseFloat((dbZkp+zkpTotal).toFixed(6));
+        ud.zkpReward=finalZkp;
+        if(_ud) _ud.zkpReward=finalZkp;
+        window._db.ref('users/'+getSess()).update({
+          zkpReward:finalZkp,
+          packages:ud.packages,
+          lastSeen:ud.lastSeen
+        });
+      });
+      updateRewardUI();
     }
   },TICK);
-
   setInterval(updateLastSeen,30000);
 }
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
