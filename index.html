@@ -2824,8 +2824,19 @@ function startDrip(){
   if(dripInt)clearInterval(dripInt);
   calcOfflineEarnings();
 
+  let _lastSavedZkp = null;
+  let _saveInProgress = false;
+
+  // โหลดค่าเริ่มต้นจาก Firebase
+  window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
+    _lastSavedZkp = snap.exists() ? (parseFloat(snap.val())||0) : 0;
+    if(_ud) _ud.zkpReward = _lastSavedZkp;
+    updateRewardUI();
+  });
+
   dripInt=setInterval(()=>{
     const ud=getUD();if(!ud||!ud.packages)return;
+    if(_lastSavedZkp===null)return;
     const now=Date.now();let changed=false;
     let zkpPerTickTotal=0;
     ud.packages.forEach((p,i)=>{
@@ -2841,28 +2852,38 @@ function startDrip(){
       if(p.remaining<=0&&oldRem>0){
         const nk=getSess()+'_'+i+'_'+p.bought;
         if(!NOTIFIED[nk]){NOTIFIED[nk]=true;
-          setTimeout(()=>{showToast(`✅ ${def.name} ครบ 30 วันแล้ว!`)},500);}
+          setTimeout(()=>{showToast(`✅ ${def.name} ӤӢӘӡӘ!`)},500);}
       }
     });
     if(changed){
       ud.lastSeen=Date.now();
-      // อ่าน Firebase แล้วบวก zkpPerTickTotal เข้าไปเสมอ
-      // Admin เพิ่ม/หัก ZKP ได้ถาวร ไม่ถูก drip เขียนทับ
-      window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
-        const dbZkp = snap.exists() ? (parseFloat(snap.val())||0) : 0;
-        const finalZkp = parseFloat((dbZkp + zkpPerTickTotal).toFixed(6));
-        if(_ud) _ud.zkpReward = finalZkp;
-        window._db.ref('users/'+getSess()).update({
-          zkpReward: finalZkp,
-          packages: ud.packages,
-          lastSeen: ud.lastSeen
-        });
-      });
+      _lastSavedZkp=parseFloat((_lastSavedZkp+zkpPerTickTotal).toFixed(6));
+      if(_ud) _ud.zkpReward=_lastSavedZkp;
       updateRewardUI();
+      if(!_saveInProgress){
+        _saveInProgress=true;
+        const toSave=_lastSavedZkp;
+        window._db.ref('users/'+getSess()).update({
+          zkpReward:toSave,packages:ud.packages,lastSeen:ud.lastSeen
+        }).then(()=>{_saveInProgress=false;}).catch(()=>{_saveInProgress=false;});
+      }
     }
   },TICK);
 
-  setInterval(updateLastSeen, 30000);
+  // sync จาก Firebase ทุก 15 วินาที รับค่าที่ Admin เพิ่ม/หัก
+  setInterval(()=>{
+    window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
+      if(!snap.exists())return;
+      const dbZkp=parseFloat(snap.val())||0;
+      if(Math.abs(dbZkp-(_lastSavedZkp||0))>0.5){
+        _lastSavedZkp=dbZkp;
+        if(_ud) _ud.zkpReward=dbZkp;
+        updateRewardUI();
+      }
+    });
+  },15000);
+
+  setInterval(updateLastSeen,30000);
 }
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
 function updateRewardUI(){
