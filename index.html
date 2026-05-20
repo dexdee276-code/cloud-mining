@@ -1372,6 +1372,15 @@ const COINS = {
 };
 const ICONS = {starter5:'⚡',starter15:'🌟',starter30:'💡',bronze:'🥉',silver:'🥈',gold:'🥇',diamond:'💎',vip:'👑',legend:'💫'};
 
+// ─── PACKAGES HELPER ───
+// Firebase อาจเก็บ array เป็น object — แปลงให้เป็น array เสมอ
+function normPackages(ud){
+  if(!ud) return;
+  if(!ud.packages){ud.packages=[];return;}
+  if(!Array.isArray(ud.packages)){
+    ud.packages=Object.values(ud.packages);
+  }
+}
 // ─── STORAGE ───
 // ─── FIREBASE STORAGE ───
 let _ud = null;
@@ -1460,6 +1469,7 @@ function doLogin(){
         window._db.ref('users/'+u+'/pw').set(hashed);
       }
       _loginFail=0; _loginLockUntil=0;
+      normPackages(ud);
       _ud=ud; setSess(u); enterDash(u); resetSessionTimer();
     });
   }).catch(()=>{
@@ -1747,6 +1757,7 @@ function verifyOTP(){
     window._db.ref('users/'+u).set(nd).then(()=>{
       window._pendingRegPass=null; _otpCode='';
       document.getElementById('otpPopupOv')?.remove();
+      normPackages(nd);
       _ud=nd; setSess(u); enterDash(u);
       showToast('🎉 สมัครสมาชิกสำเร็จ! ยินดีต้อนรับ '+u);
     });
@@ -1818,24 +1829,30 @@ function enterDash(user){
       _ud.refBy = newData.refBy;
       _ud.refCount = newData.refCount;
       _ud.refEarned = newData.refEarned;
+      // ไม่ sync packages จาก Firebase ระหว่างใช้งาน
+      // เพราะ Drip จัดการ remaining ใน memory อยู่แล้ว
       // sync zkpReward เมื่อ Admin หัก (Firebase น้อยกว่า memory เกิน 1 ZKP)
       if(newData.zkpReward !== undefined && Math.abs(newData.zkpReward - (_ud.zkpReward||0)) > 1){
         _ud.zkpReward = parseFloat(newData.zkpReward)||0;
+        if(_ud) _ud.zkpReward = parseFloat(newData.zkpReward)||0;
       }
     } else {
+      normPackages(newData);
       _ud = newData;
     }
     updateNav();
     renderMachines();
     if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
     if(document.getElementById('pgPkg')?.classList.contains('active')) renderPkgs();
+    // อัปเดต wUsd ทันทีทุกครั้งที่ USD เปลี่ยน
+    const wUsd = document.getElementById('wUsd');
+    if(wUsd) wUsd.textContent = (newData.usd||0).toFixed(2);
+    const pkgBal = document.getElementById('pkgBal');
+    if(pkgBal) pkgBal.textContent = '$'+(newData.usd||0).toFixed(2);
     // แจ้งเตือนเมื่อ USD เข้า
     if(newData.usd > oldUsd && oldUsd >= 0){
       const diff = (newData.usd - oldUsd).toFixed(2);
       showToast('💰 เติมเงินสำเร็จ! +$'+diff+' USD เข้ากระเป๋าแล้ว');
-      // อัปเดต wallet ทันทีแม้ไม่ได้อยู่หน้ากระเป๋า
-      const wUsd = document.getElementById('wUsd');
-      if(wUsd) wUsd.textContent = (newData.usd||0).toFixed(2);
     }
   });
 }
@@ -2565,8 +2582,8 @@ function submitWithdraw(){
   const accName=document.getElementById('wdAccName')?.value.trim()||'';
   const note=document.getElementById('wdNote')?.value.trim()||'';
 
-  if(!accNo){ showToast('⚠️ กรุณากรอกเลขบัญชี/เบอร์'); return; }
-  if(!accName){ showToast('⚠️ กรุณากรอกชื่อเจ้าของบัญชี'); return; }
+  if(!accNo){ btn.disabled=false; showToast('⚠️ กรุณากรอกเลขบัญชี/เบอร์'); return; }
+  if(!accName){ btn.disabled=false; showToast('⚠️ กรุณากรอกชื่อเจ้าของบัญชี'); return; }
 
   const req={
     id:'wd_'+Date.now(), user:getSess(),
@@ -2842,7 +2859,6 @@ function startDrip(){
       const oldRem=p.remaining;
       p.remaining=newRemaining;
       const zkpPerTick=def.daily/(DEMO_DAY*1000/TICK);
-      ud.zkpReward=(ud.zkpReward||0)+zkpPerTick;
       zkpTotal+=zkpPerTick;
       changed=true;
       if(p.remaining<=0&&oldRem>0){
@@ -2853,7 +2869,7 @@ function startDrip(){
     });
     if(changed){
       ud.lastSeen=Date.now();
-      // บวก ZKP เข้า memory ทันที (_ud และ ud ต้องตรงกัน)
+      // บวก ZKP เข้า memory ทันที
       const newZkp = parseFloat(((ud.zkpReward||0) + zkpTotal).toFixed(6));
       ud.zkpReward = newZkp;
       if(_ud) _ud.zkpReward = newZkp;
@@ -5001,7 +5017,7 @@ window.addEventListener('load',()=>{
   const s=getSess();
   if(s){
     fbGetUser(s).then(ud=>{
-      if(ud){_ud=ud;enterDash(s);}
+      if(ud){normPackages(ud);_ud=ud;enterDash(s);}
     });
   }
   else{
