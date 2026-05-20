@@ -1830,9 +1830,12 @@ function enterDash(user){
     if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
     if(document.getElementById('pgPkg')?.classList.contains('active')) renderPkgs();
     // แจ้งเตือนเมื่อ USD เข้า
-    if(newData.usd > oldUsd && oldUsd > 0){
+    if(newData.usd > oldUsd && oldUsd >= 0){
       const diff = (newData.usd - oldUsd).toFixed(2);
       showToast('💰 เติมเงินสำเร็จ! +$'+diff+' USD เข้ากระเป๋าแล้ว');
+      // อัปเดต wallet ทันทีแม้ไม่ได้อยู่หน้ากระเป๋า
+      const wUsd = document.getElementById('wUsd');
+      if(wUsd) wUsd.textContent = (newData.usd||0).toFixed(2);
     }
   });
 }
@@ -2850,20 +2853,17 @@ function startDrip(){
     });
     if(changed){
       ud.lastSeen=Date.now();
-      // อ่าน zkpReward จาก Firebase แล้วบวก zkpTotal เข้าไป
-      // ป้องกัน Admin เพิ่ม/หัก ZKP แล้วถูกเขียนทับ
-      window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
-        const dbZkp=snap.exists()?(parseFloat(snap.val())||0):0;
-        const finalZkp=parseFloat((dbZkp+zkpTotal).toFixed(6));
-        ud.zkpReward=finalZkp;
-        if(_ud) _ud.zkpReward=finalZkp;
-        window._db.ref('users/'+getSess()).update({
-          zkpReward:finalZkp,
-          packages:ud.packages,
-          lastSeen:ud.lastSeen
-        });
-      });
+      // บวก ZKP เข้า memory ทันที → UI เด้งทันที
+      if(_ud) _ud.zkpReward = parseFloat(((_ud.zkpReward||0) + zkpTotal).toFixed(6));
       updateRewardUI();
+      // บันทึก Firebase เฉพาะ zkpReward, packages, lastSeen
+      // ใช้ update() ไม่ใช่ set() เพื่อไม่เขียนทับ field อื่น เช่น usd
+      const u=getSess(); if(!u)return;
+      window._db.ref('users/'+u).update({
+        zkpReward: _ud ? _ud.zkpReward : (ud.zkpReward||0),
+        packages: ud.packages,
+        lastSeen: ud.lastSeen
+      });
     }
   },TICK);
   setInterval(updateLastSeen,30000);
