@@ -1817,9 +1817,9 @@ function enterDash(user){
       _ud.refBy = newData.refBy;
       _ud.refCount = newData.refCount;
       _ud.refEarned = newData.refEarned;
-      // sync zkpReward เมื่อ Admin เพิ่มหรือหักออก
-      if(newData.zkpReward !== undefined && Math.abs(newData.zkpReward - _ud.zkpReward) > 0.5){
-        _ud.zkpReward = newData.zkpReward;
+      // sync zkpReward จาก Firebase เสมอเมื่อมีการเปลี่ยนแปลง
+      if(newData.zkpReward !== undefined){
+        _ud.zkpReward = parseFloat(newData.zkpReward)||0;
       }
     } else {
       _ud = newData;
@@ -2536,6 +2536,18 @@ function toggleWdFields(){
 function submitWithdraw(){
   const ud=getUD(); if(!ud) return;
   const btn=document.getElementById('wdSubmitBtn');
+
+  // ตรวจ 1 ครั้ง/วัน อีกครั้งก่อนส่งจริง
+  const todayStr=new Date().toDateString();
+  if(ud.lastWithdrawDate===todayStr){
+    document.getElementById('withdrawOv')?.remove();
+    showToast('⏰ แจ้งแลกได้วันละ 1 ครั้ง กรุณารอพรุ่งนี้');
+    return;
+  }
+
+  // ป้องกันกดซ้ำ
+  if(btn.disabled) return;
+  btn.disabled=true;
   const zkpAmt=parseFloat(btn.dataset.zkp);
   const usdAmt=parseFloat(btn.dataset.usd);
   const lakAmt=btn.dataset.lak;
@@ -2558,10 +2570,15 @@ function submitWithdraw(){
   // บันทึกใน Firebase ให้ Admin เห็นจากทุกเครื่อง
   window._db.ref('withdraw_reqs').push(req);
 
+  // บันทึกวันที่ถอนวันนี้ ป้องกันถอนซ้ำ
+  ud.lastWithdrawDate = todayStr;
   ud.txs=ud.txs||[];
   ud.txs.unshift({desc:`💱 แจ้งแลก ${zkpAmt.toFixed(4)} ZKP (รอ Admin อนุมัติ)`,amount:zkpAmt.toFixed(4),unit:'ZKP',time:Date.now()});
   saveUD(ud);
+  // บันทึก lastWithdrawDate ลง Firebase ด้วย
+  window._db.ref('users/'+getSess()+'/lastWithdrawDate').set(todayStr);
 
+  btn.disabled=false;
   document.getElementById('withdrawOv').remove();
   showToast(`📤 ส่งคำขอแลก ${zkpAmt.toFixed(4)} ZKP ≈ ${lakAmt} ກີບ แล้ว!`);
   renderWallet();
