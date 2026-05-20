@@ -1790,8 +1790,9 @@ function doLogout(){stopMine();stopDrip();clrSess();document.getElementById('aut
 function enterDash(user){
   document.getElementById('authScreen').classList.remove('active');
   document.getElementById('dashScreen').classList.add('active');
-  updateNav();switchTab(0);renderMachines();renderPkgs();
+  updateNav();switchTab(0);renderPkgs();
   startDrip();showToast(t('toast.welcome')+' '+user+'!');
+  setTimeout(()=>{renderMachines();},500);
   resetSessionTimer();
   loadBroadcastBanner();
   listenNotifications();
@@ -1847,6 +1848,7 @@ function switchTab(i){
     document.getElementById(id)?.classList.toggle('active',i===j);
     document.getElementById('bn'+j)?.classList.toggle('active',i===j);
   });
+  if(i===0){renderMachines();}
   if(i===1)renderPkgs();
   if(i===2){renderWallet();setTimeout(renderZkpChart,300);}
   if(i===3){renderTopupHistory();renderPendingList();renderTopupCards();}
@@ -2084,7 +2086,9 @@ function renderMachines(){
   if(cnt)cnt.textContent=acs.length+(acs.length===1?' RIG':' RIGS');
   const reward=(ud.zkpReward||0).toFixed(6);
   list.innerHTML=acs.map((p,i)=>{
-    const def=PKGS[p.key];const pct=Math.round((1-p.remaining/p.days)*100);
+    const def=PKGS[p.key];
+    if(!def) return ''; // ข้ามแพ็กที่ไม่มีใน PKGS (เช่น free เก่า)
+    const pct=Math.round((1-p.remaining/p.days)*100);
     const earned=(def.profit*((p.days-p.remaining)/p.days)).toFixed(4);
     return `<div class="mc ${def.mc}">
       <div class="mc-top">
