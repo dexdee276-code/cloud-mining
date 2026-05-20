@@ -2824,19 +2824,8 @@ function startDrip(){
   if(dripInt)clearInterval(dripInt);
   calcOfflineEarnings();
 
-  let _lastSavedZkp = null;
-  let _saveInProgress = false;
-
-  // โหลดค่าเริ่มต้นจาก Firebase
-  window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
-    _lastSavedZkp = snap.exists() ? (parseFloat(snap.val())||0) : 0;
-    if(_ud) _ud.zkpReward = _lastSavedZkp;
-    updateRewardUI();
-  });
-
   dripInt=setInterval(()=>{
     const ud=getUD();if(!ud||!ud.packages)return;
-    if(_lastSavedZkp===null)return;
     const now=Date.now();let changed=false;
     let zkpPerTickTotal=0;
     ud.packages.forEach((p,i)=>{
@@ -2852,36 +2841,28 @@ function startDrip(){
       if(p.remaining<=0&&oldRem>0){
         const nk=getSess()+'_'+i+'_'+p.bought;
         if(!NOTIFIED[nk]){NOTIFIED[nk]=true;
-          setTimeout(()=>{showToast(`✅ ${def.name} ӤӢӘӡӘ!`)},500);}
+          setTimeout(()=>{showToast(`✅ ${def.name} ครบแล้ว!`)},500);}
       }
     });
-    if(changed){
+    if(changed && zkpPerTickTotal>0){
+      const u=getSess(); if(!u)return;
+      // บวก ZKP เข้า Firebase ด้วย transaction (atomic)
+      window._db.ref('users/'+u+'/zkpReward').transaction(current=>{
+        const base = (current===null||current===undefined) ? 0 : (parseFloat(current)||0);
+        return parseFloat((base + zkpPerTickTotal).toFixed(6));
+      }, (error, committed, snapshot)=>{
+        if(!error && committed && _ud){
+          _ud.zkpReward = parseFloat(snapshot.val())||0;
+          updateRewardUI();
+        }
+      }, false); // false = ไม่ใช้ local cache
+      // update packages และ lastSeen แยกต่างหาก
       ud.lastSeen=Date.now();
-      _lastSavedZkp=parseFloat((_lastSavedZkp+zkpPerTickTotal).toFixed(6));
-      if(_ud) _ud.zkpReward=_lastSavedZkp;
-      updateRewardUI();
-      if(!_saveInProgress){
-        _saveInProgress=true;
-        const toSave=_lastSavedZkp;
-        window._db.ref('users/'+getSess()).update({
-          zkpReward:toSave,packages:ud.packages,lastSeen:ud.lastSeen
-        }).then(()=>{_saveInProgress=false;}).catch(()=>{_saveInProgress=false;});
-      }
+      window._db.ref('users/'+u).update({
+        packages:ud.packages, lastSeen:ud.lastSeen
+      });
     }
   },TICK);
-
-  // sync จาก Firebase ทุก 15 วินาที รับค่าที่ Admin เพิ่ม/หัก
-  setInterval(()=>{
-    window._db.ref('users/'+getSess()+'/zkpReward').once('value').then(snap=>{
-      if(!snap.exists())return;
-      const dbZkp=parseFloat(snap.val())||0;
-      if(Math.abs(dbZkp-(_lastSavedZkp||0))>0.5){
-        _lastSavedZkp=dbZkp;
-        if(_ud) _ud.zkpReward=dbZkp;
-        updateRewardUI();
-      }
-    });
-  },15000);
 
   setInterval(updateLastSeen,30000);
 }
