@@ -1376,10 +1376,19 @@ const ICONS = {starter5:'⚡',starter15:'🌟',starter30:'💡',bronze:'🥉',si
 // Firebase อาจเก็บ array เป็น object — แปลงให้เป็น array เสมอ
 function normPackages(ud){
   if(!ud) return;
-  if(!ud.packages){ud.packages=[];return;}
+  if(!ud.packages){ ud.packages=[]; return; }
+  // Firebase เก็บ array เป็น object เมื่อ update บางส่วน
   if(!Array.isArray(ud.packages)){
-    ud.packages=Object.values(ud.packages);
+    ud.packages = Object.values(ud.packages);
   }
+  // กรอง null/undefined ออก และเติม field ที่ขาด
+  ud.packages = ud.packages.filter(p=>p&&p.key).map(p=>({
+    ...p,
+    remaining: p.remaining !== undefined ? p.remaining : (p.days||0),
+    bought: p.bought || Date.now(),
+    days: p.days || 0,
+    daily: p.daily || 0,
+  }));
 }
 // ─── STORAGE ───
 // ─── FIREBASE STORAGE ───
@@ -1413,7 +1422,30 @@ function clrSess(){localStorage.removeItem('cm_s')}
 function getUD(){return _ud;}
 function getU(){const u=getSess();if(!u||!_ud)return{};return{[u]:_ud};}
 function saveU(all){const u=getSess();if(!u)return;if(all[u]){_ud=all[u];window._db.ref('users/'+u).set(all[u]);}}
-function saveUD(d){_ud=d;const u=getSess();if(!u)return;window._db.ref('users/'+u).set(d);}
+function saveUD(d){
+  _ud=d;
+  const u=getSess();if(!u)return;
+  // ใช้ update() แทน set() เพื่อไม่เขียนทับ field ที่ Admin แก้ไข เช่น usd, zkpReward
+  window._db.ref('users/'+u).update({
+    pw: d.pw,
+    email: d.email,
+    usd: d.usd,
+    zkpReward: d.zkpReward,
+    zkpMine: d.zkpMine,
+    sessions: d.sessions,
+    packages: d.packages,
+    txs: d.txs,
+    topupReqs: d.topupReqs||[],
+    refCode: d.refCode,
+    refBy: d.refBy,
+    refCount: d.refCount||0,
+    refEarned: d.refEarned||0,
+    lastSeen: d.lastSeen||Date.now(),
+    lastWithdrawDate: d.lastWithdrawDate||null,
+    banned: d.banned||false,
+    createdAt: d.createdAt||Date.now()
+  });
+}
 function fbGetUser(u){return window._db.ref('users/'+u).once('value').then(s=>s.exists()?s.val():null);}
 
 // ─── AUTH ───
@@ -1829,12 +1861,11 @@ function enterDash(user){
       _ud.refBy = newData.refBy;
       _ud.refCount = newData.refCount;
       _ud.refEarned = newData.refEarned;
-      // ไม่ sync packages จาก Firebase ระหว่างใช้งาน
-      // เพราะ Drip จัดการ remaining ใน memory อยู่แล้ว
-      // sync zkpReward เมื่อ Admin หัก (Firebase น้อยกว่า memory เกิน 1 ZKP)
+      // normalize packages ทุกครั้ง เผื่อ Firebase เปลี่ยน format
+      normPackages(_ud);
+      // sync zkpReward เมื่อ Admin หัก/เพิ่ม (ต่างกันเกิน 1 ZKP)
       if(newData.zkpReward !== undefined && Math.abs(newData.zkpReward - (_ud.zkpReward||0)) > 1){
         _ud.zkpReward = parseFloat(newData.zkpReward)||0;
-        if(_ud) _ud.zkpReward = parseFloat(newData.zkpReward)||0;
       }
     } else {
       normPackages(newData);
