@@ -1845,10 +1845,19 @@ function enterDash(user){
     if(snap.exists()) LAK_RATE_LIVE=snap.val();
     renderTopupCards();
   });
-  // โหลด freeze status ไว้ cache ล่วงหน้า
-  window._db.ref('settings/withdraw_frozen').once('value').then(snap=>{
+  // โหลด freeze status และ listen realtime
+  window._db.ref('settings/withdraw_frozen').on('value', snap=>{
     window._withdrawFrozen = snap.exists()&&snap.val()===true;
-  }).catch(()=>{ window._withdrawFrozen = false; });
+    // อัปเดต broadcast banner เมื่อสถานะเปลี่ยน
+    const banner = document.getElementById('bcBanner');
+    if(banner && window._withdrawFrozen===false){
+      // ถ้า Admin เปิดระบบถอนแล้ว และ banner เป็น maintenance → ซ่อน
+      const bannerTitle = document.getElementById('bcBannerTitle');
+      if(bannerTitle && bannerTitle.textContent.includes('ถอน')){
+        banner.style.display='none';
+      }
+    }
+  });
   setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
 
   // Realtime listener — อัปเดตข้อมูลลูกค้าทันทีเมื่อ Admin แก้ไข
@@ -3746,13 +3755,16 @@ function setWithdrawFreeze(freeze){
   window._db.ref('settings/withdraw_frozen').set(freeze).then(()=>{
     updateFreezeUI(freeze);
     showToast(freeze?'🔒 ล็อกระบบถอนแล้ว':'🔓 เปิดระบบถอนแล้ว');
-    // ส่ง broadcast แจ้ง user ถ้าล็อก
     if(freeze){
+      // ล็อก → ส่ง broadcast แจ้ง user
       window._db.ref('broadcast/latest').set({
         id:'bc_'+Date.now(),title:'ระบบถอนเงินปิดชั่วคราว',
         body:'ขออภัยในความไม่สะดวก ระบบจะเปิดให้บริการอีกครั้งเร็วๆ นี้',
         type:'maintenance',icon:'🔧',time:Date.now(),active:true
       });
+    } else {
+      // เปิด → ลบ broadcast และซ่อน banner ในหน้า user
+      window._db.ref('broadcast/latest').remove();
     }
   });
 }
@@ -3880,10 +3892,12 @@ function renderDashChart(daily){
 
 // ── LOAD BROADCAST BANNER ──
 function loadBroadcastBanner(){
-  window._db.ref('broadcast/latest').once('value').then(snap=>{
-    if(!snap.exists()) return;
-    const m=snap.val(); if(!m||!m.active) return;
+  window._db.ref('broadcast/latest').on('value', snap=>{
     const banner=document.getElementById('bcBanner'); if(!banner) return;
+    if(!snap.exists()||!snap.val()?.active){
+      banner.style.display='none'; return;
+    }
+    const m=snap.val();
     const iconEl=document.getElementById('bcBannerIcon');
     const titleEl=document.getElementById('bcBannerTitle');
     const bodyEl=document.getElementById('bcBannerBody');
