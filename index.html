@@ -1845,6 +1845,10 @@ function enterDash(user){
     if(snap.exists()) LAK_RATE_LIVE=snap.val();
     renderTopupCards();
   });
+  // โหลด freeze status ไว้ cache ล่วงหน้า
+  window._db.ref('settings/withdraw_frozen').once('value').then(snap=>{
+    window._withdrawFrozen = snap.exists()&&snap.val()===true;
+  }).catch(()=>{ window._withdrawFrozen = false; });
   setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
 
   // Realtime listener — อัปเดตข้อมูลลูกค้าทันทีเมื่อ Admin แก้ไข
@@ -2480,19 +2484,38 @@ function showInsufficientZkpPopup(current){
 
 function showWithdrawPopup(){
   const ud=getUD(); if(!ud) return;
+  const zkp=ud.zkpReward||0;
+  // เช็ก ZKP ก่อนเลย ไม่ต้องรอ Firebase → แจ้งทันที
+  if(zkp<MIN_WITHDRAW){showInsufficientZkpPopup(zkp);return;}
+  // เช็ก daily limit ทันที
+  const todayStr=new Date().toDateString();
+  if(ud.lastWithdrawDate===todayStr){
+    const ov=document.createElement('div');ov.className='overlay';
+    ov.innerHTML=`<div class="popup" style="text-align:center;max-width:310px;">
+      <div style="font-size:2.5rem;margin-bottom:0.8rem;">⏰</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);margin-bottom:0.6rem;">แจ้งแลกได้วันละ 1 ครั้ง</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">คุณได้แจ้งแลกเงินไปแล้ววันนี้<br>กรุณากลับมาใหม่พรุ่งนี้ครับ</div>
+      <button onclick="this.closest('.overlay').remove()" class="btn btn-primary" style="width:100%;">รับทราบ</button>
+    </div>`;
+    document.body.appendChild(ov); return;
+  }
+  // ใช้ cache freeze status — ไม่ต้องรอ Firebase
+  if(window._withdrawFrozen===true){
+    const ov=document.createElement('div');ov.className='overlay';
+    ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(230,57,70,0.5);max-width:310px;">
+      <div style="font-size:2.5rem;margin-bottom:0.8rem;">🔒</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--red-bright);margin-bottom:0.6rem;">ระบบถอนปิดชั่วคราว</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">ขณะนี้ระบบถอนเงินถูกระงับชั่วคราว<br>กรุณาติดต่อ Admin หรือรอการแจ้งเตือน</div>
+      <button onclick="this.closest('.overlay').remove()" class="btn btn-primary" style="width:100%;">รับทราบ</button>
+    </div>`;
+    document.body.appendChild(ov); return;
+  }
+  // แสดง popup ทันที
+  _doShowWithdrawPopup();
+  // fetch freeze status แบบ background อัปเดต cache
   window._db.ref('settings/withdraw_frozen').once('value').then(snap=>{
-    if(snap.exists()&&snap.val()===true){
-      const ov=document.createElement('div');ov.className='overlay';
-      ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(230,57,70,0.5);max-width:310px;">
-        <div style="font-size:2.5rem;margin-bottom:0.8rem;">🔒</div>
-        <div style="font-family:\'Orbitron\',monospace;font-size:0.9rem;font-weight:900;color:var(--red-bright);margin-bottom:0.6rem;">ระบบถอนปิดชั่วคราว</div>
-        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">ขณะนี้ระบบถอนเงินถูกระงับชั่วคราว<br>กรุณาติดต่อ Admin หรือรอการแจ้งเตือน</div>
-        <button onclick="this.closest('.overlay').remove()" class="btn btn-primary" style="width:100%;">รับทราบ</button>
-      </div>`;
-      document.body.appendChild(ov); return;
-    }
-    _doShowWithdrawPopup();
-  }).catch(()=>_doShowWithdrawPopup());
+    window._withdrawFrozen = snap.exists()&&snap.val()===true;
+  }).catch(()=>{});
 }
 
 function renderWithdrawHistory(){
