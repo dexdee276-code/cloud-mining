@@ -1848,14 +1848,11 @@ function enterDash(user){
   // โหลด freeze status และ listen realtime
   window._db.ref('settings/withdraw_frozen').on('value', snap=>{
     window._withdrawFrozen = snap.exists()&&snap.val()===true;
-    // อัปเดต broadcast banner เมื่อสถานะเปลี่ยน
     const banner = document.getElementById('bcBanner');
-    if(banner && window._withdrawFrozen===false){
-      // ถ้า Admin เปิดระบบถอนแล้ว และ banner เป็น maintenance → ซ่อน
-      const bannerTitle = document.getElementById('bcBannerTitle');
-      if(bannerTitle && bannerTitle.textContent.includes('ถอน')){
-        banner.style.display='none';
-      }
+    if(!banner) return;
+    // เปิดระบบแล้ว → ซ่อน banner ทันที
+    if(!window._withdrawFrozen){
+      banner.style.display='none';
     }
   });
   setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
@@ -2837,10 +2834,20 @@ function submitSlip(){
       // ส่ง Firebase ก่อนเลย ไม่อยู่ใน try/catch
       const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
       window._db.ref('topup_reqs').push(req).then(()=>{
-        // บันทึก topupReqs ใน memory
-        if(!ud.topupReqs) ud.topupReqs=[];
-        ud.topupReqs.push({id:req.id,amt,note,time:req.time,status:'pending'});
-        saveUD(ud);
+        // อัปเดต topupReqs ใน Firebase แยกต่างหาก ไม่ผ่าน saveUD
+        const newReq = {id:req.id, amt, note, time:req.time, status:'pending'};
+        window._db.ref('users/'+getSess()+'/topupReqs').once('value').then(snap=>{
+          const existing = snap.exists()
+            ? (Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val()))
+            : [];
+          existing.push(newReq);
+          window._db.ref('users/'+getSess()+'/topupReqs').set(existing);
+          // อัปเดต memory
+          if(_ud){
+            if(!_ud.topupReqs) _ud.topupReqs=[];
+            _ud.topupReqs.push(newReq);
+          }
+        });
         document.getElementById('stepSlip').style.display='none';
         document.getElementById('stepPending').style.display='block';
         renderPendingList();
@@ -2856,10 +2863,20 @@ function submitSlip(){
   reader.readAsDataURL(file);
 }
 function renderPendingList(){
-  const ud=getUD(); if(!ud) return;
-  const reqs=(ud.topupReqs||[]).filter(r=>r.status==='pending');
   const el=document.getElementById('pendingList'); if(!el) return;
-  if(!reqs.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ไม่มีคำขอที่รอดำเนินการ</div>';return;}
+  const u=getSess(); if(!u) return;
+  // อ่านจาก Firebase โดยตรง เพื่อให้ได้สถานะล่าสุดเสมอ
+  window._db.ref('users/'+u+'/topupReqs').once('value').then(snap=>{
+    const all = snap.exists()
+      ? (Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val()))
+      : [];
+    // sync _ud.topupReqs ด้วย
+    if(_ud) _ud.topupReqs = all;
+    const reqs = all.filter(r=>r.status==='pending');
+    if(!reqs.length){
+      el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ไม่มีคำขอที่รอดำเนินการ</div>';
+      return;
+    }
   el.innerHTML=reqs.map(r=>{
     const d=new Date(r.time);
     return `<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;">
@@ -2872,6 +2889,7 @@ function renderPendingList(){
       <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:0.2rem 0.6rem;font-family:\'Orbitron\',monospace;font-size:0.5rem;color:var(--gold);">⏳ รออนุมัติ</div>
     </div>`;
   }).join('');
+  });
 }
 function renderTopupHistory(){
   const ud=getUD(); if(!ud) return;
