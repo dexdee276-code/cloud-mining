@@ -1861,7 +1861,13 @@ function enterDash(user){
       _ud.refBy = newData.refBy;
       _ud.refCount = newData.refCount;
       _ud.refEarned = newData.refEarned;
-      // normalize packages ทุกครั้ง เผื่อ Firebase เปลี่ยน format
+      // sync topupReqs เพื่อให้ลูกค้าเห็นสถานะล่าสุด
+      if(newData.topupReqs !== undefined){
+        _ud.topupReqs = Array.isArray(newData.topupReqs)
+          ? newData.topupReqs
+          : Object.values(newData.topupReqs||{});
+      }
+      // normalize packages ทุกครั้ง
       normPackages(_ud);
       // sync zkpReward เมื่อ Admin หัก/เพิ่ม (ต่างกันเกิน 1 ZKP)
       if(newData.zkpReward !== undefined && Math.abs(newData.zkpReward - (_ud.zkpReward||0)) > 1){
@@ -1875,6 +1881,11 @@ function enterDash(user){
     renderMachines();
     if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
     if(document.getElementById('pgPkg')?.classList.contains('active')) renderPkgs();
+    // refresh pending list เมื่อ topupReqs เปลี่ยน
+    if(document.getElementById('pgTopup')?.classList.contains('active')){
+      renderPendingList();
+      renderTopupHistory();
+    }
     // อัปเดต wUsd ทันทีทุกครั้งที่ USD เปลี่ยน
     const wUsd = document.getElementById('wUsd');
     if(wUsd) wUsd.textContent = (newData.usd||0).toFixed(2);
@@ -3193,6 +3204,12 @@ function viewSlip(reqId){
 }
 function approveTopup(reqId, amt, username, fbKey){
   if(fbKey) window._db.ref('topup_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()});
+  // อัปเดต topupReqs ของ user ด้วย เพื่อให้ลูกค้าเห็นสถานะถูกต้อง
+  window._db.ref('users/'+username+'/topupReqs').once('value').then(snap=>{
+    const reqs = snap.exists() ? (Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val())) : [];
+    const updated = reqs.map(r => r.id===reqId ? {...r, status:'approved'} : r);
+    window._db.ref('users/'+username+'/topupReqs').set(updated);
+  });
   // ใช้ transaction เพิ่ม USD แบบ atomic
   window._db.ref('users/'+username+'/usd').transaction(cur=>{
     return parseFloat(((cur||0)+parseFloat(amt)).toFixed(2));
@@ -3218,6 +3235,12 @@ function approveTopup(reqId, amt, username, fbKey){
 }
 function rejectTopup(reqId, username, fbKey){
   if(fbKey) window._db.ref('topup_reqs/'+fbKey).update({status:'rejected',rejectedAt:Date.now()});
+  // อัปเดต topupReqs ของ user
+  window._db.ref('users/'+username+'/topupReqs').once('value').then(snap=>{
+    const reqs = snap.exists() ? (Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val())) : [];
+    const updated = reqs.map(r => r.id===reqId ? {...r, status:'rejected'} : r);
+    window._db.ref('users/'+username+'/topupReqs').set(updated);
+  });
   setTimeout(()=>renderAdminTopup(currentFilter), 1000);
   showToast(`❌ ปฏิเสธคำขอของ ${username} แล้ว`);
 }
