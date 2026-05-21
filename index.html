@@ -2740,25 +2740,63 @@ function selTop(el,amt){
   if(lakEl) lakEl.textContent='= 0 ກີບ';
 }
 function goToQR(){
-  // ตรวจสอบว่ามีคำขอ pending อยู่ไหม
   const ud=getUD();
-  const hasPending = (ud?.topupReqs||[]).some(r=>r.status==='pending');
-  if(hasPending){
-    const ov=document.createElement('div'); ov.className='overlay';
-    ov.innerHTML=`<div class="popup" style="text-align:center;max-width:320px;">
-      <div style="font-size:2.5rem;margin-bottom:0.8rem;">⏳</div>
-      <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);margin-bottom:0.6rem;">มีคำขอรออยู่</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">
-        คุณมีคำขอเติมเงินที่รอ Admin อนุมัติอยู่<br>
-        กรุณารอให้ Admin อนุมัติหรือปฏิเสธก่อน<br>
-        ค่อยส่งคำขอใหม่ได้ครับ
-      </div>
-      <button onclick="this.closest('.overlay').remove();switchTab(3);showTopupPendingTab();" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">📋 ดูสถานะคำขอ</button>
-      <button onclick="this.closest('.overlay').remove()" style="width:100%;padding:0.6rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
-    </div>`;
-    document.body.appendChild(ov);
-    return;
-  }
+  const u=getSess(); if(!u) return;
+  // เช็ก pending จาก Firebase จริง ไม่ใช่ memory
+  window._db.ref('users/'+u+'/topupReqs').once('value').then(snap=>{
+    const all = snap.exists()
+      ? (Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val()))
+      : [];
+    // cross-check กับ topup_reqs global
+    const pendingReqs = all.filter(r=>r.status==='pending');
+    if(!pendingReqs.length){
+      // ไม่มี pending → ไปต่อได้
+      document.getElementById('stepAmount').style.display='none';
+      document.getElementById('stepQR').style.display='block';
+      document.getElementById('stepSlip').style.display='none';
+      return;
+    }
+    // มี pending → เช็ก global ว่า Admin อนุมัติไปแล้วหรือยัง
+    Promise.all(pendingReqs.map(r=>
+      window._db.ref('topup_reqs').orderByChild('id').equalTo(r.id).once('value').catch(()=>null)
+    )).then(results=>{
+      let hasRealPending = false;
+      results.forEach((snap2,i)=>{
+        if(!snap2||!snap2.exists()){ hasRealPending=true; return; }
+        let globalStatus=null;
+        snap2.forEach(child=>{ globalStatus=child.val()?.status; });
+        if(!globalStatus||globalStatus==='pending') hasRealPending=true;
+        else {
+          // Admin อนุมัติแล้ว sync
+          const idx2=all.findIndex(r=>r.id===pendingReqs[i].id);
+          if(idx2>=0) all[idx2].status=globalStatus;
+        }
+      });
+      if(!hasRealPending){
+        // sync และไปต่อ
+        window._db.ref('users/'+u+'/topupReqs').set(all);
+        if(_ud) _ud.topupReqs=all;
+        document.getElementById('stepAmount').style.display='none';
+        document.getElementById('stepQR').style.display='block';
+        document.getElementById('stepSlip').style.display='none';
+        return;
+      }
+      // มี pending จริง → แสดง popup
+      const ov=document.createElement('div'); ov.className='overlay';
+      ov.innerHTML=`<div class="popup" style="text-align:center;max-width:320px;">
+        <div style="font-size:2.5rem;margin-bottom:0.8rem;">⏳</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);margin-bottom:0.6rem;">มีคำขอรออยู่</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">
+          คุณมีคำขอเติมเงินที่รอ Admin อนุมัติอยู่<br>
+          กรุณารอให้ Admin อนุมัติหรือปฏิเสธก่อน<br>
+          ค่อยส่งคำขอใหม่ได้ครับ
+        </div>
+        <button onclick="this.closest('.overlay').remove();switchTab(3);showTopupPendingTab();" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">📋 ดูสถานะคำขอ</button>
+        <button onclick="this.closest('.overlay').remove()" style="width:100%;padding:0.6rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
+      </div>`;
+      document.body.appendChild(ov);
+    });
+  });
   document.getElementById('stepAmount').style.display='none';
   document.getElementById('stepQR').style.display='block';
   document.getElementById('stepSlip').style.display='none';
@@ -2872,32 +2910,45 @@ function submitSlip(){
 function renderPendingList(){
   const el=document.getElementById('pendingList'); if(!el) return;
   const u=getSess(); if(!u) return;
-  // อ่านจาก Firebase โดยตรง เพื่อให้ได้สถานะล่าสุดเสมอ
   window._db.ref('users/'+u+'/topupReqs').once('value').then(snap=>{
     const all = snap.exists()
       ? (Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val()))
       : [];
-    // sync _ud.topupReqs ด้วย
-    if(_ud) _ud.topupReqs = all;
-    const reqs = all.filter(r=>r.status==='pending');
-    if(!reqs.length){
+    const pendingReqs = all.filter(r=>r.status==='pending');
+    if(!pendingReqs.length){
+      if(_ud) _ud.topupReqs = all;
       el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ไม่มีคำขอที่รอดำเนินการ</div>';
       return;
     }
-  el.innerHTML=reqs.map(r=>{
-    const d=new Date(r.time);
-    return `<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;">
-      <div>
-        <div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;color:var(--gold);">${(r.amt*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString()} ກີບ</div>
-        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
-        <div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);">${d.toLocaleString('th-TH')}</div>
-        ${r.note?`<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);">${r.note}</div>`:''}
-      </div>
-      <div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:0.2rem 0.6rem;font-family:\'Orbitron\',monospace;font-size:0.5rem;color:var(--gold);">⏳ รออนุมัติ</div>
-    </div>`;
-  }).join('');
+    // cross-check กับ topup_reqs global เผื่อ Admin อนุมัติแล้วแต่ไม่ sync
+    Promise.all(pendingReqs.map(r=>
+      window._db.ref('topup_reqs').orderByChild('id').equalTo(r.id).once('value').catch(()=>null)
+    )).then(results=>{
+      let updated=false;
+      results.forEach((snap2,i)=>{
+        if(!snap2||!snap2.exists()) return;
+        let globalStatus=null;
+        snap2.forEach(child=>{ globalStatus=child.val()?.status; });
+        if(globalStatus && globalStatus!=='pending'){
+          const idx2=all.findIndex(r=>r.id===pendingReqs[i].id);
+          if(idx2>=0){ all[idx2].status=globalStatus; updated=true; }
+        }
+      });
+      if(updated) window._db.ref('users/'+u+'/topupReqs').set(all);
+      if(_ud) _ud.topupReqs=all;
+      const finalPending=all.filter(r=>r.status==='pending');
+      if(!finalPending.length){
+        el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ไม่มีคำขอที่รอดำเนินการ</div>';
+        return;
+      }
+      el.innerHTML=finalPending.map(r=>{
+        const d=new Date(r.time);
+        return '<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-family:\'Orbitron\',monospace;font-size:0.82rem;color:var(--gold);">'+(r.amt*(LAK_RATE_LIVE||LAK_RATE)).toLocaleString()+' ກີບ</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:rgba(255,215,0,0.6);">= $'+r.amt.toLocaleString()+' USD</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);">'+d.toLocaleString('th-TH')+'</div>'+(r.note?'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);">'+r.note+'</div>':'')+' </div><div style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:0.2rem 0.6rem;font-family:\'Orbitron\',monospace;font-size:0.5rem;color:var(--gold);">⏳ รออนุมัติ</div></div>';
+      }).join('');
+    });
   });
 }
+
 function renderTopupHistory(){
   const ud=getUD(); if(!ud) return;
   const reqs=(ud.topupReqs||[]).sort((a,b)=>b.time-a.time);
