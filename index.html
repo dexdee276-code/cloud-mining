@@ -2037,10 +2037,17 @@ function buyPkg(key){
         });
       }
 
+      // อัปเดต _ud ให้มี packages ใหม่ก่อน render
+      _ud = ud;
       saveUD(ud);
       showToast('✅ เช่า '+def.name+' สำเร็จ! ตัด $'+def.price+' USD แล้ว');
       updateNav(); startDrip(); switchTab(0);
-      setTimeout(()=>{renderMachines();const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);
+      setTimeout(()=>{
+        normPackages(_ud);
+        renderMachines();
+        const el=document.getElementById('machSec');
+        if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+      },600);
       renderPkgs();
     }).catch(()=>showToast('❌ เกิดข้อผิดพลาด กรุณาลองใหม่'));
   }).catch(()=>showToast('❌ เชื่อมต่อไม่ได้ กรุณาลองใหม่'));
@@ -2686,6 +2693,25 @@ function selTop(el,amt){
   if(lakEl) lakEl.textContent='= 0 ກີບ';
 }
 function goToQR(){
+  // ตรวจสอบว่ามีคำขอ pending อยู่ไหม
+  const ud=getUD();
+  const hasPending = (ud?.topupReqs||[]).some(r=>r.status==='pending');
+  if(hasPending){
+    const ov=document.createElement('div'); ov.className='overlay';
+    ov.innerHTML=`<div class="popup" style="text-align:center;max-width:320px;">
+      <div style="font-size:2.5rem;margin-bottom:0.8rem;">⏳</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);margin-bottom:0.6rem;">มีคำขอรออยู่</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">
+        คุณมีคำขอเติมเงินที่รอ Admin อนุมัติอยู่<br>
+        กรุณารอให้ Admin อนุมัติหรือปฏิเสธก่อน<br>
+        ค่อยส่งคำขอใหม่ได้ครับ
+      </div>
+      <button onclick="this.closest('.overlay').remove();switchTab(3);showTopupPendingTab();" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">📋 ดูสถานะคำขอ</button>
+      <button onclick="this.closest('.overlay').remove()" style="width:100%;padding:0.6rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
+    </div>`;
+    document.body.appendChild(ov);
+    return;
+  }
   document.getElementById('stepAmount').style.display='none';
   document.getElementById('stepQR').style.display='block';
   document.getElementById('stepSlip').style.display='none';
@@ -2729,6 +2755,12 @@ function previewSlip(e){
 }
 function submitSlip(){
   const ud=getUD(); if(!ud) return;
+  // ตรวจสอบว่ามีคำขอ pending อยู่ไหม
+  const hasPending = (ud.topupReqs||[]).some(r=>r.status==='pending');
+  if(hasPending){
+    showToast('⏳ มีคำขอรออยู่ กรุณารอ Admin อนุมัติก่อน');
+    return;
+  }
   const fileInput=document.getElementById('slipFile');
   const amt=parseFloat(document.getElementById('slipAmtInput').value);
   const note=document.getElementById('slipNote').value.trim();
@@ -2759,10 +2791,10 @@ function submitSlip(){
         compressed = canvas.toDataURL('image/jpeg', quality);
       }
 
-      try {
-        const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
-        window._db.ref('topup_reqs').push(req);
-        // topup_reqs บันทึกใน Firebase แล้ว ไม่จำเป็นต้องเก็บ localStorage
+      // ส่ง Firebase ก่อนเลย ไม่อยู่ใน try/catch
+      const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
+      window._db.ref('topup_reqs').push(req).then(()=>{
+        // บันทึก topupReqs ใน memory
         if(!ud.topupReqs) ud.topupReqs=[];
         ud.topupReqs.push({id:req.id,amt,note,time:req.time,status:'pending'});
         saveUD(ud);
@@ -2771,11 +2803,10 @@ function submitSlip(){
         renderPendingList();
         renderTopupHistory();
         showToast('📤 ส่งหลักฐานเรียบร้อยแล้ว! รอ Admin อนุมัติ');
-        // ใช้ promo code ถ้ามี
         if(_appliedPromo) redeemPromoReward(getSess());
-      } catch(e) {
-        showToast('❌ รูปใหญ่เกินไป กรุณาใช้รูปที่เล็กกว่านี้');
-      }
+      }).catch(()=>{
+        showToast('❌ ส่งไม่สำเร็จ กรุณาลองใหม่');
+      });
     };
     img.src=ev.target.result;
   };
