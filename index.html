@@ -1990,12 +1990,17 @@ function buyPkg(key){
 
   const u=getSess();
 
+  // ป้องกันกดซื้อซ้ำ
+  if(window._buying){showToast('⏳ กำลังดำเนินการ กรุณารอสักครู่...');return;}
+  window._buying = true;
+
   showToast('⏳ กำลังตรวจสอบ...');
 
   // ── ดึงยอด USD จาก Firebase ก่อนเสมอ ──
   window._db.ref('users/'+u+'/usd').once('value').then(snap=>{
     const realUsd = snap.exists() ? (snap.val()||0) : 0;
     if(realUsd < def.price){
+      window._buying=false;
       showToast(t('toast.nousd')+' (มี $'+realUsd.toFixed(2)+' / ต้องการ $'+def.price+')');
       switchTab(3); return;
     }
@@ -2003,10 +2008,11 @@ function buyPkg(key){
     // ── ใช้ transaction ตัด USD แบบ atomic ──
     window._db.ref('users/'+u+'/usd').transaction(current=>{
       const cur = current||0;
-      if(cur < def.price) return; // abort ถ้าไม่พอ
+      if(cur < def.price){ window._buying=false; return; } // abort ถ้าไม่พอ
       return parseFloat((cur - def.price).toFixed(2));
     }).then(result=>{
       if(!result.committed){
+        window._buying=false;
         showToast('❌ USD ไม่พอ กรุณาเติม USD ก่อน');
         switchTab(3); return;
       }
@@ -2070,8 +2076,9 @@ function buyPkg(key){
         if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
       },600);
       renderPkgs();
-    }).catch(()=>showToast('❌ เกิดข้อผิดพลาด กรุณาลองใหม่'));
-  }).catch(()=>showToast('❌ เชื่อมต่อไม่ได้ กรุณาลองใหม่'));
+      window._buying=false;
+    }).catch(()=>{window._buying=false;showToast('❌ เกิดข้อผิดพลาด กรุณาลองใหม่');});
+  }).catch(()=>{window._buying=false;showToast('❌ เชื่อมต่อไม่ได้ กรุณาลองใหม่');});
 }
 
 function renderPkgs(){
