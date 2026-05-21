@@ -1879,9 +1879,16 @@ function enterDash(user){
       }
       // normalize packages ทุกครั้ง
       normPackages(_ud);
-      // sync zkpReward เมื่อ Admin หัก/เพิ่ม (ต่างกันเกิน 1 ZKP)
-      if(newData.zkpReward !== undefined && Math.abs(newData.zkpReward - (_ud.zkpReward||0)) > 1){
-        _ud.zkpReward = parseFloat(newData.zkpReward)||0;
+      // sync zkpReward เมื่อ Admin หัก/เพิ่ม
+      // ถ้า Firebase น้อยกว่า memory → Admin หักแล้ว sync ทันที
+      if(newData.zkpReward !== undefined){
+        const fbZkp = parseFloat(newData.zkpReward)||0;
+        const memZkp = _ud.zkpReward||0;
+        // sync ถ้า Firebase น้อยกว่า memory (Admin หัก) หรือต่างกันเกิน 1
+        if(fbZkp < memZkp || Math.abs(fbZkp - memZkp) > 1){
+          _ud.zkpReward = fbZkp;
+          updateRewardUI();
+        }
       }
     } else {
       normPackages(newData);
@@ -3058,18 +3065,32 @@ function startDrip(){
     });
     if(changed){
       ud.lastSeen=Date.now();
-      // บวก ZKP เข้า memory ทันที
-      const newZkp = parseFloat(((ud.zkpReward||0) + zkpTotal).toFixed(6));
-      ud.zkpReward = newZkp;
-      if(_ud) _ud.zkpReward = newZkp;
-      updateRewardUI();
-      // บันทึก Firebase เฉพาะ zkpReward, packages, lastSeen
-      // ใช้ update() ไม่เขียนทับ usd
       const u=getSess(); if(!u)return;
-      window._db.ref('users/'+u).update({
-        zkpReward: newZkp,
-        packages: ud.packages,
-        lastSeen: ud.lastSeen
+      // อ่านค่า zkpReward จาก Firebase ก่อนบวก
+      // ป้องกัน Drip เขียนทับค่าที่ Admin เพิ่ง หัก/เพิ่ม
+      window._db.ref('users/'+u+'/zkpReward').once('value').then(snap=>{
+        const firebaseZkp = snap.exists() ? (parseFloat(snap.val())||0) : 0;
+        // ใช้ค่าจาก Firebase เป็น base เสมอ
+        const newZkp = parseFloat((firebaseZkp + zkpTotal).toFixed(6));
+        ud.zkpReward = newZkp;
+        if(_ud) _ud.zkpReward = newZkp;
+        updateRewardUI();
+        window._db.ref('users/'+u).update({
+          zkpReward: newZkp,
+          packages: ud.packages,
+          lastSeen: ud.lastSeen
+        });
+      }).catch(()=>{
+        // fallback ถ้า Firebase ไม่ตอบ ใช้ memory
+        const newZkp = parseFloat(((ud.zkpReward||0) + zkpTotal).toFixed(6));
+        ud.zkpReward = newZkp;
+        if(_ud) _ud.zkpReward = newZkp;
+        updateRewardUI();
+        window._db.ref('users/'+u).update({
+          zkpReward: newZkp,
+          packages: ud.packages,
+          lastSeen: ud.lastSeen
+        });
       });
     }
   },TICK);
