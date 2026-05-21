@@ -1384,10 +1384,10 @@ function normPackages(ud){
   // กรอง null/undefined ออก และเติม field ที่ขาด
   ud.packages = ud.packages.filter(p=>p&&p.key).map(p=>({
     ...p,
-    remaining: p.remaining !== undefined ? p.remaining : (p.days||0),
-    bought: p.bought || Date.now(),
+    remaining: (p.remaining !== undefined && p.remaining > 0) ? p.remaining : (p.days||0),
+    bought: (p.bought && p.bought > 1000000000000) ? p.bought : 0, // 0 = ไม่รู้วันซื้อ Drip จะใช้ tick mode
     days: p.days || 0,
-    daily: p.daily || 0,
+    daily: p.daily || (PKGS[p.key]?.daily || 0),
   }));
 }
 // ─── STORAGE ───
@@ -2885,8 +2885,16 @@ function startDrip(){
     ud.packages.forEach((p,i)=>{
       if(p.remaining<=0)return;
       const def=PKGS[p.key];if(!def)return;
-      const elapsedDays=(now-p.bought)/1000/DEMO_DAY;
-      const newRemaining=Math.max(0,p.days-elapsedDays);
+      // ถ้า bought ไม่มีหรือผิดปกติ ให้ใช้ remaining ที่มีอยู่แทน
+      let newRemaining;
+      if(p.bought && p.bought > 1000000000000){ // valid timestamp (> year 2001)
+        const elapsedDays=(now-p.bought)/1000/DEMO_DAY;
+        newRemaining=Math.max(0,p.days-elapsedDays);
+      } else {
+        // ไม่มี bought → ลด remaining ตาม tick
+        const tickDays = TICK/1000/DEMO_DAY;
+        newRemaining = Math.max(0, p.remaining - tickDays);
+      }
       const oldRem=p.remaining;
       p.remaining=newRemaining;
       const zkpPerTick=def.daily/(DEMO_DAY*1000/TICK);
