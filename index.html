@@ -2475,7 +2475,7 @@ function renderWallet(){
     return `<div class="tx-item"><div><div class="tx-d">${tx.desc}</div><div class="tx-t">${t}</div></div><div class="tx-a ${tx.amount>0?'tp':'tn'}">${tx.amount>0?'+':''}${tx.amount} ${tx.unit||'USD'}</div></div>`;
   }).join('');
 }
-const MIN_WITHDRAW = 2; // ถอนขั้นต่ำ 2 ZKP // ถอนขั้นต่ำ 30 ZKP
+const MIN_WITHDRAW = 10; // ถอนขั้นต่ำ 2 ZKP // ถอนขั้นต่ำ 30 ZKP
 
 function showInsufficientZkpPopup(current){
   const needed = MIN_WITHDRAW - (current||0);
