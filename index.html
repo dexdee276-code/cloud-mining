@@ -2744,26 +2744,45 @@ function clearPendingCache(){ _pendingCache=null; _pendingCacheTime=0; }
 
 function goToQR(){
   const u=getSess(); if(!u) return;
-  // แสดง loading ทันที
-  showToast('⏳ กำลังตรวจสอบ...');
-  checkPending(u, hasPending=>{
-    if(hasPending){
-      const ov=document.createElement('div'); ov.className='overlay';
-      ov.innerHTML=`<div class="popup" style="text-align:center;max-width:320px;">
-        <div style="font-size:2.5rem;margin-bottom:0.8rem;">⏳</div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);margin-bottom:0.6rem;">มีคำขอรออยู่</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">
-          คุณมีคำขอเติมเงินที่รอ Admin อนุมัติอยู่<br>
-          กรุณารอให้ Admin อนุมัติหรือปฏิเสธก่อน<br>
-          ค่อยส่งคำขอใหม่ได้ครับ
-        </div>
-        <button onclick="this.closest('.overlay').remove();switchTab(3);showTopupPendingTab();" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">📋 ดูสถานะคำขอ</button>
-        <button onclick="this.closest('.overlay').remove()" style="width:100%;padding:0.6rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
-      </div>`;
-      document.body.appendChild(ov); return;
+  if(!selAmt){ showToast('⚠️ กรุณาเลือกจำนวนเงินก่อน'); return; }
+  const now=Date.now();
+  // ถ้ามี cache อยู่ → ใช้ทันที ไม่รอ Firebase
+  if(_pendingCache !== null && now - _pendingCacheTime < 30000){
+    if(_pendingCache){
+      _showPendingPopup(); return;
     }
+    _doShowQR(); return;
+  }
+  // ไม่มี cache → query Firebase พร้อม timeout 5 วิ
+  // ถ้า Firebase ไม่ตอบ → บล็อกไว้ก่อน (ปลอดภัยกว่า)
+  showToast('⏳ กำลังตรวจสอบ...');
+  let done=false;
+  const timer=setTimeout(()=>{
+    if(!done){ done=true; showToast('⚠️ เชื่อมต่อช้า กรุณาลองใหม่'); }
+  }, 5000);
+  window._db.ref('topup_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
+    if(done) return; done=true; clearTimeout(timer);
+    let hasPending=false;
+    if(snap.exists()) snap.forEach(child=>{ if(child.val()?.status==='pending') hasPending=true; });
+    _pendingCache=hasPending; _pendingCacheTime=Date.now();
+    if(hasPending){ _showPendingPopup(); return; }
     _doShowQR();
-  });
+  }).catch(()=>{ if(!done){ done=true; clearTimeout(timer); showToast('⚠️ เชื่อมต่อไม่ได้ กรุณาลองใหม่'); } });
+}
+function _showPendingPopup(){
+  const ov=document.createElement('div'); ov.className='overlay';
+  ov.innerHTML=`<div class="popup" style="text-align:center;max-width:320px;">
+    <div style="font-size:2.5rem;margin-bottom:0.8rem;">⏳</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);margin-bottom:0.6rem;">มีคำขอรออยู่</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">
+      คุณมีคำขอเติมเงินที่รอ Admin อนุมัติอยู่<br>
+      กรุณารอให้ Admin อนุมัติหรือปฏิเสธก่อน<br>
+      ค่อยส่งคำขอใหม่ได้ครับ
+    </div>
+    <button onclick="this.closest('.overlay').remove();switchTab(3);showTopupPendingTab();" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">📋 ดูสถานะคำขอ</button>
+    <button onclick="this.closest('.overlay').remove()" style="width:100%;padding:0.6rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
+  </div>`;
+  document.body.appendChild(ov);
 }
 function _doShowQR(){
   document.getElementById('stepAmount').style.display='none';
