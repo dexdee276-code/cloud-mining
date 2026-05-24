@@ -2723,18 +2723,21 @@ function selTop(el,amt){
   document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel'); selAmt=amt;
 }
-// cache pending status — refresh ทุก 30 วินาที
+// cache pending status — refresh ทุก 60 วินาที
 let _pendingCache = null;
 let _pendingCacheTime = 0;
 function checkPending(u, callback){
   const now = Date.now();
-  // ใช้ cache ถ้าเพิ่งเช็กไปไม่เกิน 30 วินาที
-  if(_pendingCache !== null && now - _pendingCacheTime < 30000){
+  if(_pendingCache !== null && now - _pendingCacheTime < 60000){
     callback(_pendingCache); return;
   }
-  window._db.ref('topup_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
+  // อ่านจาก users/{u}/topupReqs เร็วกว่า scan topup_reqs ทั้งหมด
+  window._db.ref('users/'+u+'/topupReqs').once('value').then(snap=>{
     let hasPending = false;
-    if(snap.exists()) snap.forEach(child=>{ if(child.val()?.status==='pending') hasPending=true; });
+    if(snap.exists()){
+      const reqs = Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val());
+      hasPending = reqs.some(r=>r&&r.status==='pending');
+    }
     _pendingCache = hasPending;
     _pendingCacheTime = Date.now();
     callback(hasPending);
@@ -2746,28 +2749,22 @@ function goToQR(){
   const u=getSess(); if(!u) return;
   if(!selAmt){ showToast('⚠️ กรุณาเลือกจำนวนเงินก่อน'); return; }
   const now=Date.now();
-  // ถ้ามี cache อยู่ → ใช้ทันที ไม่รอ Firebase
-  if(_pendingCache !== null && now - _pendingCacheTime < 30000){
-    if(_pendingCache){
-      _showPendingPopup(); return;
-    }
+  // ถ้ามี cache → ใช้ทันที เร็วมาก
+  if(_pendingCache !== null && now - _pendingCacheTime < 60000){
+    if(_pendingCache){ _showPendingPopup(); return; }
     _doShowQR(); return;
   }
-  // ไม่มี cache → query Firebase พร้อม timeout 5 วิ
-  // ถ้า Firebase ไม่ตอบ → บล็อกไว้ก่อน (ปลอดภัยกว่า)
-  showToast('⏳ กำลังตรวจสอบ...');
-  let done=false;
-  const timer=setTimeout(()=>{
-    if(!done){ done=true; showToast('⚠️ เชื่อมต่อช้า กรุณาลองใหม่'); }
-  }, 5000);
-  window._db.ref('topup_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
-    if(done) return; done=true; clearTimeout(timer);
+  // ไม่มี cache → query users/{u}/topupReqs (เร็ว)
+  window._db.ref('users/'+u+'/topupReqs').once('value').then(snap=>{
     let hasPending=false;
-    if(snap.exists()) snap.forEach(child=>{ if(child.val()?.status==='pending') hasPending=true; });
+    if(snap.exists()){
+      const reqs=Array.isArray(snap.val())?snap.val():Object.values(snap.val());
+      hasPending=reqs.some(r=>r&&r.status==='pending');
+    }
     _pendingCache=hasPending; _pendingCacheTime=Date.now();
     if(hasPending){ _showPendingPopup(); return; }
     _doShowQR();
-  }).catch(()=>{ if(!done){ done=true; clearTimeout(timer); showToast('⚠️ เชื่อมต่อไม่ได้ กรุณาลองใหม่'); } });
+  }).catch(()=>{ _doShowQR(); });
 }
 function _showPendingPopup(){
   const ov=document.createElement('div'); ov.className='overlay';
