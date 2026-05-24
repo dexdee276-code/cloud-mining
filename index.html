@@ -2747,47 +2747,16 @@ function selTop(el,amt){
   if(lakEl) lakEl.textContent='= 0 ກີບ';
 }
 function goToQR(){
-  const ud=getUD();
   const u=getSess(); if(!u) return;
-  // เช็ก pending จาก Firebase จริง ไม่ใช่ memory
-  window._db.ref('users/'+u+'/topupReqs').once('value').then(snap=>{
-    const all = snap.exists()
-      ? (Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val()))
-      : [];
-    // cross-check กับ topup_reqs global
-    const pendingReqs = all.filter(r=>r.status==='pending');
-    if(!pendingReqs.length){
-      // ไม่มี pending → ไปต่อได้
-      document.getElementById('stepAmount').style.display='none';
-      document.getElementById('stepQR').style.display='block';
-      document.getElementById('stepSlip').style.display='none';
-      return;
-    }
-    // มี pending → เช็ก global ว่า Admin อนุมัติไปแล้วหรือยัง
-    Promise.all(pendingReqs.map(r=>
-      window._db.ref('topup_reqs').orderByChild('id').equalTo(r.id).once('value').catch(()=>null)
-    )).then(results=>{
-      let hasRealPending = false;
-      results.forEach((snap2,i)=>{
-        if(!snap2||!snap2.exists()){ hasRealPending=true; return; }
-        let globalStatus=null;
-        snap2.forEach(child=>{ globalStatus=child.val()?.status; });
-        if(!globalStatus||globalStatus==='pending') hasRealPending=true;
-        else {
-          // Admin อนุมัติแล้ว sync
-          const idx2=all.findIndex(r=>r.id===pendingReqs[i].id);
-          if(idx2>=0) all[idx2].status=globalStatus;
-        }
+  // เช็ก pending จาก topup_reqs global โดยตรง (query by user)
+  window._db.ref('topup_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
+    let hasRealPending=false;
+    if(snap.exists()){
+      snap.forEach(child=>{
+        if(child.val()?.status==='pending') hasRealPending=true;
       });
-      if(!hasRealPending){
-        // sync และไปต่อ
-        window._db.ref('users/'+u+'/topupReqs').set(all);
-        if(_ud) _ud.topupReqs=all;
-        document.getElementById('stepAmount').style.display='none';
-        document.getElementById('stepQR').style.display='block';
-        document.getElementById('stepSlip').style.display='none';
-        return;
-      }
+    }
+    if(hasRealPending){
       // มี pending จริง → แสดง popup
       const ov=document.createElement('div'); ov.className='overlay';
       ov.innerHTML=`<div class="popup" style="text-align:center;max-width:320px;">
@@ -2802,8 +2771,13 @@ function goToQR(){
         <button onclick="this.closest('.overlay').remove()" style="width:100%;padding:0.6rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
       </div>`;
       document.body.appendChild(ov);
-    });
-  });
+      return;
+    }
+    // ไม่มี pending → แสดง QR
+    _doShowQR();
+  }).catch(()=>{ _doShowQR(); });
+}
+function _doShowQR(){
   document.getElementById('stepAmount').style.display='none';
   document.getElementById('stepQR').style.display='block';
   document.getElementById('stepSlip').style.display='none';
@@ -2811,7 +2785,6 @@ function goToQR(){
   document.getElementById('qrLakAmt').textContent=lakFmt(selAmt);
   document.getElementById('qrAmount').textContent='= $'+selAmt.toLocaleString()+' USD';
   const rateEl=document.getElementById('qrRateDisplay'); if(rateEl) rateEl.textContent=(LAK_RATE_LIVE||LAK_RATE).toLocaleString();
-  // Load QR image if admin set one
   const wrap=document.getElementById('qrImageWrap');
   wrap.innerHTML='<div style="text-align:center;color:#A890CC;font-family:monospace;font-size:0.7rem;padding:2rem;">⏳ กำลังโหลด QR...</div>';
   window._db.ref('settings/qr_image').once('value').then(snap=>{
@@ -2822,6 +2795,7 @@ function goToQR(){
     }
   });
 }
+
 function backToAmount(){
   document.getElementById('stepAmount').style.display='block';
   document.getElementById('stepQR').style.display='none';
@@ -2848,44 +2822,35 @@ function previewSlip(e){
 function submitSlip(){
   const ud=getUD(); if(!ud) return;
   const u=getSess(); if(!u) return;
-  // เช็ก pending จาก Firebase จริง ไม่ใช่ memory
-  window._db.ref('users/'+u+'/topupReqs').once('value').then(snap=>{
-    const all = snap.exists()
-      ? (Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val()))
-      : [];
-    // cross-check กับ topup_reqs global เผื่อ Admin อนุมัติแล้วแต่ยังไม่ sync
-    const pendingReqs = all.filter(r=>r.status==='pending');
-    if(!pendingReqs.length){
-      _doSubmitSlip(ud, u);
+  // เช็ก pending จาก topup_reqs global โดยตรง (query by user)
+  window._db.ref('topup_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
+    let hasRealPending = false;
+    if(snap.exists()){
+      snap.forEach(child=>{
+        if(child.val()?.status==='pending') hasRealPending=true;
+      });
+    }
+    if(hasRealPending){
+      showToast('⏳ มีคำขอรออยู่ กรุณารอ Admin อนุมัติก่อน');
       return;
     }
-    Promise.all(pendingReqs.map(r=>
-      window._db.ref('topup_reqs').orderByChild('id').equalTo(r.id).once('value').catch(()=>null)
-    )).then(results=>{
-      let hasRealPending = false;
-      results.forEach((snap2,i)=>{
-        if(!snap2||!snap2.exists()){ hasRealPending=true; return; }
-        let globalStatus=null;
-        snap2.forEach(child=>{ globalStatus=child.val()?.status; });
-        if(!globalStatus||globalStatus==='pending') hasRealPending=true;
-        else {
-          const idx2=all.findIndex(r=>r.id===pendingReqs[i].id);
-          if(idx2>=0) all[idx2].status=globalStatus;
-        }
-      });
-      if(!hasRealPending){
-        // sync และไปต่อ
-        window._db.ref('users/'+u+'/topupReqs').set(all);
-        if(_ud) _ud.topupReqs=all;
-        _doSubmitSlip(ud, u);
-      } else {
-        showToast('⏳ มีคำขอรออยู่ กรุณารอ Admin อนุมัติก่อน');
-      }
-    });
-  });
+    // ไม่มี pending → sync topupReqs และไปต่อ
+    if(snap.exists()){
+      const reqs=[];
+      snap.forEach(child=>{ reqs.push(child.val()); });
+      const updatedAll = reqs.map(r=>({id:r.id||r.time,amt:r.amt,note:r.note||'',time:r.time,status:r.status}));
+      window._db.ref('users/'+u+'/topupReqs').set(updatedAll);
+      if(_ud) _ud.topupReqs=updatedAll;
+    }
+    _doSubmitSlip(ud, u);
+  }).catch(()=>{ _doSubmitSlip(ud, u); });
 }
 function _doSubmitSlip(ud, u){
-  const fileInput=document.getElementById('slipFile');
+  // ป้องกันกดส่งซ้ำ
+  if(window._submitting){ showToast('⏳ กำลังส่ง กรุณารอสักครู่...'); return; }
+  window._submitting = true;
+  const btn = document.getElementById('submitSlipBtn');
+  if(btn){ btn.disabled=true; btn.textContent='⏳ กำลังส่ง...'; }
   const amt=parseFloat(document.getElementById('slipAmtInput').value);
   const note=document.getElementById('slipNote').value.trim();
   if(!fileInput.files[0]){showToast('⚠️ กรุณาแนบสลิปก่อน');return;}
@@ -2937,8 +2902,12 @@ function _doSubmitSlip(ud, u){
         renderPendingList();
         renderTopupHistory();
         showToast('📤 ส่งหลักฐานเรียบร้อยแล้ว! รอ Admin อนุมัติ');
+        window._submitting = false;
         if(_appliedPromo) redeemPromoReward(getSess());
       }).catch(()=>{
+        window._submitting = false;
+        const btn2=document.getElementById('submitSlipBtn');
+        if(btn2){ btn2.disabled=false; btn2.textContent='📤 ส่งหลักฐาน'; }
         showToast('❌ ส่งไม่สำเร็จ กรุณาลองใหม่');
       });
     };
