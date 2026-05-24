@@ -1175,20 +1175,9 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
       <!-- Step 1: เลือกจำนวน -->
       <div class="topup-step" id="stepAmount">
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);margin-bottom:1rem;">
-          เลือกหรือพิมพ์จำนวนที่ต้องการเติม
+          เลือกจำนวนที่ต้องการเติม
         </div>
 
-        <!-- ช่องพิมพ์จำนวนเอง -->
-        <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">💵 พิมพ์จำนวน USD เอง</div>
-          <input type="number" id="customAmtInput" placeholder="เช่น 150, 500, 2000..."
-            min="1"
-            oninput="onCustomAmt(this.value)"
-            style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;outline:none;caret-color:var(--gold);margin-bottom:0.5rem;">
-          <div id="customAmtLak" style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:rgba(255,215,0,0.6);text-align:right;">= 0 ກີບ</div>
-        </div>
-
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.6rem;">หรือเลือกจากด้านล่าง</div>
         <div class="tu-grid" id="tuGrid">
           <!-- render by JS ตามอัตราแลกเปลี่ยน Firebase -->
         </div>
@@ -2716,20 +2705,12 @@ function addTestZkp(){
 // LAK_RATE และ LAK_RATE_LIVE ถูก declare ไว้ด้านบนแล้ว
 let selAmt=10;
 function lakFmt(usd){ const r=LAK_RATE_LIVE||LAK_RATE; return (usd*r).toLocaleString()+' ກີບ'; }
-function onCustomAmt(val){
-  const amt = parseFloat(val)||0;
-  const lakEl = document.getElementById('customAmtLak');
-  const _lr=LAK_RATE_LIVE||LAK_RATE; if(lakEl) lakEl.textContent = amt>0 ? '= '+(amt*_lr).toLocaleString()+' ກີບ' : '= 0 ກີບ';
-  if(amt>0){
-    // ล้างการเลือกปุ่ม
-    document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
-    selAmt = amt;
-  }
-}
+
 function renderTopupCards(){
   const grid=document.getElementById('tuGrid'); if(!grid) return;
   const rate=LAK_RATE_LIVE||LAK_RATE;
-  const amounts=[10,20,50,100,300,1000,3000];
+  // ราคาตามแพ็กเครื่องขุด
+  const amounts = PKG_ORDER.map(k=>PKGS[k]?.price).filter(Boolean);
   grid.innerHTML=amounts.map(amt=>`
     <div class="tu-card" onclick="selTop(this,${amt})">
       <div class="tu-v">${(amt*rate).toLocaleString()} ກີບ</div>
@@ -2741,10 +2722,6 @@ function renderTopupCards(){
 function selTop(el,amt){
   document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel'); selAmt=amt;
-  const inp = document.getElementById('customAmtInput');
-  const lakEl = document.getElementById('customAmtLak');
-  if(inp) inp.value='';
-  if(lakEl) lakEl.textContent='= 0 ກີບ';
 }
 function goToQR(){
   const u=getSess(); if(!u) return;
@@ -2851,7 +2828,7 @@ function _doSubmitSlip(ud, u){
   window._submitting = true;
   const btn = document.getElementById('submitSlipBtn');
   if(btn){ btn.disabled=true; btn.textContent='⏳ กำลังส่ง...'; }
-  const amt=parseFloat(document.getElementById('slipAmtInput').value);
+  const amt = parseFloat(selAmt) || 0;
   const note=document.getElementById('slipNote').value.trim();
   if(!fileInput.files[0]){showToast('⚠️ กรุณาแนบสลิปก่อน');return;}
   if(!amt||amt<=0){showToast('⚠️ กรุณากรอกยอดที่โอน');return;}
