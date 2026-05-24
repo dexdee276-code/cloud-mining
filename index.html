@@ -2847,12 +2847,44 @@ function previewSlip(e){
 }
 function submitSlip(){
   const ud=getUD(); if(!ud) return;
-  // ตรวจสอบว่ามีคำขอ pending อยู่ไหม
-  const hasPending = (ud.topupReqs||[]).some(r=>r.status==='pending');
-  if(hasPending){
-    showToast('⏳ มีคำขอรออยู่ กรุณารอ Admin อนุมัติก่อน');
-    return;
-  }
+  const u=getSess(); if(!u) return;
+  // เช็ก pending จาก Firebase จริง ไม่ใช่ memory
+  window._db.ref('users/'+u+'/topupReqs').once('value').then(snap=>{
+    const all = snap.exists()
+      ? (Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val()))
+      : [];
+    // cross-check กับ topup_reqs global เผื่อ Admin อนุมัติแล้วแต่ยังไม่ sync
+    const pendingReqs = all.filter(r=>r.status==='pending');
+    if(!pendingReqs.length){
+      _doSubmitSlip(ud, u);
+      return;
+    }
+    Promise.all(pendingReqs.map(r=>
+      window._db.ref('topup_reqs').orderByChild('id').equalTo(r.id).once('value').catch(()=>null)
+    )).then(results=>{
+      let hasRealPending = false;
+      results.forEach((snap2,i)=>{
+        if(!snap2||!snap2.exists()){ hasRealPending=true; return; }
+        let globalStatus=null;
+        snap2.forEach(child=>{ globalStatus=child.val()?.status; });
+        if(!globalStatus||globalStatus==='pending') hasRealPending=true;
+        else {
+          const idx2=all.findIndex(r=>r.id===pendingReqs[i].id);
+          if(idx2>=0) all[idx2].status=globalStatus;
+        }
+      });
+      if(!hasRealPending){
+        // sync และไปต่อ
+        window._db.ref('users/'+u+'/topupReqs').set(all);
+        if(_ud) _ud.topupReqs=all;
+        _doSubmitSlip(ud, u);
+      } else {
+        showToast('⏳ มีคำขอรออยู่ กรุณารอ Admin อนุมัติก่อน');
+      }
+    });
+  });
+}
+function _doSubmitSlip(ud, u){
   const fileInput=document.getElementById('slipFile');
   const amt=parseFloat(document.getElementById('slipAmtInput').value);
   const note=document.getElementById('slipNote').value.trim();
