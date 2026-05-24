@@ -2723,18 +2723,31 @@ function selTop(el,amt){
   document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel'); selAmt=amt;
 }
+// cache pending status — refresh ทุก 30 วินาที
+let _pendingCache = null;
+let _pendingCacheTime = 0;
+function checkPending(u, callback){
+  const now = Date.now();
+  // ใช้ cache ถ้าเพิ่งเช็กไปไม่เกิน 30 วินาที
+  if(_pendingCache !== null && now - _pendingCacheTime < 30000){
+    callback(_pendingCache); return;
+  }
+  window._db.ref('topup_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
+    let hasPending = false;
+    if(snap.exists()) snap.forEach(child=>{ if(child.val()?.status==='pending') hasPending=true; });
+    _pendingCache = hasPending;
+    _pendingCacheTime = Date.now();
+    callback(hasPending);
+  }).catch(()=>{ callback(false); });
+}
+function clearPendingCache(){ _pendingCache=null; _pendingCacheTime=0; }
+
 function goToQR(){
   const u=getSess(); if(!u) return;
-  // เช็ก pending จาก topup_reqs global โดยตรง (query by user)
-  window._db.ref('topup_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
-    let hasRealPending=false;
-    if(snap.exists()){
-      snap.forEach(child=>{
-        if(child.val()?.status==='pending') hasRealPending=true;
-      });
-    }
-    if(hasRealPending){
-      // มี pending จริง → แสดง popup
+  // แสดง loading ทันที
+  showToast('⏳ กำลังตรวจสอบ...');
+  checkPending(u, hasPending=>{
+    if(hasPending){
       const ov=document.createElement('div'); ov.className='overlay';
       ov.innerHTML=`<div class="popup" style="text-align:center;max-width:320px;">
         <div style="font-size:2.5rem;margin-bottom:0.8rem;">⏳</div>
@@ -2747,12 +2760,10 @@ function goToQR(){
         <button onclick="this.closest('.overlay').remove();switchTab(3);showTopupPendingTab();" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">📋 ดูสถานะคำขอ</button>
         <button onclick="this.closest('.overlay').remove()" style="width:100%;padding:0.6rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">ปิด</button>
       </div>`;
-      document.body.appendChild(ov);
-      return;
+      document.body.appendChild(ov); return;
     }
-    // ไม่มี pending → แสดง QR
     _doShowQR();
-  }).catch(()=>{ _doShowQR(); });
+  });
 }
 function _doShowQR(){
   document.getElementById('stepAmount').style.display='none';
@@ -2799,28 +2810,13 @@ function previewSlip(e){
 function submitSlip(){
   const ud=getUD(); if(!ud) return;
   const u=getSess(); if(!u) return;
-  // เช็ก pending จาก topup_reqs global โดยตรง (query by user)
-  window._db.ref('topup_reqs').orderByChild('user').equalTo(u).once('value').then(snap=>{
-    let hasRealPending = false;
-    if(snap.exists()){
-      snap.forEach(child=>{
-        if(child.val()?.status==='pending') hasRealPending=true;
-      });
-    }
-    if(hasRealPending){
+  checkPending(u, hasPending=>{
+    if(hasPending){
       showToast('⏳ มีคำขอรออยู่ กรุณารอ Admin อนุมัติก่อน');
       return;
     }
-    // ไม่มี pending → sync topupReqs และไปต่อ
-    if(snap.exists()){
-      const reqs=[];
-      snap.forEach(child=>{ reqs.push(child.val()); });
-      const updatedAll = reqs.map(r=>({id:r.id||r.time,amt:r.amt,note:r.note||'',time:r.time,status:r.status}));
-      window._db.ref('users/'+u+'/topupReqs').set(updatedAll);
-      if(_ud) _ud.topupReqs=updatedAll;
-    }
     _doSubmitSlip(ud, u);
-  }).catch(()=>{ _doSubmitSlip(ud, u); });
+  });
 }
 function _doSubmitSlip(ud, u){
   // ป้องกันกดส่งซ้ำ
@@ -2859,7 +2855,11 @@ function _doSubmitSlip(ud, u){
 
       // ส่ง Firebase ก่อนเลย ไม่อยู่ใน try/catch
       const req={id:'req_'+Date.now(),user:getSess(),amt,note,slipImg:compressed,time:Date.now(),status:'pending'};
+      // set cache pending = true ทันที ก่อน Firebase จะตอบ → ป้องกันกดซ้ำ
+      _pendingCache = true;
+      _pendingCacheTime = Date.now();
       window._db.ref('topup_reqs').push(req).then(()=>{
+        // ยืนยัน cache อีกรอบ
         // อัปเดต topupReqs ใน Firebase แยกต่างหาก ไม่ผ่าน saveUD
         const newReq = {id:req.id, amt, note, time:req.time, status:'pending'};
         window._db.ref('users/'+getSess()+'/topupReqs').once('value').then(snap=>{
@@ -2880,6 +2880,7 @@ function _doSubmitSlip(ud, u){
         renderTopupHistory();
         showToast('📤 ส่งหลักฐานเรียบร้อยแล้ว! รอ Admin อนุมัติ');
         window._submitting = false;
+        clearPendingCache(); // clear cache เพื่อให้เช็กใหม่ครั้งหน้า
         if(_appliedPromo) redeemPromoReward(getSess());
       }).catch(()=>{
         window._submitting = false;
