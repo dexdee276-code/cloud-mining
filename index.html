@@ -1269,7 +1269,7 @@ box-shadow:0 8px 30px rgba(74,14,143,0.4);white-space:nowrap;z-index:99999;max-w
             style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.9rem;outline:none;caret-color:var(--purple-light);">
         </div>
 
-        <button class="btn btn-primary" style="width:100%" onclick="submitSlip()">
+        <button id="submitSlipBtn" class="btn btn-primary" style="width:100%" onclick="submitSlip()">
           📤 ส่งหลักฐานการโอน
         </button>
       </div>
@@ -2840,10 +2840,19 @@ function _doSubmitSlip(ud, u){
   window._submitting = true;
   const btn = document.getElementById('submitSlipBtn');
   if(btn){ btn.disabled=true; btn.textContent='⏳ กำลังส่ง...'; }
+  const fileInput = document.getElementById('slipFile');
   const amt = parseFloat(selAmt) || 0;
-  const note=document.getElementById('slipNote').value.trim();
-  if(!fileInput.files[0]){showToast('⚠️ กรุณาแนบสลิปก่อน');return;}
-  if(!amt||amt<=0){showToast('⚠️ กรุณากรอกยอดที่โอน');return;}
+  const note = document.getElementById('slipNote').value.trim();
+  if(!fileInput||!fileInput.files[0]){
+    window._submitting=false;
+    if(btn){btn.disabled=false;btn.textContent='📤 ส่งหลักฐาน';}
+    showToast('⚠️ กรุณาแนบสลิปก่อน'); return;
+  }
+  if(!amt||amt<=0){
+    window._submitting=false;
+    if(btn){btn.disabled=false;btn.textContent='📤 ส่งหลักฐาน';}
+    showToast('⚠️ กรุณาเลือกจำนวนเงินก่อน'); return;
+  }
 
   // Resize รูปก่อน save เพื่อไม่ให้ใหญ่เกิน
   const file=fileInput.files[0];
