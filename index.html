@@ -1834,6 +1834,16 @@ function enterDash(user){
     if(snap.exists()) LAK_RATE_LIVE=snap.val();
     renderTopupCards();
   });
+  // โหลด pending cache ล่วงหน้า เพื่อให้กด QR ได้ทันทีไม่ต้องรอ
+  window._db.ref('users/'+user+'/topupReqs').once('value').then(snap=>{
+    let hasPending=false;
+    if(snap.exists()){
+      const reqs=Array.isArray(snap.val())?snap.val():Object.values(snap.val());
+      hasPending=reqs.some(r=>r&&r.status==='pending');
+    }
+    _pendingCache=hasPending;
+    _pendingCacheTime=Date.now();
+  }).catch(()=>{ _pendingCache=false; _pendingCacheTime=Date.now(); });
   // โหลด freeze status และ listen realtime
   window._db.ref('settings/withdraw_frozen').on('value', snap=>{
     window._withdrawFrozen = snap.exists()&&snap.val()===true;
