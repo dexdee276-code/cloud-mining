@@ -1336,7 +1336,7 @@ let LAK_RATE_LIVE = 22700; // โหลดจาก Firebase
 
 // ─── PACKAGES (Subscription รายเดือน 30 วัน) ───
 const PKGS = {
-  starter5:{name:'⚡ Starter5', price:5,    days:7,  profit:3.5,  daily:0.5,   hr:'5 GH/s',   limit:1, cls:'pc-s5',      mc:'mc-s5',      next:'starter15',nxt:15},
+  starter5:{name:'⚡ Starter5', price:5,    days:7,  profit:8.5,  daily:1.214,   hr:'5 GH/s',   limit:1, cls:'pc-s5',      mc:'mc-s5',      next:'starter15',nxt:15},
   starter15:{name:'🌟 Starter15',price:15,  days:14, profit:21,   daily:1.5,   hr:'10 GH/s',  limit:1, cls:'pc-s15',     mc:'mc-s15',     next:'starter30',nxt:30},
   starter30:{name:'💡 Starter30',price:30,  days:30, profit:60,   daily:2,     hr:'15 GH/s',  limit:1, cls:'pc-s30',     mc:'mc-s30',     next:'bronze',   nxt:50},
   bronze:  {name:'🥉 Bronze',  price:50,   days:30, profit:105,  daily:3.5,   hr:'20 GH/s',  limit:1, cls:'pc-mini',    mc:'mc-mini',    next:'silver',   nxt:150},
@@ -1371,12 +1371,16 @@ function normPackages(ud){
     ud.packages = Object.values(ud.packages);
   }
   // กรอง null/undefined ออก และเติม field ที่ขาด
+  // ใช้ daily/profit จาก PKGS เสมอ เพื่อให้ลูกค้าเก่าได้กำไรใหม่
   ud.packages = ud.packages.filter(p=>p&&p.key).map(p=>({
     ...p,
     remaining: (p.remaining !== undefined && p.remaining > 0) ? p.remaining : (p.days||0),
-    bought: (p.bought && p.bought > 1000000000000) ? p.bought : 0, // 0 = ไม่รู้วันซื้อ Drip จะใช้ tick mode
-    days: p.days || 0,
-    daily: p.daily || (PKGS[p.key]?.daily || 0),
+    bought: (p.bought && p.bought > 1000000000000) ? p.bought : 0,
+    days: p.days || (PKGS[p.key]?.days || 0),
+    // เก็บ daily เดิมไว้เพื่อคำนวณย้อนหลัง ถ้ายังไม่ได้คิด
+    _oldDaily: (!p._retroDone && PKGS[p.key]?.daily && p.daily && p.daily < PKGS[p.key].daily) ? p.daily : (p._oldDaily||0),
+    daily: PKGS[p.key]?.daily || p.daily || 0,
+    profit: PKGS[p.key]?.profit || p.profit || 0,
   }));
 }
 // ─── STORAGE ───
@@ -3003,39 +3007,66 @@ function calcOfflineEarnings(){
   const now=Date.now();
   const lastSeen=ud.lastSeen||now;
   const offlineSec=(now-lastSeen)/1000;
-  if(offlineSec<10) return; // ไม่นับถ้าปิดแป๊บเดียว
 
   let totalOfflineZkp=0;
+  let totalRetroZkp=0;
   let changed=false;
 
   ud.packages.forEach(p=>{
     if(p.remaining<=0) return;
     const def=PKGS[p.key]; if(!def) return;
 
-    // คำนวณ ZKP ที่ควรได้ในช่วงออฟไลน์
-    const daysOffline=Math.min(offlineSec/DEMO_DAY, p.remaining);
-    const zkpEarned=def.daily*daysOffline;
+    // ══ คำนวณส่วนต่างย้อนหลัง (retroactive) ══
+    // ถ้า daily ใน Firebase น้อยกว่า daily ใหม่ใน PKGS
+    const oldDaily = p._oldDaily || 0;
+    if(!p._retroDone && oldDaily > 0 && def.daily > oldDaily && p.bought > 1000000000000){
+      // วันที่ผ่านมาแล้ว
+      const elapsedDays = (now - p.bought) / 1000 / DEMO_DAY;
+      const daysDone = Math.min(elapsedDays, p.days - p.remaining);
+      const retroZkp = (def.daily - oldDaily) * daysDone;
+      if(retroZkp > 0){
+        totalRetroZkp += retroZkp;
+        p._retroDone = true; // mark ว่าคิดย้อนหลังแล้ว ไม่คิดซ้ำ
+        changed = true;
+      }
+    }
 
-    if(zkpEarned>0){
-      totalOfflineZkp+=zkpEarned;
-      // อัปเดต remaining
-      p.remaining=Math.max(0,p.remaining-daysOffline);
-      changed=true;
+    // ══ คำนวณ ZKP ออฟไลน์ปกติ ══
+    if(offlineSec >= 10){
+      const daysOffline=Math.min(offlineSec/DEMO_DAY, p.remaining);
+      const zkpEarned=def.daily*daysOffline;
+      if(zkpEarned>0){
+        totalOfflineZkp+=zkpEarned;
+        p.remaining=Math.max(0,p.remaining-daysOffline);
+        changed=true;
+      }
     }
   });
 
-  if(changed && totalOfflineZkp>0){
-    ud.zkpReward=(ud.zkpReward||0)+totalOfflineZkp;
-    ud.txs=ud.txs||[];
-    ud.txs.unshift({
-      desc:`⚡ ขุดระหว่างออฟไลน์ ${Math.round(offlineSec/60)} นาที`,
-      amount:+totalOfflineZkp.toFixed(6),
-      unit:'ZKP',
-      time:now
-    });
-    saveUD(ud);
-    updateRewardUI();
-    showToast(`⚡ ขุดได้ +${totalOfflineZkp.toFixed(4)} ZKP ระหว่างที่คุณออฟไลน์!`);
+  if(changed){
+    let added = totalOfflineZkp + totalRetroZkp;
+    if(added > 0){
+      ud.zkpReward=(ud.zkpReward||0)+added;
+      ud.txs=ud.txs||[];
+      if(totalRetroZkp > 0){
+        ud.txs.unshift({
+          desc:`🎁 ปรับกำไรย้อนหลัง (อัตราใหม่)`,
+          amount:+totalRetroZkp.toFixed(6),
+          unit:'ZKP', time:now
+        });
+        showToast(`🎁 ได้รับ ZKP ย้อนหลัง +${totalRetroZkp.toFixed(4)} ZKP!`);
+      }
+      if(totalOfflineZkp > 0 && offlineSec >= 10){
+        ud.txs.unshift({
+          desc:`⚡ ขุดระหว่างออฟไลน์ ${Math.round(offlineSec/60)} นาที`,
+          amount:+totalOfflineZkp.toFixed(6),
+          unit:'ZKP', time:now
+        });
+        if(totalRetroZkp === 0) showToast(`⚡ ขุดได้ +${totalOfflineZkp.toFixed(4)} ZKP ระหว่างที่คุณออฟไลน์!`);
+      }
+      saveUD(ud);
+      updateRewardUI();
+    }
   }
 }
 
