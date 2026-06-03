@@ -1370,18 +1370,49 @@ function normPackages(ud){
   if(!Array.isArray(ud.packages)){
     ud.packages = Object.values(ud.packages);
   }
-  // กรอง null/undefined ออก และเติม field ที่ขาด
+  // บันทึกแพ็กหมดอายุลง packagesHistory ก่อนลบ (เก็บไว้เช็ก cooldown)
+  if(!ud.packagesHistory) ud.packagesHistory=[];
+  ud.packages.filter(p=>p&&p.key).forEach(p=>{
+    if(p.bought && p.bought > 1000000000000){
+      const days = p.days || (PKGS[p.key]?.days || 0);
+      const elapsed = (Date.now() - p.bought) / 1000 / (DEMO_DAY||86400);
+      if(elapsed >= days){
+        // หมดอายุแล้ว → บันทึก
+        const alreadySaved = ud.packagesHistory.some(h=>h.key===p.key&&h.expiredAt===p.bought+days*(DEMO_DAY||86400)*1000);
+        if(!alreadySaved){
+          ud.packagesHistory.push({key:p.key, boughtAt:p.bought, expiredAt:p.bought+days*(DEMO_DAY||86400)*1000});
+        }
+      }
+    }
+  });
+  const beforeCount = ud.packages.filter(p=>p&&p.key).length;
+  // กรอง null/undefined และแพ็กหมดอายุออก
   // ใช้ daily/profit จาก PKGS เสมอ เพื่อให้ลูกค้าเก่าได้กำไรใหม่
-  ud.packages = ud.packages.filter(p=>p&&p.key).map(p=>({
+  ud.packages = ud.packages.filter(p=>{
+    if(!p||!p.key) return false;
+    // ถ้ามี bought timestamp ให้คำนวณ remaining จริงๆ
+    if(p.bought && p.bought > 1000000000000){
+      const days = p.days || (PKGS[p.key]?.days || 0);
+      const elapsed = (Date.now() - p.bought) / 1000 / (DEMO_DAY||86400);
+      const rem = Math.max(0, days - elapsed);
+      p.remaining = rem;
+    }
+    // กรองแพ็กที่หมดอายุแล้วออก
+    return p.remaining > 0;
+  }).map(p=>({
     ...p,
-    remaining: (p.remaining !== undefined && p.remaining > 0) ? p.remaining : (p.days||0),
     bought: (p.bought && p.bought > 1000000000000) ? p.bought : 0,
     days: p.days || (PKGS[p.key]?.days || 0),
-    // เก็บ daily เดิมไว้เพื่อคำนวณย้อนหลัง ถ้ายังไม่ได้คิด
     _oldDaily: (!p._retroDone && PKGS[p.key]?.daily && p.daily && p.daily < PKGS[p.key].daily) ? p.daily : (p._oldDaily||0),
     daily: PKGS[p.key]?.daily || p.daily || 0,
     profit: PKGS[p.key]?.profit || p.profit || 0,
   }));
+  // ถ้ามีแพ็กหมดอายุถูกลบ → save กลับ Firebase ทันที
+  const afterCount = ud.packages.length;
+  if(afterCount < beforeCount){
+    const u = getSess();
+    if(u) window._db.ref('users/'+u+'/packages').set(ud.packages);
+  }
 }
 // ─── STORAGE ───
 // ─── FIREBASE STORAGE ───
@@ -1995,8 +2026,22 @@ function buyPkg(key){
     document.body.appendChild(ov); return;
   }
   if(!isUnlocked(key)){showToast(t('toast.locked'));return}
-  const bought=(ud.packages||[]).filter(p=>p.key===key).length;
+  const bought=(ud.packages||[]).filter(p=>p.key===key&&p.remaining>0).length;
   if(bought>=def.limit){showToast(t('toast.full'));return}
+
+  // เช็ก cooldown 30 วัน สำหรับแพ็กที่เคยซื้อและหมดอายุแล้ว
+  const COOLDOWN_DAYS = 30;
+  const expired = (ud.packagesHistory||[]).filter(p=>p.key===key);
+  if(expired.length > 0){
+    const lastExpired = Math.max(...expired.map(p=>p.expiredAt||0));
+    const cooldownMs = COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+    const remaining = cooldownMs - (Date.now() - lastExpired);
+    if(remaining > 0){
+      const daysLeft = Math.ceil(remaining / (24*60*60*1000));
+      showToast(`⏳ ต้องรออีก ${daysLeft} วัน ถึงจะซื้อ ${def.name} ได้อีกครั้ง`);
+      return;
+    }
+  }
 
   const u=getSess();
 
@@ -2036,7 +2081,7 @@ function buyPkg(key){
       // ── Referral bonus 10% (ทุกครั้งที่เพื่อนซื้อ/ต่อสัญญา) ──
       if(def.price>0 && ud.refBy){
         const bonus=parseFloat((def.price*0.10).toFixed(4));
-        const isRenew=(ud.packages||[]).filter(p=>p.key===key).length>0;
+        const isRenew=(ud.packages||[]).filter(p=>p.key===key&&p.remaining>0).length>0;
         window._db.ref('users/'+ud.refBy).once('value').then(snap2=>{
           if(snap2.exists()){
             const ref=snap2.val();
@@ -3105,7 +3150,18 @@ function startDrip(){
       if(p.remaining<=0&&oldRem>0){
         const nk=getSess()+'_'+i+'_'+p.bought;
         if(!NOTIFIED[nk]){NOTIFIED[nk]=true;
-          setTimeout(()=>{showToast('✅ '+def.name+' ครบแล้ว!')},500);}
+          setTimeout(()=>{showToast('✅ '+def.name+' ครบแล้ว!')},500);
+          // บันทึก history และลบแพ็กหมดอายุออกจาก Firebase ทันที
+          const u2=getSess();
+          if(u2){
+            if(!ud.packagesHistory) ud.packagesHistory=[];
+            const expAt = p.bought + (p.days||0)*(DEMO_DAY||86400)*1000;
+            if(!ud.packagesHistory.some(h=>h.key===p.key&&h.expiredAt===expAt)){
+              ud.packagesHistory.push({key:p.key, boughtAt:p.bought, expiredAt:expAt});
+            }
+            window._db.ref('users/'+u2+'/packagesHistory').set(ud.packagesHistory);
+          }
+        }
       }
     });
     if(changed){
@@ -3120,6 +3176,12 @@ function startDrip(){
         ud.zkpReward = newZkp;
         if(_ud) _ud.zkpReward = newZkp;
         updateRewardUI();
+        // ลบแพ็กที่หมดอายุออก เพื่อให้ลูกค้าซื้อต่อได้
+        ud.packages = ud.packages.filter(p=>p.remaining>0);
+        if(_ud) _ud.packages = ud.packages;
+        // กรองแพ็กหมดอายุออกก่อน save Firebase
+        ud.packages = ud.packages.filter(p=>p.remaining>0);
+        if(_ud) _ud.packages = ud.packages;
         window._db.ref('users/'+u).update({
           zkpReward: newZkp,
           packages: ud.packages,
@@ -3131,6 +3193,9 @@ function startDrip(){
         ud.zkpReward = newZkp;
         if(_ud) _ud.zkpReward = newZkp;
         updateRewardUI();
+        // กรองแพ็กหมดอายุออกก่อน save
+        ud.packages = ud.packages.filter(p=>p.remaining>0);
+        if(_ud) _ud.packages = ud.packages;
         window._db.ref('users/'+u).update({
           zkpReward: newZkp,
           packages: ud.packages,
