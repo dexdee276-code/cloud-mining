@@ -1403,7 +1403,6 @@ function normPackages(ud){
     ...p,
     bought: (p.bought && p.bought > 1000000000000) ? p.bought : 0,
     days: p.days || (PKGS[p.key]?.days || 0),
-    _oldDaily: (!p._retroDone && PKGS[p.key]?.daily && p.daily && p.daily < PKGS[p.key].daily) ? p.daily : (p._oldDaily||0),
     daily: PKGS[p.key]?.daily || p.daily || 0,
     profit: PKGS[p.key]?.profit || p.profit || 0,
   }));
@@ -2010,7 +2009,7 @@ function addAct(icon,txt,amt,cls){
 
 // ─── PACKAGES ───
 function isUnlocked(key){
-  return true; // ทุกแพ็กซื้อได้เลย ไม่ต้องปลดล็อก
+  return true; // ซื้อแพ็กไหนก่อนก็ได้
 }
 function buyPkg(key){
   const ud=getUD();if(!ud)return;
@@ -2029,16 +2028,18 @@ function buyPkg(key){
   const bought=(ud.packages||[]).filter(p=>p.key===key&&p.remaining>0).length;
   if(bought>=def.limit){showToast(t('toast.full'));return}
 
-  // เช็ก cooldown 30 วัน สำหรับแพ็กที่เคยซื้อและหมดอายุแล้ว
-  const COOLDOWN_DAYS = 30;
-  const expired = (ud.packagesHistory||[]).filter(p=>p.key===key);
-  if(expired.length > 0){
-    const lastExpired = Math.max(...expired.map(p=>p.expiredAt||0));
-    const cooldownMs = COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
-    const remaining = cooldownMs - (Date.now() - lastExpired);
-    if(remaining > 0){
-      const daysLeft = Math.ceil(remaining / (24*60*60*1000));
-      showToast(`⏳ ต้องรออีก ${daysLeft} วัน ถึงจะซื้อ ${def.name} ได้อีกครั้ง`);
+  // แพ็กที่เคยซื้อแล้ว (active หรือหมดอายุ) → ล็อกจนกว่าจะซื้อครบทุกแพ็ก
+  const allHistory = ud.packagesHistory||[];
+  const hasExpiredOrActive = allHistory.some(p=>p.key===key) ||
+    (ud.packages||[]).some(p=>p.key===key&&p.remaining<=0);
+  if(hasExpiredOrActive){
+    const allPkgs=[...(ud.packages||[]),...allHistory];
+    const boughtKeys = [...new Set(allPkgs.map(p=>p.key))];
+    const allBought = PKG_ORDER.every(k=>boughtKeys.includes(k));
+    if(!allBought){
+      const missing = PKG_ORDER.filter(k=>!boughtKeys.includes(k));
+      const missingNames = missing.map(k=>PKGS[k]?.name||k).join(', ');
+      showToast(`⛔ ต้องซื้อให้ครบทุกแพ็กก่อน ยังขาด: ${missingNames}`);
       return;
     }
   }
@@ -2751,14 +2752,7 @@ function submitWithdraw(){
 
 function doWithdraw(){ showWithdrawPopup(); } // legacy compat
 
-function addTestZkp(){
-  const ud=getUD(); if(!ud) return;
-  ud.zkpReward=(ud.zkpReward||0)+10;
-  ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:'🧪 เพิ่ม ZKP ทดสอบ',amount:10,unit:'ZKP',time:Date.now()});
-  saveUD(ud); updateNav(); renderWallet();
-  showToast('🧪 เพิ่ม 10 ZKP สำหรับทดสอบ');
-}
+// ─── TEST FUNCTION REMOVED ───
 
 // ─── TOPUP SYSTEM ───
 // LAK_RATE และ LAK_RATE_LIVE ถูก declare ไว้ด้านบนแล้ว
@@ -3052,66 +3046,34 @@ function calcOfflineEarnings(){
   const now=Date.now();
   const lastSeen=ud.lastSeen||now;
   const offlineSec=(now-lastSeen)/1000;
+  if(offlineSec<10) return;
 
   let totalOfflineZkp=0;
-  let totalRetroZkp=0;
   let changed=false;
 
   ud.packages.forEach(p=>{
     if(p.remaining<=0) return;
     const def=PKGS[p.key]; if(!def) return;
-
-    // ══ คำนวณส่วนต่างย้อนหลัง (retroactive) ══
-    // ถ้า daily ใน Firebase น้อยกว่า daily ใหม่ใน PKGS
-    const oldDaily = p._oldDaily || 0;
-    if(!p._retroDone && oldDaily > 0 && def.daily > oldDaily && p.bought > 1000000000000){
-      // วันที่ผ่านมาแล้ว
-      const elapsedDays = (now - p.bought) / 1000 / DEMO_DAY;
-      const daysDone = Math.min(elapsedDays, p.days - p.remaining);
-      const retroZkp = (def.daily - oldDaily) * daysDone;
-      if(retroZkp > 0){
-        totalRetroZkp += retroZkp;
-        p._retroDone = true; // mark ว่าคิดย้อนหลังแล้ว ไม่คิดซ้ำ
-        changed = true;
-      }
-    }
-
-    // ══ คำนวณ ZKP ออฟไลน์ปกติ ══
-    if(offlineSec >= 10){
-      const daysOffline=Math.min(offlineSec/DEMO_DAY, p.remaining);
-      const zkpEarned=def.daily*daysOffline;
-      if(zkpEarned>0){
-        totalOfflineZkp+=zkpEarned;
-        p.remaining=Math.max(0,p.remaining-daysOffline);
-        changed=true;
-      }
+    const daysOffline=Math.min(offlineSec/DEMO_DAY, p.remaining);
+    const zkpEarned=def.daily*daysOffline;
+    if(zkpEarned>0){
+      totalOfflineZkp+=zkpEarned;
+      p.remaining=Math.max(0,p.remaining-daysOffline);
+      changed=true;
     }
   });
 
-  if(changed){
-    let added = totalOfflineZkp + totalRetroZkp;
-    if(added > 0){
-      ud.zkpReward=(ud.zkpReward||0)+added;
-      ud.txs=ud.txs||[];
-      if(totalRetroZkp > 0){
-        ud.txs.unshift({
-          desc:`🎁 ปรับกำไรย้อนหลัง (อัตราใหม่)`,
-          amount:+totalRetroZkp.toFixed(6),
-          unit:'ZKP', time:now
-        });
-        showToast(`🎁 ได้รับ ZKP ย้อนหลัง +${totalRetroZkp.toFixed(4)} ZKP!`);
-      }
-      if(totalOfflineZkp > 0 && offlineSec >= 10){
-        ud.txs.unshift({
-          desc:`⚡ ขุดระหว่างออฟไลน์ ${Math.round(offlineSec/60)} นาที`,
-          amount:+totalOfflineZkp.toFixed(6),
-          unit:'ZKP', time:now
-        });
-        if(totalRetroZkp === 0) showToast(`⚡ ขุดได้ +${totalOfflineZkp.toFixed(4)} ZKP ระหว่างที่คุณออฟไลน์!`);
-      }
-      saveUD(ud);
-      updateRewardUI();
-    }
+  if(changed && totalOfflineZkp>0){
+    ud.zkpReward=(ud.zkpReward||0)+totalOfflineZkp;
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({
+      desc:`⚡ ขุดระหว่างออฟไลน์ ${Math.round(offlineSec/60)} นาที`,
+      amount:+totalOfflineZkp.toFixed(6),
+      unit:'ZKP', time:now
+    });
+    saveUD(ud);
+    updateRewardUI();
+    showToast(`⚡ ขุดได้ +${totalOfflineZkp.toFixed(4)} ZKP ระหว่างที่คุณออฟไลน์!`);
   }
 }
 
@@ -3189,7 +3151,9 @@ function startDrip(){
         });
       }).catch(()=>{
         // fallback ถ้า Firebase ไม่ตอบ ใช้ memory
-        const newZkp = parseFloat(((ud.zkpReward||0) + zkpTotal).toFixed(6));
+        // ใช้ค่าจาก _ud ที่ sync จาก listener เป็น base
+        const baseZkp = (_ud?.zkpReward !== undefined) ? (_ud.zkpReward||0) : (ud.zkpReward||0);
+        const newZkp = parseFloat((baseZkp + zkpTotal).toFixed(6));
         ud.zkpReward = newZkp;
         if(_ud) _ud.zkpReward = newZkp;
         updateRewardUI();
