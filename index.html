@@ -1146,7 +1146,7 @@ function doRegister(){
     _otpExpiry = Date.now() + 10*60*1000; // 10 นาที
 
     // ส่ง OTP ทาง Email
-    emailjs.send('service_q3ijpyi','template_fzszgfn',{
+    emailjs.send('Wservice_q3ijpyi','template_fzszgfn',{
       to_name: u,
       to_email: e,
       otp: otp
@@ -1217,7 +1217,7 @@ function resendOTP(){
   const otp=Math.floor(100000+Math.random()*900000).toString();
   _pendingOTP=otp;
   _otpExpiry=Date.now()+10*60*1000;
-  emailjs.send('service_q3ijpyi','template_fzszgfn',{
+  emailjs.send('Wservice_q3ijpyi','template_fzszgfn',{
     to_name:_pendingUser,
     to_email:_pendingEmail,
     otp:otp
