@@ -501,6 +501,14 @@ html { font-size: 16px; }
   window._db = db;
 </script>
 
+<!-- EmailJS SDK -->
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script>
+  emailjs.init('BF9cT6VPWc8gM2HrH');
+</script>
+
 </head>
 <body>
 
@@ -967,16 +975,19 @@ html { font-size: 16px; }
 
   <nav class="bottom-nav">
     <button class="bnav active" id="bn0" onclick="switchTab(0)">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg data-i18n-nav="nav.home" data-i18n="nav.home">หน้าหลัก
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>หน้าหลัก
     </button>
     <button class="bnav" id="bn1" onclick="switchTab(1)">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg data-i18n-nav="nav.contract" data-i18n="nav.contract">สัญญาขุด
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>สัญญาขุด
     </button>
     <button class="bnav" id="bn2" onclick="switchTab(2)">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg data-i18n-nav="nav.wallet" data-i18n="nav.wallet">กระเป๋า
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>กระเป๋า
     </button>
-    <button class="bnav" id="bn3" onclick="switchTab(3)" style="display:none">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg data-i18n-nav="nav.topup" data-i18n="nav.topup">เติม USDT
+    <button class="bnav" id="bnProfile" onclick="showProfilePopup()">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>โปรไฟล์
+    </button>
+    <button class="bnav" id="bnLang" onclick="showLangPopup()">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>ภาษา
     </button>
   </nav>
 </div>
@@ -1062,6 +1073,49 @@ function doLogin(){
     _ud=ud;setSess(u);enterDash(u);
   }).catch(()=>{btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error');});
 }
+// OTP storage
+let _pendingOTP = null;
+let _pendingUser = null;
+let _pendingEmail = null;
+let _pendingPass = null;
+let _otpExpiry = null;
+
+// OTP Rate Limiting
+function getOTPCount(email){
+  const key = 'otp_limit_' + email;
+  try {
+    const data = JSON.parse(localStorage.getItem(key)||'{}');
+    const now = Date.now();
+    // รีเซ็ตถ้าผ่าน 24 ชั่วโมงแล้ว
+    if(data.resetAt && now > data.resetAt){
+      localStorage.removeItem(key);
+      return {count:0, resetAt:null};
+    }
+    return data;
+  } catch(e){ return {count:0, resetAt:null}; }
+}
+function incrementOTPCount(email){
+  const key = 'otp_limit_' + email;
+  const data = getOTPCount(email);
+  const newCount = (data.count||0) + 1;
+  const resetAt = data.resetAt || (Date.now() + 24*60*60*1000);
+  localStorage.setItem(key, JSON.stringify({count:newCount, resetAt}));
+  return newCount;
+}
+function canSendOTP(email){
+  const data = getOTPCount(email);
+  return (data.count||0) < 5;
+}
+function getOTPWaitTime(email){
+  const data = getOTPCount(email);
+  if(!data.resetAt) return '';
+  const diff = data.resetAt - Date.now();
+  if(diff <= 0) return '';
+  const hrs = Math.floor(diff/3600000);
+  const mins = Math.floor((diff%3600000)/60000);
+  return `${hrs} ชั่วโมง ${mins} นาที`;
+}
+
 function doRegister(){
   const u=document.getElementById('regUser').value.trim();
   const e=document.getElementById('regEmail').value.trim();
@@ -1069,18 +1123,111 @@ function doRegister(){
   if(!u||!e||!p){showMsg('regMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return}
   if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return}
   const btn=document.querySelector('#regForm .btn-auth');
-  btn.disabled=true;btn.textContent='⏳ กำลังสมัคร...';
+  btn.disabled=true;btn.textContent='⏳ กำลังตรวจสอบ...';
   fbGetUser(u).then(existing=>{
-    if(existing){btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;}
-    const refCode = u.toUpperCase().slice(0,4) + Math.random().toString(36).slice(2,6).toUpperCase();
-    const refBy = new URLSearchParams(window.location.search).get('ref') || '';
-    const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
-    window._db.ref('users/'+u).set(nd).then(()=>{
+    if(existing){
       btn.disabled=false;btn.textContent='🚀 CREATE NODE';
-      _ud=nd;showMsg('regMsg','✅ สมัครสำเร็จ! กำลังเข้าสู่ระบบ...','success');
-      setTimeout(()=>{setSess(u);enterDash(u)},1000);
+      showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;
+    }
+    // เช็ค rate limit
+    if(!canSendOTP(e)){
+      btn.disabled=false;btn.textContent='🚀 CREATE NODE';
+      const wait = getOTPWaitTime(e);
+      showMsg('regMsg',`❌ ส่ง OTP ครบ 5 ครั้งแล้ว กรุณารอ ${wait}`,'error');
+      return;
+    }
+
+    // สร้าง OTP 6 หลัก
+    const otp = Math.floor(100000+Math.random()*900000).toString();
+    _pendingOTP = otp;
+    _pendingUser = u;
+    _pendingEmail = e;
+    _pendingPass = p;
+    _otpExpiry = Date.now() + 10*60*1000; // 10 นาที
+
+    // ส่ง OTP ทาง Email
+    emailjs.send('service_q3ijpyi','template_fzszgfn',{
+      to_name: u,
+      to_email: e,
+      otp: otp
+    }).then(()=>{
+      incrementOTPCount(e);
+      btn.disabled=false;btn.textContent='🚀 CREATE NODE';
+      showOTPModal(u, e);
+    }).catch(()=>{
+      btn.disabled=false;btn.textContent='🚀 CREATE NODE';
+      showMsg('regMsg','❌ ส่ง Email ไม่ได้ กรุณาลองใหม่','error');
     });
-  }).catch(()=>{btn.disabled=false;btn.textContent='🚀 CREATE NODE';showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');});
+  }).catch(()=>{
+    btn.disabled=false;btn.textContent='🚀 CREATE NODE';
+    showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');
+  });
+}
+
+function showOTPModal(username, email){
+  const ov=document.createElement('div');ov.className='overlay';ov.id='otpOverlay';
+  ov.innerHTML=`<div class="popup" style="text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:0.8rem;">📧</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.5rem;">ยืนยัน Email</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:1.2rem;line-height:1.8;">
+      ส่งรหัส OTP ไปที่<br>
+      <span style="color:var(--green);">${email}</span><br>
+      กรอกรหัส 6 หลักด้านล่างครับ
+    </div>
+    <input type="number" id="otpInput" maxlength="6" placeholder="000000"
+      style="width:100%;padding:1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;outline:none;text-align:center;letter-spacing:8px;margin-bottom:1rem;">
+    <div id="otpMsg" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;margin-bottom:0.8rem;min-height:1.2rem;"></div>
+    <button onclick="verifyOTP()" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">✅ ยืนยัน OTP</button>
+    <button onclick="resendOTP()" style="width:100%;padding:0.5rem;background:none;border:none;color:rgba(157,78,221,0.7);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">📨 ส่งรหัสใหม่</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+function verifyOTP(){
+  const input=document.getElementById('otpInput').value.trim();
+  const msg=document.getElementById('otpMsg');
+  if(!input){msg.style.color='var(--red-bright)';msg.textContent='⚠ กรอกรหัส OTP';return;}
+  if(Date.now()>_otpExpiry){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสหมดอายุ กดส่งใหม่';return;}
+  if(input!==_pendingOTP){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสไม่ถูกต้อง';return;}
+
+  msg.style.color='var(--green)';msg.textContent='✅ OTP ถูกต้อง กำลังสร้างบัญชี...';
+
+  const u=_pendingUser; const e=_pendingEmail; const p=_pendingPass;
+  const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+  const refBy=new URLSearchParams(window.location.search).get('ref')||localStorage.getItem('cm_pending_ref')||'';
+  const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
+
+  window._db.ref('users/'+u).set(nd).then(()=>{
+    document.querySelectorAll('.overlay').forEach(o=>o.remove());
+    _ud=nd;
+    showMsg('regMsg','✅ สมัครสำเร็จ! กำลังเข้าสู่ระบบ...','success');
+    setTimeout(()=>{setSess(u);enterDash(u)},1000);
+  });
+}
+
+function resendOTP(){
+  const msg=document.getElementById('otpMsg');
+  if(!canSendOTP(_pendingEmail)){
+    const wait=getOTPWaitTime(_pendingEmail);
+    msg.style.color='var(--red-bright)';
+    msg.textContent=`❌ ส่งครบ 5 ครั้งแล้ว กรุณารอ ${wait}`;
+    return;
+  }
+  const otp=Math.floor(100000+Math.random()*900000).toString();
+  _pendingOTP=otp;
+  _otpExpiry=Date.now()+10*60*1000;
+  emailjs.send('service_q3ijpyi','template_fzszgfn',{
+    to_name:_pendingUser,
+    to_email:_pendingEmail,
+    otp:otp
+  }).then(()=>{
+    incrementOTPCount(_pendingEmail);
+    const remaining = 5 - getOTPCount(_pendingEmail).count;
+    msg.style.color='var(--green)';
+    msg.textContent=`✅ ส่งรหัสใหม่แล้ว (เหลือ ${remaining} ครั้ง)`;
+  }).catch(()=>{
+    msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งไม่ได้ กรุณาลองใหม่';
+  });
 }
 function doLogout(){stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
 
@@ -1435,7 +1582,7 @@ function renderWallet(){
   document.getElementById('wEth').textContent=rw.toFixed(6);
   document.getElementById('wEthUsd').textContent=(rw*ETH_RATE).toFixed(4);
   const lakEl=document.getElementById('wEthLak');
-  if(lakEl) lakEl.textContent=Math.round(rw*ETH_RATE*LAK_RATE).toLocaleString();
+  if(lakEl) lakEl.textContent="";
   document.getElementById('wDaily').textContent=dailyZkp.toFixed(4);
   document.getElementById('wDailyUsd').textContent=(dailyZkp*ETH_RATE).toFixed(2);
   document.getElementById('wActive').textContent=acs.length;
@@ -1516,7 +1663,7 @@ function showWithdrawPopup(){
   const eth=ud.ethReward||0;
   if(eth<=0){ showToast('⚠️ ยังไม่มี ETH ในกระเป๋า'); return; }
   const usdVal=(eth*ETH_RATE).toFixed(4);
-  const lakVal=Math.round(eth*ETH_RATE*LAK_RATE).toLocaleString();
+  const lakVal="";
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='withdrawOv';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd">
@@ -1632,7 +1779,7 @@ function lakFmt(usd){ return (usd*LAK_RATE).toLocaleString()+' ກີບ'; }
 function onCustomAmt(val){
   const amt = parseFloat(val)||0;
   const lakEl = document.getElementById('customAmtLak');
-  if(lakEl) lakEl.textContent = amt>0 ? '= '+(amt*LAK_RATE).toLocaleString()+' ກີບ' : '= 0 ກີບ';
+  if(lakEl) lakEl.textContent = '';
   if(amt>0){
     // ล้างการเลือกปุ่ม
     document.querySelectorAll('.tu-card').forEach(c=>c.classList.remove('sel'));
@@ -1745,7 +1892,7 @@ function renderPendingList(){
     const d=new Date(r.time);
     return `<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.8rem 1rem;margin-bottom:0.6rem;display:flex;justify-content:space-between;align-items:center;">
       <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--gold);">${(r.amt*LAK_RATE).toLocaleString()} ກີບ</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--gold);"></div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USDT</div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${d.toLocaleString('th-TH')}</div>
         ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${r.note}</div>`:''}
@@ -2050,7 +2197,7 @@ function renderAdminTopup(filter){
     return `<div class="req-card ${r.status}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
         <div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);">${(r.amt*LAK_RATE).toLocaleString()} ກີບ</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);"></div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USDT</div>
           <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem;">👤 ${r.user} · ${timeStr}</div>
           ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-top:0.15rem;">📝 ${r.note}</div>`:''}
@@ -2108,7 +2255,7 @@ function renderAdminWithdraw(){
   el.innerHTML=withdraws.sort((a,b)=>b.time-a.time).map(r=>{
     const d=new Date(r.time);
     const t2=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-    const lakDisplay = r.lakAmt || Math.round((r.amt||r.ethAmt||0)*ETH_RATE*LAK_RATE).toLocaleString();
+    const lakDisplay = r.lakAmt || '';
     const ethDisplay = r.ethAmt || r.amt || 0;
     return `<div class="req-card ${r.status}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem;">
@@ -2160,36 +2307,117 @@ function rejectWithdraw(reqId, username){
 }
 function renderAdminUsers(){
   const el=document.getElementById('adminUserList'); if(!el) return;
-  const users=getU(); const keys=Object.keys(users);
-  if(!keys.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ยังไม่มีสมาชิก</div>';return;}
-  el.innerHTML=keys.map(u=>{
-    const ud=users[u];
-    const pkgs=(ud.packages||[]).filter(p=>p.remaining>0).length;
-    return `<div class="adm-user-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;">👤 ${u}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${ud.email||''}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
-        <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">USDT</div>
+  el.innerHTML='<div style="text-align:center;padding:1rem;font-family:monospace;color:#A890CC;">⏳ กำลังโหลด...</div>';
+  window._db.ref('users').once('value').then(snap=>{
+    if(!snap.exists()){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ยังไม่มีสมาชิก</div>';return;}
+    const users=snap.val();
+    const keys=Object.keys(users);
+    el.innerHTML=`<div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.8rem;">👥 สมาชิกทั้งหมด ${keys.length} คน</div>`+
+    keys.map(u=>{
+      const ud=users[u];
+      const activePkgs=(ud.packages||[]).filter(p=>p.remaining>0);
+      const totalInvested=activePkgs.reduce((s,p)=>s+(p.price||0),0);
+      const refCount=ud.refCount||0;
+      const joinDate=ud.packages&&ud.packages.length>0?new Date(ud.packages[0].bought).toLocaleDateString('th-TH'):'ไม่ระบุ';
+      return `<div class="adm-user-card" style="margin-bottom:0.8rem;">
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem;padding-bottom:0.5rem;border-bottom:1px solid rgba(157,78,221,0.15);">
+          <div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:#fff;font-weight:700;">👤 ${u}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#A890CC;">📧 ${ud.email||'-'}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:${activePkgs.length>0?'var(--green)':'var(--text-dim)'};">
+              ${activePkgs.length>0?'🟢 Active':'⚫ ไม่ Active'}
+            </div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--text-dim);">Ref: ${ud.refCode||'-'}</div>
+          </div>
         </div>
-        <div style="background:rgba(74,222,128,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--green);">${(ud.ethReward||0).toFixed(4)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">ETH</div>
+
+        <!-- ยอดเงิน -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:0.6rem;">
+          <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.15);border-radius:8px;padding:0.5rem;text-align:center;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--gold);font-weight:700;">$${(ud.usd||0).toFixed(2)}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--text-dim);">USDT</div>
+          </div>
+          <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.15);border-radius:8px;padding:0.5rem;text-align:center;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--green);font-weight:700;">${(ud.ethReward||0).toFixed(4)}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--text-dim);">ETH</div>
+          </div>
+          <div style="background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.15);border-radius:8px;padding:0.5rem;text-align:center;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--purple-light);font-weight:700;">$${totalInvested.toLocaleString()}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:var(--text-dim);">ลงทุน</div>
+          </div>
         </div>
-        <div style="background:rgba(157,78,221,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--purple-light);">${pkgs}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div>
+
+        <!-- แพ็กที่ Active -->
+        ${activePkgs.length>0?`
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.6rem;margin-bottom:0.6rem;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.4rem;">⛏ แพ็กที่กำลังขุด (${activePkgs.length})</div>
+          ${activePkgs.map(p=>{
+            const def=PKGS[p.key];
+            const pct=Math.round((1-p.remaining/(p.days||1))*100);
+            const dailyEarn=((p.price||0)*(p.dailyPct||0)/100).toFixed(2);
+            return `<div style="margin-bottom:0.4rem;">
+              <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.62rem;">
+                <span style="color:#fff;">${def?def.name:p.key} · $${(p.price||0).toLocaleString()}</span>
+                <span style="color:var(--gold);">$${dailyEarn}/วัน</span>
+              </div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:4px;margin-top:0.2rem;">
+                <div style="width:${pct}%;height:100%;background:var(--green);border-radius:4px;"></div>
+              </div>
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--text-dim);">เหลือ ${Math.max(0,p.remaining).toFixed(1)} วัน</div>
+            </div>`;
+          }).join('')}
+        </div>`:''}
+
+        <!-- สถิติ -->
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.4rem;margin-bottom:0.6rem;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;">
+            👥 Referral: <span style="color:#fff;">${refCount} คน</span>
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;">
+            💰 Ref ได้: <span style="color:var(--green);">${(ud.refEarned||0).toFixed(4)} ETH</span>
+          </div>
         </div>
-      </div>
-      <div style="display:flex;gap:0.4rem;margin-top:0.6rem;">
-        <button onclick="adminAddUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">+ เติม USDT</button>
-        <button onclick="adminDeductUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">- หัก USDT</button>
-      </div>
+
+        <!-- ปุ่ม Admin -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;">
+          <button onclick="adminViewTx('${u}')" style="padding:0.45rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.25);border-radius:7px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">📋 ประวัติ</button>
+          <button onclick="adminAddUsd('${u}')" style="padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">+ USDT</button>
+          <button onclick="adminDeductUsd('${u}')" style="padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">- USDT</button>
+        </div>
+      </div>`;
+    }).join('');
+  }).catch(()=>{el.innerHTML='<div style="color:red;text-align:center;padding:1rem;">❌ โหลดไม่ได้</div>';});
+}
+
+function adminViewTx(username){
+  window._db.ref('users/'+username).once('value').then(snap=>{
+    if(!snap.exists()){showToast('❌ ไม่พบผู้ใช้');return;}
+    const ud=snap.val();
+    const txs=ud.txs||[];
+    const ov=document.createElement('div');ov.className='overlay';
+    ov.innerHTML=`<div class="popup" style="max-height:80vh;overflow-y:auto;">
+      <div class="pop-hd"><div class="pop-title">📋 ประวัติ ${username}</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
+      ${txs.length===0?'<div style="text-align:center;color:var(--text-dim);padding:1rem;">ยังไม่มีประวัติ</div>':
+      txs.slice(0,30).map(tx=>{
+        const d=new Date(tx.time);
+        const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        const isPos=(tx.amount||0)>0;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#fff;">${tx.desc||'-'}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--text-dim);">${t}</div>
+          </div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:${isPos?'var(--green)':'var(--red-bright)'};">
+            ${isPos?'+':''}${parseFloat(tx.amount||0).toFixed(4)} ${tx.unit||''}
+          </div>
+        </div>`;
+      }).join('')}
     </div>`;
-  }).join('');
+    document.body.appendChild(ov);
+  });
 }
 function adminAddUsd(username){
   const amt=parseFloat(prompt(`เติม USDT ให้ ${username} จำนวน:`));
@@ -2726,6 +2954,87 @@ const I18N = {
 
 function t(key){ return (I18N[LANG]||I18N['th'])[key] || key; }
 
+function showProfilePopup(){
+  const ud=getUD(); if(!ud) return;
+  const u=getSess();
+  const refLink=window.location.href.split('?')[0]+'?ref='+u;
+  const ov=document.createElement('div');ov.className='overlay';
+  ov.innerHTML=`<div class="popup">
+    <div class="pop-hd"><div class="pop-title">👤 โปรไฟล์</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
+
+    <!-- ข้อมูลโปรไฟล์ -->
+    <div style="background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+      <div style="text-align:center;margin-bottom:0.8rem;">
+        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--red-dark));display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 0.5rem;">👤</div>
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:#fff;">${u}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#A890CC;">${ud.email||'-'}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.6rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--gold);">${(ud.usd||0).toFixed(2)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;">USDT</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.6rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--green);">${(ud.ethReward||0).toFixed(4)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;">ETH</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- รหัส Referral -->
+    <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">🎁 รหัสชวนเพื่อน</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:var(--gold);text-align:center;letter-spacing:4px;margin-bottom:0.5rem;">${ud.refCode||'-'}</div>
+      <button onclick="navigator.clipboard.writeText('${refLink}').then(()=>showToast('📋 คัดลอกลิงก์แล้ว!'))" style="width:100%;padding:0.5rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:8px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">📋 คัดลอกลิงก์ชวนเพื่อน</button>
+    </div>
+
+    <!-- เปลี่ยนรหัสผ่าน -->
+    <div style="background:rgba(157,78,221,0.05);border:1px solid rgba(157,78,221,0.15);border-radius:12px;padding:1rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.8rem;">🔐 เปลี่ยนรหัสผ่าน</div>
+      <input type="password" id="oldPassInput" placeholder="รหัสผ่านเดิม"
+        style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.6rem;">
+      <input type="password" id="newPassInput" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)"
+        style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.6rem;">
+      <input type="password" id="confirmPassInput" placeholder="ยืนยันรหัสผ่านใหม่"
+        style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.8rem;">
+      <div id="changePassMsg" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;margin-bottom:0.5rem;min-height:1rem;"></div>
+      <button onclick="changeUserPass()" class="btn btn-primary" style="width:100%;">🔐 บันทึกรหัสใหม่</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+function changeUserPass(){
+  const ud=getUD(); if(!ud) return;
+  const oldP=document.getElementById('oldPassInput').value;
+  const newP=document.getElementById('newPassInput').value;
+  const confP=document.getElementById('confirmPassInput').value;
+  const msg=document.getElementById('changePassMsg');
+
+  if(!oldP||!newP||!confP){msg.style.color='var(--red-bright)';msg.textContent='⚠ กรอกข้อมูลให้ครบ';return;}
+  if(oldP!==ud.pw){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสผ่านเดิมไม่ถูกต้อง';return;}
+  if(newP.length<6){msg.style.color='var(--red-bright)';msg.textContent='⚠ รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัว';return;}
+  if(newP!==confP){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสผ่านใหม่ไม่ตรงกัน';return;}
+
+  ud.pw=newP;
+  saveUD(ud);
+  msg.style.color='var(--green)';
+  msg.textContent='✅ เปลี่ยนรหัสผ่านสำเร็จ!';
+  setTimeout(()=>{document.querySelectorAll('.overlay').forEach(o=>o.remove());},1500);
+}
+
+function showLangPopup(){
+  const ov=document.createElement('div');ov.className='overlay';
+  ov.innerHTML=`<div class="popup" style="text-align:center;">
+    <div class="pop-hd"><div class="pop-title">🌐 เลือกภาษา</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
+    <div style="display:flex;flex-direction:column;gap:0.8rem;margin-top:0.5rem;">
+      <button onclick="setLang('th');this.closest('.overlay').remove()" style="padding:1rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.9rem;cursor:pointer;">🇹🇭 ภาษาไทย</button>
+      <button onclick="setLang('en');this.closest('.overlay').remove()" style="padding:1rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.9rem;cursor:pointer;">🇬🇧 English</button>
+      <button onclick="setLang('lo');this.closest('.overlay').remove()" style="padding:1rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.9rem;cursor:pointer;">🇱🇦 ລາວ</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
 function setLang(lang){
   LANG = lang;
   localStorage.setItem('cm_lang', LANG);
