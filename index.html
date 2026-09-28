@@ -1154,9 +1154,10 @@ function doRegister(){
       incrementOTPCount(e);
       btn.disabled=false;btn.textContent='🚀 CREATE NODE';
       showOTPModal(u, e);
-    }).catch(()=>{
+    }).catch((err)=>{
+      console.error('EmailJS error:', err);
       btn.disabled=false;btn.textContent='🚀 CREATE NODE';
-      showMsg('regMsg','❌ ส่ง Email ไม่ได้ กรุณาลองใหม่','error');
+      showMsg('regMsg','❌ ส่ง Email ไม่ได้: '+JSON.stringify(err),'error');
     });
   }).catch(()=>{
     btn.disabled=false;btn.textContent='🚀 CREATE NODE';
