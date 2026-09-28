@@ -332,6 +332,8 @@ transition:transform 0.3s,box-shadow 0.3s;border:1px solid var(–border)}
 .pc-basic::before   {background:linear-gradient(90deg,var(–purple-dark),var(–purple-light))}.pc-basic:hover{box-shadow:0 6px 25px rgba(157,78,221,0.2)}
 .pc-pro::before     {background:linear-gradient(90deg,var(–red-dark),var(–red-bright))}.pc-pro:hover{box-shadow:0 6px 25px rgba(230,57,70,0.2)}
 .pc-vip::before     {background:linear-gradient(90deg,#78350f,var(–gold))}.pc-vip:hover{box-shadow:0 6px 25px rgba(255,215,0,0.15)}
+.pc-elite::before   {background:linear-gradient(90deg,#78350f,var(–gold))}.pc-elite:hover{box-shadow:0 6px 25px rgba(255,215,0,0.2)}
+.pc-ultra::before   {background:linear-gradient(90deg,#4A0E8F,#c084fc)}.pc-ultra:hover{box-shadow:0 6px 25px rgba(192,132,252,0.2)}
 .pkg-badge{position:absolute;top:0.6rem;right:0.6rem;font-family:‘Orbitron’,monospace;font-size:0.48rem;
 letter-spacing:1px;padding:0.18rem 0.45rem;border-radius:20px;font-weight:700}
 .b-free{background:linear-gradient(135deg,#065f46,var(–green));color:#000}
@@ -362,6 +364,8 @@ letter-spacing:1px;padding:0.18rem 0.45rem;border-radius:20px;font-weight:700}
 .pc-basic .btn-buy   {background:linear-gradient(135deg,var(–purple-dark),var(–purple-light));color:#fff}
 .pc-pro .btn-buy     {background:linear-gradient(135deg,var(–red-dark),var(–red-bright));color:#fff}
 .pc-vip .btn-buy     {background:linear-gradient(135deg,#78350f,var(–gold));color:#000}
+.pc-elite .btn-buy   {background:linear-gradient(135deg,#78350f,var(–gold));color:#000}
+.pc-ultra .btn-buy   {background:linear-gradient(135deg,#4A0E8F,#c084fc);color:#fff}
 .pkg-owned{width:100%;padding:0.55rem;border-radius:7px;text-align:center;font-family:‘Share Tech Mono’,monospace;font-size:0.6rem;color:var(–green);border:1px solid rgba(74,222,128,0.25);background:rgba(74,222,128,0.06)}
 .pkg-locked{width:100%;padding:0.55rem;border-radius:7px;text-align:center;font-family:‘Share Tech Mono’,monospace;font-size:0.58rem;color:var(–text-dim);border:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.2)}
 .info-box{background:rgba(80,0,120,0.35);border:2px solid rgba(180,80,255,0.4);border-radius:13px;padding:1rem;margin-bottom:1.3rem}
@@ -507,7 +511,7 @@ html { font-size: 16px; }
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
-  emailjs.init('BF9cT6VPWc8gM2HrH');
+  emailjs.init('ifiD1WB6OHpQjy78Q');
 </script>
 
 </head>
@@ -705,7 +709,7 @@ html { font-size: 16px; }
   <div id="noMachMsg" style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:1.1rem;">
     <div style="font-size:2.5rem;margin-bottom:0.6rem;">⛏️</div>
     <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;margin-bottom:0.4rem;">ยังไม่มีเครื่องขุด</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">ซื้อสัญญาขุดเพื่อเริ่มต้น<br>ขุด ETH อัตโนมัติ 7 วัน</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">ซื้อสัญญาขุดเพื่อเริ่มต้น<br>ขุด ETH อัตโนมัติตามระยะเวลาที่กำหนด</div>
     <button onclick="switchTab(1)" class="btn btn-primary" style="padding:0.7rem 1.5rem;font-size:0.8rem;">
       🛒 ดูสัญญาขุด
     </button>
@@ -749,7 +753,7 @@ html { font-size: 16px; }
   <div class="pkg-grid" id="pkgGrid"></div>
   <div class="info-box">
     <div class="info-box-t" data-i18n="pkg.how">ℹ️ วิธีทำงาน</div>
-    <div class="info-box-b" data-i18n-html="pkg.how.body">1. เติม USDT จากผู้ดูแลระบบ<br>2. เลือกสัญญาเช่ากำลังขุด<br>3. ระบบขุด ETH ให้อัตโนมัติ 7 วัน<br>4. กำไร ETH โอนเข้ากระเป๋ารางวัล (1 ETH ≈ $1)</span></div>
+    <div class="info-box-b" data-i18n-html="pkg.how.body">1. เติม USDT จากผู้ดูแลระบบ<br>2. เลือกสัญญาเช่ากำลังขุด<br>3. ระบบขุด ETH ให้อัตโนมัติตามระยะเวลาที่กำหนด<br>4. กำไร ETH โอนเข้ากระเป๋ารางวัล (1 ETH ≈ $1)</span></div>
   </div>
   <div class="sec-title" data-i18n="pkg.active">✅ สัญญาที่ใช้งานอยู่</div>
   <div id="acList"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;padding:0.6rem 0"><span data-i18n="pkg.noactive">ยังไม่มีสัญญาที่ใช้งานอยู่</span></div></div>
@@ -1147,7 +1151,7 @@ function doRegister(){
     _otpExpiry = Date.now() + 10*60*1000; // 10 นาที
 
     // ส่ง OTP ทาง Email
-    emailjs.send('Wservice_q3ijpyi','template_fzszgfn',{
+    emailjs.send('service_z1n3i6s','template_z9ltexk',{
       to_name: u,
       to_email: e,
       otp: otp
@@ -1218,7 +1222,7 @@ function resendOTP(){
   const otp=Math.floor(100000+Math.random()*900000).toString();
   _pendingOTP=otp;
   _otpExpiry=Date.now()+10*60*1000;
-  emailjs.send('Wservice_q3ijpyi','template_fzszgfn',{
+  emailjs.send('service_z1n3i6s','template_z9ltexk',{
     to_name:_pendingUser,
     to_email:_pendingEmail,
     otp:otp
@@ -2038,7 +2042,7 @@ function showRollNotif(def){
     ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(255,215,0,0.4)"><div style="font-size:2.3rem;margin-bottom:0.8rem">🏆</div><div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.45rem">${t('roll.max')}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.3rem">${t('roll.maxdesc')}</div><button class="btn btn-gold" style="width:100%" onclick="this.closest('.overlay').remove()">✅ รับทราบ</button></div>`;
   } else {
     ov.innerHTML=`<div class="popup">
-      <div class="pop-hd"><div class="pop-title">🔔 แพ็กครบ 7 วันแล้ว!</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
+      <div class="pop-hd"><div class="pop-title">🔔 แพ็กครบกำหนดแล้ว!</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
       <div class="roll-from"><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.from')}</div><div style="font-family:'Orbitron',monospace;font-size:0.88rem;font-weight:700;color:#fff">${def.name}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--green);margin-top:0.28rem">${t('roll.done')}</div></div>
       <div class="roll-next">
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.next')}</div>
@@ -2769,11 +2773,11 @@ const I18N = {
     'pkg.title':       '⛏️ Cloud Mining Contracts',
     'pkg.bal':         '💵 USDT คงเหลือ',
     'pkg.how':         'ℹ️ วิธีทำงาน',
-    'pkg.how.body':    '<span data-i18n-html="pkg.how.body">1. เติม USDT จากผู้ดูแลระบบ<br>2. เลือกสัญญาเช่ากำลังขุด<br>3. ระบบขุด ETH ให้อัตโนมัติ 7 วัน<br>4. กำไร ETH โอนเข้ากระเป๋ารางวัล (1 ETH ≈ $1)</span>',
+    'pkg.how.body':    '<span data-i18n-html="pkg.how.body">1. เติม USDT จากผู้ดูแลระบบ<br>2. เลือกสัญญาเช่ากำลังขุด<br>3. ระบบขุด ETH ให้อัตโนมัติตามระยะเวลาที่กำหนด<br>4. กำไร ETH โอนเข้ากระเป๋ารางวัล (1 ETH ≈ $1)</span>',
     'pkg.active':      '✅ สัญญาที่ใช้งานอยู่',
     'pkg.noactive':    'ยังไม่มีสัญญาที่ใช้งานอยู่',
     'pkg.profit':      'กำไร',
-    'pkg.perdays':     'ETH / 7 วัน (+20%)',
+    'pkg.perdays':     'ETH / ตามระยะเวลา',
     'pkg.roi.profit':  '💰 กำไร ETH',
     'pkg.roi.daily':   '⚡ ETH/วัน',
     'pkg.roi.value':   '📈 มูลค่ากำไร',
@@ -2829,7 +2833,7 @@ const I18N = {
     'det.bought':      'ซื้อเมื่อ:',
     'det.wallet':      '💼 ไปกระเป๋ารางวัล ETH',
     // Roll notif
-    'roll.title':      '🔔 แพ็กครบ 7 วันแล้ว!',
+    'roll.title':      '🔔 แพ็กครบกำหนดแล้ว!',
     'roll.from':       'แพ็กที่เพิ่งครบ',
     'roll.done':       '✅ กำไร ETH ถูกโอนเข้ากระเป๋าแล้ว',
     'roll.next':       '🔄 โรลเงินไปแพ็กถัดไป',
@@ -2854,7 +2858,7 @@ const I18N = {
     'toast.withdraw':  '📩 ส่งคำขอแลก',
     'toast.mineth':    '⚠️ ต้องมี ETH อย่างน้อย 1 ETH',
     'toast.expired1':  '✅',
-    'toast.expired2':  'ครบ 7 วัน! ซื้ออีก',
+    'toast.expired2':  'ครบกำหนด! ซื้ออีก',
     'toast.expired3':  'ครั้งเพื่อปลดล็อกถัดไป',
   },
   en: {
@@ -2907,11 +2911,11 @@ const I18N = {
     'pkg.title':       '⛏️ Cloud Mining Contracts',
     'pkg.bal':         '💵 USDT Balance',
     'pkg.how':         'ℹ️ How It Works',
-    'pkg.how.body':    '1. Top up USDT from admin<br>2. Choose a mining contract<br>3. System mines ETH automatically for 7 days<br>4. ETH profit goes to reward wallet (1 ETH ≈ $1)',
+    'pkg.how.body':    '1. Top up USDT from admin<br>2. Choose a mining contract<br>3. System mines ETH automatically for the specified duration<br>4. ETH profit goes to reward wallet (1 ETH ≈ $1)',
     'pkg.active':      '✅ Active Contracts',
     'pkg.noactive':    'No active contracts yet',
     'pkg.profit':      'Profit',
-    'pkg.perdays':     'ETH / 7 days (+20%)',
+    'pkg.perdays':     'ETH / specified duration',
     'pkg.roi.profit':  '💰 ETH Profit',
     'pkg.roi.daily':   '⚡ ETH/Day',
     'pkg.roi.value':   '📈 Profit Value',
