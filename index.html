@@ -147,8 +147,8 @@ box-shadow: 0 0 0 2px rgba(230,57,70,0.7), 0 0 20px rgba(230,57,70,0.4);
 box-shadow: 0 0 0 1.5px rgba(157,78,221,0.45), 0 0 8px rgba(157,78,221,0.15);
 }
 /* ── END BUTTON RING ── */
-.admin-tab{flex:1;min-width:80px;padding:0.6rem 0.5rem;background:none;border:none;border-bottom:2px solid transparent;
-font-family:‘Share Tech Mono’,monospace;font-size:0.62rem;color:var(–text-dim);cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.admin-tab{flex:1;min-width:0;padding:0.6rem 0.3rem;background:none;border:none;border-bottom:2px solid transparent;
+font-family:‘Share Tech Mono’,monospace;font-size:0.58rem;color:var(–text-dim);cursor:pointer;white-space:nowrap;transition:all 0.2s;text-align:center;overflow:hidden;text-overflow:ellipsis}
 .admin-tab.active{color:var(–gold);border-bottom-color:var(–gold)}
 .admin-page{display:none}.admin-page.active{display:block}
 .filter-btn{padding:0.3rem 0.75rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
@@ -546,9 +546,9 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 
   <!-- Admin tabs -->
 
-  <div style="display:flex;background:rgba(6,0,14,0.95);border-bottom:1px solid var(--border);overflow-x:auto;">
-    <button class="admin-tab active" id="atn0" onclick="switchAdminTab(0)">💰 เติมเงิน</button>
-    <button class="admin-tab" id="atn1" onclick="switchAdminTab(1)">💱 แลก ETH</button>
+  <div style="display:flex;background:rgba(6,0,14,0.95);border-bottom:1px solid var(--border);width:100%;box-sizing:border-box;">
+    <button class="admin-tab active" id="atn0" onclick="switchAdminTab(0)">💰 เติม</button>
+    <button class="admin-tab" id="atn1" onclick="switchAdminTab(1)">💱 แลก</button>
     <button class="admin-tab" id="atn2" onclick="switchAdminTab(2)">👥 สมาชิก</button>
     <button class="admin-tab" id="atn3" onclick="switchAdminTab(3)">⚙️ ตั้งค่า</button>
   </div>
