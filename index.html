@@ -953,7 +953,6 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 const DEMO_DAY = 86400; // วินาที/วัน (จริง)
 const TICK = 3000;
 const ETH_RATE = 2672.47; // 1 ETH = USDT
-const ETH_RATE = 1/ETH_RATE; // compat
 
 // ─── PACKAGES (คืนทุน + กำไร) ───
 const PKGS = {
@@ -1593,7 +1592,7 @@ function addTestZkp(){
 }
 
 // ─── TOPUP SYSTEM ───
-// LAK_RATE removed // 1 USDT = 22,700 LAK
+const LAK_RATE = 0; // ไม่ใช้แล้ว
 let selAmt=10;
 function lakFmt(usd){ return (usd*LAK_RATE).toLocaleString()+' ກີບ'; }
 function onCustomAmt(val){
