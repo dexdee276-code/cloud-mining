@@ -1155,14 +1155,16 @@ function doRegister(){
       to_name: u,
       to_email: e,
       otp: otp
-    }).then(()=>{
+    }).then((res)=>{
+      console.log('EmailJS OK:', res);
       incrementOTPCount(e);
       btn.disabled=false;btn.textContent='🚀 CREATE NODE';
       showOTPModal(u, e);
     }).catch((err)=>{
       console.error('EmailJS error:', err);
       btn.disabled=false;btn.textContent='🚀 CREATE NODE';
-      showMsg('regMsg','❌ ส่ง Email ไม่ได้: '+JSON.stringify(err),'error');
+      const errMsg = err && err.text ? err.text : JSON.stringify(err);
+      showMsg('regMsg','❌ ส่ง Email ไม่ได้: '+errMsg,'error');
     });
   }).catch(()=>{
     btn.disabled=false;btn.textContent='🚀 CREATE NODE';
