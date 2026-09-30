@@ -1394,21 +1394,23 @@ function showMsg(id,msg,type){
 function doLogin(){
   const uEl=document.getElementById('loginUser');
   const pEl=document.getElementById('loginPass');
-  if(!uEl||!pEl){showToast('❌ เกิดข้อผิดพลาด');return;}
+  if(!uEl||!pEl){showToast('❌ หา input ไม่เจอ');return;}
   const u=uEl.value.trim();
   const p=pEl.value;
-  if(!u||!p){showMsg('loginMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return;}
-  if(!window._db){showMsg('loginMsg','⚠ กำลังเชื่อมต่อ กรุณารอสักครู่...','error');return;}
+  if(!u||!p){showToast('⚠ กรุณากรอกข้อมูลให้ครบ');return;}
+  if(!window._db){showToast('⚠ Firebase ยังไม่พร้อม');return;}
   const btn=document.querySelector('#loginForm .btn-auth');
   if(btn){btn.disabled=true;btn.textContent='⏳ กำลังเข้าสู่ระบบ...';}
+  showToast('⏳ กำลังเข้าสู่ระบบ...');
   fbGetUser(u).then(ud=>{
     if(btn){btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';}
-    if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
-    if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
+    if(!ud){showToast('❌ ไม่พบชื่อผู้ใช้');showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
+    if(ud.pw!==p){showToast('❌ รหัสผ่านไม่ถูกต้อง');showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
     _ud=ud;setSess(u);enterDash(u);
   }).catch(err=>{
     if(btn){btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';}
-    showMsg('loginMsg','❌ เชื่อมต่อไม่ได้: '+err.message,'error');
+    showToast('❌ '+err.message);
+    showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error');
   });
 }
 // OTP storage
