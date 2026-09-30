@@ -660,9 +660,9 @@ html { font-size: 16px; }
       </div>
     </div>
     <div id="loginMsg" style="min-height:1.2rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;"></div>
-    <button class="btn-auth" onclick="doLogin()"
-      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border:none;border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);"
-      data-i18n="auth.btn.login">⚡ AUTHENTICATE</button>
+    <div onclick="doLogin()" id="loginBtn"
+      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;"
+      data-i18n="auth.btn.login">⚡ AUTHENTICATE</div>
   </div>
 
   <!-- Register Form -->
@@ -1350,7 +1350,17 @@ function getUD(){return _ud;}
 function getU(){const u=getSess();if(!u||!_ud)return{};return{[u]:_ud};}
 function saveU(all){const u=getSess();if(!u)return;if(all[u]){_ud=all[u];window._db.ref('users/'+u).set(all[u]);}}
 function saveUD(d){_ud=d;const u=getSess();if(!u)return;window._db.ref('users/'+u).set(d);}
-function fbGetUser(u){return window._db.ref('users/'+u).once('value').then(s=>s.exists()?s.val():null);}
+function fbGetUser(u){
+  if(!window._db) return Promise.resolve(null);
+  return window._db.ref('users/'+u).once('value').then(s=>{
+    if(s.exists()){
+      const ud=s.val();
+      localStorage.setItem('cm_ud_'+u, JSON.stringify(ud));
+      return ud;
+    }
+    return null;
+  });
+}
 
 // ─── AUTH ───
 let ptTimer;
@@ -1396,19 +1406,41 @@ function doLogin(){
   const u=uEl.value.trim();
   const p=pEl.value;
   if(!u||!p){showToast('⚠ กรุณากรอกข้อมูลให้ครบ');return;}
-  if(!window._db){showToast('⚠ Firebase ยังไม่พร้อม');return;}
-  const btn=document.querySelector('#loginForm .btn-auth');
-  if(btn){btn.disabled=true;btn.textContent='⏳ กำลังเข้าสู่ระบบ...';}
-  showToast('⏳ กำลังเข้าสู่ระบบ...');
+  const btn=document.getElementById('loginBtn');
+  if(btn){btn.style.opacity='0.6';btn.style.pointerEvents='none';btn.textContent='⏳...';}
+
+  // เช็ค local cache ก่อน (ช่วย login เร็วขึ้นเมื่อ Firebase ช้า)
+  const cached = localStorage.getItem('cm_ud_'+u);
+  if(cached){
+    try{
+      const ud = JSON.parse(cached);
+      if(ud.pw===p){
+        if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';btn.textContent='⚡ AUTHENTICATE';}
+        _ud=ud;setSess(u);enterDash(u);
+        // sync ข้อมูลล่าสุดจาก Firebase เบื้องหลัง
+        if(window._db) fbGetUser(u).then(fresh=>{if(fresh){_ud=fresh;localStorage.setItem('cm_ud_'+u,JSON.stringify(fresh));}});
+        return;
+      }
+    }catch(e){}
+  }
+
+  if(!window._db){
+    if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';btn.textContent='⚡ AUTHENTICATE';}
+    showToast('⚠ ไม่สามารถเชื่อมต่อได้');
+    showMsg('loginMsg','⚠ ไม่สามารถเชื่อมต่อได้','error');
+    return;
+  }
+
   fbGetUser(u).then(ud=>{
-    if(btn){btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';}
+    if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';btn.textContent='⚡ AUTHENTICATE';}
     if(!ud){showToast('❌ ไม่พบชื่อผู้ใช้');showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
     if(ud.pw!==p){showToast('❌ รหัสผ่านไม่ถูกต้อง');showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
+    localStorage.setItem('cm_ud_'+u, JSON.stringify(ud));
     _ud=ud;setSess(u);enterDash(u);
   }).catch(err=>{
-    if(btn){btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';}
-    showToast('❌ '+err.message);
-    showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error');
+    if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';btn.textContent='⚡ AUTHENTICATE';}
+    showToast('❌ เชื่อมต่อไม่ได้');
+    showMsg('loginMsg','❌ เชื่อมต่อไม่ได้ ลองใหม่อีกครั้ง','error');
   });
 }
 // OTP storage
@@ -1461,7 +1493,7 @@ function doRegister(){
   const p=document.getElementById('regPass').value;
   if(!u||!e||!p){showMsg('regMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return}
   if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return}
-  const btn=document.querySelector('#regForm .btn-auth');
+  const btn=document.getElementById('regBtn');
   btn.disabled=true;btn.textContent='⏳ กำลังตรวจสอบ...';
   fbGetUser(u).then(existing=>{
     if(existing){
