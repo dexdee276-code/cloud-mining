@@ -2343,7 +2343,7 @@ function switchAdminTab(i){
   ['apg0','apg1','apg2','apg3'].forEach((id,j)=>{
     document.getElementById(id).classList.toggle('active', i===j);
   });
-  if(i===0) renderAdminTopup(currentFilter);
+  if(i===0) renderAdminPkgReqs();
   if(i===1) renderAdminWithdraw();
   if(i===2) renderAdminUsers();
   if(i===3){ loadAdminQRPreview(); renderAdminStats(); loadUsdtAddr(); }
