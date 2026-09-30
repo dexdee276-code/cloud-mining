@@ -1357,11 +1357,28 @@ function fbGetUser(u){return window._db.ref('users/'+u).once('value').then(s=>s.
 // ─── AUTH ───
 let ptTimer;
 function switchAuthTab(t){
-  document.getElementById('tabL').classList.toggle('active',t==='login');
-  document.getElementById('tabR').classList.toggle('active',t==='register');
+  document.getElementById('tabL')?.classList.toggle('active',t==='login');
+  document.getElementById('tabR')?.classList.toggle('active',t==='register');
   document.getElementById('loginForm').classList.toggle('active',t==='login');
   document.getElementById('regForm').classList.toggle('active',t==='register');
   typePrompt(t==='login'?'auth --mode=login':'auth --mode=register');
+}
+function switchAuth(tab){
+  const isLogin = tab==='login';
+  document.getElementById('loginForm').classList.toggle('active', isLogin);
+  document.getElementById('regForm').classList.toggle('active', !isLogin);
+  const atLogin=document.getElementById('atLogin');
+  const atReg=document.getElementById('atReg');
+  if(atLogin){
+    atLogin.style.background=isLogin?'linear-gradient(135deg,#627eea,#8a9ef0)':'transparent';
+    atLogin.style.color=isLogin?'#fff':'rgba(98,126,234,0.6)';
+    atLogin.style.boxShadow=isLogin?'0 0 15px rgba(98,126,234,0.5)':'none';
+  }
+  if(atReg){
+    atReg.style.background=!isLogin?'linear-gradient(135deg,#627eea,#8a9ef0)':'transparent';
+    atReg.style.color=!isLogin?'#fff':'rgba(98,126,234,0.6)';
+    atReg.style.boxShadow=!isLogin?'0 0 15px rgba(98,126,234,0.5)':'none';
+  }
 }
 function typePrompt(txt){
   const el=document.getElementById('promptTxt');
