@@ -1172,10 +1172,13 @@ function showOTPModal(username, email){
   ov.innerHTML=`<div class="popup" style="text-align:center;">
     <div style="font-size:2.5rem;margin-bottom:0.8rem;">📧</div>
     <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.5rem;">ยืนยัน Email</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:1.2rem;line-height:1.8;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.8rem;line-height:1.8;">
       ส่งรหัส OTP ไปที่<br>
       <span style="color:var(--green);">${email}</span><br>
       กรอกรหัส 6 หลักด้านล่างครับ
+    </div>
+    <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:0.6rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--gold);line-height:1.8;">
+      ⚠️ ถ้าไม่พบ OTP ในกล่องจดหมาย<br>กรุณาเช็ค <b>Spam / จดหมายขยะ</b> ด้วยครับ
     </div>
     <input type="number" id="otpInput" placeholder="000000"
       style="width:100%;padding:1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;outline:none;text-align:center;letter-spacing:8px;margin-bottom:1rem;">
@@ -1260,9 +1263,15 @@ function enterDash(user){
 // ─── NAVIGATION ───
 const PAGES=['pgHome','pgPkg','pgWallet','pgTopup'];
 function switchTab(i){
-  PAGES.forEach((id,j)=>{document.getElementById(id).classList.toggle('active',i===j);document.getElementById('bn'+j).classList.toggle('active',i===j)});
-  if(i===1)renderPkgs();if(i===2)renderWallet();
-  if(i===3){renderTopupHistory();renderPendingList();}
+  PAGES.forEach((id,j)=>{
+    const page=document.getElementById(id);
+    if(page) page.classList.toggle('active',i===j);
+    const btn=document.getElementById('bn'+j);
+    if(btn) btn.classList.toggle('active',i===j);
+  });
+  if(i===0)renderMachines();
+  if(i===1)renderPkgs();
+  if(i===2)renderWallet();
 }
 
 // ─── MINING ───
