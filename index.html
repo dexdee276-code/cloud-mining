@@ -1452,12 +1452,11 @@ function goToUsdtPayment(key, passedAmt){
   const amt = passedAmt || (parseFloat(document.getElementById('buyAmtInput')?.value)||0);
   if(amt<100||amt>100000){showToast('⚠ ใส่จำนวน $100 - $100,000');return;}
   // โหลดที่อยู่ USDT และ QR Code จาก Firebase พร้อมกัน
-  Promise.all([
-    window._db.ref('settings/usdtAddr').once('value'),
-    window._db.ref('settings/qrCode').once('value')
-  ]).then(([addrSnap, qrSnap])=>{
+  window._db.ref('settings/usdtAddr').once('value').then(addrSnap=>{
     const addr = addrSnap.exists() ? addrSnap.val() : 'ยังไม่ได้ตั้งค่า กรุณาติดต่อ Admin';
-    const qr = qrSnap.exists() ? qrSnap.val() : null;
+    // อ่าน QR จาก localStorage แทน Firebase
+    const qr = localStorage.getItem('cm_qr_image') || null;
+    if(true){
     document.querySelectorAll('.overlay').forEach(o=>o.remove());
     const ov=document.createElement('div');ov.className='overlay';
     ov.innerHTML=`<div class="popup" style="max-height:90vh;overflow-y:auto;">
@@ -1485,6 +1484,7 @@ function goToUsdtPayment(key, passedAmt){
       <button class="btn btn-primary" style="width:100%" onclick="submitPkgPayment('${key}',${amt})">📤 ส่งหลักฐานการโอน</button>
     </div>`;
     document.body.appendChild(ov);
+  }
   });
 }
 
@@ -2733,16 +2733,12 @@ function uploadAdminQR(e){
       if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
       canvas.width=w;canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      const compressed=canvas.toDataURL('image/jpeg',0.85);
+      const compressed=canvas.toDataURL('image/jpeg',0.7);
       try{
-        // บันทึกทั้ง qr_image (preview) และ qrCode (สำหรับลูกค้า)
-        Promise.all([
-          window._db.ref('settings/qr_image').set(compressed),
-          window._db.ref('settings/qrCode').set(compressed)
-        ]).then(()=>{
-          loadAdminQRPreview();
-          showToast('✅ อัปโหลด QR Code สำเร็จ! ลูกค้าเห็นทันที');
-        }).catch(()=>showToast('❌ อัปโหลดไม่สำเร็จ กรุณาลองใหม่'));
+        // เก็บใน localStorage แทน Firebase เพื่อไม่ใช้ bandwidth
+        localStorage.setItem('cm_qr_image', compressed);
+        loadAdminQRPreview();
+        showToast('✅ อัปโหลด QR Code สำเร็จ!');
       }catch(err){showToast('❌ รูปใหญ่เกินไป');}
     };
     img.src=ev.target.result;
