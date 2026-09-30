@@ -2283,7 +2283,14 @@ function verifyAdminFromSettings(){
   const msg=document.getElementById('adminPassMsg');
   if(input===getAdminPass()){
     document.querySelectorAll('.overlay').forEach(o=>o.remove());
-    showAdmin();
+    // เปิด Admin Panel โดยตรงโดยไม่ต้องใส่รหัสอีกครั้ง
+    document.getElementById('authScreen').classList.remove('active');
+    document.getElementById('dashScreen').classList.remove('active');
+    document.getElementById('adminScreen').classList.add('active');
+    switchAdminTab(0);
+    loadAdminQRPreview();
+    renderAdminStats();
+    loadUsdtAddr();
   } else {
     msg.textContent='❌ รหัสไม่ถูกต้อง';
   }
