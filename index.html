@@ -123,7 +123,7 @@ font-family:‘Share Tech Mono’,monospace;white-space:nowrap;flex-shrink:0}
 .np-val{font-size:0.82rem;font-weight:700;color:#fff;font-family:‘Orbitron’,monospace}
 .np-lbl{font-size:0.6rem;color:rgba(157,78,221,0.8);letter-spacing:0}
 .nav-pill.usd .np-val{color:var(–gold)}.nav-pill.usd .np-lbl{color:rgba(255,215,0,0.5)}
-.btn-out{padding:0.28rem 0.65rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);
+.btn-out{padding:0.28rem 0.65rem;background:rgba(220,38,38,0.2);border:1px solid rgba(220,38,38,0.5);
 border-radius:6px;color:var(–red-bright);font-family:‘Orbitron’,monospace;font-size:0.52rem;letter-spacing:1px;cursor:pointer}
 /* ── CLICKABLE BUTTON PURPLE RING ── */
 .btn-buy, .btn, .btn-auth, .btn-mine, .btn-detail,
@@ -180,7 +180,7 @@ position:fixed;bottom:0;left:0;right:0;z-index:999;}
 .bnav{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.18rem;padding:0.6rem 0.2rem 0.45rem;
 background:none;border:none;cursor:pointer;transition:all 0.25s;color:#ffffff;
 font-family:‘Orbitron’,monospace;font-size:0.68rem;letter-spacing:0.5px;text-transform:uppercase}
-.bnav.active{color:var(–red-bright)}.bnav.active svg{filter:drop-shadow(0 0 6px rgba(255,77,90,0.9));stroke:var(–red-bright)}
+.bnav.active{color:#A78BFA}.bnav.active svg{filter:drop-shadow(0 0 6px rgba(255,77,90,0.9));stroke:var(–red-bright)}
 .bnav svg{transition:all 0.25s;stroke:#ffffff}
 
 /* ── SHARED ── */
@@ -192,10 +192,10 @@ letter-spacing:2px;cursor:pointer;transition:all 0.3s;position:relative;overflow
 .btn::after{content:’’;position:absolute;top:0;left:-100%;width:60%;height:100%;
 background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);transition:left 0.4s;transform:skewX(-15deg)}
 .btn:hover::after{left:150%}
-.btn-primary{background:linear-gradient(135deg,var(–purple),var(–red-dark));color:#fff}
-.btn-primary:hover{box-shadow:0 0 18px rgba(157,78,221,0.4);transform:translateY(-1px)}
-.btn-gold{background:linear-gradient(135deg,#78350f,var(–gold));color:#000;font-weight:700}
-.btn-green{background:linear-gradient(135deg,#065f46,var(–green));color:#000;font-weight:700}
+.btn-primary{background:linear-gradient(135deg,#5B21B6,#7C3AED);color:#fff;font-weight:700;}
+.btn-primary:hover{box-shadow:0 4px 20px rgba(124,58,237,0.5);transform:translateY(-2px)}
+.btn-gold{background:linear-gradient(135deg,#B45309,#F59E0B);color:#000;font-weight:700}
+.btn-green{background:linear-gradient(135deg,#065F46,#10B981);color:#fff;font-weight:700}
 
 /* ── HOME TAB ── */
 .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;margin-bottom:1.1rem}
@@ -238,7 +238,7 @@ font-size:1.2rem;font-weight:900;color:#fff;animation:coin-spin 4s linear infini
 .prog-fill{height:100%;background:linear-gradient(90deg,var(–purple),var(–red));border-radius:3px;transition:width 0.5s linear;position:relative;overflow:hidden}
 .prog-fill::after{content:’’;position:absolute;top:0;left:-80%;width:80%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);animation:shimmer 2s infinite}
 @keyframes shimmer{to{left:200%}}
-.btn-mine{padding:1rem 3rem;font-family:‘Orbitron’,monospace;font-size:1rem;letter-spacing:2px;cursor:pointer;border:none;border-radius:12px;background:linear-gradient(135deg,var(–purple),var(–red-dark));color:#fff;transition:all 0.3s}
+.btn-mine{padding:1rem 3rem;font-family:‘Orbitron’,monospace;font-size:1rem;letter-spacing:2px;cursor:pointer;border:none;border-radius:12px;background:linear-gradient(135deg,#5B21B6,#7C3AED);color:#fff;transition:all 0.3s;font-weight:700;}
 .btn-mine:hover{box-shadow:0 0 18px rgba(157,78,221,0.4)}
 .btn-mine.mining{background:linear-gradient(135deg,var(–red-dark),var(–purple-dark));animation:pulse-m 1s ease-in-out infinite}
 @keyframes pulse-m{0%,100%{box-shadow:0 0 8px rgba(230,57,70,0.3)}50%{box-shadow:0 0 22px rgba(230,57,70,0.6)}}
@@ -328,7 +328,7 @@ transition:transform 0.3s,box-shadow 0.3s;border:1px solid var(–border)}
 .pc-free::before    {background:linear-gradient(90deg,#064e3b,var(–green))}.pc-free:hover{box-shadow:0 6px 25px rgba(74,222,128,0.15)}
 .pc-mini::before    {background:linear-gradient(90deg,#0c4a6e,#38bdf8)}.pc-mini:hover{box-shadow:0 6px 25px rgba(56,189,248,0.15)}
 .pc-lite::before    {background:linear-gradient(90deg,#831843,#f472b6)}.pc-lite:hover{box-shadow:0 6px 25px rgba(244,114,182,0.15)}
-.pc-starter::before {background:linear-gradient(90deg,#064e3b,#22c55e)}.pc-starter:hover{box-shadow:0 6px 25px rgba(34,197,94,0.15)}
+.pc-starter::before {background:linear-gradient(90deg,#065F46,#22C55E)}.pc-starter:hover{box-shadow:0 6px 25px rgba(34,197,94,0.15)}
 .pc-basic::before   {background:linear-gradient(90deg,var(–purple-dark),var(–purple-light))}.pc-basic:hover{box-shadow:0 6px 25px rgba(157,78,221,0.2)}
 .pc-pro::before     {background:linear-gradient(90deg,var(–red-dark),var(–red-bright))}.pc-pro:hover{box-shadow:0 6px 25px rgba(230,57,70,0.2)}
 .pc-vip::before     {background:linear-gradient(90deg,#78350f,var(–gold))}.pc-vip:hover{box-shadow:0 6px 25px rgba(255,215,0,0.15)}
@@ -358,7 +358,7 @@ letter-spacing:1px;padding:0.18rem 0.45rem;border-radius:20px;font-weight:700}
 .btn-buy::after{content:’’;position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);transition:left 0.4s;transform:skewX(-15deg)}
 .btn-buy:hover::after{left:150%}.btn-buy:hover{filter:brightness(1.1);transform:scale(1.02)}
 .pc-free .btn-buy    {background:linear-gradient(135deg,#065f46,var(–green));color:#000}
-.pc-mini .btn-buy    {background:linear-gradient(135deg,#0c4a6e,#38bdf8);color:#fff}
+.pc-mini .btn-buy    {background:linear-gradient(135deg,#0369A1,#38BDF8);color:#fff}
 .pc-lite .btn-buy    {background:linear-gradient(135deg,#831843,#f472b6);color:#fff}
 .pc-starter .btn-buy {background:linear-gradient(135deg,#064e3b,#22c55e);color:#fff}
 .pc-basic .btn-buy   {background:linear-gradient(135deg,var(–purple-dark),var(–purple-light));color:#fff}
@@ -642,18 +642,16 @@ html { font-size: 16px; }
 <div class="admin-page" id="apg3">
   <div class="sec-title">⚙️ ตั้งค่าระบบ</div>
 
-  <!-- USDT Wallet Address -->
+  <!-- USDT Wallet Address + QR Code -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">💎 ที่อยู่ USDT Wallet (TRC20)</div>
     <input type="text" id="usdtAddrInput" placeholder="กรอกที่อยู่ USDT TRC20..."
       style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.75rem;outline:none;margin-bottom:0.7rem;word-break:break-all;">
     <button onclick="saveUsdtAddr()" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">💾 บันทึกที่อยู่ USDT</button>
-    <div id="usdtAddrPreview" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);word-break:break-all;"></div>
-  </div>
+    <div id="usdtAddrPreview" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);word-break:break-all;margin-bottom:1rem;"></div>
 
-  <!-- QR Code -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
-    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📱 QR Code / PromptPay</div>
+    <!-- QR Code USDT -->
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📱 QR Code USDT</div>
     <div style="text-align:center;margin-bottom:0.8rem;" id="adminQRPreview">
       <div style="width:160px;height:160px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;">
         <div style="font-size:2.5rem;">📱</div>
@@ -1407,18 +1405,27 @@ function goToUsdtPayment(key){
   if(amt<def.minPrice||amt>def.maxPrice){
     showToast(`⚠ กรอกจำนวน $${def.minPrice.toLocaleString()} - $${def.maxPrice.toLocaleString()}`);return;
   }
-  // โหลดที่อยู่ USDT จาก Firebase
-  window._db.ref('settings/usdtAddr').once('value').then(snap=>{
-    const addr = snap.exists() ? snap.val() : 'ยังไม่ได้ตั้งค่า กรุณาติดต่อ Admin';
+  // โหลดที่อยู่ USDT และ QR Code จาก Firebase พร้อมกัน
+  Promise.all([
+    window._db.ref('settings/usdtAddr').once('value'),
+    window._db.ref('settings/qrCode').once('value')
+  ]).then(([addrSnap, qrSnap])=>{
+    const addr = addrSnap.exists() ? addrSnap.val() : 'ยังไม่ได้ตั้งค่า กรุณาติดต่อ Admin';
+    const qr = qrSnap.exists() ? qrSnap.val() : null;
     document.querySelectorAll('.overlay').forEach(o=>o.remove());
     const ov=document.createElement('div');ov.className='overlay';
-    ov.innerHTML=`<div class="popup">
+    ov.innerHTML=`<div class="popup" style="max-height:90vh;overflow-y:auto;">
       <div class="pop-hd"><div class="pop-title">💎 โอน USDT</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
       <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center;">
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.5rem;">จำนวนที่ต้องโอน</div>
         <div style="font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:var(--gold);">$${amt.toLocaleString()}</div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;">USDT (TRC20)</div>
       </div>
+      ${qr?`
+      <div style="text-align:center;margin-bottom:1rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.5rem;">📱 QR Code สำหรับโอน USDT</div>
+        <img src="${qr}" style="width:180px;height:180px;border-radius:12px;border:2px solid rgba(255,215,0,0.3);">
+      </div>`:''}
       <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:12px;padding:1rem;margin-bottom:1rem;">
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.5rem;">📋 ที่อยู่ USDT (TRC20)</div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--green);word-break:break-all;margin-bottom:0.5rem;">${addr}</div>
@@ -2073,7 +2080,7 @@ function showSettingsMenu(){
     <div style="display:flex;flex-direction:column;gap:0.5rem;">
 
       <!-- โปรไฟล์ -->
-      <button onclick="this.closest('.overlay').remove();showProfilePopup()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
+      <button onclick="this.closest('.overlay').remove();showProfilePopup()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:linear-gradient(135deg,rgba(91,33,182,0.25),rgba(109,40,217,0.15));border:1px solid rgba(139,92,246,0.4);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
         <div style="font-size:1.5rem;">👤</div>
         <div>
           <div style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;">โปรไฟล์</div>
@@ -2082,7 +2089,7 @@ function showSettingsMenu(){
       </button>
 
       <!-- เปลี่ยนรหัสผ่าน -->
-      <button onclick="this.closest('.overlay').remove();showChangePassPopup()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
+      <button onclick="this.closest('.overlay').remove();showChangePassPopup()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:linear-gradient(135deg,rgba(91,33,182,0.25),rgba(109,40,217,0.15));border:1px solid rgba(139,92,246,0.4);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
         <div style="font-size:1.5rem;">🔐</div>
         <div>
           <div style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;">เปลี่ยนรหัสผ่าน</div>
@@ -2091,7 +2098,7 @@ function showSettingsMenu(){
       </button>
 
       <!-- การแจ้งเตือน -->
-      <button onclick="this.closest('.overlay').remove();showNotifSettings()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
+      <button onclick="this.closest('.overlay').remove();showNotifSettings()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:linear-gradient(135deg,rgba(91,33,182,0.25),rgba(109,40,217,0.15));border:1px solid rgba(139,92,246,0.4);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
         <div style="font-size:1.5rem;">🔔</div>
         <div>
           <div style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;">การแจ้งเตือน</div>
@@ -2100,7 +2107,7 @@ function showSettingsMenu(){
       </button>
 
       <!-- เปลี่ยนภาษา -->
-      <button onclick="this.closest('.overlay').remove();showLangPopup()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
+      <button onclick="this.closest('.overlay').remove();showLangPopup()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:linear-gradient(135deg,rgba(91,33,182,0.25),rgba(109,40,217,0.15));border:1px solid rgba(139,92,246,0.4);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
         <div style="font-size:1.5rem;">🌐</div>
         <div>
           <div style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;">เปลี่ยนภาษา</div>
@@ -2109,7 +2116,7 @@ function showSettingsMenu(){
       </button>
 
       <!-- เกี่ยวกับแอป -->
-      <button onclick="this.closest('.overlay').remove();showAboutPopup()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
+      <button onclick="this.closest('.overlay').remove();showAboutPopup()" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:linear-gradient(135deg,rgba(91,33,182,0.25),rgba(109,40,217,0.15));border:1px solid rgba(139,92,246,0.4);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;">
         <div style="font-size:1.5rem;">ℹ️</div>
         <div>
           <div style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;">เกี่ยวกับแอป</div>
@@ -2321,7 +2328,7 @@ function renderAdminPkgReqs(){
           📈 ${r.dailyPct}%/วัน · ${r.days} วัน
         </div>
         <div style="display:flex;gap:0.5rem;margin-top:0.6rem;">
-          <button onclick="approvePkgReq('${r.fbKey}','${r.user}',${r.amt},'${r.key}',${r.dailyPct},${r.days})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+          <button onclick="approvePkgReq('${r.fbKey}','${r.user}',${r.amt},'${r.key}',${r.dailyPct},${r.days})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065F46,#10B981);border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
           <button onclick="rejectPkgReq('${r.fbKey}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
         </div>
       </div>`).join('');
@@ -2384,7 +2391,7 @@ function renderAdminTopup(filter){
       </div>
       ${r.slipImg?`<img src="${r.slipImg}" class="req-slip" onclick="viewSlip('${r.id}')" title="กดเพื่อดูเต็ม">`:'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">ไม่มีสลิป</div>'}
       ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
-        <button onclick="approveTopup('${r.id}',${r.amt},'${r.user}','${r.fbKey||''}')" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+        <button onclick="approveTopup('${r.id}',${r.amt},'${r.user}','${r.fbKey||''}')" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065F46,#10B981);border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
         <button onclick="rejectTopup('${r.id}','${r.user}','${r.fbKey||''}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;">❌ ปฏิเสธ</button>
       </div>`:''}
     </div>`;
@@ -2455,7 +2462,7 @@ function renderAdminWithdraw(){
         ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.2rem;">📝 ${r.note}</div>`:''}
       </div>
       ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;">
-        <button onclick="approveWithdraw('${r.id}','${r.user}',${ethDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+        <button onclick="approveWithdraw('${r.id}','${r.user}',${ethDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065F46,#10B981);border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
         <button onclick="rejectWithdraw('${r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
       </div>`:''}
     </div>`;
@@ -2666,7 +2673,11 @@ function uploadAdminQR(e){
       canvas.getContext('2d').drawImage(img,0,0,w,h);
       const compressed=canvas.toDataURL('image/jpeg',0.85);
       try{
-        window._db.ref('settings/qr_image').set(compressed).then(()=>{
+        // บันทึกทั้ง qr_image (preview) และ qrCode (สำหรับลูกค้า)
+        Promise.all([
+          window._db.ref('settings/qr_image').set(compressed),
+          window._db.ref('settings/qrCode').set(compressed)
+        ]).then(()=>{
           loadAdminQRPreview();
           showToast('✅ อัปโหลด QR Code สำเร็จ! ลูกค้าเห็นทันที');
         }).catch(()=>showToast('❌ อัปโหลดไม่สำเร็จ กรุณาลองใหม่'));
