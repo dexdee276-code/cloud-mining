@@ -823,88 +823,50 @@ html { font-size: 16px; }
 
 <!-- TOPUP -->
 <div class="tab-page" id="pgTopup">
-  <div class="sec-title" data-i18n="top.title">💵 เติม USDT</div>
+  <div class="sec-title">💵 เติม USDT</div>
 
-  <!-- Step 1: เลือกจำนวน -->
+  <!-- Step 1: ใส่จำนวน -->
   <div class="topup-step" id="stepAmount">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);margin-bottom:1rem;">
-      เลือกหรือพิมพ์จำนวนที่ต้องการเติม
-    </div>
-
-    <!-- ช่องพิมพ์จำนวนเอง -->
     <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">💵 พิมพ์จำนวน USDT เอง</div>
-      <input type="number" id="customAmtInput" placeholder="เช่น 150, 500, 2000..."
-        min="1"
-        oninput="onCustomAmt(this.value)"
-        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;outline:none;caret-color:var(--gold);margin-bottom:0.5rem;">
-      <div id="customAmtLak" style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:rgba(255,215,0,0.6);text-align:right;">= 0 ກີບ</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">💵 จำนวน USDT ที่ต้องการเติม</div>
+      <input type="number" id="customAmtInput" placeholder="เช่น 100, 500, 1000..."
+        min="1" oninput="onCustomAmt(this.value)"
+        style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:700;outline:none;">
     </div>
-
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.6rem;">หรือเลือกจากด้านล่าง</div>
-    <div class="tu-grid">
-      <div class="tu-card" onclick="selTop(this,10)">
-        <div class="tu-v">227,000 ກີບ</div>
-        <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$10 USDT</div>
-      </div>
-      <div class="tu-card" onclick="selTop(this,20)">
-        <div class="tu-v">454,000 ກີບ</div>
-        <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$20 USDT</div>
-      </div>
-      <div class="tu-card" onclick="selTop(this,50)">
-        <div class="tu-v">1,135,000 ກີບ</div>
-        <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$50 USDT</div>
-      </div>
-      <div class="tu-card" onclick="selTop(this,100)">
-        <div class="tu-v">2,270,000 ກີບ</div>
-        <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$100 USDT</div>
-      </div>
-      <div class="tu-card" onclick="selTop(this,300)">
-        <div class="tu-v">6,810,000 ກີບ</div>
-        <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$300 USDT</div>
-      </div>
-      <div class="tu-card" onclick="selTop(this,1000)">
-        <div class="tu-v">22,700,000 ກີບ</div>
-        <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$1,000 USDT</div>
-      </div>
-      <div class="tu-card" onclick="selTop(this,3000)">
-        <div class="tu-v">68,100,000 ກີບ</div>
-        <div class="tu-l" style="color:var(--gold);font-size:0.6rem;">$3,000 USDT</div>
-      </div>
-    </div>
-    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goToQR()">
-      ถัดไป → ดู QR Code
+    <button class="btn btn-primary" style="width:100%" onclick="goToQR()">
+      ถัดไป → ดูที่อยู่โอน USDT
     </button>
   </div>
 
-  <!-- Step 2: QR Code -->
+  <!-- Step 2: QR Code + ที่อยู่ USDT -->
   <div class="topup-step" id="stepQR" style="display:none">
     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
       <button onclick="backToAmount()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">← กลับ</button>
-      <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--purple-light);">สแกน QR เพื่อโอนเงิน</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--purple-light);">โอน USDT</div>
     </div>
 
     <!-- ยอดที่ต้องโอน -->
     <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.3rem;">ยอดที่ต้องโอน</div>
-      <div id="qrLakAmt" style="font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;color:var(--gold);">2,270,000 ກີບ</div>
-      <div id="qrAmount" style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:rgba(255,215,0,0.6);margin-top:0.15rem;">= $20 USDT</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.1rem;">อัตราแลกเปลี่ยน 1 USDT = 22,700 ກີບ</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.3rem;">จำนวนที่ต้องโอน</div>
+      <div id="qrAmount" style="font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:var(--gold);">$0 USDT</div>
     </div>
 
-    <!-- QR Code image -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:1rem;text-align:center;">
-      <div id="qrImageWrap">
-        <div style="width:200px;height:200px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(157,78,221,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;">
-          <div style="font-size:2.5rem;">📱</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);text-align:center;padding:0 1rem;">QR Code จะแสดงที่นี่<br>Admin ตั้งค่าใน Settings</div>
-        </div>
-      </div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(157,78,221,0.5);margin-top:0.8rem;">PromptPay / พร้อมเพย์</div>
+    <!-- QR Code -->
+    <div id="qrImageWrap" style="text-align:center;margin-bottom:1rem;"></div>
+
+    <!-- ที่อยู่ USDT -->
+    <div id="usdtAddrDisplay" style="background:rgba(0,0,0,0.3);border:1px solid rgba(74,222,128,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.5rem;">📋 ที่อยู่ USDT (TRC20)</div>
+      <div id="usdtAddrText" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--green);word-break:break-all;margin-bottom:0.5rem;">กำลังโหลด...</div>
+      <button onclick="copyUsdtAddr()" style="width:100%;padding:0.5rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:8px;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">📋 คัดลอกที่อยู่</button>
     </div>
 
-    <button class="btn btn-primary" style="width:100%" onclick="goToSlip()">
-      ✅ โอนแล้ว → แนบสลิป
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:#A890CC;margin-bottom:1rem;line-height:1.8;text-align:center;">
+      โอน USDT ตามจำนวนข้างต้น<br>แล้วกดปุ่มด้านล่างครับ
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;padding:1rem;font-size:0.9rem;" onclick="confirmTopupDone()">
+      ✅ โอนสำเร็จแล้ว
     </button>
   </div>
 
@@ -1926,23 +1888,58 @@ function selTop(el,amt){
   if(lakEl) lakEl.textContent='= 0 ກີບ';
 }
 function goToQR(){
+  const amt = parseFloat(document.getElementById('customAmtInput').value)||selAmt||0;
+  if(amt<=0){showToast('⚠ กรอกจำนวน USDT ก่อนครับ');return;}
+  selAmt = amt;
   document.getElementById('stepAmount').style.display='none';
   document.getElementById('stepQR').style.display='block';
   document.getElementById('stepSlip').style.display='none';
   document.getElementById('stepPending').style.display='none';
-  document.getElementById('qrLakAmt').textContent=lakFmt(selAmt);
-  document.getElementById('qrAmount').textContent='= $'+selAmt.toLocaleString()+' USDT';
-  // Load QR image if admin set one
+  document.getElementById('qrAmount').textContent='$'+amt.toLocaleString()+' USDT';
+
+  // โหลด QR จาก localStorage
   const wrap=document.getElementById('qrImageWrap');
-  wrap.innerHTML='<div style="text-align:center;color:#A890CC;font-family:monospace;font-size:0.7rem;padding:2rem;">⏳ กำลังโหลด QR...</div>';
-  window._db.ref('settings/qr_image').once('value').then(snap=>{
-    if(snap.exists()){
-      wrap.innerHTML=`<img src="${snap.val()}" style="width:200px;height:200px;object-fit:contain;border-radius:8px;background:#fff;padding:8px;margin:0 auto;display:block;">`;
-    } else {
-      wrap.innerHTML='<div style="width:200px;height:200px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(157,78,221,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;"><div style=\"font-size:2.5rem\">📱</div><div style=\"font-family:Share Tech Mono,monospace;font-size:0.65rem;color:#A890CC;text-align:center;padding:0 1rem\">Admin ยังไม่ได้ตั้งค่า QR Code</div></div>';
-    }
+  const qrImg = localStorage.getItem('cm_qr_image');
+  if(qrImg){
+    wrap.innerHTML=`<img src="${qrImg}" style="width:200px;height:200px;object-fit:contain;border-radius:8px;background:#fff;padding:8px;margin:0 auto;display:block;margin-bottom:0.5rem;">`;
+  } else {
+    wrap.innerHTML='<div style="font-family:Share Tech Mono,monospace;font-size:0.65rem;color:#A890CC;text-align:center;padding:0.5rem;">ติดต่อ Admin เพื่อขอ QR Code</div>';
+  }
+
+  // โหลดที่อยู่ USDT จาก Firebase
+  window._db.ref('settings/usdtAddr').once('value').then(snap=>{
+    const addr = snap.exists() ? snap.val() : 'กรุณาติดต่อ Admin';
+    document.getElementById('usdtAddrText').textContent = addr;
+    document.getElementById('usdtAddrText').setAttribute('data-addr', addr);
   });
 }
+
+function copyUsdtAddr(){
+  const addr = document.getElementById('usdtAddrText').getAttribute('data-addr')||document.getElementById('usdtAddrText').textContent;
+  navigator.clipboard.writeText(addr).then(()=>showToast('📋 คัดลอกแล้ว!')).catch(()=>{
+    const el=document.createElement('textarea');el.value=addr;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);showToast('📋 คัดลอกแล้ว!');
+  });
+}
+
+function confirmTopupDone(){
+  const ud=getUD(); if(!ud) return;
+  const amt=selAmt||0;
+  if(amt<=0){showToast('⚠ ไม่พบจำนวน USDT');return;}
+  // บันทึกคำขอเติมเงินไป Firebase
+  const req={
+    id:'top_'+Date.now(),
+    user:getSess(),
+    amt:amt,
+    time:Date.now(),
+    status:'pending'
+  };
+  window._db.ref('topup_reqs').push(req);
+  // แสดงหน้ารอ
+  document.getElementById('stepQR').style.display='none';
+  document.getElementById('stepPending').style.display='block';
+  showToast('✅ ส่งคำขอแล้ว รอ Admin อนุมัติครับ');
+}
+
 function backToAmount(){
   document.getElementById('stepAmount').style.display='block';
   document.getElementById('stepQR').style.display='none';
