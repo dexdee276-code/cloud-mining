@@ -2363,24 +2363,29 @@ function renderAdminPkgReqs(){
     let reqs=[];
     if(snap.exists()){const d=snap.val();reqs=Object.entries(d).map(([k,v])=>({...v,fbKey:k}));}
     const pending=reqs.filter(r=>r.status==='pending');
-    if(!pending.length){
-      renderAdminTopup(currentFilter);
-      return;
-    }
-    const pkgHtml=pending.map(r=>`
-      <div class="req-card pending" style="border-color:rgba(255,215,0,0.4);">
-        <div style="font-family:'Orbitron',monospace;font-size:0.88rem;color:var(--gold);margin-bottom:0.3rem;">⛏ ${r.pkgName}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#A890CC;">
-          👤 ${r.user} · $${(r.amt||0).toLocaleString()} USDT<br>
-          📈 ${r.dailyPct}%/วัน · ${r.days} วัน
-        </div>
-        <div style="display:flex;gap:0.5rem;margin-top:0.6rem;">
-          <button onclick="approvePkgReq('${r.fbKey}','${r.user}',${r.amt},'${r.key}',${r.dailyPct},${r.days})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065F46,#10B981);border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
-          <button onclick="rejectPkgReq('${r.fbKey}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
-        </div>
-      </div>`).join('');
-    el.innerHTML=`<div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">⛏ คำขอซื้อแพ็ก (${pending.length})</div>${pkgHtml}<div style="margin-top:1rem;font-family:'Orbitron',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.5rem;">💰 คำขอเติมเงิน</div>`;
+
+    // แสดงส่วน pkg_reqs เสมอ
+    const pkgSection = pending.length>0
+      ? `<div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">⛏ คำขอลงทุน (${pending.length})</div>
+        ${pending.map(r=>`
+        <div class="req-card pending" style="border-color:rgba(255,215,0,0.4);margin-bottom:0.8rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.88rem;color:var(--gold);margin-bottom:0.3rem;">⛏ ${r.pkgName||'Cloud Mining'}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#A890CC;">
+            👤 ${r.user} · $${(r.amt||0).toLocaleString()} USDT<br>
+            📈 ${parseFloat(r.dailyPct||0).toFixed(2)}%/วัน · ${r.days||0} วัน
+          </div>
+          <div style="display:flex;gap:0.5rem;margin-top:0.6rem;">
+            <button onclick="approvePkgReq('${r.fbKey}','${r.user}',${r.amt},'${r.key||'mining'}',${r.dailyPct||0},${r.days||90})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065F46,#10B981);border:none;border-radius:8px;color:#fff;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+            <button onclick="rejectPkgReq('${r.fbKey}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
+          </div>
+        </div>`).join('')}`
+      : `<div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">⛏ คำขอลงทุน</div>
+         <div style="text-align:center;padding:1rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);">ไม่มีคำขอรออนุมัติ</div>`;
+
+    el.innerHTML = pkgSection + `<div style="margin-top:1rem;font-family:'Orbitron',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.5rem;">💰 คำขอเติมเงิน</div>`;
     renderAdminTopup(currentFilter);
+  }).catch(()=>{
+    el.innerHTML='<div style="color:red;text-align:center;padding:1rem;">❌ โหลดไม่ได้</div>';
   });
 }
 
