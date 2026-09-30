@@ -1142,29 +1142,38 @@ function doRegister(){
     _pendingUser = u;
     _pendingEmail = e;
     _pendingPass = p;
-    // สร้าง Firebase Auth account เพื่อส่ง verification email
-    const tempPass = p + 'Cm@' + Math.floor(Math.random()*9000+1000);
-    window._auth.createUserWithEmailAndPassword(e, tempPass)
-    .then(userCred=>{
-      _firebaseUser = userCred.user;
-      const actionCodeSettings = {
-        url: 'https://cloudmininggold.com',
-        handleCodeInApp: false
-      };
-      return userCred.user.sendEmailVerification(actionCodeSettings);
-    }).then(()=>{
-      btn.disabled=false;btn.textContent='🚀 CREATE NODE';
-      showOTPModal(u, e);
+
+    // สร้าง OTP 6 หลัก
+    const otp = Math.floor(100000+Math.random()*900000).toString();
+    _pendingOTP = otp;
+    _otpExpiry = Date.now() + 10*60*1000;
+
+    // ส่ง OTP ผ่าน Brevo API
+    fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': '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',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: {name:'CRYPTOMINE', email:'Cloudmininggold@gmail.com'},
+        to: [{email: e, name: u}],
+        subject: 'ยืนยันอีเมล CryptoMine - รหัส ' + otp,
+        htmlContent: '<h2>สวัสดี ' + u + '</h2><p>รหัส OTP ของคุณคือ:</p><h1 style="color:#9D4EDD;letter-spacing:8px;">' + otp + '</h1><p>รหัสนี้หมดอายุใน 10 นาที</p><p>ทีม CRYPTOMINE</p>'
+      })
+    }).then(res=>res.json()).then(data=>{
+      if(data.messageId){
+        incrementOTPCount(e);
+        btn.disabled=false;btn.textContent='🚀 CREATE NODE';
+        showOTPModal(u, e);
+      } else {
+        btn.disabled=false;btn.textContent='🚀 CREATE NODE';
+        showMsg('regMsg','❌ ส่ง Email ไม่ได้: '+JSON.stringify(data),'error');
+      }
     }).catch(err=>{
       btn.disabled=false;btn.textContent='🚀 CREATE NODE';
-      console.error('Firebase Auth error:', err);
-      if(err.code==='auth/email-already-in-use'){
-        showMsg('regMsg','❌ Email นี้ถูกใช้แล้ว กรุณาใช้ Email อื่น','error');
-      } else if(err.code==='auth/invalid-email'){
-        showMsg('regMsg','❌ Email ไม่ถูกต้อง','error');
-      } else {
-        showMsg('regMsg','❌ เกิดข้อผิดพลาด: '+err.message,'error');
-      }
+      showMsg('regMsg','❌ เกิดข้อผิดพลาด','error');
     });
   }).catch(()=>{
     btn.disabled=false;btn.textContent='🚀 CREATE NODE';
@@ -1178,47 +1187,71 @@ function showOTPModal(username, email){
     <div style="font-size:2.5rem;margin-bottom:0.8rem;">📧</div>
     <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.5rem;">ยืนยัน Email</div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:1.2rem;line-height:1.8;">
-      ส่งลิงก์ยืนยันไปที่<br>
+      ส่งรหัส OTP ไปที่<br>
       <span style="color:var(--green);">${email}</span><br>
-      กรุณาเปิด Email แล้วกดลิงก์ยืนยันครับ
+      กรอกรหัส 6 หลักด้านล่างครับ
     </div>
-    <div id="otpMsg" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;margin-bottom:0.8rem;min-height:1.2rem;color:var(--text-dim);">⏳ รอการยืนยัน Email...</div>
-    <button onclick="checkEmailVerified()" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">✅ ยืนยันแล้ว กดที่นี่</button>
-    <button onclick="resendVerification()" style="width:100%;padding:0.5rem;background:none;border:none;color:rgba(157,78,221,0.7);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">📨 ส่งลิงก์ใหม่</button>
+    <input type="number" id="otpInput" placeholder="000000"
+      style="width:100%;padding:1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;outline:none;text-align:center;letter-spacing:8px;margin-bottom:1rem;">
+    <div id="otpMsg" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;margin-bottom:0.8rem;min-height:1.2rem;"></div>
+    <button onclick="verifyOTP()" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">✅ ยืนยัน OTP</button>
+    <button onclick="resendOTPBrevo()" style="width:100%;padding:0.5rem;background:none;border:none;color:rgba(157,78,221,0.7);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">📨 ส่งรหัสใหม่</button>
   </div>`;
   document.body.appendChild(ov);
 }
 
-function checkEmailVerified(){
+function verifyOTP(){
+  const input=document.getElementById('otpInput').value.trim();
   const msg=document.getElementById('otpMsg');
-  if(!_firebaseUser){msg.style.color='var(--red-bright)';msg.textContent='❌ เกิดข้อผิดพลาด กรุณาลองใหม่';return;}
-  msg.style.color='var(--text-dim)';msg.textContent='⏳ กำลังตรวจสอบ...';
-  _firebaseUser.reload().then(()=>{
-    if(_firebaseUser.emailVerified){
-      // ยืนยันแล้ว สร้าง user ใน Firebase DB
-      const u=_pendingUser; const e=_pendingEmail; const p=_pendingPass;
-      const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
-      const refBy=new URLSearchParams(window.location.search).get('ref')||localStorage.getItem('cm_pending_ref')||'';
-      const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
-      window._db.ref('users/'+u).set(nd).then(()=>{
-        // ลบ Firebase Auth temp account
-        _firebaseUser.delete().catch(()=>{});
-        document.querySelectorAll('.overlay').forEach(o=>o.remove());
-        _ud=nd;
-        showMsg('regMsg','✅ สมัครสำเร็จ! กำลังเข้าสู่ระบบ...','success');
-        setTimeout(()=>{setSess(u);enterDash(u)},1000);
-      });
-    } else {
-      msg.style.color='var(--red-bright)';msg.textContent='❌ ยังไม่ได้ยืนยัน Email กรุณาเปิดลิงก์ใน Email ครับ';
-    }
+  if(!input){msg.style.color='var(--red-bright)';msg.textContent='⚠ กรอกรหัส OTP';return;}
+  if(Date.now()>_otpExpiry){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสหมดอายุ กดส่งใหม่';return;}
+  if(input!==_pendingOTP){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสไม่ถูกต้อง';return;}
+  msg.style.color='var(--green)';msg.textContent='✅ OTP ถูกต้อง กำลังสร้างบัญชี...';
+  const u=_pendingUser;const e=_pendingEmail;const p=_pendingPass;
+  const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+  const refBy=new URLSearchParams(window.location.search).get('ref')||localStorage.getItem('cm_pending_ref')||'';
+  const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
+  window._db.ref('users/'+u).set(nd).then(()=>{
+    document.querySelectorAll('.overlay').forEach(o=>o.remove());
+    _ud=nd;
+    showMsg('regMsg','✅ สมัครสำเร็จ! กำลังเข้าสู่ระบบ...','success');
+    setTimeout(()=>{setSess(u);enterDash(u)},1000);
   });
 }
 
-function resendVerification(){
+function resendOTPBrevo(){
   const msg=document.getElementById('otpMsg');
-  if(!_firebaseUser){msg.style.color='var(--red-bright)';msg.textContent='❌ เกิดข้อผิดพลาด';return;}
-  _firebaseUser.sendEmailVerification().then(()=>{
-    msg.style.color='var(--green)';msg.textContent='✅ ส่งลิงก์ยืนยันใหม่แล้ว';
+  if(!canSendOTP(_pendingEmail)){
+    const wait=getOTPWaitTime(_pendingEmail);
+    msg.style.color='var(--red-bright)';
+    msg.textContent='❌ ส่งครบ 5 ครั้งแล้ว กรุณารอ '+wait;
+    return;
+  }
+  const otp=Math.floor(100000+Math.random()*900000).toString();
+  _pendingOTP=otp;
+  _otpExpiry=Date.now()+10*60*1000;
+  fetch('https://api.brevo.com/v3/smtp/email',{
+    method:'POST',
+    headers:{
+      'accept':'application/json',
+      'api-key':'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',
+      'content-type':'application/json'
+    },
+    body:JSON.stringify({
+      sender:{name:'CRYPTOMINE',email:'Cloudmininggold@gmail.com'},
+      to:[{email:_pendingEmail,name:_pendingUser}],
+      subject:'ยืนยันอีเมล CryptoMine - รหัส '+otp,
+      htmlContent:'<h2>สวัสดี '+_pendingUser+'</h2><p>รหัส OTP ของคุณคือ:</p><h1 style="color:#9D4EDD;letter-spacing:8px;">'+otp+'</h1><p>รหัสนี้หมดอายุใน 10 นาที</p><p>ทีม CRYPTOMINE</p>'
+    })
+  }).then(res=>res.json()).then(data=>{
+    if(data.messageId){
+      incrementOTPCount(_pendingEmail);
+      const remaining=5-getOTPCount(_pendingEmail).count;
+      msg.style.color='var(--green)';
+      msg.textContent='✅ ส่งรหัสใหม่แล้ว (เหลือ '+remaining+' ครั้ง)';
+    } else {
+      msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งไม่ได้';
+    }
   }).catch(()=>{
     msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งไม่ได้ กรุณาลองใหม่';
   });
