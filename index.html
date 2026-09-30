@@ -1148,32 +1148,18 @@ function doRegister(){
     _pendingOTP = otp;
     _otpExpiry = Date.now() + 10*60*1000;
 
-    // ส่ง OTP ผ่าน Brevo API
-    fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'api-key': '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',
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        sender: {name:'CRYPTOMINE', email:'Cloudmininggold@gmail.com'},
-        to: [{email: e, name: u}],
-        subject: 'ยืนยันอีเมล CryptoMine - รหัส ' + otp,
-        htmlContent: '<h2>สวัสดี ' + u + '</h2><p>รหัส OTP ของคุณคือ:</p><h1 style="color:#9D4EDD;letter-spacing:8px;">' + otp + '</h1><p>รหัสนี้หมดอายุใน 10 นาที</p><p>ทีม CRYPTOMINE</p>'
-      })
-    }).then(res=>res.json()).then(data=>{
-      if(data.messageId){
-        incrementOTPCount(e);
-        btn.disabled=false;btn.textContent='🚀 CREATE NODE';
-        showOTPModal(u, e);
-      } else {
-        btn.disabled=false;btn.textContent='🚀 CREATE NODE';
-        showMsg('regMsg','❌ ส่ง Email ไม่ได้: '+JSON.stringify(data),'error');
-      }
+    // ส่ง OTP ผ่าน EmailJS
+    emailjs.send('service_6j83xlj','template_riz4m4w',{
+      to_name: u,
+      to_email: e,
+      otp: otp
+    }).then(()=>{
+      incrementOTPCount(e);
+      btn.disabled=false;btn.textContent='🚀 CREATE NODE';
+      showOTPModal(u, e);
     }).catch(err=>{
       btn.disabled=false;btn.textContent='🚀 CREATE NODE';
-      showMsg('regMsg','❌ เกิดข้อผิดพลาด','error');
+      showMsg('regMsg','❌ ส่ง Email ไม่ได้: '+(err.text||JSON.stringify(err)),'error');
     });
   }).catch(()=>{
     btn.disabled=false;btn.textContent='🚀 CREATE NODE';
@@ -1230,28 +1216,15 @@ function resendOTPBrevo(){
   const otp=Math.floor(100000+Math.random()*900000).toString();
   _pendingOTP=otp;
   _otpExpiry=Date.now()+10*60*1000;
-  fetch('https://api.brevo.com/v3/smtp/email',{
-    method:'POST',
-    headers:{
-      'accept':'application/json',
-      'api-key':'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',
-      'content-type':'application/json'
-    },
-    body:JSON.stringify({
-      sender:{name:'CRYPTOMINE',email:'Cloudmininggold@gmail.com'},
-      to:[{email:_pendingEmail,name:_pendingUser}],
-      subject:'ยืนยันอีเมล CryptoMine - รหัส '+otp,
-      htmlContent:'<h2>สวัสดี '+_pendingUser+'</h2><p>รหัส OTP ของคุณคือ:</p><h1 style="color:#9D4EDD;letter-spacing:8px;">'+otp+'</h1><p>รหัสนี้หมดอายุใน 10 นาที</p><p>ทีม CRYPTOMINE</p>'
-    })
-  }).then(res=>res.json()).then(data=>{
-    if(data.messageId){
-      incrementOTPCount(_pendingEmail);
-      const remaining=5-getOTPCount(_pendingEmail).count;
-      msg.style.color='var(--green)';
-      msg.textContent='✅ ส่งรหัสใหม่แล้ว (เหลือ '+remaining+' ครั้ง)';
-    } else {
-      msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งไม่ได้';
-    }
+  emailjs.send('service_6j83xlj','template_riz4m4w',{
+    to_name:_pendingUser,
+    to_email:_pendingEmail,
+    otp:otp
+  }).then(()=>{
+    incrementOTPCount(_pendingEmail);
+    const remaining=5-getOTPCount(_pendingEmail).count;
+    msg.style.color='var(--green)';
+    msg.textContent='✅ ส่งรหัสใหม่แล้ว (เหลือ '+remaining+' ครั้ง)';
   }).catch(()=>{
     msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งไม่ได้ กรุณาลองใหม่';
   });
