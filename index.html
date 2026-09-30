@@ -449,6 +449,16 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 .roll-extra{font-family:‘Orbitron’,monospace;font-size:1.45rem;font-weight:900;color:var(–green);text-shadow:0 0 10px rgba(74,222,128,0.4);margin-top:0.28rem}
 .roll-btns{display:flex;gap:0.65rem}
 
+/* ─── ANIMATIONS ─── */
+@keyframes blink {
+0%,100%{opacity:1;}
+50%{opacity:0.2;}
+}
+@keyframes countUp {
+from{transform:translateY(4px);opacity:0;}
+to{transform:translateY(0);opacity:1;}
+}
+
 /* ─── RESPONSIVE ─── */
 *, *::before, *::after { box-sizing: border-box; }
 html { font-size: 16px; }
@@ -1605,8 +1615,11 @@ function confirmBuyPkg(key){
 function renderMachines(){
   const ud=getUD();if(!ud)return;
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
-  const sec=document.getElementById('machSec');const list=document.getElementById('machList');const cnt=document.getElementById('machCount');
+  const sec=document.getElementById('machSec');
+  const list=document.getElementById('machList');
+  const cnt=document.getElementById('machCount');
   const noMsg=document.getElementById('noMachMsg');
+
   if(!acs.length){
     if(sec)sec.style.display='none';
     if(noMsg)noMsg.style.display='block';
@@ -1615,34 +1628,101 @@ function renderMachines(){
   if(sec)sec.style.display='block';
   if(noMsg)noMsg.style.display='none';
   if(cnt)cnt.textContent=acs.length+(acs.length===1?' RIG':' RIGS');
-  const reward=(ud.ethReward||0).toFixed(6);
-  list.innerHTML=acs.map((p,i)=>{
-    const def=PKGS[p.key];const pct=Math.round((1-p.remaining/p.days)*100);
-    const earned=(def.profit*((p.days-p.remaining)/p.days)).toFixed(4);
-    return `<div class="mc ${def.mc}">
-      <div class="mc-top">
-        <div class="mc-coin-wrap"><div class="mc-ring"></div><div class="mc-ring2"></div><div class="mc-coin">${COINS[p.key]}</div></div>
-        <div class="mc-info">
-          <div class="mc-name">${def.name}</div>
-          <div class="mc-hash">⚡ ${def.hr} · 7 ${t('home.days')}</div>
-          <div class="mc-status"><div class="mc-dot"></div>${t('home.diggingeth')}</div>
+
+  const totalEth=(ud.ethReward||0);
+  const totalDailyEth=acs.reduce((s,p)=>s+calcDailyEarn(p.price||0)/ETH_RATE,0);
+  const totalDailyUsdt=acs.reduce((s,p)=>s+calcDailyEarn(p.price||0),0);
+  const totalInvested=acs.reduce((s,p)=>s+(p.price||0),0);
+
+  // Summary Dashboard
+  const summaryHtml=`
+    <div style="background:linear-gradient(135deg,rgba(20,5,40,0.95),rgba(40,10,60,0.95));border:2px solid rgba(74,222,128,0.3);border-radius:16px;padding:1.2rem;margin-bottom:1rem;">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1s infinite;"></div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--green);letter-spacing:2px;">MINING ACTIVE</div>
+        <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;">${acs.length} RIG${acs.length>1?'S':''}</div>
+      </div>
+      <div style="text-align:center;margin-bottom:1rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">⛏ ETH สะสมทั้งหมด</div>
+        <div id="dashEthTotal" style="font-family:'Orbitron',monospace;font-size:2.2rem;font-weight:900;color:var(--green);text-shadow:0 0 20px rgba(74,222,128,0.5);">${totalEth.toFixed(6)}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--gold);margin-top:0.2rem;">≈ $${(totalEth*ETH_RATE).toFixed(2)} USDT</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
+        <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:0.6rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;color:var(--green);">+${totalDailyEth.toFixed(5)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:#A890CC;">ETH/วัน</div>
         </div>
-        <button class="btn-detail" onclick="showDetail(${i})">${t('home.viewdetail')}</button>
+        <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:0.6rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;color:var(--gold);">+$${totalDailyUsdt.toFixed(2)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:#A890CC;">USDT/วัน</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:0.6rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;color:var(--purple-light);">$${totalInvested.toLocaleString()}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:#A890CC;">ลงทุนรวม</div>
+        </div>
       </div>
-      <div class="mc-live">
-        <div><div class="mc-live-lbl">${t('home.liveeth')}</div><div class="mc-live-val" id="lv_${i}">${reward}</div></div>
-        <div style="text-align:right"><div class="mc-live-lbl">${t('home.perday')}</div><div class="mc-live-daily">+${def.daily.toFixed(4)}</div></div>
+    </div>`;
+
+  // Individual Mining Rigs
+  const rigsHtml=acs.map((p,i)=>{
+    const pct=Math.round((1-(p.remaining/(p.days||1)))*100);
+    const dailyEth=(calcDailyEarn(p.price||0)/ETH_RATE).toFixed(6);
+    const dailyUsdt=calcDailyEarn(p.price||0).toFixed(2);
+    const daysLeft=Math.max(0,p.remaining).toFixed(0);
+    const daysPassed=Math.round((p.days||1)-p.remaining);
+    const ethMined=((calcDailyEarn(p.price||0)/ETH_RATE)*daysPassed).toFixed(6);
+    const rigColor=i===0?'rgba(74,222,128,0.2)':i===1?'rgba(255,215,0,0.15)':i===2?'rgba(157,78,221,0.2)':'rgba(56,189,248,0.15)';
+    const rigBorder=i===0?'rgba(74,222,128,0.4)':i===1?'rgba(255,215,0,0.35)':i===2?'rgba(157,78,221,0.4)':'rgba(56,189,248,0.35)';
+    const rigBarColor=i===0?'var(--green)':i===1?'var(--gold)':i===2?'var(--purple-light)':'#38bdf8';
+
+    return `<div style="background:${rigColor};border:1px solid ${rigBorder};border-radius:14px;padding:1rem;margin-bottom:0.8rem;">
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div style="width:8px;height:8px;border-radius:50%;background:${rigBarColor};box-shadow:0 0 6px ${rigBarColor};animation:blink 1.5s infinite ${i*0.3}s;"></div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;color:#fff;">RIG #${i+1}</div>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;">$${(p.price||0).toLocaleString()} USDT</div>
       </div>
-      <div class="mc-stats">
-        <div class="mc-stat"><div class="mc-sv">${earned}</div><div class="mc-sl">${t('home.mined')}</div></div>
-        <div class="mc-stat"><div class="mc-sv" style="color:var(--gold)">+${def.profit}</div><div class="mc-sl">${t('home.total')}</div></div>
-        <div class="mc-stat"><div class="mc-sv" style="color:var(--red-bright)">${Math.max(0,p.remaining).toFixed(1)}</div><div class="mc-sl">${t('home.daysleft')}</div></div>
+
+      <!-- ETH Counter -->
+      <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:0.8rem;margin-bottom:0.8rem;text-align:center;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.2rem;">⛏ ETH ที่ขุดได้</div>
+        <div style="font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:${rigBarColor};">${ethMined} ETH</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;">≈ $${(parseFloat(ethMined)*ETH_RATE).toFixed(2)} USDT</div>
       </div>
-      <div class="mc-prog-hd"><span>${t('home.progress2')}</span><span class="mc-prog-pct">${pct}%</span></div>
-      <div class="mc-prog-bar"><div class="mc-prog-fill" style="width:${pct}%"></div></div>
-      <div class="mc-days">⏱ ${t('home.daysrem')} ${Math.max(0,p.remaining).toFixed(1)} ${t('home.days')}</div>
+
+      <!-- Stats Grid -->
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.4rem;margin-bottom:0.8rem;">
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;color:${rigBarColor};">+${dailyEth}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:#A890CC;">ETH/วัน</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;color:var(--gold);">+$${dailyUsdt}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:#A890CC;">USDT/วัน</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;color:#fff;">${daysPassed}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:#A890CC;">วันที่ผ่านไป</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.5rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;color:var(--red-bright);">${daysLeft}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:#A890CC;">วันที่เหลือ</div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.3rem;">
+        <span>Progress</span><span>${pct}%</span>
+      </div>
+      <div style="background:rgba(0,0,0,0.3);border-radius:4px;height:6px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,${rigBarColor},rgba(255,255,255,0.5));border-radius:4px;transition:width 0.5s;"></div>
+      </div>
     </div>`;
   }).join('');
+
+  list.innerHTML = summaryHtml + rigsHtml;
 }
 
 function showDetail(idx){
@@ -2076,8 +2156,8 @@ function calcOfflineEarnings(){
     const daysOffline=Math.min(totalElapsedDays,p.days) - Math.min(lastSeenDays,p.days);
 
     if(daysOffline>0){
-      const dailyEarn=(p.price||0)*((p.dailyPct||def.dailyPct)||0)/100;
-      const ethEarned=dailyEarn*daysOffline;
+      const dailyEarnUsdt=(p.price||0)*((p.dailyPct||def.dailyPct)||0)/100;
+      const ethEarned=(dailyEarnUsdt/ETH_RATE)*daysOffline;
       totalEth+=ethEarned;
       p.remaining=Math.max(0,p.days-totalElapsedDays);
       changed=true;
@@ -2128,9 +2208,10 @@ function startDrip(){
       const oldRem=p.remaining;
       p.remaining=Math.max(0,p.days-totalElapsedDays);
 
-      // ETH ต่อ tick (คำนวณจาก dailyPct และ price)
-      const dailyEarn=(p.price||0)*((p.dailyPct||def.dailyPct)||0)/100;
-      const ethPerTick=dailyEarn/(DEMO_DAY*1000/TICK);
+      // ETH ต่อ tick (กำไร USDT ÷ ETH_RATE = ETH)
+      const dailyEarnUsdt=(p.price||0)*((p.dailyPct||def.dailyPct)||0)/100;
+      const dailyEarnEth=dailyEarnUsdt/ETH_RATE;
+      const ethPerTick=dailyEarnEth/(DEMO_DAY*1000/TICK);
       ud.ethReward=(ud.ethReward||0)+ethPerTick;
       changed=true;
 
@@ -2152,10 +2233,19 @@ function startDrip(){
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
 function updateRewardUI(){
   const ud=getUD();if(!ud)return;const r=ud.ethReward||0;
+  // อัปเดต nav
   document.getElementById('navEth').textContent=r.toFixed(4);
-  document.querySelectorAll('[id^="lv_"]').forEach(el=>{el.textContent=r.toFixed(6);el.style.color='var(--green)';setTimeout(()=>{el.style.color=''},300)});
-  const wz=document.getElementById('wEth');if(wz){wz.textContent=r.toFixed(6);document.getElementById('wEthUsd').textContent=(r*ETH_RATE).toFixed(4)}
-  renderMachines();
+  // อัปเดต wallet
+  const wz=document.getElementById('wEth');if(wz){wz.textContent=r.toFixed(6);}
+  const wu=document.getElementById('wEthUsd');if(wu){wu.textContent=(r*ETH_RATE).toFixed(4);}
+  // อัปเดต dashboard ETH counter แบบ realtime (ไม่ re-render ทั้งหมด)
+  const dashEl=document.getElementById('dashEthTotal');
+  if(dashEl){
+    dashEl.textContent=r.toFixed(6);
+    dashEl.style.animation='none';
+    dashEl.offsetHeight; // trigger reflow
+    dashEl.style.animation='countUp 0.3s ease';
+  }
 }
 function showRollNotif(def){
   const roll=def.next?PKGS[def.next]:null;const ov=document.createElement('div');ov.className='overlay';
