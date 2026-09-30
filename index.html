@@ -1386,19 +1386,30 @@ function typePrompt(txt){
   function tk(){if(i<txt.length){el.textContent+=txt[i++];ptTimer=setTimeout(tk,38+Math.random()*28);}}
   tk();
 }
-function showMsg(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className='auth-msg '+type}
+function showMsg(id,msg,type){
+  const el=document.getElementById(id);
+  if(el){el.textContent=msg;el.className='auth-msg '+(type||'');el.style.color=type==='error'?'#f87171':type==='success'?'#4ade80':'#fff';}
+  else{showToast(msg);}
+}
 function doLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value;
-  if(!u||!p){showMsg('loginMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return}
+  const uEl=document.getElementById('loginUser');
+  const pEl=document.getElementById('loginPass');
+  if(!uEl||!pEl){showToast('❌ เกิดข้อผิดพลาด');return;}
+  const u=uEl.value.trim();
+  const p=pEl.value;
+  if(!u||!p){showMsg('loginMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return;}
+  if(!window._db){showMsg('loginMsg','⚠ กำลังเชื่อมต่อ กรุณารอสักครู่...','error');return;}
   const btn=document.querySelector('#loginForm .btn-auth');
-  btn.disabled=true;btn.textContent='⏳ กำลังเข้าสู่ระบบ...';
+  if(btn){btn.disabled=true;btn.textContent='⏳ กำลังเข้าสู่ระบบ...';}
   fbGetUser(u).then(ud=>{
-    btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';
-    if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return}
-    if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return}
+    if(btn){btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';}
+    if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
+    if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
     _ud=ud;setSess(u);enterDash(u);
-  }).catch(()=>{btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error');});
+  }).catch(err=>{
+    if(btn){btn.disabled=false;btn.textContent='⚡ AUTHENTICATE';}
+    showMsg('loginMsg','❌ เชื่อมต่อไม่ได้: '+err.message,'error');
+  });
 }
 // OTP storage
 let _pendingOTP = null;
