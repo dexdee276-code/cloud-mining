@@ -822,7 +822,7 @@ html { font-size: 16px; }
 </div>
 
 <!-- TOPUP -->
-<div class="tab-page" id="pgTopup" style="display:none">
+<div class="tab-page" id="pgTopup">
   <div class="sec-title" data-i18n="top.title">💵 เติม USDT</div>
 
   <!-- Step 1: เลือกจำนวน -->
@@ -990,11 +990,14 @@ html { font-size: 16px; }
     <button class="bnav" id="bn2" onclick="switchTab(2)">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>กระเป๋า
     </button>
+    <button class="bnav" id="bn3" onclick="switchTab(3)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>เติม USDT
+    </button>
     <button class="bnav" id="bnProfile" onclick="showProfilePopup()">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>โปรไฟล์
     </button>
     <button class="bnav" id="bnLang" onclick="showLangPopup()">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>ภาษา
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg>ภาษา
     </button>
   </nav>
 </div>
@@ -1248,7 +1251,16 @@ function enterDash(user){
     if(!snap.exists()) return;
     const newData = snap.val();
     const oldUsd = _ud ? (_ud.usd||0) : 0;
+    // เก็บค่า usd และ ethReward ที่มีอยู่ในหน่วยความจำไว้ก่อน
+    const currentUsd = _ud ? (_ud.usd||0) : 0;
+    const currentEth = _ud ? (_ud.ethReward||0) : 0;
+    const currentPkgs = _ud ? (_ud.packages||[]) : [];
     _ud = newData;
+    // ใช้ค่าที่ใหญ่กว่าระหว่าง local และ Firebase
+    _ud.usd = Math.max(currentUsd, newData.usd||0);
+    _ud.ethReward = Math.max(currentEth, newData.ethReward||0);
+    // ใช้ packages จาก local ถ้ามีมากกว่า (drip กำลังทำงาน)
+    if(currentPkgs.length > 0) _ud.packages = currentPkgs;
     updateNav();
     renderMachines();
     if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
@@ -1414,7 +1426,62 @@ function calcMiningPreview(){
 function startMiningInvestment(){
   const amt=parseFloat(document.getElementById('miningAmtInput').value)||0;
   if(amt<100||amt>100000){showToast('⚠ ใส่จำนวน $100 - $100,000');return;}
-  goToUsdtPayment('mining',amt);
+  const ud=getUD(); if(!ud) return;
+  if((ud.usd||0)<amt){
+    showToast('❌ USDT ไม่พอ กรุณาเติมเงินก่อน');
+    switchTab(3); // ไปหน้าเติม USDT
+    return;
+  }
+  // แสดง popup ยืนยัน
+  const pct=calcDailyPct(amt);
+  const daily=calcDailyEarn(amt);
+  const days=calcDays(amt);
+  const profit=daily*days;
+  const total=amt+profit;
+  const ov=document.createElement('div');ov.className='overlay';
+  ov.innerHTML=`<div class="popup" style="text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:0.5rem;">⛏</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:1rem;">ยืนยันการลงทุน</div>
+    <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;">
+        <div style="text-align:left;color:#A890CC;">💵 ลงทุน</div>
+        <div style="text-align:right;color:var(--gold);font-weight:700;">$${amt.toLocaleString()} USDT</div>
+        <div style="text-align:left;color:#A890CC;">📈 กำไร/วัน</div>
+        <div style="text-align:right;color:var(--green);">$${daily.toFixed(2)}</div>
+        <div style="text-align:left;color:#A890CC;">⏱ ระยะเวลา</div>
+        <div style="text-align:right;color:var(--purple-light);">${days} วัน</div>
+        <div style="text-align:left;color:#A890CC;">🏆 ได้คืนรวม</div>
+        <div style="text-align:right;color:#f87171;font-weight:700;">$${total.toFixed(0)}</div>
+      </div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,100,100,0.8);margin-bottom:1rem;">
+      💰 USDT คงเหลือหลังลงทุน: $${((ud.usd||0)-amt).toFixed(2)}
+    </div>
+    <div style="display:flex;gap:0.5rem;">
+      <button onclick="this.closest('.overlay').remove()" style="flex:1;padding:0.8rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">ยกเลิก</button>
+      <button onclick="confirmMiningInvestment(${amt})" class="btn btn-primary" style="flex:1;padding:0.8rem;">✅ ยืนยัน</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+function confirmMiningInvestment(amt){
+  const ud=getUD(); if(!ud) return;
+  if((ud.usd||0)<amt){showToast('❌ USDT ไม่พอ');return;}
+  // หัก USDT จากกระเป๋าทันที
+  ud.usd=(ud.usd||0)-amt;
+  const daily=calcDailyEarn(amt);
+  const days=calcDays(amt);
+  const dailyPct=calcDailyPct(amt);
+  const profit=daily*days;
+  ud.packages=ud.packages||[];
+  ud.packages.push({key:'mining',price:amt,days,daily,dailyPct,profit,bought:Date.now(),remaining:days});
+  ud.txs=ud.txs||[];
+  ud.txs.unshift({desc:`⛏ เริ่มขุด Cloud Mining $${amt.toLocaleString()}`,amount:-amt,unit:'USDT',time:Date.now()});
+  saveUD(ud);
+  document.querySelectorAll('.overlay').forEach(o=>o.remove());
+  updateNav();startDrip();renderPkgs();renderMachines();switchTab(0);
+  showToast(`✅ เริ่มขุดแล้ว! $${amt.toLocaleString()} USDT`);
 }
 
 // Modal เลือกจำนวนเงินซื้อแพ็ก
