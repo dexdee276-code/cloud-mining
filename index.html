@@ -451,6 +451,10 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 
 /* ─── ANIMATIONS ─── */
 
+@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes authScanline{0%{top:-5%;}100%{top:105%;}}
+@keyframes logoGlow{0%,100%{text-shadow:0 0 20px rgba(98,126,234,0.8),0 0 40px rgba(98,126,234,0.4);}50%{text-shadow:0 0 40px rgba(138,158,240,1),0 0 80px rgba(98,126,234,0.6);}}
+
 @keyframes lightning{0%,90%,100%{opacity:0;}92%,96%{opacity:1;}94%,98%{opacity:0.3;}}
 @keyframes lightningB{0%,85%,100%{opacity:0;}87%,91%{opacity:0.8;}89%,93%{opacity:0.2;}}
 @keyframes drillBounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(4px);}}
@@ -571,69 +575,144 @@ html { font-size: 16px; }
 
 <!-- AUTH -->
 
-<div class="screen active" id="authScreen">
-  <div class="lang-group" style="position:absolute;top:1rem;right:1rem;">
-    <button class="btn-lang active" id="alTh" onclick="setLang('th')">ไทย</button>
-    <button class="btn-lang" id="alEn" onclick="setLang('en')">EN</button>
-    <button class="btn-lang" id="alLo" onclick="setLang('lo')">ລາວ</button>
+<div class="screen active" id="authScreen" style="position:relative;overflow:hidden;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem;">
+
+  <!-- BG Canvas -->
+
+<canvas id="authBgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+
+  <!-- ETH Rain -->
+
+  <div id="authRain" style="position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:1;"></div>
+
+  <!-- Content -->
+
+  <div style="position:relative;z-index:10;width:100%;max-width:360px;animation:slideUp 0.6s ease-out;">
+
+```
+<!-- ETH Logo floating -->
+<div style="text-align:center;margin-bottom:1.2rem;animation:float 3s ease-in-out infinite;">
+  <div style="display:inline-block;position:relative;">
+    <div style="position:absolute;inset:-15px;border-radius:50%;background:radial-gradient(circle,rgba(98,126,234,0.2),transparent);animation:pulse 2s infinite;"></div>
+    <svg width="72" height="72" viewBox="0 0 80 80">
+      <defs>
+        <radialGradient id="authEthG" cx="40%" cy="35%">
+          <stop offset="0%" stop-color="#8a9ef0"/>
+          <stop offset="50%" stop-color="#627eea"/>
+          <stop offset="100%" stop-color="#2a3a8a"/>
+        </radialGradient>
+      </defs>
+      <circle cx="40" cy="40" r="38" fill="url(#authEthG)" stroke="#8a9ef0" stroke-width="1.5"/>
+      <circle cx="40" cy="40" r="38" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+      <g transform="translate(40,40)">
+        <polygon points="0,-22 13,-5 0,3 -13,-5" fill="rgba(255,255,255,0.95)"/>
+        <polygon points="0,24 13,8 0,3 -13,8" fill="rgba(255,255,255,0.7)"/>
+        <polygon points="0,-22 13,-5 0,3" fill="rgba(255,255,255,0.5)"/>
+        <polygon points="0,-22 -13,-5 0,3" fill="rgba(255,255,255,0.85)"/>
+      </g>
+    </svg>
   </div>
-  <div style="text-align:center;margin-bottom:0.3rem">
-    <div class="auth-logo">⛏ CRYPTOMINE</div>
+</div>
+
+<!-- Title -->
+<div style="text-align:center;margin-bottom:1.5rem;">
+  <div style="font-family:'Orbitron',monospace;font-size:1.7rem;font-weight:900;color:#fff;letter-spacing:4px;text-shadow:0 0 20px rgba(98,126,234,0.8),0 0 40px rgba(98,126,234,0.4);" id="aMinersTitle">⛏ CRYPTOMINE</div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(98,126,234,0.7);letter-spacing:3px;margin-top:0.3rem;">CLOUD ETH MINING PLATFORM</div>
+  <div style="height:1px;background:linear-gradient(90deg,transparent,#627eea,transparent);margin-top:0.8rem;"></div>
+</div>
+
+<!-- Lang buttons -->
+<div style="position:absolute;top:-4.5rem;right:0;display:flex;gap:0.3rem;">
+  <button class="btn-lang active" id="alTh" onclick="setLang('th')" style="font-size:0.6rem;padding:0.25rem 0.5rem;">ไทย</button>
+  <button class="btn-lang" id="alEn" onclick="setLang('en')" style="font-size:0.6rem;padding:0.25rem 0.5rem;">EN</button>
+  <button class="btn-lang" id="alLo" onclick="setLang('lo')" style="font-size:0.6rem;padding:0.25rem 0.5rem;">ລາວ</button>
+</div>
+
+<!-- Auth Card -->
+<div style="background:rgba(5,5,25,0.95);border:1px solid rgba(98,126,234,0.35);border-radius:20px;padding:1.5rem;box-shadow:0 0 20px rgba(98,126,234,0.3);backdrop-filter:blur(20px);position:relative;overflow:hidden;">
+
+  <!-- Card scanline -->
+  <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(98,126,234,0.3),transparent);top:0;animation:authScanline 3s linear infinite;"></div>
+
+  <!-- Tabs -->
+  <div style="display:flex;gap:0;margin-bottom:1.3rem;background:rgba(0,0,0,0.3);border-radius:10px;padding:3px;" id="authTabs">
+    <button id="atLogin" onclick="switchAuth('login')" style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;letter-spacing:1px;cursor:pointer;background:linear-gradient(135deg,#627eea,#8a9ef0);color:#fff;box-shadow:0 0 15px rgba(98,126,234,0.5);" data-i18n="auth.tab.login">LOGIN</button>
+    <button id="atReg" onclick="switchAuth('reg')" style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;letter-spacing:1px;cursor:pointer;background:transparent;color:rgba(98,126,234,0.6);" data-i18n="auth.tab.reg">REGISTER</button>
   </div>
-  <div class="auth-sub">MINE · EARN · DOMINATE</div>
-  <div class="auth-card">
-    <div class="auth-bar">
-      <div class="auth-bar-dot"></div><div class="auth-bar-dot"></div><div class="auth-bar-dot"></div>
-      <div class="auth-bar-title" data-i18n="auth.terminal">SECURE_AUTH_TERMINAL</div>
+
+  <!-- Login Form -->
+  <div class="auth-form active" id="loginForm">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:rgba(98,126,234,0.5);margin-bottom:0.8rem;">root@cryptomine:~$</div>
+    <div style="margin-bottom:0.9rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.35rem;letter-spacing:1px;">// USERNAME</div>
+      <div style="position:relative;">
+        <input id="loginUser" type="text" placeholder="enter_username" data-i18n-ph="auth.user"
+          style="width:100%;padding:0.8rem 1rem 0.8rem 2.4rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;transition:all 0.3s;"
+          onfocus="this.style.borderColor='#627eea';this.style.boxShadow='0 0 15px rgba(98,126,234,0.3)'" onblur="this.style.borderColor='rgba(98,126,234,0.3)';this.style.boxShadow='none'">
+        <div style="position:absolute;left:0.8rem;top:50%;transform:translateY(-50%);color:rgba(98,126,234,0.6);font-size:0.75rem;">⚡</div>
+      </div>
     </div>
-    <div class="auth-prompt">
-      <span style="color:var(--red-bright)">root@cryptomine</span><span style="color:rgba(157,78,221,0.5)">:~$</span>
-      <span id="promptTxt"></span><span class="p-cursor"></span>
+    <div style="margin-bottom:1.3rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.35rem;letter-spacing:1px;">// PASSWORD</div>
+      <div style="position:relative;">
+        <input id="loginPass" type="password" placeholder="••••••••" data-i18n-ph="auth.pass"
+          style="width:100%;padding:0.8rem 1rem 0.8rem 2.4rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;transition:all 0.3s;"
+          onfocus="this.style.borderColor='#627eea';this.style.boxShadow='0 0 15px rgba(98,126,234,0.3)'" onblur="this.style.borderColor='rgba(98,126,234,0.3)';this.style.boxShadow='none'">
+        <div style="position:absolute;left:0.8rem;top:50%;transform:translateY(-50%);color:rgba(98,126,234,0.6);font-size:0.75rem;">🔐</div>
+      </div>
     </div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tabL" data-i18n="auth.tab.login" onclick="switchAuthTab('login')">LOGIN</button>
-      <button class="auth-tab" id="tabR" data-i18n="auth.tab.reg" onclick="switchAuthTab('register')">REGISTER</button>
+    <div id="loginMsg" style="min-height:1.2rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;"></div>
+    <button class="btn-auth" onclick="doLogin()"
+      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border:none;border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);"
+      data-i18n="auth.btn.login">⚡ AUTHENTICATE</button>
+  </div>
+
+  <!-- Register Form -->
+  <div class="auth-form" id="regForm">
+    <div style="margin-bottom:0.8rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.3rem;letter-spacing:1px;">// USERNAME</div>
+      <input id="regUser" type="text" placeholder="choose_username"
+        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;transition:border-color 0.3s;"
+        onfocus="this.style.borderColor='#627eea'" onblur="this.style.borderColor='rgba(98,126,234,0.3)'">
     </div>
-    <div class="auth-form active" id="loginForm">
-      <div class="form-group">
-        <label class="form-label" data-i18n="auth.lbl.user">USERNAME</label>
-        <div class="field-icon">👤</div>
-        <input class="form-input" id="loginUser" data-i18n-ph="auth.ph.user" type="text" placeholder="enter_username" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-i18n="auth.lbl.pass">PASSWORD</label>
-        <div class="field-icon">🔑</div>
-        <input class="form-input" id="loginPass" data-i18n-ph="auth.ph.pass" type="password" placeholder="••••••••">
-      </div>
-      <button class="btn-auth" data-i18n="auth.btn.login" onclick="doLogin()">⚡ AUTHENTICATE</button>
-      <div class="auth-msg" id="loginMsg"></div>
+    <div style="margin-bottom:0.8rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.3rem;letter-spacing:1px;">// EMAIL</div>
+      <input id="regEmail" type="email" placeholder="your@email.com"
+        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;transition:border-color 0.3s;"
+        onfocus="this.style.borderColor='#627eea'" onblur="this.style.borderColor='rgba(98,126,234,0.3)'">
     </div>
-    <div class="auth-form" id="regForm">
-      <div class="form-group">
-        <label class="form-label">USERNAME</label>
-        <div class="field-icon">👤</div>
-        <input class="form-input" id="regUser" data-i18n-ph="auth.ph.reguser" type="text" placeholder="choose_identity" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-i18n="auth.lbl.email">EMAIL</label>
-        <div class="field-icon">📡</div>
-        <input class="form-input" id="regEmail" data-i18n-ph="auth.ph.email" type="email" placeholder="node@network.io">
-      </div>
-      <div class="form-group">
-        <label class="form-label">PASSWORD</label>
-        <div class="field-icon">🔐</div>
-        <input class="form-input" id="regPass" data-i18n-ph="auth.ph.regpass" type="password" placeholder="min 6 chars">
-      </div>
-      <button class="btn-auth" data-i18n="auth.btn.reg" onclick="doRegister()">🚀 CREATE NODE</button>
-      <div class="auth-msg" id="regMsg"></div>
+    <div style="margin-bottom:1.2rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.3rem;letter-spacing:1px;">// PASSWORD</div>
+      <input id="regPass" type="password" placeholder="min 6 characters"
+        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;transition:border-color 0.3s;"
+        onfocus="this.style.borderColor='#627eea'" onblur="this.style.borderColor='rgba(98,126,234,0.3)'">
+    </div>
+    <div id="regMsg" style="min-height:1.2rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;"></div>
+    <button class="btn-auth" onclick="doRegister()"
+      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border:none;border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);"
+      data-i18n="auth.btn.reg">🚀 CREATE NODE</button>
+  </div>
+
+  <!-- Stats bar -->
+  <div style="display:flex;justify-content:space-around;margin-top:1.2rem;padding-top:1rem;border-top:1px solid rgba(98,126,234,0.1);">
+    <div style="text-align:center;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:#8a9ef0;" id="aMiners">2,847</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:rgba(98,126,234,0.5);">MINERS</div>
+    </div>
+    <div style="width:1px;background:rgba(98,126,234,0.2);"></div>
+    <div style="text-align:center;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:#ffd700;">142.38</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:rgba(255,215,0,0.5);">ETH TODAY</div>
+    </div>
+    <div style="width:1px;background:rgba(98,126,234,0.2);"></div>
+    <div style="text-align:center;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:#00ff88;">99.9%</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:rgba(0,255,136,0.5);">UPTIME</div>
     </div>
   </div>
-  <div class="auth-footer">
-    <div class="auth-stat"><div class="auth-stat-val" id="aMiners">2,847</div><div class="auth-stat-lbl" data-i18n="auth.stat.miners">Active Miners</div></div>
-    <div class="auth-footer-div"></div>
-    <div class="auth-stat"><div class="auth-stat-val">142.38</div><div class="auth-stat-lbl" data-i18n="auth.stat.eth">ETH Today</div></div>
-    <div class="auth-footer-div"></div>
-    <div class="auth-stat"><div class="auth-stat-val">99.9%</div><div class="auth-stat-lbl" data-i18n="auth.stat.up">Uptime</div></div>
+</div>
+```
+
   </div>
 </div>
 
@@ -942,23 +1021,10 @@ html { font-size: 16px; }
 </div>
 
 <style>
-@keyframes minerDrill {
-  0%,100%{transform:translateX(-50%) translateY(0);}
-  25%{transform:translateX(-50%) translateY(-2px) rotate(-1deg);}
-  75%{transform:translateX(-50%) translateY(2px) rotate(1deg);}
-}
-@keyframes dustFly1 {
-  0%{transform:translate(0,0);opacity:1;}
-  100%{transform:translate(-15px,-20px);opacity:0;}
-}
-@keyframes dustFly2 {
-  0%{transform:translate(0,0);opacity:1;}
-  100%{transform:translate(15px,-25px);opacity:0;}
-}
-@keyframes dustFly3 {
-  0%{transform:translate(0,0);opacity:1;}
-  100%{transform:translate(-10px,-15px);opacity:0;}
-}
+
+
+
+
 @keyframes coinFloat {
   0%{transform:translateY(0);opacity:1;color:#ffd700;}
   50%{opacity:0.8;color:#ff6600;}
@@ -1467,10 +1533,21 @@ function resendOTPBrevo(){
     msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งไม่ได้ กรุณาลองใหม่';
   });
 }
-function doLogout(){stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
+function doLogout(){
+  stopMine();stopDrip();clrSess();
+  // หยุด scene intervals
+  if(window._sceneIntervals){window._sceneIntervals.forEach(id=>clearInterval(id));window._sceneIntervals=[];}
+  const scene=document.getElementById('miningScene');
+  if(scene){scene.style.display='none';scene._initialized=false;}
+  document.getElementById('authScreen').classList.add('active');
+  document.getElementById('dashScreen').classList.remove('active');
+  showToast(t('toast.logout'));
+}
 
 // ─── ENTER DASHBOARD ───
 function enterDash(user){
+  if(window._authRainInt){clearInterval(window._authRainInt);window._authRainInt=null;}
+  if(window._authMinersInt){clearInterval(window._authMinersInt);window._authMinersInt=null;}
   document.getElementById('authScreen').classList.remove('active');
   document.getElementById('dashScreen').classList.add('active');
   updateNav();switchTab(0);renderMachines();renderPkgs();
@@ -1965,9 +2042,10 @@ function renderMachines(){
       scene.style.display='block';
       scene._initialized=true;
       initSkyCanvas();
-      setInterval(spawnSceneParticle,50);
-      setInterval(spawnSceneRain,180);
-      setInterval(()=>{const el=document.getElementById('scHashDisplay');if(el)el.textContent=(2.3+Math.random()*0.4).toFixed(2)+' TH/s';},700);
+      window._sceneIntervals=window._sceneIntervals||[];
+      window._sceneIntervals.push(setInterval(spawnSceneParticle,80));
+      window._sceneIntervals.push(setInterval(spawnSceneRain,250));
+      window._sceneIntervals.push(setInterval(()=>{const el=document.getElementById('scHashDisplay');if(el)el.textContent=(2.3+Math.random()*0.4).toFixed(2)+' TH/s';},1000));
     }
     updateHashDisplay(acs);
   }
@@ -3922,6 +4000,7 @@ localStorage.removeItem(‘cm_lang’);
 LANG = ‘th’;
 }
 applyLang();
+initAuthBg();
 // Check referral param in URL
 const refParam = new URLSearchParams(window.location.search).get(‘ref’);
 if(refParam) localStorage.setItem(‘cm_pending_ref’, refParam);
