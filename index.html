@@ -1006,27 +1006,30 @@ const DEMO_DAY = 86400; // วินาที/วัน (จริง)
 const TICK = 3000;
 const ETH_RATE = 2672.47; // 1 ETH = USDT
 
-// ─── PACKAGES (คืนทุน + กำไร) ───
-const PKGS = {
-  starter:  {name:'🥉 Starter',  minPrice:100,  maxPrice:500,   days:90,  dailyPct:0.6,  hr:'20 GH/s',  limit:1, cls:'pc-mini',    mc:'mc-mini',    next:'basic',    nxt:1000},
-  basic:    {name:'🥈 Basic',    minPrice:1000, maxPrice:2000,  days:90,  dailyPct:0.8,  hr:'50 GH/s',  limit:1, cls:'pc-starter', mc:'mc-starter', next:'standard', nxt:3000},
-  standard: {name:'🥇 Standard', minPrice:3000, maxPrice:5000,  days:180, dailyPct:1.0,  hr:'120 GH/s', limit:1, cls:'pc-basic',   mc:'mc-basic',   next:'advanced', nxt:10000},
-  advanced: {name:'💎 Advanced', minPrice:10000,maxPrice:20000, days:180, dailyPct:1.2,  hr:'300 GH/s', limit:1, cls:'pc-pro',     mc:'mc-pro',     next:'pro',      nxt:30000},
-  pro:      {name:'🔥 Pro',      minPrice:30000,maxPrice:40000, days:270, dailyPct:1.5,  hr:'600 GH/s', limit:1, cls:'pc-vip',     mc:'mc-vip',     next:'elite',    nxt:50000},
-  elite:    {name:'👑 Elite',    minPrice:50000,maxPrice:70000, days:365, dailyPct:1.8,  hr:'900 GH/s', limit:1, cls:'pc-elite',   mc:'mc-elite',   next:'ultra',    nxt:90000},
-  ultra:    {name:'🚀 Ultra',    minPrice:90000,maxPrice:120000,days:365, dailyPct:2.3,  hr:'1.5 TH/s', limit:1, cls:'pc-ultra',   mc:'mc-ultra',   next:null,       nxt:0},
-};
-const PKG_ORDER = ['starter','basic','standard','advanced','pro','elite','ultra'];
+// ─── MINING SYSTEM ───
+// คำนวณ % กำไรต่อวันตามจำนวนเงิน
+function calcDailyPct(amt){
+  return 0.75 + (amt/100000)*2.75;
+}
+// คำนวณระยะเวลาตามจำนวนเงิน
+function calcDays(amt){
+  if(amt < 1000) return 90;
+  if(amt < 5000) return 90;
+  if(amt < 10000) return 180;
+  if(amt < 30000) return 180;
+  if(amt < 50000) return 270;
+  return 365;
+}
+// คำนวณกำไรต่อวัน
+function calcDailyEarn(amt){
+  return amt * calcDailyPct(amt) / 100;
+}
 
-// Helper: คำนวณจากราคาที่ลูกค้าเลือก
-function getPkgProfit(key, price){
-  const def = PKGS[key]; if(!def) return 0;
-  return price * (def.dailyPct/100) * def.days;
-}
-function getPkgDaily(key, price){
-  const def = PKGS[key]; if(!def) return 0;
-  return price * (def.dailyPct/100);
-}
+// PKGS ยังคงไว้เพื่อ compat แต่ใช้ระบบใหม่
+const PKGS = {
+  mining: {name:'⛏ Cloud Mining', cls:'pc-pro', mc:'mc-pro'}
+};
+const PKG_ORDER = ['mining'];
 
 const COINS = {
   starter:  '<svg viewBox="0 0 38 38" width="38" height="38"><defs><radialGradient id="cst" cx="40%" cy="35%"><stop offset="0%" stop-color="#fcd9a0"/><stop offset="100%" stop-color="#92400e"/></radialGradient></defs><circle cx="19" cy="19" r="17" fill="url(#cst)"/><text x="19" y="24.5" text-anchor="middle" font-size="14" font-family="Orbitron,monospace" font-weight="900" fill="white">Z</text></svg>',
@@ -1327,45 +1330,91 @@ function buyPkg(key){
 function renderPkgs(){
   const ud=getUD();if(!ud)return;
   document.getElementById('pkgBal').textContent='$'+(ud.usd||0).toFixed(2);
-  const colors={starter:'#fcd9a0',basic:'#e2e8f0',standard:'#fde68a',advanced:'#a5f3fc',pro:'#fca5a5',elite:'#fde68a',ultra:'#c084fc'};
-  document.getElementById('pkgGrid').innerHTML=PKG_ORDER.map(key=>{
-    const def=PKGS[key];
-    const bought=(ud.packages||[]).filter(p=>p.key===key).length;
-    const active=(ud.packages||[]).find(p=>p.key===key&&p.remaining>0);
-    const rem=def.limit-bought;
-    const exampleDaily=(def.minPrice*def.dailyPct/100).toFixed(2);
-    const exampleProfit=(def.minPrice*def.dailyPct/100*def.days).toFixed(0);
-    const months=def.days===90?'3 เดือน':def.days===180?'6 เดือน':def.days===270?'9 เดือน':'1 ปี';
-    let btn='';
-    if(active) btn=`<div class="pkg-owned">✅ กำลังขุดอยู่</div>`;
-    else if(bought>=def.limit) btn=`<div class="pkg-owned">✅ ครบแล้ว</div>`;
-    else btn=`<button class="btn-buy" onclick="showBuyModal('${key}')">⚡ เช่าเครื่องขุด</button>`;
-    return `<div class="pkg-card ${def.cls}">
-      <div class="pkg-icon">${ICONS[key]}</div>
-      <div class="pkg-name">${def.name}</div>
-      <div class="pkg-price" style="font-size:0.85rem;color:${colors[key]}">$${def.minPrice.toLocaleString()} - $${def.maxPrice.toLocaleString()}</div>
-      <div class="pkg-profit-line">${def.dailyPct}%/วัน · ${months}</div>
-      <div class="roi-box">
-        <div class="roi-row"><span class="roi-lbl">⏱ ระยะเวลา</span><span class="roi-val">${months}</span></div>
-        <div class="roi-row"><span class="roi-lbl">📈 กำไร/วัน</span><span class="roi-val">${def.dailyPct}% ของทุน</span></div>
-        <div class="roi-row"><span class="roi-lbl">💰 ตัวอย่าง $${def.minPrice.toLocaleString()}</span><span class="roi-val">$${exampleDaily}/วัน</span></div>
-        <div class="roi-div"></div>
-        <div class="roi-row"><span class="roi-lbl">🏆 กำไรรวม + ทุนคืน</span><span class="roi-profit">+$${exampleProfit} <span class="pb">+${(def.dailyPct*def.days).toFixed(0)}%</span></span></div>
-      </div>
-      <div id="pkbtn_${key}">${btn}</div>
-    </div>`;
-  }).join('');
 
-  // Active contracts
+  // กล่องลงทุนเดียว ใส่จำนวนได้อิสระ
+  document.getElementById('pkgGrid').innerHTML=`
+    <div class="pkg-card pc-pro" style="grid-column:1/-1;">
+      <div style="text-align:center;margin-bottom:1rem;">
+        <div style="font-size:2.5rem;">⛏</div>
+        <div class="pkg-name" style="font-size:1.1rem;">Cloud ETH Mining</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#A890CC;margin-top:0.3rem;">ยิ่งลงทุนมาก → % กำไรยิ่งสูงขึ้น</div>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:#A890CC;margin-bottom:0.4rem;">💵 จำนวน USDT ($100 - $100,000)</div>
+        <input type="number" id="miningAmtInput" min="100" max="100000" placeholder="เช่น 1000, 5000, 10000..."
+          oninput="calcMiningPreview()"
+          style="width:100%;padding:0.85rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:700;outline:none;">
+      </div>
+      <div id="miningPreview" style="display:none;background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+          <div style="text-align:center;background:rgba(255,215,0,0.07);border-radius:8px;padding:0.6rem;">
+            <div id="previewPct" style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--gold);">0%</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#A890CC;">%/วัน</div>
+          </div>
+          <div style="text-align:center;background:rgba(74,222,128,0.07);border-radius:8px;padding:0.6rem;">
+            <div id="previewDaily" style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--green);">$0</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#A890CC;">กำไร/วัน</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+          <div style="text-align:center;background:rgba(157,78,221,0.07);border-radius:8px;padding:0.6rem;">
+            <div id="previewDays" style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--purple-light);">0</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#A890CC;">ระยะเวลา (วัน)</div>
+          </div>
+          <div style="text-align:center;background:rgba(248,113,113,0.07);border-radius:8px;padding:0.6rem;">
+            <div id="previewTotal" style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:#f87171;">$0</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#A890CC;">ได้คืนรวม</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;font-size:0.85rem;padding:1rem;" onclick="startMiningInvestment()">⚡ เริ่มลงทุนเลย</button>
+    </div>`;
+
+  // Active contracts - แสดงทุกเครื่องแยกกัน
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
   const acEl=document.getElementById('acList');
-  if(!acs.length){acEl.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;padding:0.6rem 0">ยังไม่มีสัญญาที่ใช้งานอยู่</div>';return}
-  const col={starter:'#fcd9a0',basic:'#e2e8f0',standard:'#fde68a',advanced:'#a5f3fc',pro:'#fca5a5',elite:'#fde68a',ultra:'#c084fc'};
-  acEl.innerHTML=acs.map(p=>{
-    const def=PKGS[p.key];const pct=Math.round((1-p.remaining/p.days)*100);
-    const dailyEarn=(p.price*def.dailyPct/100).toFixed(2);
-    return `<div class="ac-card"><div class="ac-info"><div class="ac-name">${def.name} · $${(p.price||0).toLocaleString()}</div><div class="ac-meta">ผ่านไป ${(p.days-p.remaining).toFixed(1)} วัน · เหลือ ${Math.max(0,p.remaining).toFixed(1)} วัน</div><div class="ac-prog"><div style="width:${pct}%;height:100%;background:${col[p.key]||'var(--purple)'};border-radius:2px"></div></div></div><div><div class="ac-earn">+$${dailyEarn}</div><div class="ac-earn-l">USDT/วัน</div></div></div>`;
+  if(!acs.length){
+    acEl.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;padding:0.6rem 0">ยังไม่มีสัญญาที่ใช้งานอยู่</div>';
+    return;
+  }
+  acEl.innerHTML=acs.map((p,i)=>{
+    const pct=Math.round((1-(p.remaining/(p.days||1)))*100);
+    const dailyEarn=calcDailyEarn(p.price||0).toFixed(2);
+    const dailyPct=calcDailyPct(p.price||0).toFixed(2);
+    return `<div class="ac-card">
+      <div class="ac-info">
+        <div class="ac-name">⛏ เครื่องที่ ${i+1} · $${(p.price||0).toLocaleString()}</div>
+        <div class="ac-meta">${dailyPct}%/วัน · ผ่านไป ${Math.round((p.days||1)-p.remaining)} วัน · เหลือ ${Math.max(0,p.remaining).toFixed(0)} วัน</div>
+        <div class="ac-prog"><div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--purple),var(--green));border-radius:2px"></div></div>
+      </div>
+      <div>
+        <div class="ac-earn">+$${dailyEarn}</div>
+        <div class="ac-earn-l">USDT/วัน</div>
+      </div>
+    </div>`;
   }).join('');
+}
+
+function calcMiningPreview(){
+  const amt=parseFloat(document.getElementById('miningAmtInput').value)||0;
+  const preview=document.getElementById('miningPreview');
+  if(amt<100||amt>100000){preview.style.display='none';return;}
+  const pct=calcDailyPct(amt);
+  const daily=calcDailyEarn(amt);
+  const days=calcDays(amt);
+  const profit=daily*days;
+  const total=amt+profit;
+  document.getElementById('previewPct').textContent=pct.toFixed(2)+'%';
+  document.getElementById('previewDaily').textContent='$'+daily.toFixed(2);
+  document.getElementById('previewDays').textContent=days+' วัน';
+  document.getElementById('previewTotal').textContent='$'+total.toFixed(0);
+  preview.style.display='block';
+}
+
+function startMiningInvestment(){
+  const amt=parseFloat(document.getElementById('miningAmtInput').value)||0;
+  if(amt<100||amt>100000){showToast('⚠ ใส่จำนวน $100 - $100,000');return;}
+  goToUsdtPayment('mining',amt);
 }
 
 // Modal เลือกจำนวนเงินซื้อแพ็ก
@@ -1399,12 +1448,9 @@ function showBuyModal(key){
   document.body.appendChild(ov);
 }
 
-function goToUsdtPayment(key){
-  const def=PKGS[key]; if(!def) return;
-  const amt=parseFloat(document.getElementById('buyAmtInput').value)||0;
-  if(amt<def.minPrice||amt>def.maxPrice){
-    showToast(`⚠ กรอกจำนวน $${def.minPrice.toLocaleString()} - $${def.maxPrice.toLocaleString()}`);return;
-  }
+function goToUsdtPayment(key, passedAmt){
+  const amt = passedAmt || (parseFloat(document.getElementById('buyAmtInput')?.value)||0);
+  if(amt<100||amt>100000){showToast('⚠ ใส่จำนวน $100 - $100,000');return;}
   // โหลดที่อยู่ USDT และ QR Code จาก Firebase พร้อมกัน
   Promise.all([
     window._db.ref('settings/usdtAddr').once('value'),
@@ -1443,17 +1489,18 @@ function goToUsdtPayment(key){
 }
 
 function submitPkgPayment(key, amt){
+  amt = parseFloat(amt);
   const def=PKGS[key]; if(!def) return;
   const ud=getUD(); if(!ud) return;
   // บันทึกคำขอซื้อแพ็กรอ Admin อนุมัติ
   const req={
     id:'pkg_'+Date.now(),
     user:getSess(),
-    key,
-    pkgName:def.name,
+    key:'mining',
+    pkgName:'⛏ Cloud Mining',
     amt,
-    dailyPct:def.dailyPct,
-    days:def.days,
+    dailyPct:calcDailyPct(amt),
+    days:calcDays(amt),
     time:Date.now(),
     status:'pending'
   };
@@ -2342,18 +2389,21 @@ function approvePkgReq(fbKey, username, amt, pkgKey, dailyPct, days){
   window._db.ref('users/'+username).once('value').then(snap=>{
     if(snap.exists()){
       const ud=snap.val();
-      const daily=amt*dailyPct/100;
-      const profit=daily*days;
+      // ใช้ calcDailyPct และ calcDays จากระบบใหม่
+      const actualDailyPct = calcDailyPct(amt);
+      const actualDays = calcDays(amt);
+      const daily = calcDailyEarn(amt);
+      const profit = daily*actualDays;
       ud.packages=ud.packages||[];
-      ud.packages.push({key:pkgKey,price:amt,days,daily,dailyPct,profit,bought:Date.now(),remaining:days});
+      ud.packages.push({key:'mining',price:amt,days:actualDays,daily,dailyPct:actualDailyPct,profit,bought:Date.now(),remaining:actualDays});
       ud.txs=ud.txs||[];
-      ud.txs.unshift({desc:`✅ อนุมัติแพ็ก ${PKGS[pkgKey]?.name||pkgKey} $${amt.toLocaleString()}`,amount:-amt,unit:'USDT',time:Date.now()});
+      ud.txs.unshift({desc:`✅ อนุมัติการลงทุน $${amt.toLocaleString()}`,amount:-amt,unit:'USDT',time:Date.now()});
       window._db.ref('users/'+username).set(ud);
       if(getSess()===username){_ud=ud;updateNav();startDrip();}
     }
   });
   setTimeout(()=>renderAdminPkgReqs(),1000);
-  showToast(`✅ อนุมัติแพ็กให้ ${username} แล้ว`);
+  showToast(`✅ อนุมัติให้ ${username} แล้ว`);
 }
 
 function rejectPkgReq(fbKey, username){
