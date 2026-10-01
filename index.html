@@ -443,17 +443,16 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBXCvCLsPxkXBVLMaO8RISITM2d24pAL-Q",
-    authDomain: "cryptomine-b1f8d.firebaseapp.com",
-    databaseURL: "https://cryptomine-b1f8d-default-rtdb.firebaseio.com",
-    projectId: "cryptomine-b1f8d",
-    storageBucket: "cryptomine-b1f8d.firebasestorage.app",
-    messagingSenderId: "1033995691867",
-    appId: "1:1033995691867:web:9c52c61cd038ff660ddc7e"
-  };
-  firebase.initializeApp(firebaseConfig);
-  window._db = firebase.database();
+  firebase.initializeApp({
+    apiKey:"AIzaSyBXCvCLsPxkXBVLMaO8RISITM2d24pAL-Q",
+    authDomain:"cryptomine-b1f8d.firebaseapp.com",
+    databaseURL:"https://cryptomine-b1f8d-default-rtdb.firebaseio.com",
+    projectId:"cryptomine-b1f8d",
+    storageBucket:"cryptomine-b1f8d.firebasestorage.app",
+    messagingSenderId:"1033995691867",
+    appId:"1:1033995691867:web:9c52c61cd038ff660ddc7e"
+  });
+  window._db=firebase.database();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -932,7 +931,7 @@ function getSess(){return localStorage.getItem('cm_s')||''}
 function setSess(u){localStorage.setItem('cm_s',u)}
 function clrSess(){localStorage.removeItem('cm_s')}
 function getUD(){const u=getSess();return u?getU()[u]:null}
-function saveUD(d){const u=getSess();if(!u)return;const all=getU();all[u]=d;saveU(all)}
+
 
 // ─── AUTH ───
 let ptTimer;
@@ -950,58 +949,62 @@ function typePrompt(txt){
   tk();
 }
 function showMsg(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className='auth-msg '+type}
-
-function fbGetUser(u){
-  if(!window._db) return Promise.resolve(null);
-  return window._db.ref('users/'+u).once('value').then(s=>{
-    if(s.exists()){
-      const ud=s.val();
-      try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e){}
-      return ud;
-    }
-    return null;
-  });
-}
-
 function doLogin(){
-  const u=(document.getElementById('loginUser')||{}).value||'';
-  const p=(document.getElementById('loginPass')||{}).value||'';
-  const msg=document.getElementById('loginMsg');
-  if(!u.trim()||!p){if(msg){msg.textContent='⚠ กรุณากรอกข้อมูลให้ครบ';msg.className='auth-msg error';}return;}
-  
-  // ลอง cache ก่อน
+  const u=(document.getElementById('loginUser')?.value||'').trim();
+  const p=document.getElementById('loginPass')?.value||'';
+  if(!u||!p){showMsg('loginMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return;}
+  // เช็ค cache ก่อน
   try{
-    const cached=localStorage.getItem('cm_ud_'+u.trim());
+    const cached=localStorage.getItem('cm_ud_'+u);
     if(cached){
       const ud=JSON.parse(cached);
-      if(ud&&ud.pw===p){_ud=ud;setSess(u.trim());enterDash(u.trim());return;}
+      if(ud&&ud.pw===p){
+        _ud=ud;setSess(u);enterDash(u);
+        if(window._db)fbGetUser(u).then(fresh=>{if(fresh){_ud=fresh;try{localStorage.setItem('cm_ud_'+u,JSON.stringify(fresh));}catch(e){}}});
+        return;
+      }
     }
   }catch(e){}
-
-  if(!window._db){
-    if(msg){msg.textContent='⚠ กำลังเชื่อมต่อ...';msg.className='auth-msg error';}
-    return;
-  }
-  if(msg){msg.textContent='⏳ กำลังเข้าสู่ระบบ...';msg.className='auth-msg';}
-  fbGetUser(u.trim()).then(ud=>{
-    if(!ud){if(msg){msg.textContent='❌ ไม่พบชื่อผู้ใช้';msg.className='auth-msg error';}return;}
-    if(ud.pw!==p){if(msg){msg.textContent='❌ รหัสผ่านไม่ถูกต้อง';msg.className='auth-msg error';}return;}
-    _ud=ud;setSess(u.trim());enterDash(u.trim());
-  }).catch(()=>{if(msg){msg.textContent='❌ เชื่อมต่อไม่ได้';msg.className='auth-msg error';}});
+  if(!window._db){showMsg('loginMsg','⚠ กำลังเชื่อมต่อ...','error');return;}
+  showMsg('loginMsg','⏳ กำลังเข้าสู่ระบบ...','');
+  fbGetUser(u).then(ud=>{
+    if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
+    if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
+    _ud=ud;setSess(u);enterDash(u);
+  }).catch(()=>showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error'));
 }
 
 function doRegister(){
-  const u=document.getElementById('regUser').value.trim();
-  const e=document.getElementById('regEmail').value.trim();
-  const p=document.getElementById('regPass').value;
-  if(!u||!e||!p){showMsg('regMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return}
-  if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return}
-  const all=getU();
-  if(all[u]){showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return}
-  all[u]={pw:p,email:e,usd:0,zkpReward:0,zkpMine:0,sessions:0,packages:[],txs:[]};
-  saveU(all);showMsg('regMsg','✅ สมัครสำเร็จ! กำลังเข้าสู่ระบบ...','success');
-  setTimeout(()=>{setSess(u);enterDash(u)},1000);
+  const u=(document.getElementById('regUser')?.value||'').trim();
+  const e=(document.getElementById('regEmail')?.value||'').trim();
+  const p=document.getElementById('regPass')?.value||'';
+  if(!u||!e||!p){showMsg('regMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return;}
+  if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return;}
+  if(!canSendOTP(e)){showMsg('regMsg','❌ ส่ง OTP ครบ 5 ครั้ง กรุณารอ '+getOTPWaitTime(e),'error');return;}
+  const btn=document.querySelector('#regForm .btn-auth');
+  if(btn){btn.disabled=true;btn.textContent='⏳ กำลังส่ง OTP...';}
+  const checkUser=window._db?fbGetUser(u):Promise.resolve(null);
+  checkUser.then(existing=>{
+    if(existing){
+      if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}
+      showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;
+    }
+    const otp=Math.floor(100000+Math.random()*900000).toString();
+    _pendingOTP=otp;_pendingUser=u;_pendingEmail=e;_pendingPass=p;_otpExpiry=Date.now()+600000;
+    emailjs.send('service_6j83xlj','template_riz4m4w',{to_name:u,to_email:e,otp}).then(()=>{
+      incrementOTPCount(e);
+      if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}
+      showOTPModal(u,e);
+    }).catch(err=>{
+      if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}
+      showMsg('regMsg','❌ ส่ง Email ไม่ได้: '+(err?.text||'error'),'error');
+    });
+  }).catch(()=>{
+    if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}
+    showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');
+  });
 }
+
 function doLogout(){stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
 
 // ─── ENTER DASHBOARD ───
@@ -2365,48 +2368,75 @@ window.addEventListener('load',()=>{
 });
 
 
+// ─── FIREBASE ───
+function fbGetUser(u){
+  if(!window._db)return Promise.resolve(null);
+  return window._db.ref('users/'+u).once('value').then(s=>{
+    if(s.exists()){
+      const ud=s.val();
+      try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e){}
+      return ud;
+    }
+    return null;
+  });
+}
 
-// ─── MISSING FUNCTIONS ───
+// ─── SAVE USER TO FIREBASE ───
+function saveUD(ud){
+  const u=getSess();if(!u)return;
+  // save local
+  try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e){}
+  // sync firebase
+  if(window._db) window._db.ref('users/'+u).set(ud).catch(()=>{});
+  _ud=ud;
+}
 
-// OTP System
+// ─── ETH MINING CALC ───
+const ETH_RATE=2672.47;
+function calcDailyPct(amt){return 0.75+(amt/100000)*2.75;}
+function calcDays(amt){
+  if(amt<1000)return 90;
+  if(amt<5000)return 90;
+  if(amt<10000)return 180;
+  if(amt<30000)return 180;
+  if(amt<50000)return 270;
+  return 365;
+}
+function calcDailyEarn(amt){return amt*calcDailyPct(amt)/100;}
+
+// ─── OTP ───
 let _pendingOTP=null,_pendingUser=null,_pendingEmail=null,_pendingPass=null,_otpExpiry=null;
 
-function canSendOTP(email){
-  const data=getOTPCount(email);
-  if(data.count>=5){
-    const elapsed=Date.now()-data.firstTime;
-    if(elapsed<3600000) return false;
-    localStorage.removeItem('cm_otp_'+email);
-  }
+function canSendOTP(e){
+  const d=getOTPCount(e);
+  if(d.count>=5&&(Date.now()-d.firstTime)<3600000)return false;
+  if(d.count>=5)localStorage.removeItem('cm_otp_'+e);
   return true;
 }
-function getOTPCount(email){
-  try{return JSON.parse(localStorage.getItem('cm_otp_'+email)||'{"count":0,"firstTime":0}');}
-  catch(e){return {count:0,firstTime:0};}
+function getOTPCount(e){
+  try{return JSON.parse(localStorage.getItem('cm_otp_'+e)||'{"count":0,"firstTime":0}');}
+  catch(e2){return{count:0,firstTime:0};}
 }
-function incrementOTPCount(email){
-  const d=getOTPCount(email);
-  if(d.count===0)d.firstTime=Date.now();
+function incrementOTPCount(e){
+  const d=getOTPCount(e);
+  if(!d.count)d.firstTime=Date.now();
   d.count++;
-  localStorage.setItem('cm_otp_'+email,JSON.stringify(d));
+  localStorage.setItem('cm_otp_'+e,JSON.stringify(d));
 }
-function getOTPWaitTime(email){
-  const d=getOTPCount(email);
-  const remaining=3600000-(Date.now()-d.firstTime);
-  const mins=Math.ceil(remaining/60000);
-  return mins+' นาที';
+function getOTPWaitTime(e){
+  const d=getOTPCount(e);
+  return Math.ceil((3600000-(Date.now()-d.firstTime))/60000)+' นาที';
 }
-
 function showOTPModal(username,email){
   const ov=document.createElement('div');ov.className='overlay';ov.id='otpOverlay';
   ov.innerHTML=`<div class="popup" style="text-align:center;">
-    <div style="font-size:2.5rem;margin-bottom:0.8rem;">📧</div>
+    <div style="font-size:2.5rem;margin-bottom:0.5rem;">📧</div>
     <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.5rem;">ยืนยัน Email</div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.8rem;line-height:1.8;">
       ส่งรหัส OTP ไปที่<br><span style="color:var(--green);">${email}</span>
     </div>
-    <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:0.6rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--gold);line-height:1.8;">
-      ⚠️ ถ้าไม่พบ OTP กรุณาเช็ค <b>Spam / จดหมายขยะ</b> ด้วยครับ
+    <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:0.6rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--gold);">
+      ⚠️ ถ้าไม่พบ OTP กรุณาเช็ค Spam ด้วยครับ
     </div>
     <input type="number" id="otpInput" placeholder="000000"
       style="width:100%;padding:1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;outline:none;text-align:center;letter-spacing:8px;margin-bottom:1rem;">
@@ -2416,61 +2446,65 @@ function showOTPModal(username,email){
   </div>`;
   document.body.appendChild(ov);
 }
-
 function verifyOTP(){
-  const input=document.getElementById('otpInput').value.trim();
+  const input=document.getElementById('otpInput')?.value.trim();
   const msg=document.getElementById('otpMsg');
-  if(!input){msg.style.color='var(--red-bright)';msg.textContent='⚠ กรอกรหัส OTP';return;}
-  if(Date.now()>_otpExpiry){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสหมดอายุ';return;}
-  if(input!==_pendingOTP){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสไม่ถูกต้อง';return;}
-  msg.style.color='var(--green)';msg.textContent='✅ OTP ถูกต้อง กำลังสร้างบัญชี...';
+  if(!input){if(msg){msg.style.color='var(--red-bright)';msg.textContent='⚠ กรอกรหัส OTP';}return;}
+  if(Date.now()>_otpExpiry){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสหมดอายุ';}return;}
+  if(input!==_pendingOTP){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสไม่ถูกต้อง';}return;}
+  if(msg){msg.style.color='var(--green)';msg.textContent='✅ กำลังสร้างบัญชี...';}
   const u=_pendingUser,e=_pendingEmail,p=_pendingPass;
   const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
   const refBy=new URLSearchParams(window.location.search).get('ref')||localStorage.getItem('cm_pending_ref')||'';
   const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
-  window._db.ref('users/'+u).set(nd).then(()=>{
+  if(window._db){
+    window._db.ref('users/'+u).set(nd).then(()=>{
+      document.querySelectorAll('.overlay').forEach(o=>o.remove());
+      _ud=nd;setTimeout(()=>{setSess(u);enterDash(u);},300);
+    });
+  } else {
+    try{localStorage.setItem('cm_ud_'+u,JSON.stringify(nd));}catch(e2){}
     document.querySelectorAll('.overlay').forEach(o=>o.remove());
-    _ud=nd;
-    setTimeout(()=>{setSess(u);enterDash(u);},500);
-  });
+    _ud=nd;setSess(u);enterDash(u);
+  }
 }
-
 function resendOTPBrevo(){
   const msg=document.getElementById('otpMsg');
   if(!canSendOTP(_pendingEmail)){
-    msg.style.color='var(--red-bright)';
-    msg.textContent='❌ ส่งครบ 5 ครั้งแล้ว กรุณารอ '+getOTPWaitTime(_pendingEmail);
+    if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งครบ 5 ครั้ง รอ '+getOTPWaitTime(_pendingEmail);}
     return;
   }
   const otp=Math.floor(100000+Math.random()*900000).toString();
-  _pendingOTP=otp;_otpExpiry=Date.now()+10*60*1000;
+  _pendingOTP=otp;_otpExpiry=Date.now()+600000;
   emailjs.send('service_6j83xlj','template_riz4m4w',{
-    to_name:_pendingUser,to_email:_pendingEmail,otp:otp
+    to_name:_pendingUser,to_email:_pendingEmail,otp
   }).then(()=>{
     incrementOTPCount(_pendingEmail);
-    msg.style.color='var(--green)';msg.textContent='✅ ส่งรหัสใหม่แล้ว';
-  }).catch(()=>{msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งไม่ได้';});
+    if(msg){msg.style.color='var(--green)';msg.textContent='✅ ส่งรหัสใหม่แล้ว';}
+  }).catch(()=>{if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งไม่ได้';}});
 }
 
-// Mining Investment
+// ─── MINING INVESTMENT ───
 function startMiningInvestment(){
   const amt=parseFloat(document.getElementById('miningAmtInput')?.value)||0;
   if(amt<100||amt>100000){showToast('⚠ ใส่จำนวน $100 - $100,000');return;}
   const ud=getUD();if(!ud)return;
-  if((ud.usd||0)<amt){showToast('❌ USDT ไม่พอ');switchTab(3);return;}
-  const pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt);
-  const total=amt+daily*days;
+  if((ud.usd||0)<amt){showToast('❌ USDT ไม่พอ กรุณาเติมเงินก่อน');switchTab(3);return;}
+  const pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt),total=amt+daily*days;
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup" style="text-align:center;">
     <div style="font-size:2rem;margin-bottom:0.5rem;">⛏</div>
     <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);margin-bottom:1rem;">ยืนยันการลงทุน</div>
     <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;">
-        <div style="text-align:left;color:#A890CC;">💵 ลงทุน</div><div style="text-align:right;color:var(--gold);">$${amt.toLocaleString()}</div>
-        <div style="text-align:left;color:#A890CC;">📈 กำไร/วัน</div><div style="text-align:right;color:var(--green);">$${daily.toFixed(2)}</div>
-        <div style="text-align:left;color:#A890CC;">⏱ ระยะเวลา</div><div style="text-align:right;color:var(--purple-light);">${days} วัน</div>
-        <div style="text-align:left;color:#A890CC;">🏆 รับคืนรวม</div><div style="text-align:right;color:#f87171;">$${total.toFixed(0)}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;text-align:left;">
+        <div style="color:#A890CC;">💵 ลงทุน</div><div style="color:var(--gold);text-align:right;">$${amt.toLocaleString()}</div>
+        <div style="color:#A890CC;">📈 กำไร/วัน</div><div style="color:var(--green);text-align:right;">$${daily.toFixed(2)}</div>
+        <div style="color:#A890CC;">⏱ ระยะเวลา</div><div style="color:var(--purple-light);text-align:right;">${days} วัน</div>
+        <div style="color:#A890CC;">🏆 ได้คืนรวม</div><div style="color:#f87171;text-align:right;">$${total.toFixed(0)}</div>
       </div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,100,100,0.8);margin-bottom:1rem;">
+      USDT คงเหลือ: $${((ud.usd||0)-amt).toFixed(2)}
     </div>
     <div style="display:flex;gap:0.5rem;">
       <button onclick="this.closest('.overlay').remove()" style="flex:1;padding:0.8rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">ยกเลิก</button>
@@ -2479,7 +2513,6 @@ function startMiningInvestment(){
   </div>`;
   document.body.appendChild(ov);
 }
-
 function confirmMiningInvestment(amt){
   const ud=getUD();if(!ud)return;
   if((ud.usd||0)<amt){showToast('❌ USDT ไม่พอ');return;}
@@ -2488,19 +2521,18 @@ function confirmMiningInvestment(amt){
   ud.packages=ud.packages||[];
   ud.packages.push({key:'mining',price:amt,days,daily,dailyPct,profit:daily*days,bought:Date.now(),remaining:days});
   ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:`⛏ เริ่มขุด $${amt.toLocaleString()}`,amount:-amt,unit:'USDT',time:Date.now()});
+  ud.txs.unshift({desc:`⛏ เริ่มขุด $${amt.toLocaleString()} USDT`,amount:-amt,unit:'USDT',time:Date.now()});
   saveUD(ud);
   document.querySelectorAll('.overlay').forEach(o=>o.remove());
   updateNav();startDrip();renderPkgs();renderMachines();switchTab(0);
   showToast(`✅ เริ่มขุดแล้ว! $${amt.toLocaleString()} USDT`);
 }
 
-// Convert ETH -> USDT
-const ETH_RATE=2672.47;
+// ─── CONVERT ETH→USDT ───
 function showConvertPopup(){
   const ud=getUD();if(!ud)return;
   const eth=ud.ethReward||0;
-  if(eth<=0){showToast('❌ ไม่มี ETH ที่จะแปลง');return;}
+  if(eth<=0){showToast('❌ ไม่มี ETH');return;}
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd"><div class="pop-title">💱 แปลง ETH → USDT</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
@@ -2523,9 +2555,7 @@ function showConvertPopup(){
 function calcConvertPreview(){
   const amt=parseFloat(document.getElementById('convertAmt')?.value)||0;
   const el=document.getElementById('convertPreview');
-  if(!el)return;
-  if(amt<=0){el.textContent='';return;}
-  el.textContent=`= $${(amt*ETH_RATE).toFixed(2)} USDT`;
+  if(el) el.textContent=amt>0?`= $${(amt*ETH_RATE).toFixed(2)} USDT`:'';
 }
 function submitConvert(){
   const ud=getUD();if(!ud)return;
@@ -2535,23 +2565,23 @@ function submitConvert(){
   const usdt=parseFloat((amt*ETH_RATE).toFixed(2));
   ud.usd=(ud.usd||0)+usdt;
   ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:`💱 แปลง ${amt.toFixed(6)} ETH → $${usdt} USDT`,amount:usdt,unit:'USDT',time:Date.now()});
+  ud.txs.unshift({desc:`💱 แปลง ${amt.toFixed(6)} ETH`,amount:usdt,unit:'USDT',time:Date.now()});
   saveUD(ud);
   document.querySelectorAll('.overlay').forEach(o=>o.remove());
   updateNav();renderWallet();
   showToast(`✅ แปลงสำเร็จ! +$${usdt} USDT`);
 }
 
-// Admin PKG Reqs
+// ─── ADMIN PKG REQS ───
 function renderAdminPkgReqs(){
   const el=document.getElementById('adminTopupList');if(!el)return;
-  el.innerHTML='<div style="text-align:center;padding:1rem;font-family:monospace;color:#A890CC;">⏳ กำลังโหลด...</div>';
-  if(!window._db){el.innerHTML='<div style="color:red;padding:1rem;">❌ ไม่มี Firebase</div>';return;}
+  if(!window._db){renderAdminTopup();return;}
+  el.innerHTML='<div style="padding:0.5rem;font-family:monospace;color:#A890CC;font-size:0.7rem;">⏳ โหลด...</div>';
   window._db.ref('pkg_reqs').once('value').then(snap=>{
     let reqs=[];
-    if(snap.exists()){const d=snap.val();reqs=Object.entries(d).map(([k,v])=>({...v,fbKey:k}));}
+    if(snap.exists()){reqs=Object.entries(snap.val()).map(([k,v])=>({...v,fbKey:k}));}
     const pending=reqs.filter(r=>r.status==='pending');
-    const pkgSection=pending.length>0
+    const html=pending.length>0
       ?`<div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">⛏ คำขอลงทุน (${pending.length})</div>
         ${pending.map(r=>`<div class="req-card pending" style="border-color:rgba(255,215,0,0.4);margin-bottom:0.8rem;">
           <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--gold);">⛏ Cloud Mining</div>
@@ -2563,11 +2593,10 @@ function renderAdminPkgReqs(){
         </div>`).join('')}`
       :`<div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.5rem;">⛏ คำขอลงทุน</div>
         <div style="text-align:center;padding:0.8rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);">ไม่มีคำขอ</div>`;
-    el.innerHTML=pkgSection+`<div style="margin-top:1rem;font-family:'Orbitron',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.5rem;">💰 คำขอเติมเงิน</div>`;
+    el.innerHTML=html+`<div style="margin-top:1rem;font-family:'Orbitron',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.5rem;">💰 คำขอเติมเงิน</div>`;
     renderAdminTopup();
-  }).catch(()=>{el.innerHTML='<div style="color:red;padding:1rem;">❌ โหลดไม่ได้</div>';renderAdminTopup();});
+  }).catch(()=>{el.innerHTML='';renderAdminTopup();});
 }
-
 function approvePkgReq(fbKey,username,amt){
   if(!window._db)return;
   window._db.ref('pkg_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()});
@@ -2578,71 +2607,92 @@ function approvePkgReq(fbKey,username,amt){
     ud.packages=ud.packages||[];
     ud.packages.push({key:'mining',price:amt,days,daily,dailyPct,profit:daily*days,bought:Date.now(),remaining:days});
     ud.txs=ud.txs||[];
-    ud.txs.unshift({desc:`✅ อนุมัติลงทุน $${amt.toLocaleString()}`,amount:-amt,unit:'USDT',time:Date.now()});
+    ud.txs.unshift({desc:`✅ อนุมัติลงทุน $${amt}`,amount:-amt,unit:'USDT',time:Date.now()});
     window._db.ref('users/'+username).set(ud);
     if(getSess()===username){_ud=ud;updateNav();startDrip();}
   });
   setTimeout(()=>renderAdminPkgReqs(),1000);
   showToast(`✅ อนุมัติให้ ${username}`);
 }
-
 function rejectPkgReq(fbKey,username){
   if(!window._db)return;
   window._db.ref('pkg_reqs/'+fbKey).update({status:'rejected'});
-  // คืน USDT
-  window._db.ref('users/'+username+'/usd').once('value').then(snap=>{
-    const req_snap=window._db.ref('pkg_reqs/'+fbKey);
-    req_snap.once('value').then(rs=>{
-      if(rs.exists()){
-        const amt=rs.val().amt||0;
-        const cur=snap.val()||0;
-        window._db.ref('users/'+username+'/usd').set(cur+amt);
-      }
-    });
-  });
   setTimeout(()=>renderAdminPkgReqs(),1000);
-  showToast(`❌ ปฏิเสธคำขอ ${username}`);
+  showToast(`❌ ปฏิเสธ ${username}`);
 }
 
-// Admin USDT Address
+// ─── USDT ADDRESS ───
 function saveUsdtAddr(){
   const addr=document.getElementById('usdtAddrInput')?.value.trim();
   if(!addr){showToast('⚠ กรอกที่อยู่ก่อน');return;}
   if(!window._db){showToast('❌ ไม่มี Firebase');return;}
-  window._db.ref('settings/usdtAddr').set(addr).then(()=>{
-    showToast('✅ บันทึกที่อยู่ USDT แล้ว');
-    loadUsdtAddr();
-  });
+  window._db.ref('settings/usdtAddr').set(addr).then(()=>{showToast('✅ บันทึกแล้ว');loadUsdtAddr();});
 }
 function loadUsdtAddr(){
   if(!window._db)return;
   window._db.ref('settings/usdtAddr').once('value').then(snap=>{
+    if(!snap.exists())return;
     const inp=document.getElementById('usdtAddrInput');
     const prev=document.getElementById('usdtAddrPreview');
-    if(snap.exists()&&inp){inp.value=snap.val();}
-    if(snap.exists()&&prev){prev.textContent='📋 '+snap.val();}
+    if(inp)inp.value=snap.val();
+    if(prev)prev.textContent='📋 '+snap.val();
   });
 }
 
-// Settings Menu
+// ─── QR CODE (localStorage) ───
+function uploadAdminQR(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      canvas.width=img.width;canvas.height=img.height;
+      canvas.getContext('2d').drawImage(img,0,0);
+      const compressed=canvas.toDataURL('image/jpeg',0.7);
+      try{
+        localStorage.setItem('cm_qr_image',compressed);
+        loadAdminQRPreview();
+        showToast('✅ อัปโหลด QR Code สำเร็จ!');
+      }catch(err){showToast('❌ รูปใหญ่เกินไป');}
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function loadAdminQRPreview(){
+  const wrap=document.getElementById('adminQRPreview');if(!wrap)return;
+  const img=localStorage.getItem('cm_qr_image');
+  if(img){
+    wrap.innerHTML=`<img src="${img}" style="width:160px;height:160px;border-radius:10px;border:2px solid rgba(255,215,0,0.3);">`;
+    const btn=document.getElementById('delQRBtn');if(btn)btn.style.display='block';
+  }
+}
+function deleteQR(){
+  localStorage.removeItem('cm_qr_image');
+  const wrap=document.getElementById('adminQRPreview');
+  if(wrap)wrap.innerHTML='<div style="width:160px;height:160px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;"><div style="font-size:2rem;">📱</div></div>';
+  const btn=document.getElementById('delQRBtn');if(btn)btn.style.display='none';
+  showToast('🗑️ ลบ QR แล้ว');
+}
+
+// ─── SETTINGS ───
 function showSettingsMenu(){
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd"><div class="pop-title">⚙️ ตั้งค่า</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
     <div style="display:flex;flex-direction:column;gap:0.6rem;">
-      <button onclick="showProfilePopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>👤</span><span style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;">โปรไฟล์</span></button>
-      <button onclick="showChangePassPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>🔐</span><span style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;">เปลี่ยนรหัสผ่าน</span></button>
-      <button onclick="showLangPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>🌐</span><span style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;">เปลี่ยนภาษา</span></button>
-      <button onclick="showAboutPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>ℹ️</span><span style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;">เกี่ยวกับแอป</span></button>
-      <button onclick="showAdminPassPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:12px;color:rgba(255,215,0,0.5);cursor:pointer;text-align:left;width:100%;"><span>🔑</span><span style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;">Admin Access</span></button>
+      <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showProfilePopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>👤</span><span style="font-family:'Share Tech Mono',monospace;">โปรไฟล์</span></button>
+      <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showChangePassPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>🔐</span><span style="font-family:'Share Tech Mono',monospace;">เปลี่ยนรหัสผ่าน</span></button>
+      <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showLangPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>🌐</span><span style="font-family:'Share Tech Mono',monospace;">เปลี่ยนภาษา</span></button>
+      <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showAboutPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>ℹ️</span><span style="font-family:'Share Tech Mono',monospace;">เกี่ยวกับแอป</span></button>
+      <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showAdminPassPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:12px;color:rgba(255,215,0,0.5);cursor:pointer;text-align:left;width:100%;"><span>🔑</span><span style="font-family:'Share Tech Mono',monospace;">Admin Access</span></button>
     </div>
   </div>`;
   document.body.appendChild(ov);
 }
-
 function showProfilePopup(){
   const ud=getUD();if(!ud)return;
-  document.querySelectorAll('.overlay').forEach(o=>o.remove());
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd"><div class="pop-title">👤 โปรไฟล์</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
@@ -2652,191 +2702,146 @@ function showProfilePopup(){
     </div>
     <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:1rem;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;">
-        <div style="color:#A890CC;">💵 USDT</div><div style="color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
-        <div style="color:#A890CC;">⛏ ETH</div><div style="color:var(--green);">${(ud.ethReward||0).toFixed(6)}</div>
-        <div style="color:#A890CC;">🔗 Ref Code</div><div style="color:var(--purple-light);">${ud.refCode||'-'}</div>
+        <div style="color:#A890CC;">💵 USDT</div><div style="color:var(--gold);text-align:right;">$${(ud.usd||0).toFixed(2)}</div>
+        <div style="color:#A890CC;">⛏ ETH</div><div style="color:var(--green);text-align:right;">${(ud.ethReward||0).toFixed(6)}</div>
+        <div style="color:#A890CC;">🔗 Ref Code</div><div style="color:var(--purple-light);text-align:right;">${ud.refCode||'-'}</div>
       </div>
     </div>
   </div>`;
   document.body.appendChild(ov);
 }
-
 function showChangePassPopup(){
-  document.querySelectorAll('.overlay').forEach(o=>o.remove());
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd"><div class="pop-title">🔐 เปลี่ยนรหัสผ่าน</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
     <div class="form-group"><input type="password" id="cpOld" placeholder="รหัสเดิม" class="form-input"></div>
-    <div class="form-group"><input type="password" id="cpNew" placeholder="รหัสใหม่" class="form-input"></div>
+    <div class="form-group"><input type="password" id="cpNew" placeholder="รหัสใหม่ (6+ ตัว)" class="form-input"></div>
     <div id="cpMsg" style="min-height:1rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;margin-bottom:0.5rem;"></div>
     <button class="btn btn-primary" style="width:100%" onclick="changeUserPass()">✅ บันทึก</button>
   </div>`;
   document.body.appendChild(ov);
 }
-
 function changeUserPass(){
   const ud=getUD();if(!ud)return;
-  const oldP=document.getElementById('cpOld')?.value;
-  const newP=document.getElementById('cpNew')?.value;
+  const o=document.getElementById('cpOld')?.value;
+  const n=document.getElementById('cpNew')?.value;
   const msg=document.getElementById('cpMsg');
-  if(ud.pw!==oldP){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสเดิมไม่ถูก';}return;}
-  if(!newP||newP.length<6){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสใหม่ต้องมี 6 ตัวขึ้นไป';}return;}
-  ud.pw=newP;
-  saveUD(ud);
-  if(msg){msg.style.color='var(--green)';msg.textContent='✅ เปลี่ยนรหัสผ่านแล้ว';}
+  if(ud.pw!==o){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสเดิมไม่ถูก';}return;}
+  if(!n||n.length<6){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสต้องมี 6 ตัวขึ้นไป';}return;}
+  ud.pw=n;saveUD(ud);
+  if(msg){msg.style.color='var(--green)';msg.textContent='✅ เปลี่ยนรหัสแล้ว';}
   setTimeout(()=>document.querySelectorAll('.overlay').forEach(o=>o.remove()),1000);
 }
-
 function showLangPopup(){
-  document.querySelectorAll('.overlay').forEach(o=>o.remove());
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd"><div class="pop-title">🌐 ภาษา</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
     <div style="display:flex;flex-direction:column;gap:0.6rem;">
-      <button onclick="setLang('th');this.closest('.overlay').remove()" style="padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.85rem;">🇹🇭 ภาษาไทย</button>
-      <button onclick="setLang('en');this.closest('.overlay').remove()" style="padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.85rem;">🇬🇧 English</button>
-      <button onclick="setLang('lo');this.closest('.overlay').remove()" style="padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.85rem;">🇱🇦 ລາວ</button>
+      <button onclick="setLang('th');this.closest('.overlay').remove()" style="padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;font-family:'Share Tech Mono',monospace;">🇹🇭 ภาษาไทย</button>
+      <button onclick="setLang('en');this.closest('.overlay').remove()" style="padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;font-family:'Share Tech Mono',monospace;">🇬🇧 English</button>
+      <button onclick="setLang('lo');this.closest('.overlay').remove()" style="padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;font-family:'Share Tech Mono',monospace;">🇱🇦 ລາວ</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
 }
-
 function showAboutPopup(){
-  document.querySelectorAll('.overlay').forEach(o=>o.remove());
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup" style="text-align:center;">
     <div style="font-size:3rem;margin-bottom:0.5rem;">⛏</div>
     <div style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--gold);margin-bottom:0.3rem;">CRYPTOMINE</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#A890CC;margin-bottom:1rem;">Cloud ETH Mining Platform v2.0</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);line-height:1.8;">
-      🌐 cloudmininggold.com<br>
-      📧 Cloudmininggold@gmail.com
-    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#A890CC;line-height:2;">Cloud ETH Mining Platform<br>🌐 cloudmininggold.com</div>
     <button onclick="this.closest('.overlay').remove()" class="btn btn-primary" style="width:100%;margin-top:1rem;">ปิด</button>
   </div>`;
   document.body.appendChild(ov);
 }
-
 function showAdminPassPopup(){
-  document.querySelectorAll('.overlay').forEach(o=>o.remove());
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup" style="text-align:center;">
     <div style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--gold);margin-bottom:1rem;">🔑 Admin Access</div>
     <input type="password" id="adminPassInput" placeholder="รหัส Admin"
       style="width:100%;padding:0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.3);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:1rem;outline:none;margin-bottom:0.5rem;">
-    <div id="adminPassMsg" style="min-height:1rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;margin-bottom:0.8rem;color:var(--red-bright);"></div>
-    <button onclick="verifyAdminFromSettings()" class="btn btn-primary" style="width:100%;">🔓 เข้าสู่ระบบ Admin</button>
+    <div id="adminPassMsg" style="min-height:1rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--red-bright);margin-bottom:0.8rem;"></div>
+    <button onclick="verifyAdminFromSettings()" class="btn btn-primary" style="width:100%;">🔓 เข้า Admin</button>
   </div>`;
   document.body.appendChild(ov);
   setTimeout(()=>document.getElementById('adminPassInput')?.focus(),100);
 }
-
 function verifyAdminFromSettings(){
   const input=document.getElementById('adminPassInput')?.value;
   const msg=document.getElementById('adminPassMsg');
   if(input===getAdminPass()){
     document.querySelectorAll('.overlay').forEach(o=>o.remove());
-    document.getElementById('authScreen').classList.remove('active');
-    document.getElementById('dashScreen').classList.remove('active');
-    document.getElementById('adminScreen').classList.add('active');
-    switchAdminTab(0);
-    loadAdminQRPreview();
-    renderAdminStats();
-    loadUsdtAddr();
+    document.getElementById('authScreen')?.classList.remove('active');
+    document.getElementById('dashScreen')?.classList.remove('active');
+    document.getElementById('adminScreen')?.classList.add('active');
+    switchAdminTab(0);loadAdminQRPreview();renderAdminStats();loadUsdtAddr();
   } else {
     if(msg)msg.textContent='❌ รหัสไม่ถูกต้อง';
   }
 }
-
 function copyRefLink(){
   const ud=getUD();if(!ud)return;
-  const link=window.location.origin+window.location.pathname+'?ref='+(ud.refCode||'');
-  navigator.clipboard.writeText(link).then(()=>showToast('📋 คัดลอกลิงก์แล้ว!')).catch(()=>showToast('❌ คัดลอกไม่ได้'));
+  const link=location.origin+location.pathname+'?ref='+(ud.refCode||'');
+  navigator.clipboard?.writeText(link).then(()=>showToast('📋 คัดลอกแล้ว!')).catch(()=>showToast('❌ คัดลอกไม่ได้'));
 }
-
 function renderReferral(){
   const ud=getUD();if(!ud)return;
   const el=document.getElementById('refSection');if(!el)return;
   const code=ud.refCode||'-';
-  const link=window.location.origin+window.location.pathname+'?ref='+code;
+  const link=location.origin+location.pathname+'?ref='+code;
   el.innerHTML=`<div style="background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.2);border-radius:12px;padding:1rem;margin-top:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.5rem;">🔗 Referral</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--purple-light);margin-bottom:0.5rem;">รหัส: ${code}</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.5rem;word-break:break-all;">${link}</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.5rem;word-break:break-all;">${link}</div>
     <button onclick="copyRefLink()" class="btn btn-primary" style="width:100%;padding:0.6rem;font-size:0.65rem;">📋 คัดลอกลิงก์</button>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-top:0.5rem;">
-      แนะนำ: ${ud.refCount||0} คน · ได้รับ: $${(ud.refEarned||0).toFixed(2)}
-    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-top:0.5rem;">แนะนำ: ${ud.refCount||0} คน · ได้: $${(ud.refEarned||0).toFixed(2)}</div>
   </div>`;
 }
-
 function calcOfflineEarnings(){
   const ud=getUD();if(!ud)return;
-  const now=Date.now();
-  const lastSeen=ud.lastSeen||now;
-  const offlineSec=(now-lastSeen)/1000;
+  const now=Date.now(),lastSeen=ud.lastSeen||now,offlineSec=(now-lastSeen)/1000;
   if(offlineSec<10)return;
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
   if(!acs.length)return;
   let totalEth=0;
-  acs.forEach((p,idx)=>{
-    const daysOffline=Math.min(offlineSec/86400, p.remaining);
-    const dailyEarnUsdt=(p.price||0)*((p.dailyPct||0))/100;
-    const ethEarned=(dailyEarnUsdt/ETH_RATE)*daysOffline;
-    totalEth+=ethEarned;
-    p.remaining=Math.max(0,p.remaining-daysOffline);
+  acs.forEach(p=>{
+    const daysOff=Math.min(offlineSec/86400,p.remaining);
+    totalEth+=(((p.price||0)*(p.dailyPct||0)/100)/ETH_RATE)*daysOff;
+    p.remaining=Math.max(0,p.remaining-daysOff);
   });
-  if(totalEth>0){
-    ud.ethReward=(ud.ethReward||0)+totalEth;
-    saveUD(ud);
-    showToast(`✅ ขุดออฟไลน์ได้ +${totalEth.toFixed(6)} ETH`);
-  }
+  if(totalEth>0){ud.ethReward=(ud.ethReward||0)+totalEth;saveUD(ud);showToast(`✅ ขุดออฟไลน์ +${totalEth.toFixed(6)} ETH`);}
 }
-
-function updateLastSeen(){
-  const ud=getUD();if(!ud)return;
-  ud.lastSeen=Date.now();
-  saveUD(ud);
-}
-
+function updateLastSeen(){const ud=getUD();if(!ud)return;ud.lastSeen=Date.now();saveUD(ud);}
 function confirmTopupDone(){
   const ud=getUD();if(!ud)return;
-  const amt=selAmt||0;
+  const amt=typeof selAmt!=='undefined'?selAmt:0;
   if(amt<=0){showToast('⚠ ไม่พบจำนวน');return;}
   if(!window._db){showToast('❌ ไม่มี Firebase');return;}
-  const req={id:'top_'+Date.now(),user:getSess(),amt:amt,time:Date.now(),status:'pending'};
-  window._db.ref('topup_reqs').push(req);
+  window._db.ref('topup_reqs').push({id:'top_'+Date.now(),user:getSess(),amt,time:Date.now(),status:'pending'});
   document.getElementById('stepQR').style.display='none';
   document.getElementById('stepPending').style.display='block';
   showToast('✅ ส่งคำขอแล้ว รอ Admin อนุมัติ');
 }
-
 function copyUsdtAddr(){
-  const addr=document.getElementById('usdtAddrText')?.getAttribute('data-addr')||
-             document.getElementById('usdtAddrText')?.textContent||'';
-  navigator.clipboard.writeText(addr).then(()=>showToast('📋 คัดลอกแล้ว!')).catch(()=>{
-    const el=document.createElement('textarea');el.value=addr;
-    document.body.appendChild(el);el.select();document.execCommand('copy');
-    document.body.removeChild(el);showToast('📋 คัดลอกแล้ว!');
+  const el=document.getElementById('usdtAddrText');
+  const addr=el?.getAttribute('data-addr')||el?.textContent||'';
+  navigator.clipboard?.writeText(addr).then(()=>showToast('📋 คัดลอกแล้ว!')).catch(()=>{
+    const t=document.createElement('textarea');t.value=addr;document.body.appendChild(t);t.select();
+    document.execCommand('copy');document.body.removeChild(t);showToast('📋 คัดลอกแล้ว!');
   });
 }
-
-// Admin view tx
 function adminViewTx(username){
   if(!window._db)return;
   window._db.ref('users/'+username+'/txs').once('value').then(snap=>{
-    const txs=snap.exists()?snap.val():[];
+    const txs=snap.exists()?(Array.isArray(snap.val())?snap.val():Object.values(snap.val()||{})):[];
     const ov=document.createElement('div');ov.className='overlay';
-    const txList=Array.isArray(txs)?txs:Object.values(txs||{});
     ov.innerHTML=`<div class="popup">
-      <div class="pop-hd"><div class="pop-title">💳 ประวัติ ${username}</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
+      <div class="pop-hd"><div class="pop-title">💳 ${username}</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
       <div style="max-height:60vh;overflow-y:auto;">
-        ${txList.length?txList.slice(0,20).map(tx=>`
-          <div style="padding:0.6rem 0;border-bottom:1px solid rgba(157,78,221,0.1);font-family:'Share Tech Mono',monospace;font-size:0.7rem;">
-            <div style="color:#A890CC;">${new Date(tx.time||0).toLocaleDateString('th-TH')}</div>
-            <div style="color:#fff;">${tx.desc||'-'}</div>
-            <div style="color:${(tx.amount||0)>=0?'var(--green)':'var(--red-bright)'};">${(tx.amount||0)>=0?'+':''}${tx.amount||0} ${tx.unit||'USDT'}</div>
-          </div>`).join(''):'<div style="text-align:center;color:var(--text-dim);padding:1rem;">ไม่มีประวัติ</div>'}
+        ${txs.length?txs.slice(0,20).map(tx=>`<div style="padding:0.6rem 0;border-bottom:1px solid rgba(157,78,221,0.1);font-family:'Share Tech Mono',monospace;font-size:0.7rem;">
+          <div style="color:#A890CC;">${new Date(tx.time||0).toLocaleDateString('th-TH')}</div>
+          <div style="color:#fff;">${tx.desc||'-'}</div>
+          <div style="color:${(tx.amount||0)>=0?'var(--green)':'var(--red-bright)'};">${(tx.amount||0)>=0?'+':''}${tx.amount} ${tx.unit||'USDT'}</div>
+        </div>`).join(''):'<div style="text-align:center;color:var(--text-dim);padding:1rem;">ไม่มีประวัติ</div>'}
       </div>
     </div>`;
     document.body.appendChild(ov);
