@@ -113,6 +113,7 @@ transition:all 0.3s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 10
 @keyframes ledPulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 @keyframes heatRise{0%,100%{transform:scaleY(0.3);opacity:0.3;}50%{transform:scaleY(1);opacity:1;}}
 @keyframes loadBarAnim{0%{transform:translateX(-100%);}100%{transform:translateX(250%);}}
+@keyframes scParticleFly{0%{transform:translate(0,0);opacity:1;}100%{transform:translate(var(–px),var(–py));opacity:0;}}
 @keyframes shimmerBar{0%{left:-30%;}100%{left:130%;}}
 @keyframes heatRise{0%,100%{transform:scaleY(0.3);opacity:0.3;}50%{transform:scaleY(1);opacity:1;}}
 .auth-footer{display:flex;gap:1.5rem;justify-content:center;margin-top:1.5rem}
@@ -658,9 +659,6 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 <!-- ═══ MINING SCENE ═══ -->
 
 <div id="miningScene" style="display:none;margin-bottom:1rem;">
-<!-- ══════════════════════════════
-     SCENE
-══════════════════════════════ -->
 <div style="position:relative;width:100%;height:300px;border-radius:24px;overflow:hidden;margin-bottom:1rem;border:2px solid rgba(98,126,234,0.5);animation:borderGlow 3s ease-in-out infinite;">
   <canvas id="sky" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
 
@@ -1753,7 +1751,9 @@ function doRegister(){
   });
 }
 
-function doLogout(){stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
+function doLogout(){
+  if(window._scenePartInt){clearInterval(window._scenePartInt);window._scenePartInt=null;}
+  const sc=document.getElementById('miningScene');if(sc)sc.style.display='none';stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
 
 // ─── ENTER DASHBOARD ───
 function enterDash(user){
@@ -1927,6 +1927,19 @@ function renderMachines(){
 
   // Start ETH rain
   if(!_ethRainInt) _ethRainInt=setInterval(spawnEthRain,300);
+  // Init mining scene
+  const scene=document.getElementById('miningScene');
+  if(scene&&scene.style.display==='none'){
+    scene.style.display='block';
+    setTimeout(()=>{initSkyCanvas();},100);
+    if(!_scenePartInt) _scenePartInt=setInterval(spawnSceneParticle,50);
+    // Hash rate
+    setInterval(()=>{
+      const acs2=(ud.packages||[]).filter(p=>p.remaining>0);
+      const hr=(acs2.reduce((s,p)=>s+(p.price||0),0)/1000*0.5).toFixed(2);
+      const el=document.getElementById('scHashDisplay');if(el)el.textContent=hr+' TH/s';
+    },800);
+  }
 
   // Summary
   const summary=`
@@ -3813,6 +3826,56 @@ function initMiningScene(acs){
       el.textContent=(total/1000*0.5+Math.random()*0.3).toFixed(2)+' TH/s';
     }
   },800));
+}
+
+
+// ─── MINING SCENE JS ───
+function initSkyCanvas(){
+  const canvas=document.getElementById('sky');
+  if(!canvas||canvas._init) return;
+  canvas._init=true;
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||420;
+  canvas.height=canvas.offsetHeight||300;
+  const stars=Array.from({length:60},()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height*0.55,
+    r:Math.random()*1.2+0.2, vx:(Math.random()-0.5)*0.08, vy:(Math.random()-0.5)*0.05,
+    phase:Math.random()*Math.PI*2,
+    col:['rgba(98,126,234,','rgba(138,158,240,','rgba(192,132,252,','rgba(200,220,255,'][Math.floor(Math.random()*4)]
+  }));
+  function draw(){
+    if(!document.getElementById('sky')) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const sky=ctx.createLinearGradient(0,0,0,canvas.height);
+    sky.addColorStop(0,'#020015'); sky.addColorStop(0.6,'#04001f'); sky.addColorStop(1,'rgba(4,0,20,0)');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s=>{
+      s.x+=s.vx; s.y+=s.vy; s.phase+=0.012;
+      if(s.x<0||s.x>canvas.width) s.vx*=-1;
+      if(s.y<0||s.y>canvas.height*0.55) s.vy*=-1;
+      const a=(Math.sin(s.phase)*0.4+0.6)*0.7;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=s.col+a+')'; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// Scene particles
+let _scenePartInt=null;
+function spawnSceneParticle(){
+  const c=document.getElementById('scParticles');if(!c)return;
+  const p=document.createElement('div');
+  const ang=Math.random()*Math.PI*2;
+  const spd=6+Math.random()*18;
+  const px=Math.cos(ang)*spd; const py=-(4+Math.random()*18);
+  const cols=['#627eea','#8a9ef0','#c084fc','#ffd700','#ffffff'];
+  const col=cols[Math.floor(Math.random()*cols.length)];
+  const sz=1.5+Math.random()*2.5;
+  p.style.cssText=`position:absolute;width:${sz}px;height:${sz}px;border-radius:50%;background:${col};box-shadow:0 0 ${sz*2}px ${col};pointer-events:none;animation:scParticleFly 0.25s forwards ease-out;--px:${px}px;--py:${py}px;`;
+  c.appendChild(p);
+  setTimeout(()=>p.remove(),300);
 }
 
 </script>
