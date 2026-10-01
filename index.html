@@ -112,7 +112,7 @@ transition:all 0.3s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 10
 @keyframes loadBar{0%{width:15%;}50%{width:90%;}100%{width:15%;}}
 @keyframes ledPulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 @keyframes heatRise{0%,100%{transform:scaleY(0.3);opacity:0.3;}50%{transform:scaleY(1);opacity:1;}}
-@keyframes loadBarAnim{0%{width:5%;margin-left:0%;opacity:0.6;}50%{width:60%;margin-left:20%;opacity:1;}100%{width:5%;margin-left:90%;opacity:0.6;}}
+@keyframes loadBarAnim{0%{transform:translateX(-100%);}100%{transform:translateX(250%);}}
 @keyframes heatRise{0%,100%{transform:scaleY(0.3);opacity:0.3;}50%{transform:scaleY(1);opacity:1;}}
 .auth-footer{display:flex;gap:1.5rem;justify-content:center;margin-top:1.5rem}
 .auth-stat{text-align:center}
@@ -2001,8 +2001,8 @@ function renderMachines(){
         </svg>
         <div style="flex:1;min-width:0;">
           <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:${bc};margin-bottom:0.3rem;animation:blink 2s infinite;">⚡ MINING ETH...</div>
-          <div style="background:rgba(0,0,0,0.5);border-radius:3px;height:5px;overflow:hidden;margin-bottom:0.3rem;max-width:100%;">
-            <div style="height:100%;background:linear-gradient(90deg,${bc},rgba(255,255,255,0.4));border-radius:3px;animation:loadBarAnim 1.5s ease-in-out infinite;"></div>
+          <div style="background:rgba(0,0,0,0.5);border-radius:3px;height:5px;overflow:hidden;margin-bottom:0.3rem;width:100%;position:relative;max-width:100%;">
+            <div style="position:absolute;left:0;width:30%;height:100%;background:linear-gradient(90deg,transparent,${bc},transparent);border-radius:3px;animation:loadBarAnim 1.5s linear infinite;"></div>
           </div>
           <div style="display:flex;gap:2px;align-items:flex-end;height:18px;">
             ${Array.from({length:8},(_,j)=>`<div style="width:4px;background:${bc};border-radius:2px;transform-origin:bottom;animation:heatRise ${0.6+j*0.08}s infinite ${j*0.08}s;opacity:0.8;"></div>`).join('')}
