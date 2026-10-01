@@ -1499,7 +1499,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 <div class="tab-page" id="pgWallet">
       <div class="sec-title" data-i18n="wal.title">💼 กระเป๋าของฉัน</div>
       <div class="wb wb-usd">
-        <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USD</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
+        <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USDT</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
         <div class="wb-amt" id="wUsd">0.00</div>
         <div class="wb-equiv">USDT</div>
         <button class="btn btn-gold" style="width:100%" data-i18n="wal.addUsd" onclick="switchTab(3)">+ เติม USD</button>
@@ -2139,18 +2139,17 @@ function showDetail(idx){
 function renderWallet(){
   const ud=getUD();if(!ud)return;
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
-  const dailyZkp=acs.reduce((s,p)=>s+p.daily,0);
-  const totalP=(ud.packages||[]).reduce((s,p)=>{const def=PKGS[p.key];return s+(def.profit*((p.days-p.remaining)/p.days))},0);
-  document.getElementById('wUsd').textContent=(ud.usd||0).toFixed(2);
+  const dailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
+  const totalP=acs.reduce((s,p)=>s+(p.profit||0),0);
+  const usdEl=document.getElementById('wUsd');if(usdEl)usdEl.textContent=(ud.usd||0).toFixed(2);
   const rw=ud.ethReward||0;
-  document.getElementById('wZkp').textContent=rw.toFixed(6);
-  document.getElementById('wZkpUsd').textContent=(rw*ETH_RATE).toFixed(4);
-  const lakEl=document.getElementById('wZkpLak');
-  if(lakEl) lakEl.textContent=Math.round(rw*ETH_RATE*LAK_RATE).toLocaleString();
-  document.getElementById('wDaily').textContent=dailyZkp.toFixed(4);
-  document.getElementById('wDailyUsd').textContent=(dailyZkp*ETH_RATE).toFixed(2);
-  document.getElementById('wActive').textContent=acs.length;
-  document.getElementById('wProfit').textContent='$'+totalP.toFixed(2);
+  const zkpEl=document.getElementById('wZkp');if(zkpEl)zkpEl.textContent=rw.toFixed(6);
+  const zkpUsdEl=document.getElementById('wZkpUsd');if(zkpUsdEl)zkpUsdEl.textContent=(rw*ETH_RATE).toFixed(2);
+  const lakEl=document.getElementById('wZkpLak');if(lakEl)lakEl.textContent='';
+  const dEl=document.getElementById('wDaily');if(dEl)dEl.textContent=dailyEth.toFixed(6);
+  const dUEl=document.getElementById('wDailyUsd');if(dUEl)dUEl.textContent=(dailyEth*ETH_RATE).toFixed(2);
+  const aEl=document.getElementById('wActive');if(aEl)aEl.textContent=acs.length;
+  const pEl=document.getElementById('wProfit');if(pEl)pEl.textContent='$'+totalP.toFixed(2);
   const txs=ud.txs||[];const txEl=document.getElementById('txHist');
   if(!txs.length){txEl.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace">${t('wal.nohist')}</div>`;return}
   txEl.innerHTML=txs.slice(0,10).map(tx=>{
@@ -2888,7 +2887,7 @@ const I18N = {
     'pkg.ac.days':     'วัน',
     // Wallet
     'wal.title':       '💼 กระเป๋าของฉัน',
-    'wal.usd.title':   'กระเป๋า USD',
+    'wal.usd.title':   'กระเป๋า USDT',
     'wal.usd.sub':     'ใช้สำหรับเช่ากำลังขุดเท่านั้น',
     'wal.addUsd':      '+ เติม USD',
     'wal.eth.title':   'กระเป๋ารางวัล ETH',
@@ -3025,7 +3024,7 @@ const I18N = {
     'pkg.ac.remain':   'Remaining',
     'pkg.ac.days':     'days',
     'wal.title':       '💼 My Wallet',
-    'wal.usd.title':   'USD Wallet',
+    'wal.usd.title':   'USDT Wallet',
     'wal.usd.sub':     'Used for renting mining power only',
     'wal.addUsd':      '+ Add USD',
     'wal.eth.title':   'ETH Reward Wallet',
@@ -3157,8 +3156,8 @@ const I18N = {
     'pkg.ac.remain':   'ເຫຼືອ',
     'pkg.ac.days':     'ວັນ',
     'wal.title':       '💼 ກະເປົ໋າຂອງຂ້ອຍ',
-    'wal.usd.title':   'ກະເປົ໋າ USD',
-    'wal.usd.sub':     'ໃຊ້ສຳລັບເຊົ່າກຳລັງຂຸດເທົ່ານັ້ນ',
+    'wal.usd.title':   'ກະເປົ໋າ USDT',
+    'wal.usd.sub':     'ໃຊ້ສຳລັບເຊົ່າກຳລັງຂຸດ ETH ເທົ່ານັ້ນ',
     'wal.addUsd':      '+ ຕື່ມ USD',
     'wal.eth.title':   'ກະເປົ໋າລາງວັນ ETH',
     'wal.eth.sub':     'ກຳໄລຈາກສັນຍາ → ແລກກັບຜູ້ດູແລ',
