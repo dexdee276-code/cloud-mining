@@ -1732,7 +1732,13 @@ function doLogin(){
       const ud=JSON.parse(cached);
       if(ud&&ud.pw===p){
         _ud=ud;setSess(u);enterDash(u);
-        if(window._db)fbGetUser(u).then(fresh=>{if(fresh){_ud=fresh;try{localStorage.setItem('cm_ud_'+u,JSON.stringify(fresh));}catch(e){}}});
+        if(window._db)fbGetUser(u).then(fresh=>{if(fresh){
+          // เก็บ ethReward ปัจจุบันไว้ ถ้าสูงกว่า Firebase ให้ใช้ local
+          const curEth=_ud?(_ud.ethReward||0):0;
+          fresh.ethReward=Math.max(fresh.ethReward||0,curEth);
+          _ud=fresh;
+          try{localStorage.setItem('cm_ud_'+u,JSON.stringify(fresh));}catch(e){}
+        }});
         return;
       }
     }
@@ -2551,37 +2557,37 @@ function startDrip(){
     if(changed){saveUD(ud);updateRewardUI();}
   },TICK);
 
-  // smooth display - อัปเดต UI ทุก 100ms โดยคำนวณจาก rate
+  // smooth display - อัปเดต UI ทุก 100ms
   if(window._displayInt) clearInterval(window._displayInt);
   window._displayInt = setInterval(()=>{
-    const ud=getUD();if(!ud)return;
-    const acs=(ud.packages||[]).filter(p=>p.remaining>0);
-    if(!acs.length)return;
-    // คำนวณ ETH ที่เพิ่มขึ้นใน 100ms
+    if(!_ud) return;
+    const acs=(_ud.packages||[]).filter(p=>p.remaining>0);
+    if(!acs.length) return;
+    // ETH ที่ขุดได้ใน 100ms
     const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
-    const ethPer100ms=totalDailyEth/(86400*10);
-    ud.ethReward=(ud.ethReward||0)+ethPer100ms;
-    // อัปเดต UI เท่านั้น ไม่ save Firebase
-    try{localStorage.setItem('cm_ud_'+getSess(),JSON.stringify(ud));}catch(e){}
-    _ud=ud;
-    // อัปเดตตัวเลข
-    const r=ud.ethReward;
+    const ethPer100ms=totalDailyEth/864000;
+    // เพิ่ม ethReward ใน _ud โดยตรง
+    _ud.ethReward=(_ud.ethReward||0)+ethPer100ms;
+    const r=_ud.ethReward;
+    // อัปเดต dashboard total
     const dashEl=document.getElementById('dashEthTotal');
-    if(dashEl)dashEl.textContent=r.toFixed(6);
+    if(dashEl) dashEl.textContent=r.toFixed(6);
+    // อัปเดตแต่ละ RIG
     const totalDaily=acs.reduce((s,p)=>s+(p.daily||0),0);
     acs.forEach((p,i)=>{
       const ratio=totalDaily>0?(p.daily||0)/totalDaily:1/acs.length;
-      const ethMined=(r*ratio).toFixed(8);
+      const rigEth=(r*ratio);
       const el=document.getElementById('rig_eth_'+i);
-      if(el)el.textContent=ethMined;
+      if(el) el.textContent=rigEth.toFixed(8);
       const elU=document.getElementById('rig_usdt_'+i);
-      if(elU)elU.textContent='≈ $'+(parseFloat(ethMined)*ETH_RATE).toFixed(2);
+      if(elU) elU.textContent='≈ $'+(rigEth*ETH_RATE).toFixed(2);
+      if(Math.random()>0.85) spawnRigFloat(i);
     });
-    // wallet
-    const wZkp=document.getElementById('wZkp');if(wZkp)wZkp.textContent=r.toFixed(6);
-    const wZkpUsd=document.getElementById('wZkpUsd');if(wZkpUsd)wZkpUsd.textContent=(r*ETH_RATE).toFixed(2);
-    // float particles
-    if(Math.random()>0.85) acs.forEach((_,i)=>spawnRigFloat(i));
+    // อัปเดตกระเป๋า
+    const wZkp=document.getElementById('wZkp');
+    if(wZkp) wZkp.textContent=r.toFixed(6);
+    const wZkpUsd=document.getElementById('wZkpUsd');
+    if(wZkpUsd) wZkpUsd.textContent=(r*ETH_RATE).toFixed(2);
   },100);
 }
 function spawnRigFloat(i){
