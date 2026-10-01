@@ -1450,7 +1450,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
   <div id="noMachMsg" style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:1.1rem;">
     <div style="font-size:2.5rem;margin-bottom:0.6rem;">⛏️</div>
     <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;margin-bottom:0.4rem;">ยังไม่มีเครื่องขุด</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">ซื้อสัญญาขุดเพื่อเริ่มต้น<br>ขุด ETH อัตโนมัติ 7 วัน</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">เติม USDT แล้วลงทุนเช่ากำลังขุด<br>ระบบขุด ETH ให้อัตโนมัติทุกวัน</div>
     <button onclick="switchTab(1)" class="btn btn-primary" style="padding:0.7rem 1.5rem;font-size:0.8rem;">
       🛒 ดูสัญญาขุด
     </button>
@@ -1963,6 +1963,8 @@ function renderMachines(){
   const totalInv=acs.reduce((s,p)=>s+(p.price||0),0);
 
   if(!_ethRainInt) _ethRainInt=setInterval(spawnEthRain,280);
+  // Show mining scene
+  setTimeout(()=>initMiningScene(acs),100);
 
   // ── SUMMARY ──
   const summary=`
@@ -2539,7 +2541,7 @@ function showRollNotif(def){
     ov.innerHTML=`<div class="popup" style="text-align:center;border-color:rgba(255,215,0,0.4)"><div style="font-size:2.3rem;margin-bottom:0.8rem">🏆</div><div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.45rem">${t('roll.max')}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.3rem">${t('roll.maxdesc')}</div><button class="btn btn-gold" style="width:100%" onclick="this.closest('.overlay').remove()">✅ รับทราบ</button></div>`;
   } else {
     ov.innerHTML=`<div class="popup">
-      <div class="pop-hd"><div class="pop-title">🔔 แพ็กครบ 7 วันแล้ว!</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
+      <div class="pop-hd"><div class="pop-title">🔔 สัญญาขุดหมดอายุแล้ว!</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
       <div class="roll-from"><div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.from')}</div><div style="font-family:'Orbitron',monospace;font-size:0.88rem;font-weight:700;color:#fff">${def.name}</div><div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--green);margin-top:0.28rem">${t('roll.done')}</div></div>
       <div class="roll-next">
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.28rem">${t('roll.next')}</div>
@@ -2906,11 +2908,11 @@ const I18N = {
     'pkg.title':       '⛏️ Cloud Mining Contracts',
     'pkg.bal':         '💵 USD คงเหลือ',
     'pkg.how':         'ℹ️ วิธีทำงาน',
-    'pkg.how.body':    '<span data-i18n-html="pkg.how.body">1. เติม USD จากผู้ดูแลระบบ<br>2. เลือกสัญญาเช่ากำลังขุด<br>3. ระบบขุด ETH ให้อัตโนมัติ 7 วัน<br>4. กำไร ETH โอนเข้ากระเป๋ารางวัล (1 ETH ≈ $1)</span>',
+    'pkg.how.body':    '<span data-i18n-html="pkg.how.body">1. เติม USDT<br>2. ลงทุนเช่ากำลังขุด ETH<br>3. ระบบขุด ETH ให้อัตโนมัติทุกวัน<br>4. กำไร ETH สะสมในกระเป๋า แลกเป็น USDT ได้</span>',
     'pkg.active':      '✅ สัญญาที่ใช้งานอยู่',
     'pkg.noactive':    'ยังไม่มีสัญญาที่ใช้งานอยู่',
     'pkg.profit':      'กำไร',
-    'pkg.perdays':     'ETH / 7 วัน (+20%)',
+    'pkg.perdays':     'ETH / วัน',
     'pkg.roi.profit':  '💰 กำไร ETH',
     'pkg.roi.daily':   '⚡ ETH/วัน',
     'pkg.roi.value':   '📈 มูลค่ากำไร',
@@ -2966,7 +2968,7 @@ const I18N = {
     'det.bought':      'ซื้อเมื่อ:',
     'det.wallet':      '💼 ไปกระเป๋ารางวัล ETH',
     // Roll notif
-    'roll.title':      '🔔 แพ็กครบ 7 วันแล้ว!',
+    'roll.title':      '🔔 สัญญาขุดหมดอายุแล้ว!',
     'roll.from':       'แพ็กที่เพิ่งครบ',
     'roll.done':       '✅ กำไร ETH ถูกโอนเข้ากระเป๋าแล้ว',
     'roll.next':       '🔄 โรลเงินไปแพ็กถัดไป',
@@ -3176,7 +3178,7 @@ const I18N = {
     'pkg.title':       '⛏️ ສັນຍາຂຸດ Cloud',
     'pkg.bal':         '💵 ຍອດ USD',
     'pkg.how':         'ℹ️ ວິທີເຮັດວຽກ',
-    'pkg.how.body':    '1. ຕື່ມ USD ຈາກຜູ້ດູແລ<br>2. ເລືອກສັນຍາເຊົ່າກຳລັງຂຸດ<br>3. ລະບົບຂຸດ ETH ໃຫ້ອັດຕະໂນມັດ 7 ວັນ<br>4. ກຳໄລ ETH ໂອນໃສ່ກະເປົ໋າລາງວັນ (1 ETH ≈ $1)',
+    'pkg.how.body':    '1. ຕື່ມ USDT<br>2. ລົງທຶນເຊົ່າກຳລັງຂຸດ ETH<br>3. ລະບົບຂຸດ ETH ໃຫ້ອັດຕະໂນມັດທຸກວັນ<br>4. ETH ສະສົມໃນກະເປົ໋າ ແລກເປັນ USDT ໄດ້',
     'pkg.active':      '✅ ສັນຍາທີ່ໃຊ້ງານ',
     'pkg.noactive':    'ຍັງບໍ່ມີສັນຍາທີ່ໃຊ້ງານ',
     'pkg.profit':      'ກຳໄລ',
