@@ -935,6 +935,7 @@ function getUD(){const u=getSess();return u?getU()[u]:null}
 
 // ─── AUTH ───
 let ptTimer;
+let _ud = null;
 function switchAuthTab(t){
   document.getElementById('tabL').classList.toggle('active',t==='login');
   document.getElementById('tabR').classList.toggle('active',t==='register');
