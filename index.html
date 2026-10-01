@@ -117,6 +117,9 @@ transition:all 0.3s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 10
 @keyframes loadBarAnim{0%{transform:translateX(-100%);}100%{transform:translateX(250%);}}
 @keyframes scParticleFly{0%{transform:translate(0,0);opacity:1;}100%{transform:translate(var(–px),var(–py));opacity:0;}}
 @keyframes shimmerBar{0%{left:-30%;}100%{left:130%;}}
+@keyframes ethGlow{0%,100%{text-shadow:0 0 20px rgba(74,222,128,0.6),0 0 40px rgba(74,222,128,0.3);}50%{text-shadow:0 0 40px rgba(74,222,128,1),0 0 80px rgba(74,222,128,0.6),0 0 120px rgba(74,222,128,0.3);}}
+@keyframes floatUp{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(-40px);opacity:0;}}
+@keyframes ethShimmer{0%{left:-100%;}100%{left:200%;}}
 @keyframes heatRise{0%,100%{transform:scaleY(0.3);opacity:0.3;}50%{transform:scaleY(1);opacity:1;}}
 .auth-footer{display:flex;gap:1.5rem;justify-content:center;margin-top:1.5rem}
 .auth-stat{text-align:center}
@@ -2110,14 +2113,67 @@ function renderMachines(){
         </div>
       </div>
 
-      <!-- ETH mined -->
-      <div style="background:linear-gradient(135deg,rgba(0,0,0,0.6),${glow},0.04));border:1px solid ${bd};opacity:0.9;border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;text-align:center;width:100%;box-sizing:border-box;overflow:hidden;position:relative;">
+      <!-- ETH mined - premium counter -->
+      <div style="background:linear-gradient(145deg,rgba(0,0,0,0.7),${glow},0.05));border:1px solid ${bd};border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;width:100%;box-sizing:border-box;overflow:hidden;position:relative;animation:borderPulse 3s ease-in-out infinite ${i*0.7}s;">
+        <!-- Scanline -->
+        <div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${c},transparent);opacity:0.1;animation:scanline 4s linear infinite;pointer-events:none;"></div>
+        <!-- Grid -->
+        <div style="position:absolute;inset:0;background-image:linear-gradient(${glow},0.02) 1px,transparent 1px),linear-gradient(90deg,${glow},0.02) 1px,transparent 1px);background-size:10px 10px;pointer-events:none;"></div>
+        <!-- Top line -->
         <div style="position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,${c},transparent);opacity:0.5;"></div>
-        <div style="position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,${c},transparent);opacity:0.3;"></div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:${c};opacity:0.5;letter-spacing:3px;margin-bottom:0.3rem;">⛏ ETH MINED</div>
-        <div id="rig_eth_${i}" style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:${c};text-shadow:0 0 25px ${c};overflow:hidden;letter-spacing:1px;">${ethMined} ETH</div>
-        <div id="rig_usdt_${i}" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,215,0,0.7);margin-top:0.15rem;">≈ $${(parseFloat(ethMined)*ETH_RATE).toFixed(2)} USDT</div>
-        <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:'Orbitron',monospace;font-size:2rem;color:${c};opacity:0.08;font-weight:900;animation:floatEth 3s ease-in-out infinite ${i*0.5}s;pointer-events:none;">Ξ</div>
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;position:relative;">
+          <div style="display:flex;align-items:center;gap:0.3rem;">
+            <div style="width:6px;height:6px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c};animation:pulse 0.7s infinite;flex-shrink:0;"></div>
+            <span style="font-family:'Orbitron',monospace;font-size:0.5rem;color:${c};opacity:0.6;letter-spacing:2px;">⛏ ETH MINED</span>
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.42rem;color:${c};opacity:0.4;background:${glow},0.06);border:1px solid ${glow},0.15);border-radius:8px;padding:0.1rem 0.35rem;">LIVE</div>
+        </div>
+
+        <!-- Big ETH number -->
+        <div style="text-align:center;position:relative;margin-bottom:0.4rem;">
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:180px;height:50px;background:radial-gradient(ellipse,${glow},0.07),transparent);pointer-events:none;border-radius:50%;"></div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.46rem;color:${c};opacity:0.4;letter-spacing:3px;margin-bottom:0.15rem;">Ξ ETHEREUM</div>
+          <div style="position:relative;display:inline-block;">
+            <div id="rig_eth_${i}" style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:${c};animation:ethGlow 2s ease-in-out infinite ${i*0.3}s;letter-spacing:2px;line-height:1;position:relative;z-index:1;">${ethMined}</div>
+            <!-- Shimmer -->
+            <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;">
+              <div style="position:absolute;top:0;bottom:0;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);animation:ethShimmer 2.5s linear infinite;"></div>
+            </div>
+            <!-- Float particles -->
+            <div id="rig_float_${i}" style="position:absolute;inset:0;pointer-events:none;overflow:visible;"></div>
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:${c};opacity:0.5;margin-top:0.1rem;">ETH</div>
+        </div>
+
+        <!-- USDT value -->
+        <div style="text-align:center;margin-bottom:0.6rem;">
+          <div style="display:inline-flex;align-items:center;gap:0.3rem;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:20px;padding:0.2rem 0.6rem;">
+            <span style="font-size:0.6rem;">💵</span>
+            <span id="rig_usdt_${i}" style="font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:700;color:#ffd700;">≈ $${(parseFloat(ethMined)*ETH_RATE).toFixed(2)}</span>
+            <span style="font-family:'Share Tech Mono',monospace;font-size:0.4rem;color:rgba(255,215,0,0.4);">USDT</span>
+          </div>
+        </div>
+
+        <!-- Mini stats -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.25rem;">
+          <div style="background:rgba(0,0,0,0.4);border:1px solid ${glow},0.12);border-radius:8px;padding:0.35rem;text-align:center;overflow:hidden;position:relative;">
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${c},transparent);opacity:0.3;"></div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.46rem;color:${c};font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">+${((p.daily||0)/ETH_RATE/86400).toFixed(8)}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.38rem;color:${c};opacity:0.35;margin-top:0.05rem;">ETH/วินาที</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,215,0,0.12);border-radius:8px;padding:0.35rem;text-align:center;overflow:hidden;position:relative;">
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.3),transparent);"></div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.46rem;color:#ffd700;font-weight:700;">+$${(p.daily||0).toFixed(2)}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.38rem;color:rgba(255,215,0,0.35);margin-top:0.05rem;">USDT/วัน</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(192,132,252,0.12);border-radius:8px;padding:0.35rem;text-align:center;overflow:hidden;position:relative;">
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(192,132,252,0.3),transparent);"></div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.46rem;color:#c084fc;font-weight:700;">${Math.max(0,p.remaining).toFixed(0)} วัน</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.38rem;color:rgba(192,132,252,0.35);margin-top:0.05rem;">คงเหลือ</div>
+          </div>
+        </div>
       </div>
 
       <!-- Stats 2x2 -->
@@ -2484,7 +2540,7 @@ function startDrip(){
       if(p.remaining<=0)return;
       const elapsed=(now-p.bought)/1000;const daysPassed=elapsed/DEMO_DAY;
       const oldRem=p.remaining;p.remaining=Math.max(0,p.days-daysPassed);
-      const ethPerTick=p.daily/(DEMO_DAY*1000/TICK);
+      const ethPerTick=(p.daily/ETH_RATE)/(DEMO_DAY*1000/TICK);
       ud.ethReward=(ud.ethReward||0)+ethPerTick;changed=true;
       if(p.remaining<=0&&oldRem>0){
         const nk=getSess()+'_'+i+'_'+p.bought;
@@ -2495,6 +2551,18 @@ function startDrip(){
     if(changed){saveUD(ud);updateRewardUI();}
   },TICK);
 }
+function spawnRigFloat(i){
+  const c=document.getElementById('rig_float_'+i);if(!c)return;
+  const el=document.createElement('div');
+  const x=10+Math.random()*80;
+  const sym=Math.random()>0.5?'Ξ':'+';
+  const col=i===0?'#4ade80':i===1?'#ffd700':i===2?'#c084fc':'#38bdf8';
+  el.style.cssText=`position:absolute;left:${x}%;bottom:0;font-family:'Orbitron',monospace;font-size:${6+Math.random()*5}px;color:${col};opacity:0.7;animation:floatUp ${0.7+Math.random()*0.5}s ease-out forwards;pointer-events:none;z-index:10;`;
+  el.textContent=sym;
+  c.appendChild(el);
+  setTimeout(()=>el.remove(),1200);
+}
+
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
 // ETH Rain in machine section
 function spawnEthRain(){
@@ -2518,9 +2586,14 @@ function updateRewardUI(){
   // nav
   const navEth=document.getElementById('navEth');if(navEth)navEth.textContent=r.toFixed(4);
   const navUsdt=document.getElementById('navUsdt');if(navUsdt)navUsdt.textContent=(ud.usd||0).toFixed(2);
-  // wallet
+  // wallet - update both possible IDs
   const wEth=document.getElementById('wEth');if(wEth)wEth.textContent=r.toFixed(6);
   const wEthUsd=document.getElementById('wEthUsd');if(wEthUsd)wEthUsd.textContent=(r*ETH_RATE).toFixed(2);
+  const wZkp=document.getElementById('wZkp');if(wZkp)wZkp.textContent=r.toFixed(6);
+  const wZkpUsd=document.getElementById('wZkpUsd');if(wZkpUsd)wZkpUsd.textContent=(r*ETH_RATE).toFixed(2);
+  const ud2=getUD();if(ud2){
+    const wUsd=document.getElementById('wUsd');if(wUsd)wUsd.textContent=(ud2.usd||0).toFixed(2);
+  }
   // dashboard ETH total
   const dashEl=document.getElementById('dashEthTotal');
   if(dashEl){dashEl.textContent=r.toFixed(6);}
