@@ -2390,6 +2390,9 @@ function fbGetUser(u){
       return ud;
     }
     return null;
+  }).catch(err=>{
+    console.error('fbGetUser error:',err);
+    throw err;
   });
 }
 
