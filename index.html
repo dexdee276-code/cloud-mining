@@ -1412,8 +1412,8 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 </div>
 </div>
 
-<div id="machSec" style="display:none;margin-bottom:1.1rem;position:relative;">
-  <div id="ethRainContainer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;"></div>
+<div id="machSec" style="display:none;margin-bottom:1.1rem;position:relative;overflow:hidden;">
+  <div id="ethRainContainer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;max-width:100%;"></div>
         <div class="mach-header">
           <div class="mach-hdr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
           <div><div class="mach-hdr-t" data-i18n="home.machtitle">⚙️ เครื่องขุดของฉัน</div><div class="mach-hdr-s" data-i18n="home.machsub">ACTIVE MINING RIGS</div></div>
@@ -2394,12 +2394,12 @@ function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
 function spawnEthRain(){
   const c=document.getElementById('ethRainContainer');if(!c)return;
   const r=document.createElement('div');
-  const x=Math.random()*100;
-  const sz=8+Math.random()*10;
-  const dur=1.5+Math.random()*1.5;
+  const x=Math.random()*90;
+  const sz=8+Math.random()*8;
+  const dur=2+Math.random()*1.5;
   const cols=['#627eea','#8a9ef0','#c084fc','#ffd700','#4ade80'];
   const col=cols[Math.floor(Math.random()*cols.length)];
-  r.style.cssText=`position:absolute;left:${x}%;top:-20px;font-family:'Orbitron',monospace;font-size:${sz}px;font-weight:900;color:${col};text-shadow:0 0 ${sz/2}px ${col};animation:rainFall ${dur}s linear forwards;pointer-events:none;z-index:0;`;
+  r.style.cssText=`position:absolute;left:${x}%;top:0px;font-family:'Orbitron',monospace;font-size:${sz}px;font-weight:900;color:${col};text-shadow:0 0 ${sz/2}px ${col};animation:coinFloat ${dur}s linear forwards;pointer-events:none;opacity:0.7;`;
   r.textContent='Ξ';
   c.appendChild(r);
   setTimeout(()=>r.remove(),(dur+0.1)*1000);
