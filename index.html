@@ -573,7 +573,7 @@ html { font-size: 16px; }
 
 <!-- AUTH -->
 
-<div class="screen active" id="authScreen" style="position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem;">
+<div class="screen active" id="authScreen" style="position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem;isolation:isolate;">
 
   <!-- BG Canvas -->
 
@@ -581,11 +581,11 @@ html { font-size: 16px; }
 
   <!-- ETH Rain -->
 
-  <div id="authRain" style="position:fixed;inset:0;overflow:hidden;pointer-events:none;touch-action:none;z-index:2;"></div>
+  <div id="authRain" style="position:fixed;inset:0;overflow:hidden;pointer-events:none;touch-action:none;z-index:1;"></div>
 
   <!-- Content -->
 
-  <div style="position:relative;z-index:20;width:100%;max-width:360px;animation:slideUp 0.6s ease-out;">
+  <div style="position:relative;z-index:100;width:100%;max-width:360px;animation:slideUp 0.6s ease-out;">
 
 ```
 <!-- ETH Logo floating -->
@@ -634,8 +634,8 @@ html { font-size: 16px; }
 
   <!-- Tabs -->
   <div style="display:flex;gap:0;margin-bottom:1.3rem;background:rgba(0,0,0,0.3);border-radius:10px;padding:3px;" id="authTabs">
-    <button id="atLogin" onclick="switchAuth('login')" style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;letter-spacing:1px;cursor:pointer;background:linear-gradient(135deg,#627eea,#8a9ef0);color:#fff;box-shadow:0 0 15px rgba(98,126,234,0.5);" data-i18n="auth.tab.login">LOGIN</button>
-    <button id="atReg" onclick="switchAuth('reg')" style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;letter-spacing:1px;cursor:pointer;background:transparent;color:rgba(98,126,234,0.6);" data-i18n="auth.tab.reg">REGISTER</button>
+    <button id="atLogin" onclick="switchAuth('login')" style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;letter-spacing:1px;cursor:pointer;background:linear-gradient(135deg,#627eea,#8a9ef0);color:#fff;box-shadow:0 0 15px rgba(98,126,234,0.5);">LOGIN</button>
+    <button id="atReg" onclick="switchAuth('reg')" style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;letter-spacing:1px;cursor:pointer;background:transparent;color:rgba(98,126,234,0.6);">REGISTER</button>
   </div>
 
   <!-- Login Form -->
@@ -661,8 +661,7 @@ html { font-size: 16px; }
     </div>
     <div id="loginMsg" style="min-height:1.2rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;"></div>
     <div onclick="doLogin()" id="loginBtn"
-      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;"
-      data-i18n="auth.btn.login">⚡ AUTHENTICATE</div>
+      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;position:relative;z-index:50;">⚡ AUTHENTICATE</div>
   </div>
 
   <!-- Register Form -->
@@ -686,9 +685,8 @@ html { font-size: 16px; }
         onfocus="this.style.borderColor='#627eea'" onblur="this.style.borderColor='rgba(98,126,234,0.3)'">
     </div>
     <div id="regMsg" style="min-height:1.2rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;"></div>
-    <button class="btn-auth" onclick="doRegister()"
-      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border:none;border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);"
-      data-i18n="auth.btn.reg">🚀 CREATE NODE</button>
+    <div onclick="doRegister()" id="regBtn"
+      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;position:relative;z-index:50;">🚀 CREATE NODE</div>
   </div>
 
   <!-- Stats bar -->
