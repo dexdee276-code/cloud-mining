@@ -1426,6 +1426,7 @@ function showMsg(id,msg,type){
   else{showToast(msg);}
 }
 function doLogin(){
+  alert('1: doLogin called - u=' + (document.getElementById('loginUser')?.value||'NOT FOUND'));
   const uEl=document.getElementById('loginUser');
   const pEl=document.getElementById('loginPass');
   if(!uEl||!pEl){showToast('❌ หา input ไม่เจอ');return;}
