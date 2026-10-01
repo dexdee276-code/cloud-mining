@@ -119,6 +119,16 @@ transition:all 0.3s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 10
 @keyframes shimmerBar{0%{left:-30%;}100%{left:130%;}}
 @keyframes ethGlow{0%,100%{text-shadow:0 0 20px rgba(74,222,128,0.6),0 0 40px rgba(74,222,128,0.3);}50%{text-shadow:0 0 40px rgba(74,222,128,1),0 0 80px rgba(74,222,128,0.6),0 0 120px rgba(74,222,128,0.3);}}
 @keyframes floatUp{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(-40px);opacity:0;}}
+@keyframes ethPopup{
+0%{transform:translateY(0) scale(0.5);opacity:0;}
+15%{transform:translateY(-10px) scale(1.2);opacity:1;}
+70%{transform:translateY(-60px) scale(1);opacity:1;}
+100%{transform:translateY(-120px) scale(0.8);opacity:0;}
+}
+@keyframes ethPopupGlow{
+0%,100%{text-shadow:0 0 10px currentColor,0 0 20px currentColor;}
+50%{text-shadow:0 0 20px currentColor,0 0 40px currentColor,0 0 60px currentColor;}
+}
 @keyframes ethShimmer{0%{left:-100%;}100%{left:200%;}}
 @keyframes heatRise{0%,100%{transform:scaleY(0.3);opacity:0.3;}50%{transform:scaleY(1);opacity:1;}}
 .auth-footer{display:flex;gap:1.5rem;justify-content:center;margin-top:1.5rem}
@@ -1438,6 +1448,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 </div>
 </div>
 
+<div id="ethPopupLayer" style="position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden;"></div>
 <div id="machSec" style="display:none;margin-bottom:1.1rem;position:relative;overflow:hidden;">
   <div id="ethRainContainer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;max-width:100%;"></div>
         <div class="mach-header">
@@ -2578,6 +2589,16 @@ function startDrip(){
     _ud.ethReward=(_ud.ethReward||0)+ethPer50ms;
     const r=_ud.ethReward;
 
+    // spawn popup ทุก 3 วิ
+    if(!window._popupCount) window._popupCount=0;
+    window._popupCount++;
+    if(window._popupCount >= 60){
+      window._popupCount=0;
+      const gained=r-(_lastPopupEth||r);
+      if(gained>0) spawnEthPopup(gained);
+      _lastPopupEth=r;
+    }
+
     // ── แสดงตัวเลขหลายรูปแบบ ──
     // dashboard: 6 ทศนิยม
     const dashEl=document.getElementById('dashEthTotal');
@@ -2615,6 +2636,53 @@ function spawnRigFloat(i){
   el.textContent=sym;
   c.appendChild(el);
   setTimeout(()=>el.remove(),1200);
+}
+
+
+// ── ETH Popup ──
+let _lastPopupEth = 0;
+function spawnEthPopup(ethAmount){
+  const layer = document.getElementById('ethPopupLayer');
+  if(!layer) return;
+
+  const el = document.createElement('div');
+  const x = 15 + Math.random() * 70;
+  const y = 30 + Math.random() * 40;
+
+  // สี random สวยๆ
+  const styles = [
+    {color:'#4ade80', shadow:'rgba(74,222,128,0.8)'},
+    {color:'#ffd700', shadow:'rgba(255,215,0,0.8)'},
+    {color:'#00ffcc', shadow:'rgba(0,255,204,0.8)'},
+    {color:'#c084fc', shadow:'rgba(192,132,252,0.8)'},
+    {color:'#38bdf8', shadow:'rgba(56,189,248,0.8)'},
+  ];
+  const s = styles[Math.floor(Math.random()*styles.length)];
+
+  el.style.cssText = `
+    position:absolute;
+    left:${x}%;
+    top:${y}%;
+    font-family:'Orbitron',monospace;
+    font-weight:900;
+    font-size:${1.1 + Math.random()*0.6}rem;
+    color:${s.color};
+    text-shadow:0 0 15px ${s.shadow},0 0 30px ${s.shadow};
+    animation:ethPopup 1.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+    pointer-events:none;
+    white-space:nowrap;
+    letter-spacing:1px;
+  `;
+
+  // format ตัวเลข
+  const sign = '+';
+  const formatted = ethAmount >= 0.001
+    ? ethAmount.toFixed(4)
+    : ethAmount.toFixed(6);
+
+  el.innerHTML = `${sign}${formatted} <span style="font-size:0.7em;opacity:0.8;">ETH</span>`;
+  layer.appendChild(el);
+  setTimeout(()=>el.remove(), 1900);
 }
 
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null;}if(window._displayInt){clearInterval(window._displayInt);window._displayInt=null;}}
