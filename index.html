@@ -1337,7 +1337,7 @@ function switchAuthTab(t){
   document.getElementById('tabR')?.classList.toggle('active',t==='register');
   document.getElementById('loginForm').classList.toggle('active',t==='login');
   document.getElementById('regForm').classList.toggle('active',t==='register');
-  typePrompt(t==='login'?'auth --mode=login':'auth --mode=register');
+  if(document.getElementById('promptTxt')) typePrompt(t==='login'?'auth --mode=login':'auth --mode=register');
 }
 function initAuthBg(){
   const canvas=document.getElementById('authBgCanvas');
@@ -1410,6 +1410,7 @@ function switchAuth(tab){
 }
 function typePrompt(txt){
   const el=document.getElementById('promptTxt');
+  if(!el) return;
   clearTimeout(ptTimer);el.textContent='';let i=0;
   function tk(){if(i<txt.length){el.textContent+=txt[i++];ptTimer=setTimeout(tk,38+Math.random()*28);}}
   tk();
@@ -4092,7 +4093,7 @@ if(ud){_ud=ud;enterDash(s);}
 });
 }
 else{
-typePrompt(‘auth –mode=login’);
+if(document.getElementById(‘promptTxt’)) typePrompt(‘auth –mode=login’);
 setInterval(()=>{const el=document.getElementById(‘aMiners’);if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
 }
 });
