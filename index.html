@@ -965,13 +965,25 @@ function doLogin(){
       }
     }
   }catch(e){}
-  if(!window._db){showMsg('loginMsg','⚠ กำลังเชื่อมต่อ...','error');return;}
   showMsg('loginMsg','⏳ กำลังเข้าสู่ระบบ...','');
-  fbGetUser(u).then(ud=>{
-    if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
-    if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
-    _ud=ud;setSess(u);enterDash(u);
-  }).catch(()=>showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error'));
+  // รอ Firebase พร้อม max 5 วินาที
+  const tryLogin=()=>{
+    if(!window._db){showMsg('loginMsg','❌ เชื่อมต่อ Firebase ไม่ได้','error');return;}
+    fbGetUser(u).then(ud=>{
+      if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
+      if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
+      _ud=ud;setSess(u);enterDash(u);
+    }).catch(()=>showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error'));
+  };
+  if(window._db){tryLogin();}
+  else{
+    let attempts=0;
+    const wait=setInterval(()=>{
+      attempts++;
+      if(window._db){clearInterval(wait);tryLogin();}
+      else if(attempts>=10){clearInterval(wait);showMsg('loginMsg','❌ Firebase ไม่พร้อม','error');}
+    },500);
+  }
 }
 
 function doRegister(){
