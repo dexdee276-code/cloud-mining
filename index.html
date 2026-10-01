@@ -1797,7 +1797,7 @@ function doRegister(){
   });
 }
 
-function doLogout(){
+function doLogout(){saveUDForce(_ud);
   if(window._scenePartInt){clearInterval(window._scenePartInt);window._scenePartInt=null;}
   const sc=document.getElementById('miningScene');if(sc)sc.style.display='none';stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
 
@@ -2538,58 +2538,63 @@ function doTopup(){ /* legacy - now handled by submitSlip */ }
 // ─── DRIP ENGINE ───
 let dripInt=null;const NOTIFIED={};
 function startDrip(){
-  if(dripInt)clearInterval(dripInt);
+  if(dripInt) clearInterval(dripInt);
+  if(window._displayInt) clearInterval(window._displayInt);
+
+  // ── TICK: save Firebase ทุก 3 วิ ──
   dripInt=setInterval(()=>{
-    const ud=getUD();if(!ud||!ud.packages)return;
-    const now=Date.now();let changed=false;
-    ud.packages.forEach((p,i)=>{
-      if(p.remaining<=0)return;
-      const elapsed=(now-p.bought)/1000;const daysPassed=elapsed/DEMO_DAY;
-      const oldRem=p.remaining;p.remaining=Math.max(0,p.days-daysPassed);
-      const ethPerTick=(p.daily/ETH_RATE)/(DEMO_DAY*1000/TICK);
-      ud.ethReward=(ud.ethReward||0)+ethPerTick;changed=true;
-      if(p.remaining<=0&&oldRem>0){
-        const nk=getSess()+'_'+i+'_'+p.bought;
-        if(!NOTIFIED[nk]){NOTIFIED[nk]=true;const def=PKGS[p.key];const bought=(ud.packages||[]).filter(q=>q.key===p.key).length;
-          setTimeout(()=>{bought>=2?showRollNotif(def):showToast(`${t('toast.expired1')} ${def.name} ${t('toast.expired2')} ${2-bought} ${t('toast.expired3')}`)},500);}
-      }
+    if(!_ud||!_ud.packages) return;
+    const now=Date.now();
+    let changed=false;
+    _ud.packages.forEach((p)=>{
+      if(p.remaining<=0) return;
+      const elapsed=(now-(p.bought||now))/1000;
+      const daysPassed=elapsed/DEMO_DAY;
+      p.remaining=Math.max(0,(p.days||1)-daysPassed);
+      changed=true;
     });
-    if(changed){saveUD(ud);updateRewardUI();}
+    if(changed) saveUD(_ud);
   },TICK);
 
-  // smooth display - อัปเดต UI ทุก 100ms
-  if(window._displayInt) clearInterval(window._displayInt);
-  window._displayInt = setInterval(()=>{
-    if(!_ud) return;
-    const acs=(_ud.packages||[]).filter(p=>p.remaining>0);
+  // ── DISPLAY: อัปเดต UI ทุก 200ms ──
+  window._displayInt=setInterval(()=>{
+    if(!_ud||!_ud.packages) return;
+    const acs=_ud.packages.filter(p=>p.remaining>0);
     if(!acs.length) return;
-    // ETH ที่ขุดได้ใน 100ms
+
+    // คำนวณ ETH ที่ได้ใน 200ms
     const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
-    const ethPer100ms=totalDailyEth/864000;
-    // เพิ่ม ethReward ใน _ud โดยตรง
-    _ud.ethReward=(_ud.ethReward||0)+ethPer100ms;
+    const ethPer200ms=totalDailyEth/432000;
+    _ud.ethReward=(_ud.ethReward||0)+ethPer200ms;
+
     const r=_ud.ethReward;
-    // อัปเดต dashboard total
+
+    // อัปเดต dashboard
     const dashEl=document.getElementById('dashEthTotal');
     if(dashEl) dashEl.textContent=r.toFixed(6);
-    // อัปเดตแต่ละ RIG
-    const totalDaily=acs.reduce((s,p)=>s+(p.daily||0),0);
-    acs.forEach((p,i)=>{
-      const ratio=totalDaily>0?(p.daily||0)/totalDaily:1/acs.length;
-      const rigEth=(r*ratio);
-      const el=document.getElementById('rig_eth_'+i);
-      if(el) el.textContent=rigEth.toFixed(8);
-      const elU=document.getElementById('rig_usdt_'+i);
-      if(elU) elU.textContent='≈ $'+(rigEth*ETH_RATE).toFixed(2);
-      if(Math.random()>0.85) spawnRigFloat(i);
-    });
+
     // อัปเดตกระเป๋า
     const wZkp=document.getElementById('wZkp');
     if(wZkp) wZkp.textContent=r.toFixed(6);
     const wZkpUsd=document.getElementById('wZkpUsd');
     if(wZkpUsd) wZkpUsd.textContent=(r*ETH_RATE).toFixed(2);
-  },100);
+    const wUsd=document.getElementById('wUsd');
+    if(wUsd) wUsd.textContent=(_ud.usd||0).toFixed(2);
+
+    // อัปเดตแต่ละ RIG
+    const totalDaily=acs.reduce((s,p)=>s+(p.daily||0),0);
+    acs.forEach((p,i)=>{
+      const ratio=totalDaily>0?(p.daily||0)/totalDaily:1/acs.length;
+      const rigEth=r*ratio;
+      const el=document.getElementById('rig_eth_'+i);
+      if(el) el.textContent=rigEth.toFixed(8);
+      const elU=document.getElementById('rig_usdt_'+i);
+      if(elU) elU.textContent='≈ $'+(rigEth*ETH_RATE).toFixed(2);
+      if(Math.random()>0.8) spawnRigFloat(i);
+    });
+  },200);
 }
+
 function spawnRigFloat(i){
   const c=document.getElementById('rig_float_'+i);if(!c)return;
   const el=document.createElement('div');
@@ -3474,13 +3479,25 @@ function fbGetUser(u){
 }
 
 // ─── SAVE USER TO FIREBASE ───
+let _lastFbSync=0;
 function saveUD(ud){
   const u=getSess();if(!u)return;
-  // save local
-  try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e){}
-  // sync firebase
-  if(window._db) window._db.ref('users/'+u).set(ud).catch(()=>{});
   _ud=ud;
+  // save local ทุกครั้ง
+  try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e){}
+  // sync Firebase ทุก 30 วิเท่านั้น
+  const now=Date.now();
+  if(window._db && now-_lastFbSync>30000){
+    _lastFbSync=now;
+    window._db.ref('users/'+u).set(ud).catch(()=>{});
+  }
+}
+function saveUDForce(ud){
+  const u=getSess();if(!u)return;
+  _ud=ud;
+  try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e){}
+  if(window._db) window._db.ref('users/'+u).set(ud).catch(()=>{});
+  _lastFbSync=Date.now();
 }
 
 // ─── ETH MINING CALC ───
