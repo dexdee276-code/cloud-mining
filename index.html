@@ -973,7 +973,9 @@ function doLogin(){
       if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
       if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
       _ud=ud;setSess(u);enterDash(u);
-    }).catch(()=>showMsg('loginMsg','❌ เชื่อมต่อไม่ได้','error'));
+    }).catch(err=>{
+      showMsg('loginMsg','❌ '+( err&&err.message?err.message:JSON.stringify(err)),'error');
+    });
   };
   if(window._db){tryLogin();}
   else{
