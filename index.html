@@ -100,6 +100,9 @@ transition:all 0.3s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 10
 .auth-prompt{font-family:‘Share Tech Mono’,monospace;font-size:0.72rem;color:rgba(157,78,221,0.5);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.3rem}
 .p-cursor{display:inline-block;width:7px;height:0.9em;background:var(–purple-light);animation:blink 1s step-end infinite}
 @keyframes blink{50%{opacity:0}}
+@keyframes spinFan{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes loadBarAnim{0%{width:10%;opacity:0.6;}50%{width:90%;opacity:1;}100%{width:10%;opacity:0.6;}}
+@keyframes heatRise{0%,100%{transform:scaleY(0.3);opacity:0.3;}50%{transform:scaleY(1);opacity:1;}}
 .auth-footer{display:flex;gap:1.5rem;justify-content:center;margin-top:1.5rem}
 .auth-stat{text-align:center}
 .auth-stat-val{font-family:‘Orbitron’,monospace;font-size:0.9rem;font-weight:700;color:var(–purple-light)}
@@ -689,45 +692,69 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 
 <!-- PACKAGES -->
 <div class="tab-page" id="pgPkg">
-  <div class="sec-title" data-i18n="pkg.title">⛏️ Cloud Mining Contracts</div>
-  <div class="pkg-bal"><div><div class="pkg-bal-l" data-i18n="pkg.bal">💵 USD คงเหลือ</div></div><div class="pkg-bal-v" id="pkgBal">$0.00</div></div>
-  <div class="pkg-grid" id="pkgGrid"></div>
-  <div class="info-box">
-    <div class="info-box-t" data-i18n="pkg.how">ℹ️ วิธีทำงาน</div>
-    <div class="info-box-b" data-i18n-html="pkg.how.body">1. เติม USD จากผู้ดูแลระบบ<br>2. เลือกสัญญาเช่ากำลังขุด<br>3. ระบบขุด ZKP ให้อัตโนมัติ 7 วัน<br>4. กำไร ZKP โอนเข้ากระเป๋ารางวัล (1 ZKP ≈ $1)</span></div>
+```
+
+  <div class="sec-title" data-i18n="pkg.title">⛏ สัญญาขุด ETH</div>
+
+  <!-- Input จำนวน USDT -->
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.5rem;">💵 จำนวน USDT ที่ต้องการลงทุน ($100 - $100,000)</div>
+    <input type="number" id="miningAmtInput" min="100" max="100000" placeholder="เช่น 500, 1000, 5000..."
+      oninput="calcMiningPreview()"
+      style="width:100%;padding:0.85rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;outline:none;caret-color:var(--gold);margin-bottom:0.5rem;">
+
+```
+<!-- Preview -->
+<div id="miningPreview" style="display:none;background:rgba(0,0,0,0.2);border-radius:10px;padding:0.8rem;margin-top:0.8rem;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;">
+    <div style="color:#A890CC;">📈 กำไร/วัน</div><div id="pvDaily" style="color:var(--green);text-align:right;"></div>
+    <div style="color:#A890CC;">⛏ ETH/วัน</div><div id="pvEthDaily" style="color:var(--green);text-align:right;"></div>
+    <div style="color:#A890CC;">📅 ระยะเวลา</div><div id="pvDays" style="color:var(--purple-light);text-align:right;"></div>
+    <div style="color:#A890CC;">💰 % กำไร/วัน</div><div id="pvPct" style="color:var(--gold);text-align:right;"></div>
+    <div style="color:#A890CC;">🏆 ได้คืนรวม</div><div id="pvTotal" style="color:#f87171;text-align:right;font-weight:700;"></div>
   </div>
-  <div class="sec-title" data-i18n="pkg.active">✅ สัญญาที่ใช้งานอยู่</div>
-  <div id="acList"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;padding:0.6rem 0"><span data-i18n="pkg.noactive">ยังไม่มีสัญญาที่ใช้งานอยู่</span></div></div>
 </div>
 
-<!-- WALLET -->
+<button class="btn btn-primary" style="width:100%;font-size:0.85rem;padding:1rem;margin-top:1rem;" onclick="startMiningInvestment()">⚡ เริ่มลงทุนเลย</button>
+```
+
+  </div>
+
+  <!-- สัญญาที่กำลังขุดอยู่ -->
+
+  <div class="sec-title" style="font-size:0.8rem;margin-top:0.5rem;">⚡ สัญญาที่กำลังขุดอยู่</div>
+  <div id="acList"></div>
+</div>
+
 <div class="tab-page" id="pgWallet">
-  <div class="sec-title" data-i18n="wal.title">💼 กระเป๋าของฉัน</div>
-  <div class="wb wb-usd">
-    <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USD</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
-    <div class="wb-amt" id="wUsd">0.00</div>
-    <div class="wb-equiv">USD</div>
-    <button class="btn btn-gold" style="width:100%" data-i18n="wal.addUsd" onclick="switchTab(3)">+ เติม USD</button>
-  </div>
-  <div class="wb wb-zkp">
-    <div class="wb-head">
-      <div class="wb-ibox">🔷</div>
-      <div><div class="wb-title" data-i18n="wal.zkp.title">กระเป๋ารางวัล ZKP</div><div class="wb-sub" data-i18n="wal.zkp.sub">กำไรจากสัญญาขุด → แลกกับผู้ดูแล</div></div>
-      <div class="wb-live">LIVE</div>
+      <div class="sec-title" data-i18n="wal.title">💼 กระเป๋าของฉัน</div>
+      <div class="wb wb-usd">
+        <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USD</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
+        <div class="wb-amt" id="wUsd">0.00</div>
+        <div class="wb-equiv">USD</div>
+        <button class="btn btn-gold" style="width:100%" data-i18n="wal.addUsd" onclick="switchTab(3)">+ เติม USD</button>
+      </div>
+      <div class="wb wb-zkp">
+        <div class="wb-head">
+          <div class="wb-ibox">🔷</div>
+          <div><div class="wb-title" data-i18n="wal.zkp.title">กระเป๋ารางวัล ZKP</div><div class="wb-sub" data-i18n="wal.zkp.sub">กำไรจากสัญญาขุด → แลกกับผู้ดูแล</div></div>
+          <div class="wb-live">LIVE</div>
+        </div>
+        <div class="wb-amt" id="wZkp">0.000000</div>
+        <div class="wb-equiv">≈ $<span id="wZkpUsd">0.000000</span> USD · <span id="wZkpLak">0</span> ກີບ</div>
+        <div class="wb-daily"><span data-i18n="wal.daily">⚡ รับ/วัน:</span><span class="wb-dv"><span id="wDaily">0</span> ZKP · +$<span id="wDailyUsd">0.00</span></span></div>
+        <button class="btn btn-primary" style="width:100%" onclick="showWithdrawPopup()">💱 แจ้งแลกเงิน</button>
+      </div>
+      <div class="w-grid">
+        <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
+        <div class="w-stat"><div class="ws-l" data-i18n="wal.profit">กำไรสะสม</div><div class="ws-v wv-green" id="wProfit">$0.00</div><div class="ws-s" data-i18n="wal.profitsub">USD จากสัญญา</div></div>
+      </div>
+      <div class="sec-title" data-i18n="wal.history">📋 ประวัติธุรกรรม</div>
+      <div id="txHist"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace"><span data-i18n="wal.nohist">ยังไม่มีประวัติ</span></div></div>
     </div>
-    <div class="wb-amt" id="wZkp">0.000000</div>
-    <div class="wb-equiv">≈ $<span id="wZkpUsd">0.000000</span> USD · <span id="wZkpLak">0</span> ກີບ</div>
-    <div class="wb-daily"><span data-i18n="wal.daily">⚡ รับ/วัน:</span><span class="wb-dv"><span id="wDaily">0</span> ZKP · +$<span id="wDailyUsd">0.00</span></span></div>
-    <button class="btn btn-primary" style="width:100%" onclick="showWithdrawPopup()">💱 แจ้งแลกเงิน</button>
-  </div>
-  <div class="w-grid">
-    <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
-    <div class="w-stat"><div class="ws-l" data-i18n="wal.profit">กำไรสะสม</div><div class="ws-v wv-green" id="wProfit">$0.00</div><div class="ws-s" data-i18n="wal.profitsub">USD จากสัญญา</div></div>
-  </div>
-  <div class="sec-title" data-i18n="wal.history">📋 ประวัติธุรกรรม</div>
-  <div id="txHist"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace"><span data-i18n="wal.nohist">ยังไม่มีประวัติ</span></div></div>
-</div>
 
+```
 <!-- TOPUP -->
 <div class="tab-page" id="pgTopup">
   <div class="sec-title" data-i18n="top.title">💵 เติม USD</div>
@@ -930,7 +957,18 @@ function saveU(u){localStorage.setItem('cm_u',JSON.stringify(u))}
 function getSess(){return localStorage.getItem('cm_s')||''}
 function setSess(u){localStorage.setItem('cm_s',u)}
 function clrSess(){localStorage.removeItem('cm_s')}
-function getUD(){const u=getSess();return u?getU()[u]:null}
+function getUD(){
+  if(_ud) return _ud;
+  const u=getSess();
+  if(!u) return null;
+  // ลองดึงจาก new cache format ก่อน
+  try{
+    const cached=localStorage.getItem('cm_ud_'+u);
+    if(cached){const ud=JSON.parse(cached);_ud=ud;return ud;}
+  }catch(e){}
+  // fallback เดิม
+  return getU()[u]||null;
+}
 
 
 // ─── AUTH ───
@@ -1109,58 +1147,74 @@ function buyPkg(key){
 }
 
 function renderPkgs(){
-  const ud=getUD();if(!ud)return;
-  document.getElementById('pkgBal').textContent='$'+(ud.usd||0).toFixed(2);
-  const colors={free:'var(--green)',mini:'#38bdf8',lite:'#f472b6',starter:'#22c55e',basic:'var(--purple-light)',pro:'var(--red-bright)',vip:'var(--gold)'};
-  document.getElementById('pkgGrid').innerHTML=PKG_ORDER.map(key=>{
-    const def=PKGS[key];
-    const bought=(ud.packages||[]).filter(p=>p.key===key).length;
-    const active=(ud.packages||[]).find(p=>p.key===key&&p.remaining>0);
-    const unlocked=isUnlocked(key);const rem=def.limit-bought;
-    let badge='';
-    if(key==='free')badge='<div class="pkg-badge b-free">FREE</div>';
-    else if(key==='pro')badge='<div class="pkg-badge b-hot">+200 ZKP 🔥</div>';
-    else if(key==='vip')badge='<div class="pkg-badge b-vip">+600 ZKP 👑</div>';
-    else if(key==='ultimate')badge='<div class="pkg-badge" style="background:linear-gradient(135deg,#0f2878,#00f0ff);color:#000;font-weight:900;">💎 ทุนคืน+กำไร</div>';
-    else badge=`<div class="pkg-badge b-zkp">+${def.profit} ZKP</div>`;
-    const dots=Array.from({length:def.limit},(_,i)=>`<div class="ldot ${i<bought?'used':'avail'}"></div>`).join('');
-    const limitRow=bought>=def.limit?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--red-bright);margin-bottom:0.45rem">✅ ${t('pkg.owned')} (${def.limit}/${def.limit})</div>`:`<div class="limit-wrap">${dots}<span>${t('pkg.more')} ${rem} ${t('pkg.times')}</span></div>`;
-    let btn='';
-    if(!unlocked){const pdef=PKGS[PKG_ORDER[PKG_ORDER.indexOf(key)-1]];const pb=(ud.packages||[]).filter(p=>p.key===PKG_ORDER[PKG_ORDER.indexOf(key)-1]).length;btn=`<div class="pkg-locked">${t('pkg.locked')} ${pdef.name} ${t('pkg.locked2')} (${pb}/2)</div>`;}
-    else if(bought>=def.limit)btn=`<div class="pkg-owned">${t('pkg.owned')}</div>`;
-    else if(active)btn=`<div class="pkg-owned">${t('pkg.digging')} ${rem} ${t('pkg.times')}</div>`;
-    else btn=`<button class="btn-buy" onclick="buyPkg('${key}')">${def.price===0?t('pkg.free'):t('pkg.buy')}</button>`;
-    return `<div class="pkg-card ${def.cls}" style="${!unlocked?'opacity:0.42;filter:grayscale(55%)':''}">
-      ${badge}
-      <div class="pkg-icon">${ICONS[key]}</div>
-      <div class="pkg-name">${def.name}</div>
-      <div class="pkg-price">${def.price>0?'$'+def.price.toLocaleString():'$0'}</div>
-      <div class="pkg-profit-line">${def.refund?`<span style="color:#00f0ff">💎 ทุนคืน 5,000 ZKP + กำไร 2,000 ZKP</span>`:t('pkg.profit')+' '+def.profit+' ZKP / 7 '+t('pkg.ac.days')+' (+20%)'}</div>
-      <div class="roi-box">
-        <div class="roi-row"><span class="roi-lbl">${t('pkg.roi.profit')}</span><span class="roi-val" style="${def.refund?'color:#00f0ff':''}">+${def.profit} ZKP</span></div>
-        <div class="roi-row"><span class="roi-lbl">${t('pkg.roi.daily')}</span><span class="roi-val">~${def.daily.toFixed(2)} ZKP</span></div>
-        <div class="roi-div"></div>
-        <div class="roi-row"><span class="roi-lbl">${t('pkg.roi.value')}</span><span class="roi-profit" style="${def.refund?'color:#00f0ff;font-size:0.9rem':''}">~$${def.profit}.00 ${def.refund?'<span class="pb" style="background:linear-gradient(135deg,#0f2878,#00f0ff);color:#000">ทุนคืน</span>':'<span class="pb">+20%</span>'}</span></div>
+  const ud=getUD();
+  const el=document.getElementById('acList');
+  if(!el) return;
+  const acs=(ud?.packages||[]).filter(p=>p.remaining>0);
+  if(!acs.length){
+    el.innerHTML=`<div style="text-align:center;padding:2rem;font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--text-dim);">
+      ยังไม่มีสัญญาขุด<br>ใส่จำนวน USDT ด้านบนแล้วกด เริ่มลงทุนเลย
+    </div>`;
+    return;
+  }
+  el.innerHTML=acs.map((p,i)=>{
+    const pct=Math.round((1-(p.remaining/(p.days||1)))*100);
+    const ethMined=((p.daily||0)/ETH_RATE)*((p.days||1)-p.remaining);
+    const colors=['rgba(74,222,128,0.2)','rgba(255,215,0,0.15)','rgba(157,78,221,0.2)','rgba(56,189,248,0.15)'];
+    const borders=['rgba(74,222,128,0.4)','rgba(255,215,0,0.35)','rgba(157,78,221,0.4)','rgba(56,189,248,0.35)'];
+    const barColors=['#4ade80','#ffd700','#c084fc','#38bdf8'];
+    const c=colors[i%4],b=borders[i%4],bc=barColors[i%4];
+    return `<div style="background:${c};border:1px solid ${b};border-radius:14px;padding:1rem;margin-bottom:0.8rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div style="width:8px;height:8px;border-radius:50%;background:${bc};box-shadow:0 0 6px ${bc};animation:blink 1s infinite;"></div>
+          <span style="font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;color:#fff;">RIG #${i+1}</span>
+        </div>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;">$${(p.price||0).toLocaleString()} USDT</span>
       </div>
-      ${limitRow}<div id="pkbtn_${key}">${btn}</div>
+      <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:0.8rem;margin-bottom:0.8rem;text-align:center;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.2rem;">⛏ ETH ที่ขุดได้</div>
+        <div style="font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:${bc};">${ethMined.toFixed(6)} ETH</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;">≈ $${(ethMined*ETH_RATE).toFixed(2)} USDT</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.3rem;margin-bottom:0.8rem;">
+        <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:0.4rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:${bc};font-weight:700;">+${((p.daily||0)/ETH_RATE).toFixed(5)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:#A890CC;">ETH/วัน</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:0.4rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:#ffd700;font-weight:700;">+$${(p.daily||0).toFixed(2)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:#A890CC;">USDT/วัน</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:0.4rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:#fff;font-weight:700;">${Math.round((p.days||1)-p.remaining)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:#A890CC;">วันผ่าน</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:0.4rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:#f87171;font-weight:700;">${Math.max(0,p.remaining).toFixed(0)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:#A890CC;">วันเหลือ</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#A890CC;margin-bottom:0.3rem;">
+        <span>Progress</span><span style="color:${bc};">${pct}%</span>
+      </div>
+      <div style="background:rgba(0,0,0,0.4);border-radius:4px;height:7px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,${bc},rgba(255,255,255,0.4));border-radius:4px;box-shadow:0 0 8px ${bc};"></div>
+      </div>
     </div>`;
   }).join('');
-  // Active contracts
-  const acs=(ud.packages||[]).filter(p=>p.remaining>0);
-  const acEl=document.getElementById('acList');
-  if(!acs.length){acEl.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;padding:0.6rem 0">ยังไม่มีสัญญาที่ใช้งานอยู่</div>';return}
-  const col={free:'var(--green)',mini:'#38bdf8',lite:'#f472b6',starter:'#22c55e',basic:'var(--purple-light)',pro:'var(--red-bright)',vip:'var(--gold)'};
-  acEl.innerHTML=acs.map(p=>{const def=PKGS[p.key];const pct=Math.round((1-p.remaining/p.days)*100);
-    return `<div class="ac-card"><div class="ac-info"><div class="ac-name">${def.name}</div><div class="ac-meta">${t('pkg.ac.elapsed')} ${(p.days-p.remaining).toFixed(1)} ${t('pkg.ac.days')} · ${t('pkg.ac.remain')} ${Math.max(0,p.remaining).toFixed(1)} ${t('pkg.ac.days')}</div><div class="ac-prog"><div style="width:${pct}%;height:100%;background:${col[p.key]};border-radius:2px"></div></div></div><div><div class="ac-earn">+${def.daily.toFixed(2)}</div><div class="ac-earn-l">ZKP/วัน</div></div></div>`;
-  }).join('');
 }
+
 
 // ─── MACHINES ───
 function renderMachines(){
   const ud=getUD();if(!ud)return;
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
-  const sec=document.getElementById('machSec');const list=document.getElementById('machList');const cnt=document.getElementById('machCount');
+  const sec=document.getElementById('machSec');
+  const list=document.getElementById('machList');
+  const cnt=document.getElementById('machCount');
   const noMsg=document.getElementById('noMachMsg');
+
   if(!acs.length){
     if(sec)sec.style.display='none';
     if(noMsg)noMsg.style.display='block';
@@ -1169,34 +1223,135 @@ function renderMachines(){
   if(sec)sec.style.display='block';
   if(noMsg)noMsg.style.display='none';
   if(cnt)cnt.textContent=acs.length+(acs.length===1?' RIG':' RIGS');
-  const reward=(ud.zkpReward||0).toFixed(6);
-  list.innerHTML=acs.map((p,i)=>{
-    const def=PKGS[p.key];const pct=Math.round((1-p.remaining/p.days)*100);
-    const earned=(def.profit*((p.days-p.remaining)/p.days)).toFixed(4);
-    return `<div class="mc ${def.mc}">
-      <div class="mc-top">
-        <div class="mc-coin-wrap"><div class="mc-ring"></div><div class="mc-ring2"></div><div class="mc-coin">${COINS[p.key]}</div></div>
-        <div class="mc-info">
-          <div class="mc-name">${def.name}</div>
-          <div class="mc-hash">⚡ ${def.hr} · 7 ${t('home.days')}</div>
-          <div class="mc-status"><div class="mc-dot"></div>${t('home.diggingzkp')}</div>
+
+  const totalEth=(ud.ethReward||0);
+  const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
+  const totalDailyUsdt=acs.reduce((s,p)=>s+(p.daily||0),0);
+  const totalInvested=acs.reduce((s,p)=>s+(p.price||0),0);
+
+  // Summary dashboard
+  const summary=`<div style="background:linear-gradient(135deg,rgba(10,0,30,0.98),rgba(20,5,40,0.98));border:2px solid rgba(74,222,128,0.3);border-radius:16px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+      <div style="width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80;animation:blink 0.8s infinite;"></div>
+      <span style="font-family:'Orbitron',monospace;font-size:0.7rem;color:#4ade80;letter-spacing:2px;">MINING ACTIVE</span>
+      <span style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;">${acs.length} RIG${acs.length>1?'S':''}</span>
+    </div>
+    <div style="text-align:center;margin-bottom:1rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.3rem;">⛏ ETH สะสมทั้งหมด</div>
+      <div id="dashEthTotal" style="font-family:'Orbitron',monospace;font-size:2.2rem;font-weight:900;color:#4ade80;text-shadow:0 0 20px rgba(74,222,128,0.5);">${totalEth.toFixed(6)}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--gold);margin-top:0.2rem;">≈ $${(totalEth*ETH_RATE).toFixed(2)} USDT</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
+      <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:0.6rem;text-align:center;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;color:#4ade80;">+${totalDailyEth.toFixed(5)}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:#A890CC;">ETH/วัน</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:0.6rem;text-align:center;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;color:var(--gold);">+$${totalDailyUsdt.toFixed(2)}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:#A890CC;">USDT/วัน</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:0.6rem;text-align:center;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;color:var(--purple-light);">$${totalInvested.toLocaleString()}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:#A890CC;">ลงทุนรวม</div>
+      </div>
+    </div>
+  </div>`;
+
+  // RIG cards
+  const colors=['rgba(74,222,128,0.15)','rgba(255,215,0,0.1)','rgba(157,78,221,0.15)','rgba(56,189,248,0.1)'];
+  const borders=['rgba(74,222,128,0.35)','rgba(255,215,0,0.3)','rgba(157,78,221,0.35)','rgba(56,189,248,0.3)'];
+  const barColors=['#4ade80','#ffd700','#c084fc','#38bdf8'];
+
+  const rigs=acs.map((p,i)=>{
+    const pct=Math.round((1-(p.remaining/(p.days||1)))*100);
+    const daysPassed=Math.round((p.days||1)-p.remaining);
+    const ethMined=(((p.daily||0)/ETH_RATE)*daysPassed).toFixed(6);
+    const bc=barColors[i%4];
+    return `<div style="background:${colors[i%4]};border:1px solid ${borders[i%4]};border-radius:14px;padding:1rem;margin-bottom:0.8rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div style="width:8px;height:8px;border-radius:50%;background:${bc};box-shadow:0 0 6px ${bc};animation:blink 1s infinite ${i*0.3}s;"></div>
+          <span style="font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;color:#fff;">RIG #${i+1}</span>
         </div>
-        <button class="btn-detail" onclick="showDetail(${i})">${t('home.viewdetail')}</button>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#A890CC;">$${(p.price||0).toLocaleString()} · ${(p.dailyPct||0).toFixed(2)}%/วัน</span>
       </div>
-      <div class="mc-live">
-        <div><div class="mc-live-lbl">${t('home.livezkp')}</div><div class="mc-live-val" id="lv_${i}">${reward}</div></div>
-        <div style="text-align:right"><div class="mc-live-lbl">${t('home.perday')}</div><div class="mc-live-daily">+${def.daily.toFixed(4)}</div></div>
+
+      <!-- Mini rig animation -->
+      <div style="background:rgba(0,0,0,0.4);border:1px solid ${borders[i%4]};border-radius:10px;padding:0.7rem;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.8rem;">
+        <svg width="65" height="45" viewBox="0 0 70 48" style="flex-shrink:0;">
+          <rect x="5" y="5" width="60" height="30" rx="4" fill="#0d0d30" stroke="${bc}" stroke-width="1.5"/>
+          <rect x="12" y="12" width="16" height="10" rx="2" fill="${bc}" opacity="0.8"/>
+          <rect x="32" y="12" width="16" height="10" rx="2" fill="${bc}" opacity="0.6"/>
+          <g transform="translate(20,35)">
+            <circle r="8" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="1.5"/>
+            <g style="animation:spinFan 0.15s linear infinite;transform-origin:0 0;">
+              <line x1="0" y1="-7" x2="0" y2="7" stroke="${bc}" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="-7" y1="0" x2="7" y2="0" stroke="${bc}" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="-5" y1="-5" x2="5" y2="5" stroke="${bc}" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="5" y1="-5" x2="-5" y2="5" stroke="${bc}" stroke-width="1.5" stroke-linecap="round"/>
+            </g>
+            <circle r="2.5" fill="${bc}"/>
+          </g>
+          <g transform="translate(50,35)">
+            <circle r="8" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="1.5"/>
+            <g style="animation:spinFan 0.12s linear infinite reverse;transform-origin:0 0;">
+              <line x1="0" y1="-7" x2="0" y2="7" stroke="${bc}" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="-7" y1="0" x2="7" y2="0" stroke="${bc}" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+            <circle r="2.5" fill="${bc}"/>
+          </g>
+          <circle cx="10" cy="9" r="2" fill="${bc}" style="animation:blink 0.5s infinite;"/>
+          <circle cx="16" cy="9" r="2" fill="#ffd700" style="animation:blink 0.8s infinite 0.2s;"/>
+          <circle cx="22" cy="9" r="2" fill="#00ff88" style="animation:blink 0.6s infinite 0.4s;"/>
+        </svg>
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:${bc};margin-bottom:0.3rem;animation:blink 2s infinite;">⚡ MINING ETH...</div>
+          <div style="background:rgba(0,0,0,0.5);border-radius:3px;height:5px;overflow:hidden;margin-bottom:0.3rem;">
+            <div style="height:100%;background:linear-gradient(90deg,${bc},rgba(255,255,255,0.4));border-radius:3px;animation:loadBarAnim 1.5s ease-in-out infinite;"></div>
+          </div>
+          <div style="display:flex;gap:2px;align-items:flex-end;height:18px;">
+            ${Array.from({length:8},(_,j)=>`<div style="width:4px;background:${bc};border-radius:2px;transform-origin:bottom;animation:heatRise ${0.6+j*0.08}s infinite ${j*0.08}s;opacity:0.8;"></div>`).join('')}
+          </div>
+        </div>
       </div>
-      <div class="mc-stats">
-        <div class="mc-stat"><div class="mc-sv">${earned}</div><div class="mc-sl">${t('home.mined')}</div></div>
-        <div class="mc-stat"><div class="mc-sv" style="color:var(--gold)">+${def.profit}</div><div class="mc-sl">${t('home.total')}</div></div>
-        <div class="mc-stat"><div class="mc-sv" style="color:var(--red-bright)">${Math.max(0,p.remaining).toFixed(1)}</div><div class="mc-sl">${t('home.daysleft')}</div></div>
+
+      <!-- ETH mined -->
+      <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:0.8rem;margin-bottom:0.8rem;text-align:center;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#A890CC;margin-bottom:0.2rem;">⛏ ETH ที่ขุดได้</div>
+        <div id="rig_eth_${i}" style="font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:${bc};text-shadow:0 0 15px ${bc};">${ethMined} ETH</div>
+        <div id="rig_usdt_${i}" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;">≈ $${(parseFloat(ethMined)*ETH_RATE).toFixed(2)} USDT</div>
       </div>
-      <div class="mc-prog-hd"><span>${t('home.progress2')}</span><span class="mc-prog-pct">${pct}%</span></div>
-      <div class="mc-prog-bar"><div class="mc-prog-fill" style="width:${pct}%"></div></div>
-      <div class="mc-days">⏱ ${t('home.daysrem')} ${Math.max(0,p.remaining).toFixed(1)} ${t('home.days')}</div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.3rem;margin-bottom:0.8rem;">
+        <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:0.4rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:${bc};font-weight:700;">+${((p.daily||0)/ETH_RATE).toFixed(5)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.46rem;color:#A890CC;">ETH/วัน</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:0.4rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);font-weight:700;">+$${(p.daily||0).toFixed(2)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.46rem;color:#A890CC;">USDT/วัน</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:0.4rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:#fff;font-weight:700;">${daysPassed}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.46rem;color:#A890CC;">วันผ่าน</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:0.4rem;text-align:center;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:#f87171;font-weight:700;">${Math.max(0,p.remaining).toFixed(0)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.46rem;color:#A890CC;">วันเหลือ</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:#A890CC;margin-bottom:0.3rem;">
+        <span>PROGRESS</span><span style="color:${bc};">${pct}%</span>
+      </div>
+      <div style="background:rgba(0,0,0,0.4);border-radius:4px;height:7px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,${bc},rgba(255,255,255,0.4));border-radius:4px;box-shadow:0 0 8px ${bc};"></div>
+      </div>
     </div>`;
   }).join('');
+
+  list.innerHTML=summary+rigs;
 }
 
 function showDetail(idx){
@@ -1538,11 +1693,27 @@ function startDrip(){
 }
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
 function updateRewardUI(){
-  const ud=getUD();if(!ud)return;const r=ud.zkpReward||0;
-  document.getElementById('navZkp').textContent=r.toFixed(4);
-  document.querySelectorAll('[id^="lv_"]').forEach(el=>{el.textContent=r.toFixed(6);el.style.color='var(--green)';setTimeout(()=>{el.style.color=''},300)});
-  const wz=document.getElementById('wZkp');if(wz){wz.textContent=r.toFixed(6);document.getElementById('wZkpUsd').textContent=(r*ZKP_RATE).toFixed(4)}
-  renderMachines();
+  const ud=getUD();if(!ud)return;
+  const r=ud.ethReward||0;
+  // nav
+  const navEth=document.getElementById('navEth');if(navEth)navEth.textContent=r.toFixed(4);
+  const navUsdt=document.getElementById('navUsdt');if(navUsdt)navUsdt.textContent=(ud.usd||0).toFixed(2);
+  // wallet
+  const wEth=document.getElementById('wEth');if(wEth)wEth.textContent=r.toFixed(6);
+  const wEthUsd=document.getElementById('wEthUsd');if(wEthUsd)wEthUsd.textContent=(r*ETH_RATE).toFixed(2);
+  // dashboard ETH total
+  const dashEl=document.getElementById('dashEthTotal');
+  if(dashEl){dashEl.textContent=r.toFixed(6);}
+  // อัปเดต ETH แต่ละ RIG
+  const acs=(ud.packages||[]).filter(p=>p.remaining>0);
+  acs.forEach((p,i)=>{
+    const daysPassed=Math.round((p.days||1)-p.remaining);
+    const ethMined=(((p.daily||0)/ETH_RATE)*daysPassed).toFixed(6);
+    const el=document.getElementById('rig_eth_'+i);
+    const elU=document.getElementById('rig_usdt_'+i);
+    if(el)el.textContent=ethMined+' ETH';
+    if(elU)elU.textContent='≈ $'+(parseFloat(ethMined)*ETH_RATE).toFixed(2)+' USDT';
+  });
 }
 function showRollNotif(def){
   const roll=def.next?PKGS[def.next]:null;const ov=document.createElement('div');ov.className='overlay';
@@ -2503,6 +2674,25 @@ function resendOTPBrevo(){
 }
 
 // ─── MINING INVESTMENT ───
+
+function calcMiningPreview(){
+  const amt=parseFloat(document.getElementById('miningAmtInput')?.value)||0;
+  const preview=document.getElementById('miningPreview');
+  if(!preview) return;
+  if(amt<100){preview.style.display='none';return;}
+  const pct=calcDailyPct(amt);
+  const daily=calcDailyEarn(amt);
+  const ethDaily=daily/ETH_RATE;
+  const days=calcDays(amt);
+  const total=amt+daily*days;
+  document.getElementById('pvDaily').textContent='$'+daily.toFixed(2)+' USDT';
+  document.getElementById('pvEthDaily').textContent=ethDaily.toFixed(6)+' ETH';
+  document.getElementById('pvDays').textContent=days+' วัน';
+  document.getElementById('pvPct').textContent=pct.toFixed(2)+'%/วัน';
+  document.getElementById('pvTotal').textContent='$'+total.toFixed(0)+' USDT';
+  preview.style.display='block';
+}
+
 function startMiningInvestment(){
   const amt=parseFloat(document.getElementById('miningAmtInput')?.value)||0;
   if(amt<100||amt>100000){showToast('⚠ ใส่จำนวน $100 - $100,000');return;}
