@@ -2550,6 +2550,39 @@ function startDrip(){
     });
     if(changed){saveUD(ud);updateRewardUI();}
   },TICK);
+
+  // smooth display - อัปเดต UI ทุก 100ms โดยคำนวณจาก rate
+  if(window._displayInt) clearInterval(window._displayInt);
+  window._displayInt = setInterval(()=>{
+    const ud=getUD();if(!ud)return;
+    const acs=(ud.packages||[]).filter(p=>p.remaining>0);
+    if(!acs.length)return;
+    // คำนวณ ETH ที่เพิ่มขึ้นใน 100ms
+    const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
+    const ethPer100ms=totalDailyEth/(86400*10);
+    ud.ethReward=(ud.ethReward||0)+ethPer100ms;
+    // อัปเดต UI เท่านั้น ไม่ save Firebase
+    try{localStorage.setItem('cm_ud_'+getSess(),JSON.stringify(ud));}catch(e){}
+    _ud=ud;
+    // อัปเดตตัวเลข
+    const r=ud.ethReward;
+    const dashEl=document.getElementById('dashEthTotal');
+    if(dashEl)dashEl.textContent=r.toFixed(6);
+    const totalDaily=acs.reduce((s,p)=>s+(p.daily||0),0);
+    acs.forEach((p,i)=>{
+      const ratio=totalDaily>0?(p.daily||0)/totalDaily:1/acs.length;
+      const ethMined=(r*ratio).toFixed(8);
+      const el=document.getElementById('rig_eth_'+i);
+      if(el)el.textContent=ethMined;
+      const elU=document.getElementById('rig_usdt_'+i);
+      if(elU)elU.textContent='≈ $'+(parseFloat(ethMined)*ETH_RATE).toFixed(2);
+    });
+    // wallet
+    const wZkp=document.getElementById('wZkp');if(wZkp)wZkp.textContent=r.toFixed(6);
+    const wZkpUsd=document.getElementById('wZkpUsd');if(wZkpUsd)wZkpUsd.textContent=(r*ETH_RATE).toFixed(2);
+    // float particles
+    if(Math.random()>0.85) acs.forEach((_,i)=>spawnRigFloat(i));
+  },100);
 }
 function spawnRigFloat(i){
   const c=document.getElementById('rig_float_'+i);if(!c)return;
@@ -2563,7 +2596,7 @@ function spawnRigFloat(i){
   setTimeout(()=>el.remove(),1200);
 }
 
-function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null}}
+function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null;}if(window._displayInt){clearInterval(window._displayInt);window._displayInt=null;}}
 // ETH Rain in machine section
 function spawnEthRain(){
   const c=document.getElementById('ethRainContainer');if(!c)return;
