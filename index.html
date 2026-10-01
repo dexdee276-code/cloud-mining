@@ -1812,6 +1812,11 @@ function enterDash(user){
   renderPkgs();
   switchTab(0);
   showToast(t('toast.welcome')+' '+user+'!');
+  // sync Firebase ทุก 60 วิ
+  if(window._fbSyncInt) clearInterval(window._fbSyncInt);
+  window._fbSyncInt=setInterval(()=>{
+    if(_ud&&window._db) window._db.ref('users/'+getSess()).set(_ud).catch(()=>{});
+  },60000);
   setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
 }
 
@@ -3484,25 +3489,18 @@ function fbGetUser(u){
 }
 
 // ─── SAVE USER TO FIREBASE ───
-let _lastFbSync=0;
 function saveUD(ud){
   const u=getSess();if(!u)return;
   _ud=ud;
-  // save local ทุกครั้ง
+  // save localStorage ทุกครั้ง
   try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e){}
-  // sync Firebase ทุก 30 วิเท่านั้น
-  const now=Date.now();
-  if(window._db && now-_lastFbSync>30000){
-    _lastFbSync=now;
-    window._db.ref('users/'+u).set(ud).catch(()=>{});
-  }
 }
 function saveUDForce(ud){
   const u=getSess();if(!u)return;
   _ud=ud;
   try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e){}
+  // sync Firebase เฉพาะตอน force (logout)
   if(window._db) window._db.ref('users/'+u).set(ud).catch(()=>{});
-  _lastFbSync=Date.now();
 }
 
 // ─── ETH MINING CALC ───
