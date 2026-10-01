@@ -2583,29 +2583,37 @@ let _ethRainInt=null;
 function updateRewardUI(){
   const ud=getUD();if(!ud)return;
   const r=ud.ethReward||0;
-  // nav
-  const navEth=document.getElementById('navEth');if(navEth)navEth.textContent=r.toFixed(4);
-  const navUsdt=document.getElementById('navUsdt');if(navUsdt)navUsdt.textContent=(ud.usd||0).toFixed(2);
-  // wallet - update both possible IDs
-  const wEth=document.getElementById('wEth');if(wEth)wEth.textContent=r.toFixed(6);
-  const wEthUsd=document.getElementById('wEthUsd');if(wEthUsd)wEthUsd.textContent=(r*ETH_RATE).toFixed(2);
+
+  // ── กระเป๋า ETH ──
   const wZkp=document.getElementById('wZkp');if(wZkp)wZkp.textContent=r.toFixed(6);
   const wZkpUsd=document.getElementById('wZkpUsd');if(wZkpUsd)wZkpUsd.textContent=(r*ETH_RATE).toFixed(2);
-  const ud2=getUD();if(ud2){
-    const wUsd=document.getElementById('wUsd');if(wUsd)wUsd.textContent=(ud2.usd||0).toFixed(2);
-  }
-  // dashboard ETH total
+  const wUsd=document.getElementById('wUsd');if(wUsd)wUsd.textContent=(ud.usd||0).toFixed(2);
+
+  // ── dashboard ETH total ──
   const dashEl=document.getElementById('dashEthTotal');
-  if(dashEl){dashEl.textContent=r.toFixed(6);}
-  // อัปเดต ETH แต่ละ RIG
+  if(dashEl){
+    dashEl.textContent=r.toFixed(6);
+    // อัปเดต USDT ใต้ตัวเลขใหญ่
+    const dashUsdt=document.getElementById('dashEthUsdt');
+    if(dashUsdt)dashUsdt.textContent='≈ $'+(r*ETH_RATE).toFixed(2)+' USDT';
+  }
+
+  // ── อัปเดต RIG แต่ละตัว (ใช้ ethReward รวม หารตาม proportion) ──
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
+  const totalDaily=acs.reduce((s,p)=>s+(p.daily||0),0);
   acs.forEach((p,i)=>{
-    const daysPassed=Math.round((p.days||1)-p.remaining);
-    const ethMined=(((p.daily||0)/ETH_RATE)*daysPassed).toFixed(6);
+    // ETH ที่ RIG นี้ขุดได้ = สัดส่วนของ ethReward รวม
+    const ratio=totalDaily>0?(p.daily||0)/totalDaily:1/acs.length;
+    const ethMined=(r*ratio).toFixed(8);
     const el=document.getElementById('rig_eth_'+i);
     const elU=document.getElementById('rig_usdt_'+i);
-    if(el)el.textContent=ethMined+' ETH';
-    if(elU)elU.textContent='≈ $'+(parseFloat(ethMined)*ETH_RATE).toFixed(2)+' USDT';
+    if(el)el.textContent=ethMined;
+    if(elU){
+      // อัปเดต USDT ใน pill
+      elU.textContent='≈ $'+(parseFloat(ethMined)*ETH_RATE).toFixed(2);
+    }
+    // spawn float particle
+    if(Math.random()>0.6) spawnRigFloat(i);
   });
 }
 function showRollNotif(def){
