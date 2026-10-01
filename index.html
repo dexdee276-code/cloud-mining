@@ -2004,7 +2004,8 @@ function renderMachines(){
     </div>
     <div style="text-align:center;margin-bottom:1rem;position:relative;">
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:rgba(74,222,128,0.4);letter-spacing:3px;margin-bottom:0.4rem;">⛏ ETH MINED TOTAL</div>
-      <div id="dashEthTotal" style="font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:#4ade80;animation:numberTick 2s ease-in-out infinite;line-height:1;letter-spacing:2px;">${totalEth.toFixed(6)}</div>
+      <div id="dashEthTotal" style="font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:#4ade80;animation:numberTick 2s ease-in-out infinite;line-height:1;letter-spacing:2px;">${totalEth.toFixed(4)}</div>
+      <div id="dashEthRate" style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:rgba(74,222,128,0.5);margin-top:0.2rem;letter-spacing:1px;">+${(totalDailyEth/86400).toFixed(8)} ETH/วินาที</div>
       <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:0.3rem;">
         <div style="height:1px;width:30px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.4));"></div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.4);">≈ $${(totalEth*ETH_RATE).toFixed(2)} USDT</div>
@@ -2572,18 +2573,18 @@ function startDrip(){
     const acs=_ud.packages.filter(p=>p.remaining>0);
     if(!acs.length) return;
 
-    // คำนวณ ETH ที่ได้ใน 50ms
+    // ETH จริงต่อ 50ms
     const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
     const ethPer50ms=totalDailyEth/1728000;
     _ud.ethReward=(_ud.ethReward||0)+ethPer50ms;
-
     const r=_ud.ethReward;
 
-    // อัปเดต dashboard
+    // ── แสดงตัวเลขหลายรูปแบบ ──
+    // dashboard: 4 ทศนิยม ให้วิ่งเร็ว
     const dashEl=document.getElementById('dashEthTotal');
-    if(dashEl) dashEl.textContent=r.toFixed(6);
+    if(dashEl) dashEl.textContent=r.toFixed(4);
 
-    // อัปเดตกระเป๋า
+    // กระเป๋า: 6 ทศนิยม
     const wZkp=document.getElementById('wZkp');
     if(wZkp) wZkp.textContent=r.toFixed(6);
     const wZkpUsd=document.getElementById('wZkpUsd');
@@ -2591,16 +2592,16 @@ function startDrip(){
     const wUsd=document.getElementById('wUsd');
     if(wUsd) wUsd.textContent=(_ud.usd||0).toFixed(2);
 
-    // อัปเดตแต่ละ RIG
+    // RIG: 6 ทศนิยม
     const totalDaily=acs.reduce((s,p)=>s+(p.daily||0),0);
     acs.forEach((p,i)=>{
       const ratio=totalDaily>0?(p.daily||0)/totalDaily:1/acs.length;
       const rigEth=r*ratio;
       const el=document.getElementById('rig_eth_'+i);
-      if(el) el.textContent=rigEth.toFixed(8);
+      if(el) el.textContent=rigEth.toFixed(6);
       const elU=document.getElementById('rig_usdt_'+i);
       if(elU) elU.textContent='≈ $'+(rigEth*ETH_RATE).toFixed(2);
-      if(Math.random()>0.95) spawnRigFloat(i);
+      if(Math.random()>0.9) spawnRigFloat(i);
     });
   },50);
 }
