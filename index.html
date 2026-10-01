@@ -4044,9 +4044,11 @@ if(mb) mb.textContent=isMining?t(‘home.stop’):t(‘home.start’);
 const ms=document.getElementById(‘mineStatus’);
 if(ms&&!isMining) ms.textContent=t(‘home.waiting’);
 
-// Re-render dynamic content
+// Re-render dynamic content (only when logged in)
+if(getSess()){
 renderMachines();
 renderPkgs();
+}
 if(document.getElementById(‘pgWallet’)?.classList.contains(‘active’)) renderWallet();
 }
 
