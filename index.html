@@ -2572,10 +2572,10 @@ function startDrip(){
     const acs=_ud.packages.filter(p=>p.remaining>0);
     if(!acs.length) return;
 
-    // คำนวณ ETH ที่ได้ใน 200ms
+    // คำนวณ ETH ที่ได้ใน 50ms
     const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
-    const ethPer200ms=totalDailyEth/432000;
-    _ud.ethReward=(_ud.ethReward||0)+ethPer200ms;
+    const ethPer50ms=totalDailyEth/1728000;
+    _ud.ethReward=(_ud.ethReward||0)+ethPer50ms;
 
     const r=_ud.ethReward;
 
@@ -2600,9 +2600,9 @@ function startDrip(){
       if(el) el.textContent=rigEth.toFixed(8);
       const elU=document.getElementById('rig_usdt_'+i);
       if(elU) elU.textContent='≈ $'+(rigEth*ETH_RATE).toFixed(2);
-      if(Math.random()>0.8) spawnRigFloat(i);
+      if(Math.random()>0.95) spawnRigFloat(i);
     });
-  },200);
+  },50);
 }
 
 function spawnRigFloat(i){
