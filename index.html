@@ -539,8 +539,6 @@ html { font-size: 16px; }
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBXCvCLsPxkXBVLMaO8RISITM2d24pAL-Q",
@@ -554,8 +552,6 @@ html { font-size: 16px; }
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   window._db = db;
-  const auth = firebase.auth();
-  window._auth = auth;
 </script>
 
 <!-- EmailJS SDK -->
@@ -573,123 +569,98 @@ html { font-size: 16px; }
 
 <!-- AUTH -->
 
-<div class="screen active" id="authScreen" style="position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:1rem;isolation:isolate;">
+<div class="screen active" id="authScreen">
+  <div class="lang-group" style="position:absolute;top:1rem;right:1rem;z-index:10;">
+    <button class="btn-lang active" id="alTh" onclick="setLang('th')">ไทย</button>
+    <button class="btn-lang" id="alEn" onclick="setLang('en')">EN</button>
+    <button class="btn-lang" id="alLo" onclick="setLang('lo')">ລາວ</button>
+  </div>
 
-  <!-- BG Canvas -->
+  <!-- ETH Rain BG -->
 
-<canvas id="authBgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;touch-action:none;"></canvas>
-
-  <!-- ETH Rain -->
-
-  <div id="authRain" style="position:fixed;inset:0;overflow:hidden;pointer-events:none;touch-action:none;z-index:1;"></div>
+  <div id="authRain" style="position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;"></div>
+  <!-- BG particles -->
+  <canvas id="authBgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
 
   <!-- Content -->
 
-  <div style="position:relative;z-index:100;width:100%;max-width:360px;animation:slideUp 0.6s ease-out;">
+  <div style="position:relative;z-index:10;width:100%;max-width:360px;padding:1rem;text-align:center;">
 
 ```
-<!-- ETH Logo floating -->
-<div style="text-align:center;margin-bottom:1.2rem;animation:float 3s ease-in-out infinite;">
-  <div style="display:inline-block;position:relative;">
-    <div style="position:absolute;inset:-15px;border-radius:50%;background:radial-gradient(circle,rgba(98,126,234,0.2),transparent);animation:pulse 2s infinite;"></div>
-    <svg width="72" height="72" viewBox="0 0 80 80">
-      <defs>
-        <radialGradient id="authEthG" cx="40%" cy="35%">
-          <stop offset="0%" stop-color="#8a9ef0"/>
-          <stop offset="50%" stop-color="#627eea"/>
-          <stop offset="100%" stop-color="#2a3a8a"/>
-        </radialGradient>
-      </defs>
-      <circle cx="40" cy="40" r="38" fill="url(#authEthG)" stroke="#8a9ef0" stroke-width="1.5"/>
-      <circle cx="40" cy="40" r="38" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
-      <g transform="translate(40,40)">
-        <polygon points="0,-22 13,-5 0,3 -13,-5" fill="rgba(255,255,255,0.95)"/>
-        <polygon points="0,24 13,8 0,3 -13,8" fill="rgba(255,255,255,0.7)"/>
-        <polygon points="0,-22 13,-5 0,3" fill="rgba(255,255,255,0.5)"/>
-        <polygon points="0,-22 -13,-5 0,3" fill="rgba(255,255,255,0.85)"/>
-      </g>
-    </svg>
-  </div>
+<!-- Logo -->
+<div style="animation:float 3s ease-in-out infinite;margin-bottom:1rem;">
+  <svg width="70" height="70" viewBox="0 0 80 80" style="filter:drop-shadow(0 0 15px rgba(98,126,234,0.8));">
+    <circle cx="40" cy="40" r="38" fill="url(#aEG)" stroke="#8a9ef0" stroke-width="1.5"/>
+    <defs><radialGradient id="aEG" cx="40%" cy="35%"><stop offset="0%" stop-color="#8a9ef0"/><stop offset="100%" stop-color="#2a3a8a"/></radialGradient></defs>
+    <g transform="translate(40,40)">
+      <polygon points="0,-22 13,-5 0,3 -13,-5" fill="rgba(255,255,255,0.95)"/>
+      <polygon points="0,24 13,8 0,3 -13,8" fill="rgba(255,255,255,0.7)"/>
+      <polygon points="0,-22 13,-5 0,3" fill="rgba(255,255,255,0.5)"/>
+      <polygon points="0,-22 -13,-5 0,3" fill="rgba(255,255,255,0.85)"/>
+    </g>
+  </svg>
 </div>
 
 <!-- Title -->
-<div style="text-align:center;margin-bottom:1.5rem;">
-  <div style="font-family:'Orbitron',monospace;font-size:1.7rem;font-weight:900;color:#fff;letter-spacing:4px;text-shadow:0 0 20px rgba(98,126,234,0.8),0 0 40px rgba(98,126,234,0.4);" id="aMinersTitle">⛏ CRYPTOMINE</div>
-  <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(98,126,234,0.7);letter-spacing:3px;margin-top:0.3rem;">CLOUD ETH MINING PLATFORM</div>
-  <div style="height:1px;background:linear-gradient(90deg,transparent,#627eea,transparent);margin-top:0.8rem;"></div>
-</div>
+<div style="font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:4px;text-shadow:0 0 20px rgba(98,126,234,0.8);margin-bottom:0.3rem;">⛏ CRYPTOMINE</div>
+<div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(98,126,234,0.7);letter-spacing:3px;margin-bottom:1.5rem;">CLOUD ETH MINING PLATFORM</div>
 
-<!-- Lang buttons -->
-<div style="position:absolute;top:-4.5rem;right:0;display:flex;gap:0.3rem;">
-  <button class="btn-lang active" id="alTh" onclick="setLang('th')" style="font-size:0.6rem;padding:0.25rem 0.5rem;">ไทย</button>
-  <button class="btn-lang" id="alEn" onclick="setLang('en')" style="font-size:0.6rem;padding:0.25rem 0.5rem;">EN</button>
-  <button class="btn-lang" id="alLo" onclick="setLang('lo')" style="font-size:0.6rem;padding:0.25rem 0.5rem;">ລາວ</button>
-</div>
-
-<!-- Auth Card -->
-<div style="background:rgba(5,5,25,0.95);border:1px solid rgba(98,126,234,0.35);border-radius:20px;padding:1.5rem;box-shadow:0 0 20px rgba(98,126,234,0.3);backdrop-filter:blur(20px);position:relative;overflow:hidden;">
-
-  <!-- Card scanline -->
-  <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(98,126,234,0.3),transparent);top:0;animation:authScanline 3s linear infinite;"></div>
+<!-- Card -->
+<div style="background:rgba(5,5,25,0.95);border:1px solid rgba(98,126,234,0.35);border-radius:20px;padding:1.5rem;box-shadow:0 0 30px rgba(98,126,234,0.2);">
 
   <!-- Tabs -->
-  <div style="display:flex;gap:0;margin-bottom:1.3rem;background:rgba(0,0,0,0.3);border-radius:10px;padding:3px;" id="authTabs">
-    <button id="atLogin" onclick="switchAuth('login')" style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;letter-spacing:1px;cursor:pointer;background:linear-gradient(135deg,#627eea,#8a9ef0);color:#fff;box-shadow:0 0 15px rgba(98,126,234,0.5);">LOGIN</button>
-    <button id="atReg" onclick="switchAuth('reg')" style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;letter-spacing:1px;cursor:pointer;background:transparent;color:rgba(98,126,234,0.6);">REGISTER</button>
+  <div style="display:flex;background:rgba(0,0,0,0.3);border-radius:10px;padding:3px;margin-bottom:1.2rem;">
+    <button id="atLogin" onclick="switchAuth('login')"
+      style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#627eea,#8a9ef0);color:#fff;box-shadow:0 0 15px rgba(98,126,234,0.5);">LOGIN</button>
+    <button id="atReg" onclick="switchAuth('reg')"
+      style="flex:1;padding:0.6rem;border-radius:8px;border:none;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;background:transparent;color:rgba(98,126,234,0.6);">REGISTER</button>
   </div>
 
   <!-- Login Form -->
   <div class="auth-form active" id="loginForm">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:rgba(98,126,234,0.5);margin-bottom:0.8rem;">root@cryptomine:~$</div>
-    <div style="margin-bottom:0.9rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.35rem;letter-spacing:1px;">// USERNAME</div>
-      <div style="position:relative;">
-        <input id="loginUser" type="text" placeholder="enter_username" data-i18n-ph="auth.user"
-          style="width:100%;padding:0.8rem 1rem 0.8rem 2.4rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;transition:all 0.3s;"
-          onfocus="this.style.borderColor='#627eea';this.style.boxShadow='0 0 15px rgba(98,126,234,0.3)'" onblur="this.style.borderColor='rgba(98,126,234,0.3)';this.style.boxShadow='none'">
-        <div style="position:absolute;left:0.8rem;top:50%;transform:translateY(-50%);color:rgba(98,126,234,0.6);font-size:0.75rem;">⚡</div>
-      </div>
+    <div style="margin-bottom:0.9rem;text-align:left;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.35rem;">// USERNAME</div>
+      <input id="loginUser" type="text" placeholder="enter_username"
+        style="width:100%;padding:0.8rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;"
+        onfocus="this.style.borderColor='#627eea'" onblur="this.style.borderColor='rgba(98,126,234,0.3)'">
     </div>
-    <div style="margin-bottom:1.3rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.35rem;letter-spacing:1px;">// PASSWORD</div>
-      <div style="position:relative;">
-        <input id="loginPass" type="password" placeholder="••••••••" data-i18n-ph="auth.pass"
-          style="width:100%;padding:0.8rem 1rem 0.8rem 2.4rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;transition:all 0.3s;"
-          onfocus="this.style.borderColor='#627eea';this.style.boxShadow='0 0 15px rgba(98,126,234,0.3)'" onblur="this.style.borderColor='rgba(98,126,234,0.3)';this.style.boxShadow='none'">
-        <div style="position:absolute;left:0.8rem;top:50%;transform:translateY(-50%);color:rgba(98,126,234,0.6);font-size:0.75rem;">🔐</div>
-      </div>
+    <div style="margin-bottom:1rem;text-align:left;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.35rem;">// PASSWORD</div>
+      <input id="loginPass" type="password" placeholder="••••••••"
+        style="width:100%;padding:0.8rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;"
+        onfocus="this.style.borderColor='#627eea'" onblur="this.style.borderColor='rgba(98,126,234,0.3)'">
     </div>
-    <div id="loginMsg" style="min-height:1.2rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;"></div>
-    <div onclick="doLogin()" id="loginBtn"
-      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;position:relative;z-index:50;">⚡ AUTHENTICATE</div>
+    <div id="loginMsg" style="min-height:1rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;text-align:left;"></div>
+    <button onclick="doLogin()"
+      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border:none;border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);">⚡ AUTHENTICATE</button>
   </div>
 
   <!-- Register Form -->
   <div class="auth-form" id="regForm">
-    <div style="margin-bottom:0.8rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.3rem;letter-spacing:1px;">// USERNAME</div>
+    <div style="margin-bottom:0.8rem;text-align:left;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.3rem;">// USERNAME</div>
       <input id="regUser" type="text" placeholder="choose_username"
-        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;transition:border-color 0.3s;"
+        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;"
         onfocus="this.style.borderColor='#627eea'" onblur="this.style.borderColor='rgba(98,126,234,0.3)'">
     </div>
-    <div style="margin-bottom:0.8rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.3rem;letter-spacing:1px;">// EMAIL</div>
+    <div style="margin-bottom:0.8rem;text-align:left;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.3rem;">// EMAIL</div>
       <input id="regEmail" type="email" placeholder="your@email.com"
-        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;transition:border-color 0.3s;"
+        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;"
         onfocus="this.style.borderColor='#627eea'" onblur="this.style.borderColor='rgba(98,126,234,0.3)'">
     </div>
-    <div style="margin-bottom:1.2rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.3rem;letter-spacing:1px;">// PASSWORD</div>
+    <div style="margin-bottom:1rem;text-align:left;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:rgba(98,126,234,0.7);margin-bottom:0.3rem;">// PASSWORD</div>
       <input id="regPass" type="password" placeholder="min 6 characters"
-        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;transition:border-color 0.3s;"
+        style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,30,0.6);border:1px solid rgba(98,126,234,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;"
         onfocus="this.style.borderColor='#627eea'" onblur="this.style.borderColor='rgba(98,126,234,0.3)'">
     </div>
-    <div id="regMsg" style="min-height:1.2rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;"></div>
-    <div onclick="doRegister()" id="regBtn"
-      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;position:relative;z-index:50;">🚀 CREATE NODE</div>
+    <div id="regMsg" style="min-height:1rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;text-align:left;"></div>
+    <button onclick="doRegister()"
+      style="width:100%;padding:1rem;background:linear-gradient(135deg,#4a5eb8,#627eea,#8a9ef0);border:none;border-radius:12px;color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 20px rgba(98,126,234,0.4);">🚀 CREATE NODE</button>
   </div>
 
-  <!-- Stats bar -->
+  <!-- Stats -->
   <div style="display:flex;justify-content:space-around;margin-top:1.2rem;padding-top:1rem;border-top:1px solid rgba(98,126,234,0.1);">
     <div style="text-align:center;">
       <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:#8a9ef0;" id="aMiners">2,847</div>
@@ -1296,7 +1267,6 @@ html { font-size: 16px; }
 </div>
 
 <script>
-'use strict';
 // ─── CONFIG ───
 const DEMO_DAY = 86400; // วินาที/วัน (จริง)
 const TICK = 3000;
@@ -1369,6 +1339,58 @@ function switchAuthTab(t){
   document.getElementById('regForm').classList.toggle('active',t==='register');
   typePrompt(t==='login'?'auth --mode=login':'auth --mode=register');
 }
+function initAuthBg(){
+  const canvas=document.getElementById('authBgCanvas');
+  if(!canvas||canvas._init) return;
+  canvas._init=true;
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth||420;
+  canvas.height=window.innerHeight||800;
+  const pts=Array.from({length:60},()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    r:Math.random()*1.2+0.2,
+    vx:(Math.random()-0.5)*0.1, vy:(Math.random()-0.5)*0.08,
+    phase:Math.random()*Math.PI*2,
+    col:['rgba(98,126,234,','rgba(138,158,240,','rgba(192,132,252,','rgba(255,255,255,'][Math.floor(Math.random()*4)]
+  }));
+  function draw(){
+    if(!document.getElementById('authBgCanvas')) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const g=ctx.createRadialGradient(canvas.width/2,canvas.height/2,0,canvas.width/2,canvas.height/2,canvas.width);
+    g.addColorStop(0,'#06001a'); g.addColorStop(1,'#020010');
+    ctx.fillStyle=g; ctx.fillRect(0,0,canvas.width,canvas.height);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.phase+=0.015;
+      if(p.x<0||p.x>canvas.width) p.vx*=-1;
+      if(p.y<0||p.y>canvas.height) p.vy*=-1;
+      const a=(Math.sin(p.phase)*0.4+0.6)*0.5;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.col+a+')'; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  // ETH rain
+  window._authRainInt=setInterval(()=>{
+    const c=document.getElementById('authRain'); if(!c) return;
+    const r=document.createElement('div');
+    const x=Math.random()*100;
+    const sz=8+Math.random()*12;
+    const dur=2+Math.random()*2;
+    const cols=['#627eea','#8a9ef0','#c084fc','#ffd700'];
+    const col=cols[Math.floor(Math.random()*cols.length)];
+    r.style.cssText=`position:absolute;left:${x}%;top:-20px;font-family:'Orbitron',monospace;font-size:${sz}px;font-weight:900;color:${col};text-shadow:0 0 ${sz/2}px ${col};animation:rainFall ${dur}s linear forwards;pointer-events:none;`;
+    r.textContent='Ξ';
+    c.appendChild(r);
+    setTimeout(()=>r.remove(),(dur+0.1)*1000);
+  },220);
+  // miners counter
+  window._authMinersInt=setInterval(()=>{
+    const el=document.getElementById('aMiners');
+    if(el) el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString();
+  },2000);
+}
+
 function switchAuth(tab){
   const isLogin = tab==='login';
   document.getElementById('loginForm').classList.toggle('active', isLogin);
