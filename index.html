@@ -78,9 +78,11 @@ background:linear-gradient(90deg,transparent,var(–purple-light),var(–red),tr
 .auth-bar-dot:nth-child(1){background:#ff5f57}.auth-bar-dot:nth-child(2){background:#febc2e}.auth-bar-dot:nth-child(3){background:#28c840}
 .auth-bar-title{flex:1;text-align:center;font-family:‘Share Tech Mono’,monospace;font-size:0.65rem;color:rgba(157,78,221,0.4);letter-spacing:2px}
 .auth-tabs{display:flex;margin-bottom:1.4rem;border-bottom:1px solid rgba(157,78,221,0.15)}
-.auth-tab{flex:1;padding:0.6rem;background:none;border:none;font-family:‘Share Tech Mono’,monospace;font-size:0.72rem;
-letter-spacing:2px;color:var(–text-dim);cursor:pointer;transition:all 0.25s;text-transform:uppercase}
-.auth-tab.active{color:var(–purple-light);border-bottom:2px solid var(–purple-light)}
+.auth-tab{flex:1;padding:0.65rem;background:transparent;border:none;
+font-family:‘Orbitron’,monospace;font-size:0.62rem;font-weight:700;
+letter-spacing:1px;color:rgba(157,78,221,0.4);cursor:pointer;transition:all 0.25s;border-radius:8px;}
+.auth-tab.active{color:#fff;background:linear-gradient(135deg,#7c3aed,#9333ea);
+box-shadow:0 0 20px rgba(124,58,237,0.5);}
 .auth-form{display:none}.auth-form.active{display:block}
 .form-group{margin-bottom:1rem;position:relative}
 .form-label{display:flex;align-items:center;gap:0.3rem;font-family:‘Share Tech Mono’,monospace;font-size:0.65rem;
@@ -135,8 +137,13 @@ font-family:‘Share Tech Mono’,monospace;white-space:nowrap}
 .np-val{font-size:0.88rem;font-weight:700;color:#fff;font-family:‘Orbitron’,monospace}
 .np-lbl{font-size:0.65rem;color:rgba(157,78,221,0.8);letter-spacing:1px}
 .nav-pill.usd .np-val{color:var(–gold)}.nav-pill.usd .np-lbl{color:rgba(255,215,0,0.5)}
-.btn-out{padding:0.28rem 0.65rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);
-border-radius:6px;color:var(–red-bright);font-family:‘Orbitron’,monospace;font-size:0.52rem;letter-spacing:1px;cursor:pointer}
+.btn-out{padding:0.3rem 0.7rem;
+background:linear-gradient(135deg,rgba(220,38,38,0.2),rgba(239,68,68,0.1));
+border:1px solid rgba(239,68,68,0.5);border-radius:8px;
+color:#f87171;font-family:‘Orbitron’,monospace;font-size:0.52rem;
+letter-spacing:1px;cursor:pointer;transition:all 0.2s;font-weight:700;}
+.btn-out:hover{background:linear-gradient(135deg,rgba(220,38,38,0.4),rgba(239,68,68,0.2));
+box-shadow:0 0 12px rgba(239,68,68,0.3);}
 /* ── CLICKABLE BUTTON PURPLE RING ── */
 .btn-buy, .btn, .btn-auth, .btn-mine, .btn-detail,
 .bnav, .tu-card, .btn-out, .btn-lang,
@@ -163,11 +170,12 @@ box-shadow: 0 0 0 2px rgba(230,57,70,0.7), 0 0 20px rgba(230,57,70,0.4);
 box-shadow: 0 0 0 1.5px rgba(157,78,221,0.45), 0 0 8px rgba(157,78,221,0.15);
 }
 /* ── END BUTTON RING ── */
-.admin-tab{flex:1;min-width:80px;padding:0.6rem 0.5rem;background:none;border:none;border-bottom:2px solid transparent;
+.admin-tab{flex:1;min-width:80px;padding:0.6rem 0.5rem;
+background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;
 font-family:‘Share Tech Mono’,monospace;font-size:0.62rem;color:var(–text-dim);cursor:pointer;white-space:nowrap;transition:all 0.2s}
 .admin-tab.active{color:var(–gold);border-bottom-color:var(–gold)}
 .admin-page{display:none}.admin-page.active{display:block}
-.filter-btn{padding:0.3rem 0.75rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+.filter-btn{padding:0.3rem 0.75rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);
 border-radius:20px;color:var(–text-dim);font-family:‘Share Tech Mono’,monospace;font-size:0.62rem;cursor:pointer;transition:all 0.2s}
 .filter-btn.active{background:rgba(157,78,221,0.15);border-color:var(–purple-light);color:var(–purple-light)}
 .req-card{background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:1rem;margin-bottom:0.8rem}
@@ -179,7 +187,8 @@ border-radius:20px;color:var(–text-dim);font-family:‘Share Tech Mono’,mono
 
 /* ── LANG ── */
 .lang-group{display:flex;gap:0.2rem;flex-wrap:nowrap;}
-.btn-lang{padding:0.2rem 0.4rem;font-size:0.6rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);
+.btn-lang{padding:0.2rem 0.45rem;font-size:0.6rem;
+background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);
 border-radius:5px;color:var(–text-dim);font-family:‘Orbitron’,monospace;font-size:0.48rem;letter-spacing:1px;cursor:pointer;transition:all 0.2s}
 .btn-lang:hover,.btn-lang.active{background:rgba(157,78,221,0.25);border-color:var(–purple-light);color:var(–purple-light)}
 
@@ -192,7 +201,8 @@ position:fixed;bottom:0;left:0;right:0;z-index:200;}
 .bnav{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.18rem;padding:0.6rem 0.2rem 0.45rem;
 background:none;border:none;cursor:pointer;transition:all 0.25s;color:#ffffff;
 font-family:‘Orbitron’,monospace;font-size:0.6rem;letter-spacing:0.5px;text-transform:uppercase}
-.bnav.active{color:var(–red-bright)}.bnav.active svg{filter:drop-shadow(0 0 6px rgba(255,77,90,0.9));stroke:var(–red-bright)}
+.bnav.active{color:#a855f7;}
+.bnav.active svg{filter:drop-shadow(0 0 6px rgba(168,85,247,0.9));stroke:#a855f7;}
 .bnav svg{transition:all 0.25s;stroke:#ffffff}
 
 /* ── SHARED ── */
@@ -204,9 +214,15 @@ letter-spacing:2px;cursor:pointer;transition:all 0.3s;position:relative;overflow
 .btn::after{content:’’;position:absolute;top:0;left:-100%;width:60%;height:100%;
 background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);transition:left 0.4s;transform:skewX(-15deg)}
 .btn:hover::after{left:150%}
-.btn-primary{background:linear-gradient(135deg,var(–purple),var(–red-dark));color:#fff}
+.btn-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea);color:#fff;
+box-shadow:0 4px 15px rgba(124,58,237,0.4);border:none;font-weight:700;}
+.btn-primary:hover{box-shadow:0 4px 25px rgba(124,58,237,0.6);transform:translateY(-1px);}
+.btn-primary:active{transform:scale(0.97);}
 .btn-primary:hover{box-shadow:0 0 18px rgba(157,78,221,0.4);transform:translateY(-1px)}
-.btn-gold{background:linear-gradient(135deg,#78350f,var(–gold));color:#000;font-weight:700}
+.btn-gold{background:linear-gradient(135deg,#b45309,#d97706,#fbbf24);color:#000;font-weight:800;
+box-shadow:0 4px 20px rgba(251,191,36,0.4),0 0 30px rgba(251,191,36,0.2);border:none;border-radius:12px;}
+.btn-gold:hover{box-shadow:0 4px 30px rgba(251,191,36,0.6);transform:translateY(-1px);}
+.btn-gold:active{transform:scale(0.97);}
 .btn-green{background:linear-gradient(135deg,#065f46,var(–green));color:#000;font-weight:700}
 
 /* ── HOME TAB ── */
@@ -250,7 +266,13 @@ font-size:1.2rem;font-weight:900;color:#fff;animation:coin-spin 4s linear infini
 .prog-fill{height:100%;background:linear-gradient(90deg,var(–purple),var(–red));border-radius:3px;transition:width 0.5s linear;position:relative;overflow:hidden}
 .prog-fill::after{content:’’;position:absolute;top:0;left:-80%;width:80%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);animation:shimmer 2s infinite}
 @keyframes shimmer{to{left:200%}}
-.btn-mine{padding:0.85rem 2.5rem;font-family:‘Orbitron’,monospace;font-size:0.9rem;letter-spacing:2px;cursor:pointer;border:none;border-radius:12px;background:linear-gradient(135deg,var(–purple),var(–red-dark));color:#fff;transition:all 0.3s}
+.btn-mine{padding:0.85rem 2.5rem;font-family:‘Orbitron’,monospace;font-size:0.9rem;
+letter-spacing:2px;cursor:pointer;border:none;border-radius:14px;
+background:linear-gradient(135deg,#059669,#10b981,#34d399);
+color:#fff;font-weight:700;transition:all 0.3s;
+box-shadow:0 4px 20px rgba(16,185,129,0.5),0 0 40px rgba(16,185,129,0.2);}
+.btn-mine:hover{box-shadow:0 4px 30px rgba(16,185,129,0.7);transform:translateY(-1px);}
+.btn-mine:active{transform:scale(0.97);}
 .btn-mine:hover{box-shadow:0 0 18px rgba(157,78,221,0.4)}
 .btn-mine.mining{background:linear-gradient(135deg,var(–red-dark),var(–purple-dark));animation:pulse-m 1s ease-in-out infinite}
 @keyframes pulse-m{0%,100%{box-shadow:0 0 8px rgba(230,57,70,0.3)}50%{box-shadow:0 0 22px rgba(230,57,70,0.6)}}
@@ -367,7 +389,13 @@ letter-spacing:1px;padding:0.18rem 0.45rem;border-radius:20px;font-weight:700}
 .limit-wrap{display:flex;align-items:center;gap:0.3rem;margin-bottom:0.55rem;font-family:‘Share Tech Mono’,monospace;font-size:0.72rem;color:#A890CC}
 .ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .ldot.used{background:var(–red-bright)}.ldot.avail{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2)}
-.btn-buy{width:100%;padding:0.75rem;border:none;border-radius:9px;font-family:‘Orbitron’,monospace;font-size:0.78rem;letter-spacing:1px;cursor:pointer;transition:all 0.25s;font-weight:700;position:relative;overflow:hidden}
+.btn-buy{width:100%;padding:0.75rem;border:none;border-radius:12px;
+font-family:‘Orbitron’,monospace;font-size:0.75rem;letter-spacing:1px;
+cursor:pointer;transition:all 0.25s;font-weight:700;position:relative;overflow:hidden;
+background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea);color:#fff;
+box-shadow:0 4px 15px rgba(124,58,237,0.4);}
+.btn-buy:hover{box-shadow:0 4px 25px rgba(124,58,237,0.6);transform:translateY(-1px);}
+.btn-buy:active{transform:scale(0.97);}
 .btn-buy::after{content:’’;position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);transition:left 0.4s;transform:skewX(-15deg)}
 .btn-buy:hover::after{left:150%}.btn-buy:hover{filter:brightness(1.1);transform:scale(1.02)}
 .pc-free .btn-buy    {background:linear-gradient(135deg,#065f46,var(–green));color:#000}
@@ -1502,7 +1530,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
         <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USDT</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
         <div class="wb-amt" id="wUsd">0.00</div>
         <div class="wb-equiv">USDT</div>
-        <button class="btn btn-gold" style="width:100%" data-i18n="wal.addUsd" onclick="switchTab(3)">+ เติม USD</button>
+        <button class="btn btn-gold" style="width:100%;padding:0.85rem;" onclick="switchTab(3)">💵 เติม USDT</button>
       </div>
       <div class="wb wb-eth">
         <div class="wb-head">
@@ -1513,7 +1541,9 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
         <div class="wb-amt" id="wZkp">0.000000</div>
         <div class="wb-equiv">≈ $<span id="wZkpUsd">0.000000</span> USD · <span id="wZkpLak">0</span> ກີບ</div>
         <div class="wb-daily"><span data-i18n="wal.daily">⚡ รับ/วัน:</span><span class="wb-dv"><span id="wDaily">0</span> ETH · +$<span id="wDailyUsd">0.00</span></span></div>
-        <button class="btn btn-primary" style="width:100%" onclick="showWithdrawPopup()">💱 แจ้งแลกเงิน</button>
+        <button onclick="showWithdrawPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;
+  background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
+  box-shadow:0 4px 20px rgba(16,185,129,0.4),0 0 30px rgba(16,185,129,0.15);">💱 แจ้งแลกเงิน ETH</button>
       </div>
       <div class="w-grid">
         <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
@@ -1536,11 +1566,16 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
         min="1" oninput="onCustomAmt(this.value)"
         style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:700;outline:none;">
     </div>
-    <button class="btn btn-primary" style="width:100%" onclick="goToQR()">
-      ถัดไป → ดูที่อยู่โอน USDT
-    </button>
-  </div>
+    <button onclick="goToQR()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;
+```
 
+background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
+box-shadow:0 4px 20px rgba(59,130,246,0.4),0 0 30px rgba(59,130,246,0.15);”>
+ถัดไป → ดูที่อยู่โอน USDT
+</button>
+</div>
+
+```
   <!-- Step 2: QR Code + ที่อยู่ USDT -->
   <div class="topup-step" id="stepQR" style="display:none">
     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
@@ -1565,11 +1600,16 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
       โอน USDT ตามจำนวนข้างต้น แล้วกดปุ่มด้านล่าง
     </div>
 
-    <button class="btn btn-primary" style="width:100%;padding:1rem;" onclick="confirmTopupDone()">
-      ✅ โอนสำเร็จแล้ว
-    </button>
-  </div>
+    <button onclick="confirmTopupDone()" style="width:100%;padding:1rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;letter-spacing:1px;
+```
 
+background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
+box-shadow:0 4px 20px rgba(16,185,129,0.5),0 0 40px rgba(16,185,129,0.2);”>
+✅ โอนสำเร็จแล้ว
+</button>
+</div>
+
+```
   <!-- Step 3: รอการอนุมัติ -->
   <div class="topup-step" id="stepPending" style="display:none">
     <div style="text-align:center;padding:2rem 1rem;">
