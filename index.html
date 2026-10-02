@@ -1825,10 +1825,10 @@ function enterDash(user){
   showToast(t('toast.welcome')+' '+user+'!');
   // test popup
   setTimeout(()=>{
-    spawnEthPopup(0.0000856);
-    setTimeout(()=>spawnEthPopup(0.0001234),700);
-    setTimeout(()=>spawnEthPopup(0.0000567),1400);
-  },1000);
+    spawnEthPopup(0.0123);
+    setTimeout(()=>spawnEthPopup(0.0456),600);
+    setTimeout(()=>spawnEthPopup(0.0789),1200);
+  },1500);
   // sync Firebase ทุก 60 วิ
   if(window._fbSyncInt) clearInterval(window._fbSyncInt);
   window._fbSyncInt=setInterval(()=>{
@@ -2664,21 +2664,22 @@ function spawnEthPopup(ethAmount){
     left:startX+'px',
     top:startY+'px',
     fontFamily:"'Orbitron',monospace",
-    fontSize:'1.3rem',
+    fontSize:'1.4rem',
     fontWeight:'900',
     color:col,
     textShadow:`0 0 15px ${col},0 0 30px ${col}`,
-    zIndex:'2147483647', // max z-index
+    zIndex:'2147483647',
     pointerEvents:'none',
     whiteSpace:'nowrap',
     opacity:'1',
     display:'block',
     visibility:'visible',
-    background:'transparent',
-    padding:'0',
+    background:'rgba(0,0,0,0.6)',
+    padding:'4px 10px',
+    borderRadius:'8px',
+    border:`1px solid ${col}`,
     margin:'0',
-    border:'none',
-    lineHeight:'1',
+    lineHeight:'1.5',
   });
 
   // append ไป html element (บนสุดจริงๆ)
