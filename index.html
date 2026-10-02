@@ -651,6 +651,13 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 <!-- Tab 2: รายชื่อสมาชิก -->
 <div class="admin-page" id="apg2">
   <div class="sec-title">👥 สมาชิกทั้งหมด</div>
+  <!-- ค้นหา -->
+  <div style="position:relative;margin-bottom:0.8rem;">
+    <input type="text" id="userSearchInput" placeholder="🔍 ค้นหาชื่อผู้ใช้หรืออีเมล..."
+      oninput="filterAdminUsers(this.value)"
+      style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:10px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;box-sizing:border-box;">
+  </div>
+  <div id="adminUserCount" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#A890CC;margin-bottom:0.5rem;"></div>
   <div id="adminUserList"></div>
 </div>
 
@@ -2361,81 +2368,66 @@ function showWithdrawPopup(){
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='withdrawOv';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd">
-      <div class="pop-title">📤 ถอนออก</div>
-      <button class="pop-close" onclick="document.getElementById('withdrawOv').remove()">✕ ปิด</button>
+      <div class="pop-title">📤 ถอน USDT</div>
+      <button class="pop-close" onclick="document.getElementById('withdrawOv').remove()">✕</button>
     </div>
 
-    <!-- ยอด USDT -->
-    <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.3rem;">💵 USDT ที่จะถอน</div>
-      <div style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:var(--gold);text-shadow:0 0 15px rgba(255,215,0,0.4);">$${usd.toFixed(2)}</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:rgba(255,215,0,0.6);margin-top:0.3rem;">USDT</div>
+    <!-- ยอดคงเหลือ -->
+    <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.7rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#A890CC;">💵 คงเหลือในกระเป๋า</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--gold);">$${usd.toFixed(2)} USDT</div>
     </div>
 
-    <!-- ข้อมูลรับเงิน -->
-    <div style="margin-bottom:0.8rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.4rem;">🏦 ช่องทางรับเงิน</div>
-      <select id="wdMethod" onchange="toggleWdFields()"
-        style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.4);border:none;border-bottom:1px solid rgba(157,78,221,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.7rem;appearance:none;cursor:pointer;">
-        <option value="bank">🏦 โอนบัญชีธนาคาร</option>
-        <option value="promptpay">📱 PromptPay / พร้อมเพย์</option>
-        <option value="bcel">🏧 BCEL (ลาว)</option>
-        <option value="other">💬 อื่นๆ</option>
-      </select>
-    </div>
+    <!-- จำนวนที่ต้องการถอน -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">💰 จำนวนที่ต้องการถอน (USDT)</div>
+    <input type="number" id="wdAmt" placeholder="เช่น 100" max="${usd.toFixed(2)}"
+      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.1rem;outline:none;margin-bottom:1rem;">
 
-    <!-- Bank fields -->
-    <div id="wdBankFields">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">ชื่อธนาคาร</div>
-      <input type="text" id="wdBank" placeholder="เช่น กสิกรไทย, ไทยพาณิชย์, BCEL..."
-        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.7rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">เลขบัญชี / เบอร์ PromptPay</div>
-      <input type="text" id="wdAccNo" placeholder="กรอกเลขบัญชีหรือเบอร์โทร"
-        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.7rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">ชื่อเจ้าของบัญชี</div>
-      <input type="text" id="wdAccName" placeholder="ชื่อ-นามสกุล"
-        style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.8rem;">
-    </div>
+    <!-- เครือข่าย -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">🌐 เครือข่าย</div>
+    <select id="wdNetwork"
+      style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(98,126,234,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;appearance:none;">
+      <option value="TRC20">TRC20 (TRON) — ค่าธรรมเนียมต่ำ</option>
+      <option value="ERC20">ERC20 (Ethereum)</option>
+      <option value="BEP20">BEP20 (BSC)</option>
+    </select>
+
+    <!-- ที่อยู่ USDT -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">📋 ที่อยู่ USDT ปลายทาง</div>
+    <input type="text" id="wdAddr" placeholder="กรอกที่อยู่ wallet USDT..."
+      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.72rem;outline:none;margin-bottom:0.5rem;word-break:break-all;">
 
     <!-- หมายเหตุ -->
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);margin-bottom:0.35rem;">📝 หมายเหตุ (ไม่บังคับ)</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">📝 หมายเหตุ (ไม่บังคับ)</div>
     <input type="text" id="wdNote" placeholder="หมายเหตุเพิ่มเติม..."
-      style="width:100%;padding:0.65rem 0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;">
+      style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:1rem;">
 
-    <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:8px;padding:0.7rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);line-height:1.7;">
-      ⚠️ หลังส่งคำขอ Admin จะดำเนินการภายใน 24 ชั่วโมง<br>
-      ETH จะถูกหักจากกระเป๋าหลังได้รับการอนุมัติ
+    <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:8px;padding:0.6rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);line-height:1.7;">
+      ⚠️ Admin จะดำเนินการภายใน 24 ชั่วโมง
     </div>
 
-    <button onclick="submitWithdraw()"
-      class="btn btn-primary" style="width:100%;padding:1rem;">
-      📤 ยืนยันถอนออก $${usd.toFixed(2)} USDT
+    <button onclick="submitWithdraw()" class="btn btn-primary" style="width:100%;padding:1rem;">
+      📤 ยืนยันแจ้งถอน
     </button>
   </div>`;
   document.body.appendChild(ov);
 }
 
-function toggleWdFields(){
-  // สามารถเพิ่ม logic แสดง/ซ่อน field ตาม method ได้
-}
-
 function submitWithdraw(){
   const ud=getUD(); if(!ud) return;
-  const usdAmt=ud.usd||0;
-  if(usdAmt<=0){showToast('⚠️ ไม่มี USDT ให้ถอน');return;}
-  const method=document.getElementById('wdMethod')?.value||'bank';
-  const bank=document.getElementById('wdBank')?.value.trim()||'';
-  const accNo=document.getElementById('wdAccNo')?.value.trim()||'';
-  const accName=document.getElementById('wdAccName')?.value.trim()||'';
+  const usdAmt=parseFloat(document.getElementById('wdAmt')?.value)||0;
+  const addr=document.getElementById('wdAddr')?.value.trim()||'';
+  const network=document.getElementById('wdNetwork')?.value||'TRC20';
   const note=document.getElementById('wdNote')?.value.trim()||'';
 
-  if(!accNo){showToast('⚠️ กรุณากรอกเลขบัญชี/เบอร์');return;}
-  if(!accName){showToast('⚠️ กรุณากรอกชื่อเจ้าของบัญชี');return;}
+  if(usdAmt<=0){showToast('⚠️ กรอกจำนวนที่ต้องการถอน');return;}
+  if(usdAmt>(ud.usd||0)){showToast('⚠️ จำนวนเกินกว่าที่มีในกระเป๋า');return;}
+  if(!addr){showToast('⚠️ กรุณากรอกที่อยู่ USDT');return;}
 
   const req={
     id:'wd_'+Date.now(), user:getSess(),
     amt:usdAmt, unit:'USDT',
-    method, bank, accNo, accName, note,
+    addr, network, note,
     time:Date.now(), status:'pending'
   };
 
@@ -2443,10 +2435,10 @@ function submitWithdraw(){
     window._db.ref('withdraw_reqs').push(req);
   }
 
-  // หัก USDT ออก
-  ud.usd=0;
+  // หัก USDT ออกตามจำนวนที่ขอถอน
+  ud.usd=Math.max(0,(ud.usd||0)-usdAmt);
   ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:`📤 แจ้งถอน $${usdAmt.toFixed(2)} USDT (รอ Admin อนุมัติ)`,amount:-usdAmt,unit:'USDT',time:Date.now()});
+  ud.txs.unshift({desc:`📤 แจ้งถอน $${usdAmt.toFixed(2)} USDT → ${network} (รอ Admin อนุมัติ)`,amount:-usdAmt,unit:'USDT',time:Date.now()});
   saveUD(ud);
 
   document.getElementById('withdrawOv').remove();
@@ -3125,6 +3117,57 @@ function rejectWithdraw(reqId, username){
   localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
   renderAdminWithdraw(); showToast(`❌ ปฏิเสธคำขอแลก ETH ของ ${username}`);
 }
+
+// ── Admin User Search ──
+let _allAdminUsers = {};
+
+function filterAdminUsers(query){
+  const q = query.toLowerCase().trim();
+  const el = document.getElementById('adminUserList');
+  const countEl = document.getElementById('adminUserCount');
+  if(!el) return;
+  const keys = Object.keys(_allAdminUsers).filter(u=>{
+    if(!q) return true;
+    const ud = _allAdminUsers[u];
+    return u.toLowerCase().includes(q) || (ud.email||'').toLowerCase().includes(q);
+  });
+  if(countEl) countEl.textContent = `พบ ${keys.length} คน`;
+  if(!keys.length){
+    el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:2rem;">ไม่พบสมาชิก</div>';
+    return;
+  }
+  el.innerHTML = keys.map(u => buildUserCard(u, _allAdminUsers[u])).join('');
+}
+
+function buildUserCard(u, ud){
+  const pkgs=(ud.packages||[]).filter(p=>p.remaining>0).length;
+  return `<div class="adm-user-card" style="margin-bottom:0.8rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;">👤 ${u}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);">${ud.email||''}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:0.5rem;">
+      <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:var(--text-dim);">USDT</div>
+      </div>
+      <div style="background:rgba(74,222,128,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);">${(ud.ethReward||0).toFixed(4)}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:var(--text-dim);">ETH</div>
+      </div>
+      <div style="background:rgba(157,78,221,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);">${pkgs}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:var(--text-dim);">แพ็ก Active</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.4rem;">
+      <button onclick="adminAddUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">+ เติม</button>
+      <button onclick="adminDeductUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">- หัก</button>
+      <button onclick="adminViewTx('${u}')" style="flex:1;padding:0.45rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:7px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">📋 ประวัติ</button>
+    </div>
+  </div>`;
+}
+
 function renderAdminUsers(){
   const el=document.getElementById('adminUserList');if(!el)return;
   if(!window._db){el.innerHTML='<div style="color:red;padding:1rem;">❌ ไม่มี Firebase</div>';return;}
