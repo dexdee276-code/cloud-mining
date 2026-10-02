@@ -1837,11 +1837,7 @@ function enterDash(user){
   renderPkgs();
   switchTab(0);
   showToast(t('toast.welcome')+' '+user+'!');
-  // test popup
-  setTimeout(()=>{
-    alert('กำลังทดสอบ popup');
-    spawnEthPopup(0.0123);
-  },1500);
+
   // sync Firebase ทุก 60 วิ
   if(window._fbSyncInt) clearInterval(window._fbSyncInt);
   window._fbSyncInt=setInterval(()=>{
@@ -2611,7 +2607,7 @@ function startDrip(){
     // spawn popup ทุก 3 วิ
     if(!window._popupCount) window._popupCount=0;
     window._popupCount++;
-    if(window._popupCount >= 60){
+    if(window._popupCount >= 200){
       window._popupCount=0;
       // คำนวณ ETH ที่ได้ใน 3 วิ จาก rate
       const ethPer3s=totalDailyEth/28800;
