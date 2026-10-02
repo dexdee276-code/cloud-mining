@@ -1825,10 +1825,14 @@ function enterDash(user){
   showToast(t('toast.welcome')+' '+user+'!');
   // test popup
   setTimeout(()=>{
-    spawnEthPopup(0.0000123);
-    setTimeout(()=>spawnEthPopup(0.0000456),500);
-    setTimeout(()=>spawnEthPopup(0.0000789),1000);
-  },1000);
+    const layer=document.getElementById('ethPopupLayer');
+    console.log('layer:', layer, 'z-index:', layer?.style.zIndex);
+    const el=document.createElement('div');
+    el.style.cssText='position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:red;font-weight:900;z-index:99999;background:yellow;padding:1rem;border-radius:10px;';
+    el.textContent='+0.001234 ETH';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),3000);
+  },500);
   // sync Firebase ทุก 60 วิ
   if(window._fbSyncInt) clearInterval(window._fbSyncInt);
   window._fbSyncInt=setInterval(()=>{
