@@ -530,6 +530,13 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 <body>
 
 <div class="toast" id="toast"></div>
+<div class="eth-popup" id="ethPopup" style="display:none;">
+  <div class="eth-popup-icon">⛏</div>
+  <div class="eth-popup-label">ETH MINED</div>
+  <div class="eth-popup-amount" id="ethPopupAmount">+0.00000000</div>
+  <div class="eth-popup-unit">ETH</div>
+  <div class="eth-popup-usdt" id="ethPopupUsdt">≈ $0.00 USDT</div>
+</div>
 
 <!-- AUTH -->
 
@@ -2601,7 +2608,7 @@ function startDrip(){
         if(acs2.length>0){
           const dailyEth=acs2.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
           const ethPer10s=(dailyEth*10/86400);
-          if(ethPer10s>0) showToast('⛏ +'+ethPer10s.toFixed(8)+' ETH');
+          if(ethPer10s>0) spawnEthPopup(ethPer10s);
         }
       }
     }
@@ -2661,53 +2668,20 @@ function spawnRigFloat(i){
 
 // ── ETH Popup ──
 let _lastPopupEth = 0;
+
+
+
 function spawnEthPopup(ethAmount){
-  const cols=['#4ade80','#ffd700','#00ffcc','#c084fc','#f87171'];
-  const col=cols[Math.floor(Math.random()*cols.length)];
-  const formatted=ethAmount>=0.001?ethAmount.toFixed(4):ethAmount.toFixed(6);
-
-  const startX=window.innerWidth*(0.15+Math.random()*0.7);
-  const startY=window.innerHeight*(0.35+Math.random()*0.3);
-
-  const el=document.createElement('div');
-  el.textContent='+'+formatted+' ETH';
-
-  // ใช้ inline style ทุกอย่าง สำคัญมาก
-  Object.assign(el.style,{
-    position:'fixed',
-    left:startX+'px',
-    top:startY+'px',
-    fontFamily:"'Orbitron',monospace",
-    fontSize:'1.4rem',
-    fontWeight:'900',
-    color:col,
-    textShadow:`0 0 15px ${col},0 0 30px ${col}`,
-    zIndex:'2147483647',
-    pointerEvents:'none',
-    whiteSpace:'nowrap',
-    opacity:'1',
-    display:'block',
-    visibility:'visible',
-    background:'rgba(0,0,0,0.6)',
-    padding:'4px 10px',
-    borderRadius:'8px',
-    border:`1px solid ${col}`,
-    margin:'0',
-    lineHeight:'1.5',
-  });
-
-  // append ไป html element (บนสุดจริงๆ)
-  document.documentElement.appendChild(el);
-
-  let y=startY;
-  let opacity=1;
-  const int=setInterval(()=>{
-    y-=2.5;
-    opacity-=0.022;
-    el.style.top=y+'px';
-    el.style.opacity=String(opacity);
-    if(opacity<=0){clearInterval(int);try{el.remove();}catch(e){}}
-  },20);
+  const popup=document.getElementById('ethPopup');
+  const amtEl=document.getElementById('ethPopupAmount');
+  const usdtEl=document.getElementById('ethPopupUsdt');
+  if(!popup||!amtEl) return;
+  const formatted=ethAmount>=0.0001?ethAmount.toFixed(6):ethAmount.toFixed(8);
+  amtEl.textContent='+'+formatted;
+  if(usdtEl) usdtEl.textContent='≈ $'+(ethAmount*ETH_RATE).toFixed(4)+' USDT';
+  popup.style.cssText='display:block;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;background:linear-gradient(135deg,rgba(0,20,10,0.97),rgba(0,30,15,0.97));border:2px solid rgba(74,222,128,0.6);border-radius:20px;padding:1.2rem 2rem;text-align:center;box-shadow:0 0 40px rgba(74,222,128,0.4);pointer-events:none;';
+  clearTimeout(window._ethPopupTimer);
+  window._ethPopupTimer=setTimeout(()=>{popup.style.display='none';},2500);
 }
 
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null;}if(window._displayInt){clearInterval(window._displayInt);window._displayInt=null;}}
