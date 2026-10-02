@@ -2648,49 +2648,37 @@ function spawnRigFloat(i){
 // ── ETH Popup ──
 let _lastPopupEth = 0;
 function spawnEthPopup(ethAmount){
-  const cols=[
-    {c:'#4ade80',s:'rgba(74,222,128,0.9)'},
-    {c:'#ffd700',s:'rgba(255,215,0,0.9)'},
-    {c:'#00ffcc',s:'rgba(0,255,204,0.9)'},
-    {c:'#c084fc',s:'rgba(192,132,252,0.9)'},
-    {c:'#38bdf8',s:'rgba(56,189,248,0.9)'},
-  ];
+  const cols=['#4ade80','#ffd700','#00ffcc','#c084fc','#f87171'];
   const col=cols[Math.floor(Math.random()*cols.length)];
-  const x=15+Math.random()*70; // % of screen width
-  const startY=window.innerHeight*(0.3+Math.random()*0.4); // px from top
-  const sz=1.1+Math.random()*0.5;
   const formatted=ethAmount>=0.001?ethAmount.toFixed(4):ethAmount.toFixed(6);
 
+  const startX=window.innerWidth*(0.15+Math.random()*0.7);
+  const startY=window.innerHeight*(0.3+Math.random()*0.4);
+
   const el=document.createElement('div');
-  el.style.cssText=`
-    position:fixed;
-    left:${x}%;
-    top:${startY}px;
-    transform:translateX(-50%);
-    font-family:'Orbitron',monospace;
-    font-size:${sz}rem;
-    font-weight:900;
-    color:${col.c};
-    text-shadow:0 0 10px ${col.s},0 0 25px ${col.s};
-    pointer-events:none;
-    z-index:99999;
-    white-space:nowrap;
-    transition:none;
-  `;
-  el.innerHTML=`+${formatted} <span style="font-size:0.75em;opacity:0.7;">ETH</span>`;
+  el.textContent='+'+formatted+' ETH';
+  el.style.position='fixed';
+  el.style.left=startX+'px';
+  el.style.top=startY+'px';
+  el.style.fontFamily="'Orbitron',monospace";
+  el.style.fontSize=(1.1+Math.random()*0.4)+'rem';
+  el.style.fontWeight='900';
+  el.style.color=col;
+  el.style.textShadow='0 0 12px '+col+',0 0 24px '+col;
+  el.style.zIndex='999999';
+  el.style.pointerEvents='none';
+  el.style.whiteSpace='nowrap';
   document.body.appendChild(el);
 
-  // animate ด้วย JS แทน CSS เพราะ iOS บางครั้ง CSS animation ไม่ทำงาน
-  let opacity=1;
   let y=startY;
-  const speed=1.5;
+  let opacity=1;
   const int=setInterval(()=>{
-    y-=speed;
-    opacity-=0.018;
+    y-=2;
+    opacity-=0.02;
     el.style.top=y+'px';
     el.style.opacity=opacity;
     if(opacity<=0){clearInterval(int);el.remove();}
-  },16);
+  },20);
 }
 
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null;}if(window._displayInt){clearInterval(window._displayInt);window._displayInt=null;}}
