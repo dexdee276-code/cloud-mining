@@ -1448,7 +1448,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 </div>
 </div>
 
-<div id="ethPopupLayer" style="position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden;"></div>
+<div id="ethPopupLayer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;"></div>
 <div id="machSec" style="display:none;margin-bottom:1.1rem;position:relative;overflow:hidden;">
   <div id="ethRainContainer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;max-width:100%;"></div>
         <div class="mach-header">
@@ -2594,9 +2594,12 @@ function startDrip(){
     window._popupCount++;
     if(window._popupCount >= 60){
       window._popupCount=0;
-      const gained=r-(_lastPopupEth||r);
-      if(gained>0) spawnEthPopup(gained);
-      _lastPopupEth=r;
+      if(_lastPopupEth===0) { _lastPopupEth=r; }
+      else {
+        const gained=r-_lastPopupEth;
+        if(gained>0) spawnEthPopup(gained);
+        _lastPopupEth=r;
+      }
     }
 
     // ── แสดงตัวเลขหลายรูปแบบ ──
@@ -2646,8 +2649,8 @@ function spawnEthPopup(ethAmount){
   if(!layer) return;
 
   const el = document.createElement('div');
-  const x = 15 + Math.random() * 70;
-  const y = 30 + Math.random() * 40;
+  const x = 20 + Math.random() * 60;
+  const y = 40 + Math.random() * 30;
 
   // สี random สวยๆ
   const styles = [
