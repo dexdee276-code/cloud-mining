@@ -2622,17 +2622,11 @@ function startDrip(){
     const acs=_ud.packages.filter(p=>p.remaining>0);
     if(!acs.length) return;
 
-    // คำนวณ ETH จาก bought timestamp จริงๆ
+    // เพิ่ม ETH ทุก 50ms ตาม rate จริง
     const now=Date.now();
-    let totalEthShouldHave=0;
-    acs.forEach(p=>{
-      if(!p.bought) return;
-      const elapsedDays=(now-p.bought)/1000/86400;
-      const earnedDays=Math.min(elapsedDays,p.days);
-      totalEthShouldHave+=(p.daily/ETH_RATE)*earnedDays;
-    });
-    // set ethReward = max(current, shouldHave) ป้องกันลด
-    _ud.ethReward=Math.max(_ud.ethReward||0, totalEthShouldHave);
+    const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
+    const ethPer50ms=totalDailyEth/(86400*20); // 20 = 1000ms/50ms
+    _ud.ethReward=(_ud.ethReward||0)+ethPer50ms;
     const r=_ud.ethReward;
 
     // ── แสดงตัวเลขหลายรูปแบบ ──
@@ -4009,30 +4003,28 @@ function calcOfflineEarnings(){
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
   if(!acs.length)return;
 
-  let changed=false;
+  let totalMissed=0;
   acs.forEach(p=>{
     if(!p.bought) return;
-    // คำนวณจาก bought timestamp จริงๆ
     const elapsedDays=(now-p.bought)/1000/86400;
-    // ETH ที่ควรได้ทั้งหมดถึงตอนนี้
-    const totalDaysEarned=Math.min(elapsedDays, p.days);
+    const totalDaysEarned=Math.min(elapsedDays,p.days);
     const totalEthShouldHave=(p.daily/ETH_RATE)*totalDaysEarned;
-    // ETH ที่ได้ไปแล้ว = (days - remaining) * daily/ETH_RATE
     const daysAlreadyEarned=(p.days-p.remaining);
     const ethAlreadyEarned=(p.daily/ETH_RATE)*daysAlreadyEarned;
-    // ส่วนต่างที่ยังไม่ได้รับ
     const ethMissed=totalEthShouldHave-ethAlreadyEarned;
-    if(ethMissed>0){
-      ud.ethReward=(ud.ethReward||0)+ethMissed;
-      // อัปเดต remaining
+    if(ethMissed>0.000000001){
+      totalMissed+=ethMissed;
       p.remaining=Math.max(0,p.days-totalDaysEarned);
-      changed=true;
     }
   });
 
-  if(changed){
+  if(totalMissed>0.000000001){
+    ud.ethReward=(ud.ethReward||0)+totalMissed;
     saveUD(ud);
-    showToast(`✅ อัปเดต ETH ให้ตรงตามเวลาจริง`);
+    // แสดง toast เฉพาะถ้าออฟไลน์นานพอ (>1 นาที)
+    if(totalMissed>0.0000001){
+      showToast(`⛏ ขุดออฟไลน์ +${totalMissed.toFixed(6)} ETH`);
+    }
   }
 }
 function updateLastSeen(){
