@@ -511,6 +511,15 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     appId:"1:1033995691867:web:9c52c61cd038ff660ddc7e"
   });
   window._db=firebase.database();
+  // แจ้งว่า Firebase พร้อมแล้ว
+  window._db.ref('.info/connected').on('value',(snap)=>{
+    const el=document.getElementById('fbStatus');
+    if(snap.val()===true){
+      if(el){el.textContent='✅ เชื่อมต่อแล้ว';el.style.color='rgba(74,222,128,0.8)';}
+    } else {
+      if(el){el.textContent='⏳ กำลังเชื่อมต่อ...';el.style.color='rgba(255,150,0,0.8)';}
+    }
+  });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -534,6 +543,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <div class="auth-logo">⛏ CRYPTOMINE</div>
   </div>
   <div class="auth-sub">MINE ETH · EARN USDT · DOMINATE</div>
+  <div id="fbStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,100,100,0.8);text-align:center;margin-bottom:0.5rem;">⏳ กำลังเชื่อมต่อ Firebase...</div>
   <div class="auth-card">
     <div class="auth-bar">
       <div class="auth-bar-dot"></div><div class="auth-bar-dot"></div><div class="auth-bar-dot"></div>
@@ -1768,11 +1778,15 @@ function doLogin(){
   };
   if(window._db){tryLogin();}
   else{
+    showMsg('loginMsg','⏳ กำลังเชื่อมต่อ...','');
     let attempts=0;
     const wait=setInterval(()=>{
       attempts++;
       if(window._db){clearInterval(wait);tryLogin();}
-      else if(attempts>=10){clearInterval(wait);showMsg('loginMsg','❌ Firebase ไม่พร้อม','error');}
+      else if(attempts>=20){
+        clearInterval(wait);
+        showMsg('loginMsg','❌ เชื่อมต่อไม่ได้ กรุณารีโหลดหน้า','error');
+      }
     },500);
   }
 }
