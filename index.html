@@ -1561,7 +1561,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
         <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USDT</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
         <div class="wb-amt" id="wUsd">0.00</div>
         <div class="wb-equiv">USDT</div>
-        <button class="btn btn-gold" style="width:100%;padding:0.85rem;margin-bottom:0.5rem;" onclick="switchTab(3)">💵 เติม USDT</button>
+        <button class="btn btn-gold" style="width:100%;padding:0.85rem;margin-bottom:0.5rem;" onclick="showTopupPopup()">💵 เติม USDT</button>
         <button onclick="showWithdrawPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;
   background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
   box-shadow:0 4px 20px rgba(16,185,129,0.4),0 0 30px rgba(16,185,129,0.15);">📤 ถอนออก</button>
@@ -2695,6 +2695,116 @@ function spawnEthPopup(ethAmount){
   popup.style.cssText='display:block;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;background:linear-gradient(135deg,rgba(0,20,10,0.97),rgba(0,30,15,0.97));border:2px solid rgba(74,222,128,0.6);border-radius:20px;padding:1.2rem 2rem;text-align:center;box-shadow:0 0 40px rgba(74,222,128,0.4);pointer-events:none;';
   clearTimeout(window._ethPopupTimer);
   window._ethPopupTimer=setTimeout(()=>{popup.style.display='none';},2500);
+}
+
+
+function showTopupPopup(){
+  const ov=document.createElement('div');ov.className='overlay';ov.id='topupPopupOv';
+  ov.innerHTML=`<div class="popup">
+    <div class="pop-hd">
+      <div class="pop-title">💵 เติม USDT</div>
+      <button class="pop-close" onclick="document.getElementById('topupPopupOv').remove()">✕</button>
+    </div>
+
+    <!-- Step 1: ใส่จำนวน -->
+    <div id="tpStep1">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">จำนวน USDT ที่ต้องการเติม</div>
+      <input type="number" id="tpAmt" placeholder="เช่น 100, 500, 1000..."
+        style="width:100%;padding:0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.2rem;outline:none;margin-bottom:1rem;">
+      <button onclick="showTopupQR()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;
+        background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
+        box-shadow:0 4px 20px rgba(59,130,246,0.4);">ถัดไป → ดูที่อยู่โอน</button>
+    </div>
+
+    <!-- Step 2: QR + ที่อยู่ -->
+    <div id="tpStep2" style="display:none;">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+        <button onclick="document.getElementById('tpStep1').style.display='block';document.getElementById('tpStep2').style.display='none';"
+          style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">← กลับ</button>
+        <div style="font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--purple-light);">โอน USDT</div>
+      </div>
+
+      <!-- จำนวน -->
+      <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:0.8rem;margin-bottom:1rem;text-align:center;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.2rem;">จำนวนที่ต้องโอน</div>
+        <div id="tpAmtDisplay" style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:var(--gold);">$0 USDT</div>
+      </div>
+
+      <!-- QR Code -->
+      <div id="tpQRWrap" style="text-align:center;margin-bottom:1rem;"></div>
+
+      <!-- ที่อยู่ USDT -->
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(74,222,128,0.2);border-radius:12px;padding:0.8rem;margin-bottom:1rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.4rem;">📋 ที่อยู่ USDT (TRC20)</div>
+        <div id="tpAddrText" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--green);word-break:break-all;margin-bottom:0.5rem;">กำลังโหลด...</div>
+        <button onclick="
+          const addr=document.getElementById('tpAddrText').textContent;
+          navigator.clipboard?.writeText(addr).then(()=>showToast('📋 คัดลอกแล้ว!')).catch(()=>showToast('❌ คัดลอกไม่ได้'));
+        " style="width:100%;padding:0.5rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:8px;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.62rem;cursor:pointer;">
+          📋 คัดลอกที่อยู่
+        </button>
+      </div>
+
+      <!-- เครือข่าย -->
+      <div style="background:rgba(98,126,234,0.07);border:1px solid rgba(98,126,234,0.2);border-radius:10px;padding:0.6rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#A890CC;text-align:center;">
+        ⚠️ โอนผ่าน <span style="color:#627eea;font-weight:700;">TRC20 (TRON)</span> เท่านั้น
+      </div>
+
+      <button onclick="tpConfirmDone()" style="width:100%;padding:1rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;
+        background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
+        box-shadow:0 4px 20px rgba(16,185,129,0.5);">
+        ✅ โอนสำเร็จแล้ว
+      </button>
+    </div>
+
+    <!-- Step 3: รอ Admin -->
+    <div id="tpStep3" style="display:none;text-align:center;padding:1.5rem 0;">
+      <div style="font-size:3rem;margin-bottom:0.8rem;">⏳</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--purple-light);margin-bottom:0.5rem;">รอการอนุมัติ</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);line-height:1.8;margin-bottom:1.2rem;">
+        ส่งคำขอเรียบร้อยแล้ว!<br>Admin จะอนุมัติภายใน 5-15 นาที<br>USDT จะเข้ากระเป๋าโดยอัตโนมัติ
+      </div>
+      <button onclick="document.getElementById('topupPopupOv').remove()" class="btn btn-primary" style="width:100%;">
+        🏠 ปิด
+      </button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+function showTopupQR(){
+  const amt=parseFloat(document.getElementById('tpAmt')?.value)||0;
+  if(amt<=0){showToast('⚠ กรอกจำนวนก่อนครับ');return;}
+  document.getElementById('tpStep1').style.display='none';
+  document.getElementById('tpStep2').style.display='block';
+  document.getElementById('tpAmtDisplay').textContent='$'+amt.toLocaleString()+' USDT';
+  // โหลด QR
+  const wrap=document.getElementById('tpQRWrap');
+  const qr=localStorage.getItem('cm_qr_image');
+  if(qr){
+    wrap.innerHTML=`<img src="${qr}" style="width:180px;height:180px;object-fit:contain;background:#fff;padding:8px;border-radius:10px;margin:0 auto;display:block;">`;
+  } else {
+    wrap.innerHTML='<div style="font-family:monospace;font-size:0.65rem;color:#A890CC;text-align:center;">ติดต่อ Admin เพื่อขอ QR Code</div>';
+  }
+  // โหลดที่อยู่
+  const addrEl=document.getElementById('tpAddrText');
+  if(window._db){
+    window._db.ref('settings/usdtAddr').once('value').then(snap=>{
+      if(addrEl) addrEl.textContent=snap.exists()?snap.val():'ติดต่อ Admin';
+    });
+  }
+}
+
+function tpConfirmDone(){
+  const amt=parseFloat(document.getElementById('tpAmt')?.value)||0;
+  if(amt<=0){showToast('⚠ ไม่พบจำนวน');return;}
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  window._db.ref('topup_reqs').push({
+    id:'top_'+Date.now(),user:getSess(),amt,time:Date.now(),status:'pending'
+  });
+  document.getElementById('tpStep2').style.display='none';
+  document.getElementById('tpStep3').style.display='block';
+  showToast('✅ ส่งคำขอแล้ว รอ Admin อนุมัติ');
 }
 
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null;}if(window._displayInt){clearInterval(window._displayInt);window._displayInt=null;}}
