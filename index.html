@@ -1823,6 +1823,12 @@ function enterDash(user){
   renderPkgs();
   switchTab(0);
   showToast(t('toast.welcome')+' '+user+'!');
+  // test popup
+  setTimeout(()=>{
+    spawnEthPopup(0.0000123);
+    setTimeout(()=>spawnEthPopup(0.0000456),500);
+    setTimeout(()=>spawnEthPopup(0.0000789),1000);
+  },1000);
   // sync Firebase ทุก 60 วิ
   if(window._fbSyncInt) clearInterval(window._fbSyncInt);
   window._fbSyncInt=setInterval(()=>{
