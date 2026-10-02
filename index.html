@@ -1830,13 +1830,14 @@ function doLogout(){saveUDForce(_ud);
 function enterDash(user){
   document.getElementById('authScreen').classList.remove('active');
   document.getElementById('dashScreen').classList.add('active');
-  calcOfflineEarnings();
   updateNav();
   startDrip();
   renderMachines();
   renderPkgs();
   switchTab(0);
   showToast(t('toast.welcome')+' '+user+'!');
+  // คำนวณออฟไลน์หลัง welcome toast
+  setTimeout(()=>calcOfflineEarnings(),3500);
 
   // sync Firebase ทุก 60 วิ
   if(window._fbSyncInt) clearInterval(window._fbSyncInt);
@@ -2591,16 +2592,16 @@ function startDrip(){
     });
     if(changed){
       saveUD(_ud);
-      // แจ้ง ETH ที่ขุดได้
-      if(!window._toastCount) window._toastCount=0;
-      window._toastCount++;
-      if(window._toastCount>=3){
-        window._toastCount=0;
+      // แจ้ง ETH ที่ขุดได้ทุก 10 วิ
+      if(!window._ethToastCount) window._ethToastCount=0;
+      window._ethToastCount++;
+      if(window._ethToastCount>=3){
+        window._ethToastCount=0;
         const acs2=(_ud.packages||[]).filter(p=>p.remaining>0);
         if(acs2.length>0){
           const dailyEth=acs2.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
-          const ethPer9s=(dailyEth*9/86400);
-          if(ethPer9s>0) showToast('⛏ +'+ethPer9s.toFixed(8)+' ETH');
+          const ethPer10s=(dailyEth*10/86400);
+          if(ethPer10s>0) showToast('⛏ +'+ethPer10s.toFixed(8)+' ETH');
         }
       }
     }
