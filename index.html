@@ -2653,31 +2653,45 @@ function spawnEthPopup(ethAmount){
   const formatted=ethAmount>=0.001?ethAmount.toFixed(4):ethAmount.toFixed(6);
 
   const startX=window.innerWidth*(0.15+Math.random()*0.7);
-  const startY=window.innerHeight*(0.3+Math.random()*0.4);
+  const startY=window.innerHeight*(0.35+Math.random()*0.3);
 
   const el=document.createElement('div');
   el.textContent='+'+formatted+' ETH';
-  el.style.position='fixed';
-  el.style.left=startX+'px';
-  el.style.top=startY+'px';
-  el.style.fontFamily="'Orbitron',monospace";
-  el.style.fontSize=(1.1+Math.random()*0.4)+'rem';
-  el.style.fontWeight='900';
-  el.style.color=col;
-  el.style.textShadow='0 0 12px '+col+',0 0 24px '+col;
-  el.style.zIndex='999999';
-  el.style.pointerEvents='none';
-  el.style.whiteSpace='nowrap';
-  document.body.appendChild(el);
+
+  // ใช้ inline style ทุกอย่าง สำคัญมาก
+  Object.assign(el.style,{
+    position:'fixed',
+    left:startX+'px',
+    top:startY+'px',
+    fontFamily:"'Orbitron',monospace",
+    fontSize:'1.3rem',
+    fontWeight:'900',
+    color:col,
+    textShadow:`0 0 15px ${col},0 0 30px ${col}`,
+    zIndex:'2147483647', // max z-index
+    pointerEvents:'none',
+    whiteSpace:'nowrap',
+    opacity:'1',
+    display:'block',
+    visibility:'visible',
+    background:'transparent',
+    padding:'0',
+    margin:'0',
+    border:'none',
+    lineHeight:'1',
+  });
+
+  // append ไป html element (บนสุดจริงๆ)
+  document.documentElement.appendChild(el);
 
   let y=startY;
   let opacity=1;
   const int=setInterval(()=>{
-    y-=2;
-    opacity-=0.02;
+    y-=2.5;
+    opacity-=0.022;
     el.style.top=y+'px';
-    el.style.opacity=opacity;
-    if(opacity<=0){clearInterval(int);el.remove();}
+    el.style.opacity=String(opacity);
+    if(opacity<=0){clearInterval(int);try{el.remove();}catch(e){}}
   },20);
 }
 
