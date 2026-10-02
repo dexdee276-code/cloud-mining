@@ -2797,9 +2797,11 @@ function showTopupPopup(){
   document.body.appendChild(ov);
 }
 
+let _tpCurrentAmt=0;
 function showTopupQR(){
   const amt=parseFloat(document.getElementById('tpAmt')?.value)||0;
   if(amt<=0){showToast('⚠ กรอกจำนวนก่อนครับ');return;}
+  _tpCurrentAmt=amt;
   document.getElementById('tpStep1').style.display='none';
   document.getElementById('tpStep2').style.display='block';
   document.getElementById('tpAmtDisplay').textContent='$'+amt.toLocaleString()+' USDT';
@@ -2825,15 +2827,23 @@ function showTopupQR(){
 }
 
 function tpConfirmDone(){
-  const amt=parseFloat(document.getElementById('tpAmt')?.value)||0;
+  const amt=_tpCurrentAmt||parseFloat(document.getElementById('tpAmt')?.value)||0;
   if(amt<=0){showToast('⚠ ไม่พบจำนวน');return;}
   if(!window._db){showToast('❌ ไม่มี Firebase');return;}
-  window._db.ref('topup_reqs').push({
-    id:'top_'+Date.now(),user:getSess(),amt,time:Date.now(),status:'pending'
+  const req={
+    id:'top_'+Date.now(),
+    user:getSess(),
+    amt:amt,
+    time:Date.now(),
+    status:'pending'
+  };
+  window._db.ref('topup_reqs').push(req).then(()=>{
+    document.getElementById('tpStep2').style.display='none';
+    document.getElementById('tpStep3').style.display='block';
+    _tpCurrentAmt=0;
+  }).catch(()=>{
+    showToast('❌ ส่งคำขอไม่สำเร็จ กรุณาลองใหม่');
   });
-  document.getElementById('tpStep2').style.display='none';
-  document.getElementById('tpStep3').style.display='block';
-  showToast('✅ ส่งคำขอแล้ว รอ Admin อนุมัติ');
 }
 
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null;}if(window._displayInt){clearInterval(window._displayInt);window._displayInt=null;}}
@@ -2984,36 +2994,42 @@ function filterReqs(f){
   renderAdminTopup(f);
 }
 function renderAdminTopup(filter){
-  const el = document.getElementById('adminTopupList'); if(!el) return;
-  let reqs = JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
-  if(filter !== 'all') reqs = reqs.filter(r=>r.status===filter);
-  reqs.sort((a,b)=>b.time-a.time);
-  if(!reqs.length){
-    el.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-align:center;padding:2rem;">ไม่มีรายการ</div>`;
-    return;
-  }
-  const statusColor={pending:'var(--gold)',approved:'var(--green)',rejected:'var(--red-bright)'};
-  const statusText={pending:'⏳ รออนุมัติ',approved:'✅ อนุมัติแล้ว',rejected:'❌ ปฏิเสธ'};
-  el.innerHTML = reqs.map(r=>{
-    const d = new Date(r.time);
-    const timeStr = `${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-    return `<div class="req-card ${r.status}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
-        <div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);">${(r.amt*LAK_RATE).toLocaleString()} ກີບ</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,215,0,0.6);">= $${r.amt.toLocaleString()} USD</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem;">👤 ${r.user} · ${timeStr}</div>
-          ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-top:0.15rem;">📝 ${r.note}</div>`:''}
+  const el=document.getElementById('adminTopupList');if(!el)return;
+  if(!window._db){el.innerHTML='<div style="color:red;padding:1rem;">❌ ไม่มี Firebase</div>';return;}
+  el.innerHTML='<div style="text-align:center;padding:1rem;font-family:monospace;color:#A890CC;font-size:0.7rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('topup_reqs').once('value').then(snap=>{
+    let reqs=[];
+    if(snap.exists()){
+      reqs=Object.entries(snap.val()).map(([k,v])=>({...v,fbKey:k}));
+    }
+    if(filter&&filter!=='all') reqs=reqs.filter(r=>r.status===filter);
+    reqs.sort((a,b)=>b.time-a.time);
+    if(!reqs.length){
+      el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ไม่มีรายการ</div>';
+      return;
+    }
+    const statusColor={pending:'var(--gold)',approved:'var(--green)',rejected:'var(--red-bright)'};
+    const statusText={pending:'⏳ รออนุมัติ',approved:'✅ อนุมัติแล้ว',rejected:'❌ ปฏิเสธ'};
+    el.innerHTML=reqs.map(r=>{
+      const d=new Date(r.time);
+      const timeStr=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+      return `<div class="req-card ${r.status}" style="margin-bottom:0.8rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
+          <div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);">$${(r.amt||0).toLocaleString()} USDT</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem;">👤 ${r.user||'-'} · ${timeStr}</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border:1px solid ${statusColor[r.status]||'var(--border)'};border-radius:20px;padding:0.2rem 0.55rem;font-family:'Orbitron',monospace;font-size:0.48rem;color:${statusColor[r.status]};">${statusText[r.status]||r.status}</div>
         </div>
-        <div style="background:rgba(0,0,0,0.2);border:1px solid ${statusColor[r.status]||'var(--border)'};border-radius:20px;padding:0.2rem 0.55rem;font-family:'Orbitron',monospace;font-size:0.48rem;color:${statusColor[r.status]};">${statusText[r.status]||r.status}</div>
-      </div>
-      ${r.slipImg?`<img src="${r.slipImg}" class="req-slip" onclick="viewSlip('${r.id}')" title="กดเพื่อดูเต็ม">`:'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--text-dim);margin-bottom:0.5rem;">ไม่มีสลิป</div>'}
-      ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
-        <button onclick="approveTopup('${r.id}',${r.amt},'${r.user}')" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
-        <button onclick="rejectTopup('${r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;">❌ ปฏิเสธ</button>
-      </div>`:''}
-    </div>`;
-  }).join('');
+        ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
+          <button onclick="approveTopup('${r.fbKey}',${r.amt},'${r.user}')" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+          <button onclick="rejectTopup('${r.fbKey}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;">❌ ปฏิเสธ</button>
+        </div>`:''}
+      </div>`;
+    }).join('');
+  }).catch(()=>{
+    el.innerHTML='<div style="color:red;padding:1rem;">❌ โหลดไม่สำเร็จ</div>';
+  });
 }
 function viewSlip(reqId){
   const reqs = JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
@@ -3027,27 +3043,28 @@ function viewSlip(reqId){
   ov.onclick = e=>{ if(e.target===ov) ov.remove(); };
   document.body.appendChild(ov);
 }
-function approveTopup(reqId, amt, username){
-  const reqs=JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
-  const req=reqs.find(r=>r.id===reqId);if(!req)return;
-  req.status='approved';req.approvedAt=Date.now();
-  localStorage.setItem('cm_topup_reqs',JSON.stringify(reqs));
-  const users=getU();const ud=users[username];
-  if(ud){
+function approveTopup(fbKey, amt, username){
+  if(!window._db)return;
+  // อัปเดตสถานะใน Firebase
+  window._db.ref('topup_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()});
+  // เพิ่ม USDT ให้ user
+  window._db.ref('users/'+username).once('value').then(snap=>{
+    if(!snap.exists())return;
+    const ud=snap.val();
     ud.usd=(ud.usd||0)+parseFloat(amt);
-    ud.topupReqs=(ud.topupReqs||[]).map(r=>r.id===reqId?{...r,status:'approved'}:r);
-    ud.txs=ud.txs||[];ud.txs.unshift({desc:'✅ เติม USD (อนุมัติแล้ว)',amount:+amt,unit:'USDT',time:Date.now()});
-    users[username]=ud;saveU(users);
-  }
-  updateNav();renderAdminTopup(currentFilter);
-  showToast(`✅ อนุมัติ $${parseFloat(amt).toLocaleString()} USD ให้ ${username} แล้ว!`);
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({desc:`✅ เติม USDT $${parseFloat(amt).toLocaleString()} (อนุมัติแล้ว)`,amount:+amt,unit:'USDT',time:Date.now()});
+    window._db.ref('users/'+username).set(ud);
+    // อัปเดต local ถ้าเป็น user ที่ login อยู่
+    if(getSess()===username){_ud=ud;updateNav();}
+  });
+  setTimeout(()=>renderAdminTopup(currentFilter),1000);
+  showToast(`✅ อนุมัติ $${parseFloat(amt).toLocaleString()} USDT ให้ ${username} แล้ว!`);
 }
-function rejectTopup(reqId, username){
-  const reqs=JSON.parse(localStorage.getItem('cm_topup_reqs')||'[]');
-  const req=reqs.find(r=>r.id===reqId);if(!req)return;
-  req.status='rejected';req.rejectedAt=Date.now();
-  localStorage.setItem('cm_topup_reqs',JSON.stringify(reqs));
-  renderAdminTopup(currentFilter);
+function rejectTopup(fbKey, username){
+  if(!window._db)return;
+  window._db.ref('topup_reqs/'+fbKey).update({status:'rejected',rejectedAt:Date.now()});
+  setTimeout(()=>renderAdminTopup(currentFilter),1000);
   showToast(`❌ ปฏิเสธคำขอของ ${username} แล้ว`);
 }
 function renderAdminWithdraw(){
