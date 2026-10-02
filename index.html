@@ -3126,55 +3126,80 @@ function rejectWithdraw(reqId, username){
   renderAdminWithdraw(); showToast(`❌ ปฏิเสธคำขอแลก ETH ของ ${username}`);
 }
 function renderAdminUsers(){
-  const el=document.getElementById('adminUserList'); if(!el) return;
-  const users=getU(); const keys=Object.keys(users);
-  if(!keys.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;">ยังไม่มีสมาชิก</div>';return;}
-  el.innerHTML=keys.map(u=>{
-    const ud=users[u];
-    const pkgs=(ud.packages||[]).filter(p=>p.remaining>0).length;
-    return `<div class="adm-user-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;">👤 ${u}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">${ud.email||''}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
-        <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">USDT</div>
+  const el=document.getElementById('adminUserList');if(!el)return;
+  if(!window._db){el.innerHTML='<div style="color:red;padding:1rem;">❌ ไม่มี Firebase</div>';return;}
+  el.innerHTML='<div style="text-align:center;padding:1rem;font-family:monospace;color:#A890CC;font-size:0.7rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('users').once('value').then(snap=>{
+    if(!snap.exists()){
+      el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ยังไม่มีสมาชิก</div>';
+      return;
+    }
+    const users=snap.val();
+    const keys=Object.keys(users);
+    el.innerHTML=keys.map(u=>{
+      const ud=users[u];
+      const pkgs=(ud.packages||[]).filter(p=>p.remaining>0).length;
+      return `<div class="adm-user-card" style="margin-bottom:0.8rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;">👤 ${u}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);">${ud.email||''}</div>
         </div>
-        <div style="background:rgba(74,222,128,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--green);">${(ud.ethReward||0).toFixed(4)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">ETH</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:0.5rem;">
+          <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:var(--text-dim);">USDT</div>
+          </div>
+          <div style="background:rgba(74,222,128,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);">${(ud.ethReward||0).toFixed(4)}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:var(--text-dim);">ETH</div>
+          </div>
+          <div style="background:rgba(157,78,221,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);">${pkgs}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:var(--text-dim);">แพ็ก Active</div>
+          </div>
         </div>
-        <div style="background:rgba(157,78,221,0.07);border-radius:7px;padding:0.5rem;text-align:center;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--purple-light);">${pkgs}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:var(--text-dim);">แพ็ก Active</div>
+        <div style="display:flex;gap:0.4rem;">
+          <button onclick="adminAddUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">+ เติม USDT</button>
+          <button onclick="adminDeductUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">- หัก USDT</button>
+          <button onclick="adminViewTx('${u}')" style="flex:1;padding:0.45rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:7px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">📋 ประวัติ</button>
         </div>
-      </div>
-      <div style="display:flex;gap:0.4rem;margin-top:0.6rem;">
-        <button onclick="adminAddUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">+ เติม USD</button>
-        <button onclick="adminDeductUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">- หัก USD</button>
-      </div>
-    </div>`;
-  }).join('');
+      </div>`;
+    }).join('');
+  }).catch(()=>{
+    el.innerHTML='<div style="color:red;padding:1rem;">❌ โหลดไม่สำเร็จ</div>';
+  });
 }
 function adminAddUsd(username){
-  const amt=parseFloat(prompt(`เติม USD ให้ ${username} จำนวน:`));
+  const amt=parseFloat(prompt(`เติม USDT ให้ ${username} จำนวน:`));
   if(!amt||amt<=0) return;
-  const users=getU(); const ud=users[username]; if(!ud) return;
-  ud.usd=(ud.usd||0)+amt;
-  ud.txs=ud.txs||[]; ud.txs.unshift({desc:`Admin เติม USD`,amount:+amt,unit:'USDT',time:Date.now()});
-  users[username]=ud; saveU(users);
-  updateNav(); renderAdminUsers();
-  showToast(`✅ เติม $${amt} USD ให้ ${username} แล้ว`);
+  if(!window._db) return;
+  window._db.ref('users/'+username).once('value').then(snap=>{
+    if(!snap.exists()) return;
+    const ud=snap.val();
+    ud.usd=(ud.usd||0)+amt;
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({desc:`Admin เติม $${amt} USDT`,amount:+amt,unit:'USDT',time:Date.now()});
+    window._db.ref('users/'+username).set(ud);
+    if(getSess()===username){_ud=ud;updateNav();}
+    setTimeout(()=>renderAdminUsers(),800);
+    showToast(`✅ เติม $${amt} USDT ให้ ${username} แล้ว`);
+  });
 }
 function adminDeductUsd(username){
-  const amt=parseFloat(prompt(`หัก USD จาก ${username} จำนวน:`));
+  const amt=parseFloat(prompt(`หัก USDT จาก ${username} จำนวน:`));
   if(!amt||amt<=0) return;
-  const users=getU(); const ud=users[username]; if(!ud) return;
-  ud.usd=Math.max(0,(ud.usd||0)-amt);
-  users[username]=ud; saveU(users);
-  renderAdminUsers(); showToast(`💸 หัก $${amt} USD จาก ${username} แล้ว`);
+  if(!window._db) return;
+  window._db.ref('users/'+username).once('value').then(snap=>{
+    if(!snap.exists()) return;
+    const ud=snap.val();
+    ud.usd=Math.max(0,(ud.usd||0)-amt);
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({desc:`Admin หัก $${amt} USDT`,amount:-amt,unit:'USDT',time:Date.now()});
+    window._db.ref('users/'+username).set(ud);
+    if(getSess()===username){_ud=ud;updateNav();}
+    setTimeout(()=>renderAdminUsers(),800);
+    showToast(`💸 หัก $${amt} USDT จาก ${username} แล้ว`);
+  });
 }
 
 
