@@ -2589,7 +2589,21 @@ function startDrip(){
       p.remaining=Math.max(0,(p.days||1)-daysPassed);
       changed=true;
     });
-    if(changed) saveUD(_ud);
+    if(changed){
+      saveUD(_ud);
+      // แจ้ง ETH ที่ขุดได้
+      if(!window._toastCount) window._toastCount=0;
+      window._toastCount++;
+      if(window._toastCount>=3){
+        window._toastCount=0;
+        const acs2=(_ud.packages||[]).filter(p=>p.remaining>0);
+        if(acs2.length>0){
+          const dailyEth=acs2.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
+          const ethPer9s=(dailyEth*9/86400);
+          if(ethPer9s>0) showToast('⛏ +'+ethPer9s.toFixed(8)+' ETH');
+        }
+      }
+    }
   },TICK);
 
   // ── DISPLAY: อัปเดต UI ทุก 200ms ──
@@ -2603,16 +2617,6 @@ function startDrip(){
     const ethPer50ms=totalDailyEth/1728000;
     _ud.ethReward=(_ud.ethReward||0)+ethPer50ms;
     const r=_ud.ethReward;
-
-    // spawn popup ทุก 3 วิ
-    if(!window._popupCount) window._popupCount=0;
-    window._popupCount++;
-    if(window._popupCount >= 200){
-      window._popupCount=0;
-      // คำนวณ ETH ที่ได้ใน 3 วิ จาก rate
-      const ethPer3s=totalDailyEth/28800;
-      if(ethPer3s>0) spawnEthPopup(ethPer3s);
-    }
 
     // ── แสดงตัวเลขหลายรูปแบบ ──
     // dashboard: 6 ทศนิยม
