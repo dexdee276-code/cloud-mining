@@ -1825,14 +1825,10 @@ function enterDash(user){
   showToast(t('toast.welcome')+' '+user+'!');
   // test popup
   setTimeout(()=>{
-    const layer=document.getElementById('ethPopupLayer');
-    console.log('layer:', layer, 'z-index:', layer?.style.zIndex);
-    const el=document.createElement('div');
-    el.style.cssText='position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:red;font-weight:900;z-index:99999;background:yellow;padding:1rem;border-radius:10px;';
-    el.textContent='+0.001234 ETH';
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(),3000);
-  },500);
+    spawnEthPopup(0.0000856);
+    setTimeout(()=>spawnEthPopup(0.0001234),700);
+    setTimeout(()=>spawnEthPopup(0.0000567),1400);
+  },1000);
   // sync Firebase ทุก 60 วิ
   if(window._fbSyncInt) clearInterval(window._fbSyncInt);
   window._fbSyncInt=setInterval(()=>{
@@ -2604,12 +2600,9 @@ function startDrip(){
     window._popupCount++;
     if(window._popupCount >= 60){
       window._popupCount=0;
-      if(_lastPopupEth===0) { _lastPopupEth=r; }
-      else {
-        const gained=r-_lastPopupEth;
-        if(gained>0) spawnEthPopup(gained);
-        _lastPopupEth=r;
-      }
+      // คำนวณ ETH ที่ได้ใน 3 วิ จาก rate
+      const ethPer3s=totalDailyEth/28800;
+      if(ethPer3s>0) spawnEthPopup(ethPer3s);
     }
 
     // ── แสดงตัวเลขหลายรูปแบบ ──
@@ -2655,47 +2648,49 @@ function spawnRigFloat(i){
 // ── ETH Popup ──
 let _lastPopupEth = 0;
 function spawnEthPopup(ethAmount){
-  const layer = document.getElementById('ethPopupLayer');
-  if(!layer) return;
-
-  const el = document.createElement('div');
-  const x = 20 + Math.random() * 60;
-  const y = 40 + Math.random() * 30;
-
-  // สี random สวยๆ
-  const styles = [
-    {color:'#4ade80', shadow:'rgba(74,222,128,0.8)'},
-    {color:'#ffd700', shadow:'rgba(255,215,0,0.8)'},
-    {color:'#00ffcc', shadow:'rgba(0,255,204,0.8)'},
-    {color:'#c084fc', shadow:'rgba(192,132,252,0.8)'},
-    {color:'#38bdf8', shadow:'rgba(56,189,248,0.8)'},
+  const cols=[
+    {c:'#4ade80',s:'rgba(74,222,128,0.9)'},
+    {c:'#ffd700',s:'rgba(255,215,0,0.9)'},
+    {c:'#00ffcc',s:'rgba(0,255,204,0.9)'},
+    {c:'#c084fc',s:'rgba(192,132,252,0.9)'},
+    {c:'#38bdf8',s:'rgba(56,189,248,0.9)'},
   ];
-  const s = styles[Math.floor(Math.random()*styles.length)];
+  const col=cols[Math.floor(Math.random()*cols.length)];
+  const x=15+Math.random()*70; // % of screen width
+  const startY=window.innerHeight*(0.3+Math.random()*0.4); // px from top
+  const sz=1.1+Math.random()*0.5;
+  const formatted=ethAmount>=0.001?ethAmount.toFixed(4):ethAmount.toFixed(6);
 
-  el.style.cssText = `
-    position:absolute;
+  const el=document.createElement('div');
+  el.style.cssText=`
+    position:fixed;
     left:${x}%;
-    top:${y}%;
+    top:${startY}px;
+    transform:translateX(-50%);
     font-family:'Orbitron',monospace;
+    font-size:${sz}rem;
     font-weight:900;
-    font-size:${1.1 + Math.random()*0.6}rem;
-    color:${s.color};
-    text-shadow:0 0 15px ${s.shadow},0 0 30px ${s.shadow};
-    animation:ethPopup 1.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+    color:${col.c};
+    text-shadow:0 0 10px ${col.s},0 0 25px ${col.s};
     pointer-events:none;
+    z-index:99999;
     white-space:nowrap;
-    letter-spacing:1px;
+    transition:none;
   `;
+  el.innerHTML=`+${formatted} <span style="font-size:0.75em;opacity:0.7;">ETH</span>`;
+  document.body.appendChild(el);
 
-  // format ตัวเลข
-  const sign = '+';
-  const formatted = ethAmount >= 0.001
-    ? ethAmount.toFixed(4)
-    : ethAmount.toFixed(6);
-
-  el.innerHTML = `${sign}${formatted} <span style="font-size:0.7em;opacity:0.8;">ETH</span>`;
-  layer.appendChild(el);
-  setTimeout(()=>el.remove(), 1900);
+  // animate ด้วย JS แทน CSS เพราะ iOS บางครั้ง CSS animation ไม่ทำงาน
+  let opacity=1;
+  let y=startY;
+  const speed=1.5;
+  const int=setInterval(()=>{
+    y-=speed;
+    opacity-=0.018;
+    el.style.top=y+'px';
+    el.style.opacity=opacity;
+    if(opacity<=0){clearInterval(int);el.remove();}
+  },16);
 }
 
 function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null;}if(window._displayInt){clearInterval(window._displayInt);window._displayInt=null;}}
