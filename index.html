@@ -3064,8 +3064,8 @@ function renderAdminStats(){
 function renderAdminPanel(){ showAdmin(); } // legacy compat
 function updateNav(){
   const ud=getUD();if(!ud)return;
-  document.getElementById('navZkp').textContent=(ud.ethReward||0).toFixed(4);
-  document.getElementById('navUsd').textContent=(ud.usd||0).toFixed(2);
+  const navZkp=document.getElementById('navZkp');if(navZkp)navZkp.textContent=(ud.ethReward||0).toFixed(4);
+  const navUsdEl=document.getElementById('navUsd');if(navUsdEl)navUsdEl.textContent=(ud.usd||0).toFixed(2);
   document.getElementById('stTotal').textContent=(ud.ethMine||0).toFixed(4);
   document.getElementById('stUsd').textContent=((ud.ethMine||0)*ETH_RATE).toFixed(2);
   document.getElementById('stSess').textContent=(ud.sessions||0);
