@@ -1572,9 +1572,14 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
         <div class="wb-amt" id="wZkp">0.000000</div>
         <div class="wb-equiv">≈ $<span id="wZkpUsd">0.000000</span> USD · <span id="wZkpLak">0</span> ກີບ</div>
         <div class="wb-daily"><span data-i18n="wal.daily">⚡ รับ/วัน:</span><span class="wb-dv"><span id="wDaily">0</span> ETH · +$<span id="wDailyUsd">0.00</span></span></div>
+        <!-- แปลง ETH → USDT -->
+        <button onclick="showConvertPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;margin-bottom:0.5rem;
+  background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
+  box-shadow:0 4px 20px rgba(59,130,246,0.4),0 0 30px rgba(59,130,246,0.15);">💱 แปลง ETH → USDT</button>
+        <!-- แจ้งถอน USDT -->
         <button onclick="showWithdrawPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;
   background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
-  box-shadow:0 4px 20px rgba(16,185,129,0.4),0 0 30px rgba(16,185,129,0.15);">💱 แจ้งแลกเงิน ETH</button>
+  box-shadow:0 4px 20px rgba(16,185,129,0.4),0 0 30px rgba(16,185,129,0.15);">📤 แจ้งถอน USDT</button>
       </div>
       <div class="w-grid">
         <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
