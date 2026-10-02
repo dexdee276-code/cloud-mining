@@ -2623,10 +2623,19 @@ function startDrip(){
     if(!acs.length) return;
 
     // เพิ่ม ETH ทุก 50ms ตาม rate จริง
-    const now=Date.now();
     const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
-    const ethPer50ms=totalDailyEth/(86400*20); // 20 = 1000ms/50ms
-    _ud.ethReward=(_ud.ethReward||0)+ethPer50ms;
+    const ethPer50ms=totalDailyEth/(86400*20);
+    // เพิ่มแค่ส่วนที่ยังไม่เกิน max ที่ควรได้
+    const now2=Date.now();
+    let maxEth=0;
+    acs.forEach(p=>{
+      if(!p.bought) return;
+      const elapsedDays=(now2-p.bought)/1000/86400;
+      maxEth+=(p.daily/ETH_RATE)*Math.min(elapsedDays,p.days);
+    });
+    maxEth-=(_ud.ethConverted||0); // หัก ETH ที่แปลงไปแล้ว
+    const newEth=(_ud.ethReward||0)+ethPer50ms;
+    _ud.ethReward=Math.min(newEth, Math.max(_ud.ethReward||0, maxEth));
     const r=_ud.ethReward;
 
     // ── แสดงตัวเลขหลายรูปแบบ ──
@@ -3763,6 +3772,7 @@ function submitConvert(){
   const amt=parseFloat(document.getElementById('convertAmt')?.value)||0;
   if(amt<=0||amt>(ud.ethReward||0)){showToast('❌ จำนวนไม่ถูกต้อง');return;}
   ud.ethReward=parseFloat(((ud.ethReward||0)-amt).toFixed(6));
+  ud.ethConverted=(ud.ethConverted||0)+amt; // เก็บยอดที่แปลงแล้ว
   const usdt=parseFloat((amt*ETH_RATE).toFixed(2));
   ud.usd=(ud.usd||0)+usdt;
   ud.txs=ud.txs||[];
@@ -4011,7 +4021,10 @@ function calcOfflineEarnings(){
     const totalEthShouldHave=(p.daily/ETH_RATE)*totalDaysEarned;
     const daysAlreadyEarned=(p.days-p.remaining);
     const ethAlreadyEarned=(p.daily/ETH_RATE)*daysAlreadyEarned;
-    const ethMissed=totalEthShouldHave-ethAlreadyEarned;
+    // หัก ETH ที่แปลงไปแล้วออกด้วย
+    const ethConverted=ud.ethConverted||0;
+    const ethCurrentNet=(ud.ethReward||0)+ethConverted;
+    const ethMissed=totalEthShouldHave-ethCurrentNet;
     if(ethMissed>0.000000001){
       totalMissed+=ethMissed;
       p.remaining=Math.max(0,p.days-totalDaysEarned);
