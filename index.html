@@ -1561,7 +1561,10 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
         <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USDT</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
         <div class="wb-amt" id="wUsd">0.00</div>
         <div class="wb-equiv">USDT</div>
-        <button class="btn btn-gold" style="width:100%;padding:0.85rem;" onclick="switchTab(3)">💵 เติม USDT</button>
+        <button class="btn btn-gold" style="width:100%;padding:0.85rem;margin-bottom:0.5rem;" onclick="switchTab(3)">💵 เติม USDT</button>
+        <button onclick="showWithdrawPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;
+  background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
+  box-shadow:0 4px 20px rgba(16,185,129,0.4),0 0 30px rgba(16,185,129,0.15);">📤 ถอนออก</button>
       </div>
       <div class="wb wb-eth">
         <div class="wb-head">
@@ -1576,20 +1579,17 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
         <button onclick="showConvertPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;margin-bottom:0.5rem;
   background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
   box-shadow:0 4px 20px rgba(59,130,246,0.4),0 0 30px rgba(59,130,246,0.15);">💱 แปลง ETH → USDT</button>
-        <!-- แจ้งถอน USDT -->
-        <button onclick="showWithdrawPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;
-  background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
-  box-shadow:0 4px 20px rgba(16,185,129,0.4),0 0 30px rgba(16,185,129,0.15);">📤 แจ้งถอน USDT</button>
-      </div>
-      <div class="w-grid">
-        <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
-        <div class="w-stat"><div class="ws-l" data-i18n="wal.profit">กำไรสะสม</div><div class="ws-v wv-green" id="wProfit">$0.00</div><div class="ws-s" data-i18n="wal.profitsub">USD จากสัญญา</div></div>
-      </div>
-      <div class="sec-title" data-i18n="wal.history">📋 ประวัติธุรกรรม</div>
-      <div id="txHist"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace"><span data-i18n="wal.nohist">ยังไม่มีประวัติ</span></div></div>
-    </div>
 
 ```
+  </div>
+  <div class="w-grid">
+    <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
+    <div class="w-stat"><div class="ws-l" data-i18n="wal.profit">กำไรสะสม</div><div class="ws-v wv-green" id="wProfit">$0.00</div><div class="ws-s" data-i18n="wal.profitsub">USD จากสัญญา</div></div>
+  </div>
+  <div class="sec-title" data-i18n="wal.history">📋 ประวัติธุรกรรม</div>
+  <div id="txHist"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace"><span data-i18n="wal.nohist">ยังไม่มีประวัติ</span></div></div>
+</div>
+
 <!-- TOPUP -->
 <div class="tab-page" id="pgTopup">
   <div class="sec-title">💵 เติม USDT</div>
@@ -2312,41 +2312,36 @@ function renderWallet(){
 }
 function showWithdrawPopup(){
   const ud=getUD(); if(!ud) return;
-  const eth=ud.ethReward||0;
-  if(eth<50){
-    // แสดง popup แจ้งเตือนชัดเจน
+  const usd=ud.usd||0;
+  if(usd<1){
     const ov=document.createElement('div'); ov.className='overlay';
     ov.innerHTML=`<div class="popup" style="max-width:320px;text-align:center;">
       <div style="font-size:3rem;margin-bottom:0.8rem;">⚠️</div>
       <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--red-bright);margin-bottom:0.6rem;">ไม่สามารถถอนได้</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:var(--text);line-height:1.8;margin-bottom:0.5rem;">
-        ยอดถอนขั้นต่ำคือ<br>
-        <span style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:var(--gold);">50 ETH</span>
+        USDT ของคุณตอนนี้<br>
+        <span style="font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:var(--gold);">$${usd.toFixed(2)} USDT</span>
       </div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text-dim);margin-bottom:1.3rem;">
-        ETH ของคุณตอนนี้: <span style="color:var(--green);font-weight:700;">${eth.toFixed(4)} ETH</span><br>
-        ต้องการอีก <span style="color:var(--red-bright);font-weight:700;">${(50-eth).toFixed(4)} ETH</span>
+        กรุณาแปลง ETH → USDT ก่อนครับ
       </div>
       <button onclick="this.closest('.overlay').remove()" class="btn btn-primary" style="width:100%;">✅ รับทราบ</button>
     </div>`;
     document.body.appendChild(ov);
     return;
   }
-  const usdVal=(eth*ETH_RATE).toFixed(4);
-  const lakVal=Math.round(eth*ETH_RATE*LAK_RATE).toLocaleString();
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='withdrawOv';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd">
-      <div class="pop-title">💱 แจ้งแลกเงิน</div>
+      <div class="pop-title">📤 ถอนออก</div>
       <button class="pop-close" onclick="document.getElementById('withdrawOv').remove()">✕ ปิด</button>
     </div>
 
-    <!-- ยอด ETH -->
-    <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.3rem;">💰 ETH ที่จะแลก</div>
-      <div style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:var(--green);text-shadow:0 0 15px rgba(74,222,128,0.4);">${eth.toFixed(4)} ETH</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--gold);margin-top:0.3rem;">≈ $${usdVal} USD</div>
-      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--gold);margin-top:0.2rem;">${lakVal} ກີບ</div>
+    <!-- ยอด USDT -->
+    <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-bottom:0.3rem;">💵 USDT ที่จะถอน</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:var(--gold);text-shadow:0 0 15px rgba(255,215,0,0.4);">$${usd.toFixed(2)}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:rgba(255,215,0,0.6);margin-top:0.3rem;">USDT</div>
     </div>
 
     <!-- ข้อมูลรับเงิน -->
@@ -2384,10 +2379,9 @@ function showWithdrawPopup(){
       ETH จะถูกหักจากกระเป๋าหลังได้รับการอนุมัติ
     </div>
 
-    <button id="wdSubmitBtn" data-eth="${eth}" data-usd="${usdVal}" data-lak="${lakVal}"
-      onclick="submitWithdraw()"
-      class="btn btn-primary" style="width:100%;">
-      📤 ยืนยันแจ้งแลกเงิน
+    <button onclick="submitWithdraw()"
+      class="btn btn-primary" style="width:100%;padding:1rem;">
+      📤 ยืนยันถอนออก $${usd.toFixed(2)} USDT
     </button>
   </div>`;
   document.body.appendChild(ov);
@@ -2399,35 +2393,36 @@ function toggleWdFields(){
 
 function submitWithdraw(){
   const ud=getUD(); if(!ud) return;
-  const btn=document.getElementById('wdSubmitBtn');
-  const ethAmt=parseFloat(btn.dataset.eth);
-  const usdAmt=parseFloat(btn.dataset.usd);
-  const lakAmt=btn.dataset.lak;
-  const method=document.getElementById('wdMethod').value;
+  const usdAmt=ud.usd||0;
+  if(usdAmt<=0){showToast('⚠️ ไม่มี USDT ให้ถอน');return;}
+  const method=document.getElementById('wdMethod')?.value||'bank';
   const bank=document.getElementById('wdBank')?.value.trim()||'';
   const accNo=document.getElementById('wdAccNo')?.value.trim()||'';
   const accName=document.getElementById('wdAccName')?.value.trim()||'';
   const note=document.getElementById('wdNote')?.value.trim()||'';
 
-  if(!accNo){ showToast('⚠️ กรุณากรอกเลขบัญชี/เบอร์'); return; }
-  if(!accName){ showToast('⚠️ กรุณากรอกชื่อเจ้าของบัญชี'); return; }
+  if(!accNo){showToast('⚠️ กรุณากรอกเลขบัญชี/เบอร์');return;}
+  if(!accName){showToast('⚠️ กรุณากรอกชื่อเจ้าของบัญชี');return;}
 
   const req={
     id:'wd_'+Date.now(), user:getSess(),
-    ethAmt, usdAmt, lakAmt,
+    amt:usdAmt, unit:'USDT',
     method, bank, accNo, accName, note,
     time:Date.now(), status:'pending'
   };
 
-  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  ws.push(req); localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
+  if(window._db){
+    window._db.ref('withdraw_reqs').push(req);
+  }
 
+  // หัก USDT ออก
+  ud.usd=0;
   ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:`💱 แจ้งแลก ${ethAmt.toFixed(4)} ETH (รอ Admin อนุมัติ)`,amount:ethAmt.toFixed(4),unit:'ETH',time:Date.now()});
+  ud.txs.unshift({desc:`📤 แจ้งถอน $${usdAmt.toFixed(2)} USDT (รอ Admin อนุมัติ)`,amount:-usdAmt,unit:'USDT',time:Date.now()});
   saveUD(ud);
 
   document.getElementById('withdrawOv').remove();
-  showToast(`📤 ส่งคำขอแลก ${ethAmt.toFixed(4)} ETH ≈ ${lakAmt} ກີບ แล้ว!`);
+  showToast(`📤 ส่งคำขอถอน $${usdAmt.toFixed(2)} USDT แล้ว!`);
   renderWallet();
 }
 
