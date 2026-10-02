@@ -1834,7 +1834,9 @@ function doRegister(){
   });
 }
 
-function doLogout(){saveUDForce(_ud);
+function doLogout(){
+  if(_ud){_ud.lastSeen=Date.now();}
+  saveUDForce(_ud);
   if(window._scenePartInt){clearInterval(window._scenePartInt);window._scenePartInt=null;}
   const sc=document.getElementById('miningScene');if(sc)sc.style.display='none';stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
 
@@ -2614,16 +2616,23 @@ function startDrip(){
     }
   },TICK);
 
-  // ── DISPLAY: อัปเดต UI ทุก 200ms ──
+  // ── DISPLAY: อัปเดต UI ทุก 50ms ──
   window._displayInt=setInterval(()=>{
     if(!_ud||!_ud.packages) return;
     const acs=_ud.packages.filter(p=>p.remaining>0);
     if(!acs.length) return;
 
-    // ETH จริงต่อ 50ms
-    const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
-    const ethPer50ms=totalDailyEth/1728000;
-    _ud.ethReward=(_ud.ethReward||0)+ethPer50ms;
+    // คำนวณ ETH จาก bought timestamp จริงๆ
+    const now=Date.now();
+    let totalEthShouldHave=0;
+    acs.forEach(p=>{
+      if(!p.bought) return;
+      const elapsedDays=(now-p.bought)/1000/86400;
+      const earnedDays=Math.min(elapsedDays,p.days);
+      totalEthShouldHave+=(p.daily/ETH_RATE)*earnedDays;
+    });
+    // set ethReward = max(current, shouldHave) ป้องกันลด
+    _ud.ethReward=Math.max(_ud.ethReward||0, totalEthShouldHave);
     const r=_ud.ethReward;
 
     // ── แสดงตัวเลขหลายรูปแบบ ──
@@ -3996,19 +4005,41 @@ function renderReferral(){
 }
 function calcOfflineEarnings(){
   const ud=getUD();if(!ud)return;
-  const now=Date.now(),lastSeen=ud.lastSeen||now,offlineSec=(now-lastSeen)/1000;
-  if(offlineSec<10)return;
+  const now=Date.now();
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
   if(!acs.length)return;
-  let totalEth=0;
+
+  let changed=false;
   acs.forEach(p=>{
-    const daysOff=Math.min(offlineSec/86400,p.remaining);
-    totalEth+=(((p.price||0)*(p.dailyPct||0)/100)/ETH_RATE)*daysOff;
-    p.remaining=Math.max(0,p.remaining-daysOff);
+    if(!p.bought) return;
+    // คำนวณจาก bought timestamp จริงๆ
+    const elapsedDays=(now-p.bought)/1000/86400;
+    // ETH ที่ควรได้ทั้งหมดถึงตอนนี้
+    const totalDaysEarned=Math.min(elapsedDays, p.days);
+    const totalEthShouldHave=(p.daily/ETH_RATE)*totalDaysEarned;
+    // ETH ที่ได้ไปแล้ว = (days - remaining) * daily/ETH_RATE
+    const daysAlreadyEarned=(p.days-p.remaining);
+    const ethAlreadyEarned=(p.daily/ETH_RATE)*daysAlreadyEarned;
+    // ส่วนต่างที่ยังไม่ได้รับ
+    const ethMissed=totalEthShouldHave-ethAlreadyEarned;
+    if(ethMissed>0){
+      ud.ethReward=(ud.ethReward||0)+ethMissed;
+      // อัปเดต remaining
+      p.remaining=Math.max(0,p.days-totalDaysEarned);
+      changed=true;
+    }
   });
-  if(totalEth>0){ud.ethReward=(ud.ethReward||0)+totalEth;saveUD(ud);showToast(`✅ ขุดออฟไลน์ +${totalEth.toFixed(6)} ETH`);}
+
+  if(changed){
+    saveUD(ud);
+    showToast(`✅ อัปเดต ETH ให้ตรงตามเวลาจริง`);
+  }
 }
-function updateLastSeen(){const ud=getUD();if(!ud)return;ud.lastSeen=Date.now();saveUD(ud);}
+function updateLastSeen(){
+  const ud=getUD();if(!ud)return;
+  ud.lastSeen=Date.now();
+  saveUD(ud);
+}
 function confirmTopupDone(){
   const ud=getUD();if(!ud)return;
   const amt=typeof selAmt!=='undefined'?selAmt:0;
