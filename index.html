@@ -674,6 +674,31 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <button id="delQRBtn" onclick="deleteQR()" style="display:none;width:100%;padding:0.5rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">🗑️ ลบ QR Code</button>
   </div>
 
+  <!-- ที่อยู่ USDT -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);margin-bottom:0.8rem;">💵 ที่อยู่ USDT สำหรับรับโอน</div>
+
+    <!-- เครือข่าย -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">เครือข่าย</div>
+    <select id="usdtNetwork" style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.8rem;appearance:none;cursor:pointer;">
+      <option value="TRC20">TRC20 (TRON) — ค่าธรรมเนียมต่ำ</option>
+      <option value="ERC20">ERC20 (Ethereum)</option>
+      <option value="BEP20">BEP20 (BSC)</option>
+    </select>
+
+    <!-- ที่อยู่ -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">ที่อยู่ Wallet</div>
+    <input type="text" id="usdtAddrInput" placeholder="กรอกที่อยู่ USDT..."
+      style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.3);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.75rem;outline:none;margin-bottom:0.8rem;word-break:break-all;">
+
+    <!-- Preview -->
+    <div id="usdtAddrPreview" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(74,222,128,0.5);margin-bottom:0.8rem;word-break:break-all;"></div>
+
+    <button onclick="saveUsdtAddr()" style="width:100%;padding:0.7rem;border:none;border-radius:10px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;
+      background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
+      box-shadow:0 4px 15px rgba(16,185,129,0.3);">💾 บันทึกที่อยู่ USDT</button>
+  </div>
+
   <!-- เปลี่ยนรหัส Admin -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.8rem;">🔐 เปลี่ยนรหัส Admin</div>
@@ -2747,7 +2772,7 @@ function showTopupPopup(){
 
       <!-- เครือข่าย -->
       <div style="background:rgba(98,126,234,0.07);border:1px solid rgba(98,126,234,0.2);border-radius:10px;padding:0.6rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#A890CC;text-align:center;">
-        ⚠️ โอนผ่าน <span style="color:#627eea;font-weight:700;">TRC20 (TRON)</span> เท่านั้น
+        ⚠️ โอนผ่าน <span id="tpNetworkDisplay" style="color:#627eea;font-weight:700;">TRC20 (TRON)</span> เท่านั้น
       </div>
 
       <button onclick="tpConfirmDone()" style="width:100%;padding:1rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;
@@ -2786,11 +2811,15 @@ function showTopupQR(){
   } else {
     wrap.innerHTML='<div style="font-family:monospace;font-size:0.65rem;color:#A890CC;text-align:center;">ติดต่อ Admin เพื่อขอ QR Code</div>';
   }
-  // โหลดที่อยู่
+  // โหลดที่อยู่และเครือข่าย
   const addrEl=document.getElementById('tpAddrText');
+  const netEl=document.getElementById('tpNetworkDisplay');
   if(window._db){
-    window._db.ref('settings/usdtAddr').once('value').then(snap=>{
-      if(addrEl) addrEl.textContent=snap.exists()?snap.val():'ติดต่อ Admin';
+    window._db.ref('settings').once('value').then(snap=>{
+      if(!snap.exists()) return;
+      const data=snap.val();
+      if(addrEl) addrEl.textContent=data.usdtAddr||'ติดต่อ Admin';
+      if(netEl) netEl.textContent=data.usdtNetwork||'TRC20';
     });
   }
 }
@@ -3946,18 +3975,29 @@ function rejectPkgReq(fbKey,username){
 // ─── USDT ADDRESS ───
 function saveUsdtAddr(){
   const addr=document.getElementById('usdtAddrInput')?.value.trim();
+  const network=document.getElementById('usdtNetwork')?.value||'TRC20';
   if(!addr){showToast('⚠ กรอกที่อยู่ก่อน');return;}
   if(!window._db){showToast('❌ ไม่มี Firebase');return;}
-  window._db.ref('settings/usdtAddr').set(addr).then(()=>{showToast('✅ บันทึกแล้ว');loadUsdtAddr();});
+  window._db.ref('settings/usdtAddr').set(addr);
+  window._db.ref('settings/usdtNetwork').set(network);
+  window._db.ref('settings/usdtAddr').once('value').then(()=>{
+    showToast('✅ บันทึกที่อยู่ USDT แล้ว');
+    loadUsdtAddr();
+  });
 }
 function loadUsdtAddr(){
   if(!window._db)return;
-  window._db.ref('settings/usdtAddr').once('value').then(snap=>{
+  window._db.ref('settings').once('value').then(snap=>{
     if(!snap.exists())return;
+    const data=snap.val();
     const inp=document.getElementById('usdtAddrInput');
     const prev=document.getElementById('usdtAddrPreview');
-    if(inp)inp.value=snap.val();
-    if(prev)prev.textContent='📋 '+snap.val();
+    const net=document.getElementById('usdtNetwork');
+    if(data.usdtAddr){
+      if(inp)inp.value=data.usdtAddr;
+      if(prev)prev.textContent='📋 '+data.usdtAddr;
+    }
+    if(data.usdtNetwork&&net){net.value=data.usdtNetwork;}
   });
 }
 
