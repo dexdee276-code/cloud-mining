@@ -4116,8 +4116,24 @@ function startMiningInvestment(){
   if(amt<100||amt>100000){showToast('⚠ ใส่จำนวน $100 - $100,000');return;}
   const ud=getUD();if(!ud)return;
   if((ud.usd||0)<amt){
-    showToast('❌ USDT ไม่พอ กรุณาเติมก่อนครับ');
-    setTimeout(()=>{switchTab(2);setTimeout(()=>showTopupPopup(),400);},300);
+    const ov=document.createElement('div');ov.className='overlay';
+    ov.innerHTML=`<div class="popup" style="text-align:center;max-width:300px;">
+      <div style="font-size:2.5rem;margin-bottom:0.8rem;">💰</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#f87171;margin-bottom:0.5rem;">USDT ไม่เพียงพอ</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.3rem;">ต้องการ <span style="color:#ffd700;font-weight:700;">$${amt.toLocaleString()}</span> USDT</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:1.2rem;">มีในกระเป๋า <span style="color:#4ade80;font-weight:700;">$${(ud.usd||0).toFixed(2)}</span> USDT</div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <button onclick="this.closest('.overlay').remove();switchTab(2);setTimeout(()=>showTopupPopup(),300);"
+          style="padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;background:linear-gradient(135deg,#b45309,#d97706,#fbbf24);color:#000;box-shadow:0 4px 20px rgba(251,191,36,0.4);">
+          💵 เติม USDT
+        </button>
+        <button onclick="this.closest('.overlay').remove()"
+          style="padding:0.7rem;border:1px solid rgba(255,255,255,0.1);border-radius:12px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.7rem;background:transparent;color:rgba(255,255,255,0.4);">
+          ปิด
+        </button>
+      </div>
+    </div>`;
+    document.body.appendChild(ov);
     return;
   }
   const pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt),total=amt+daily*days;
