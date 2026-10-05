@@ -1931,7 +1931,10 @@ function enterDash(user){
 // ─── NAVIGATION ───
 const PAGES=['pgHome','pgPkg','pgWallet','pgTopup'];
 function switchTab(i){
-  PAGES.forEach((id,j)=>{document.getElementById(id).classList.toggle('active',i===j);document.getElementById('bn'+j).classList.toggle('active',i===j)});
+  PAGES.forEach((id,j)=>{
+    const page=document.getElementById(id);if(page)page.classList.toggle('active',i===j);
+    const btn=document.getElementById('bn'+j);if(btn)btn.classList.toggle('active',i===j);
+  });
   if(i===1)renderPkgs();if(i===2)renderWallet();
   if(i===3){renderTopupHistory();renderPendingList();}
 }
