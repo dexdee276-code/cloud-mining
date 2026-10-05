@@ -1706,6 +1706,9 @@ box-shadow:0 4px 20px rgba(16,185,129,0.5),0 0 40px rgba(16,185,129,0.2);”>
 <button class="bnav" id="bnMining" onclick="switchTab(0);setTimeout(()=>{const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);">
   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="3"/></svg>เครื่องขุด
 </button>
+<button class="bnav" id="bnHistory" onclick="showHistoryPopup()">
+  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>ประวัติ
+</button>
 ```
 
   </nav>
@@ -2868,6 +2871,38 @@ function tpConfirmDone(){
   }).catch(()=>{
     showToast('❌ ส่งคำขอไม่สำเร็จ กรุณาลองใหม่');
   });
+}
+
+
+function showHistoryPopup(){
+  const ud=getUD();if(!ud)return;
+  const txs=ud.txs||[];
+  const ov=document.createElement('div');ov.className='overlay';
+  ov.innerHTML=`<div class="popup">
+    <div class="pop-hd">
+      <div class="pop-title">📋 ประวัติการทำรายการ</div>
+      <button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button>
+    </div>
+    <div style="max-height:65vh;overflow-y:auto;">
+      ${txs.length?txs.slice(0,50).map(tx=>{
+        const d=new Date(tx.time||0);
+        const t=d.getDate()+'/'+(d.getMonth()+1)+' '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+        const amt=parseFloat(tx.amount||0);
+        const isPos=amt>=0;
+        const col=isPos?'var(--green)':'var(--red-bright)';
+        return '<div style="padding:0.7rem 0;border-bottom:1px solid rgba(157,78,221,0.1);display:flex;justify-content:space-between;align-items:center;">'
+          +'<div>'
+          +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;color:#fff;">'+( tx.desc||'-')+'</div>'
+          +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.55rem;color:#A890CC;margin-top:0.15rem;">'+t+'</div>'
+          +'</div>'
+          +'<div style="font-family:\'Orbitron\',monospace;font-size:0.75rem;font-weight:700;color:'+col+';text-align:right;white-space:nowrap;margin-left:0.5rem;">'
+          +(isPos?'+':'')+amt.toFixed(2)+' '+(tx.unit||'USDT')
+          +'</div>'
+          +'</div>';
+      }).join(''):'<div style="text-align:center;padding:2rem;font-family:Share Tech Mono,monospace;font-size:0.75rem;color:#A890CC;">ยังไม่มีประวัติ</div>'}
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
 }
 
 function stopDrip(){
