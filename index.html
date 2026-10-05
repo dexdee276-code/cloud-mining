@@ -2460,11 +2460,11 @@ function submitWithdraw(){
     window._db.ref('withdraw_reqs').push(req);
   }
 
-  // หัก USDT ออกตามจำนวนที่ขอถอน
+  // หัก USDT ออกตามจำนวนที่ขอถอน แล้ว sync Firebase ทันที
   ud.usd=Math.max(0,(ud.usd||0)-usdAmt);
   ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:`📤 แจ้งถอน $${usdAmt.toFixed(2)} USDT → ${network} (รอ Admin อนุมัติ)`,amount:-usdAmt,unit:'USDT',time:Date.now()});
-  saveUD(ud);
+  ud.txs.unshift({desc:`📤 แจ้งถอน $${usdAmt.toFixed(2)} USDT → ${network} (กำลังตรวจสอบ)`,amount:-usdAmt,unit:'USDT',time:Date.now()});
+  saveUDForce(ud);
 
   document.getElementById('withdrawOv').remove();
   showToast(`📤 ส่งคำขอถอน $${usdAmt.toFixed(2)} USDT แล้ว!`);
@@ -3126,35 +3126,28 @@ function renderAdminWithdraw(){
 
 function approveWithdraw(fbKey, username, amt){
   if(!window._db)return;
-  window._db.ref('withdraw_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()});
-  // อัปเดต user - usd ถูกหักไปแล้วตอน submitWithdraw แค่บันทึก tx
-  window._db.ref('users/'+username).once('value').then(snap=>{
-    if(!snap.exists())return;
-    const ud=snap.val();
-    ud.txs=ud.txs||[];
-    ud.txs.unshift({desc:`✅ ถอน $${parseFloat(amt).toFixed(2)} USDT อนุมัติแล้ว`,amount:-parseFloat(amt),unit:'USDT',time:Date.now()});
-    window._db.ref('users/'+username).set(ud);
-    if(getSess()===username){_ud=ud;updateNav();}
+  // แค่อัปเดตสถานะ ไม่แตะ usd เพราะหักไปแล้วตอน submit
+  window._db.ref('withdraw_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()}).then(()=>{
+    setTimeout(()=>renderAdminWithdraw(),800);
+    showToast(`✅ อนุมัติถอน $${parseFloat(amt).toFixed(2)} USDT ให้ ${username}`);
   });
-  setTimeout(()=>renderAdminWithdraw(),1000);
-  showToast(`✅ อนุมัติถอน $${parseFloat(amt).toFixed(2)} USDT ให้ ${username}`);
 }
 
 function rejectWithdraw(fbKey, username, amt){
   if(!window._db)return;
   window._db.ref('withdraw_reqs/'+fbKey).update({status:'rejected',rejectedAt:Date.now()});
-  // คืน USDT ให้ user
-  window._db.ref('users/'+username+'/usd').once('value').then(snap=>{
-    const cur=snap.val()||0;
-    window._db.ref('users/'+username+'/usd').set(cur+parseFloat(amt));
-    window._db.ref('users/'+username+'/txs').once('value').then(s=>{
-      const txs=s.exists()?(Array.isArray(s.val())?s.val():Object.values(s.val()||{})):[];
-      txs.unshift({desc:`❌ คืน $${parseFloat(amt).toFixed(2)} USDT (ปฏิเสธถอน)`,amount:+parseFloat(amt),unit:'USDT',time:Date.now()});
-      window._db.ref('users/'+username+'/txs').set(txs);
-    });
+  // คืน USDT ให้ user ใน Firebase
+  window._db.ref('users/'+username).once('value').then(snap=>{
+    if(!snap.exists())return;
+    const ud=snap.val();
+    ud.usd=(ud.usd||0)+parseFloat(amt);
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({desc:`↩️ คืน $${parseFloat(amt).toFixed(2)} USDT (ปฏิเสธถอน)`,amount:+parseFloat(amt),unit:'USDT',time:Date.now()});
+    window._db.ref('users/'+username).set(ud);
+    if(getSess()===username){_ud=ud;updateNav();renderWallet();}
   });
-  setTimeout(()=>renderAdminWithdraw(),1000);
-  showToast(`❌ ปฏิเสธคำขอถอน คืน $${parseFloat(amt).toFixed(2)} USDT ให้ ${username}`);
+  setTimeout(()=>renderAdminWithdraw(),800);
+  showToast(`❌ ปฏิเสธถอน คืน $${parseFloat(amt).toFixed(2)} USDT ให้ ${username}`);
 }
 
 // ── Admin User Search ──
