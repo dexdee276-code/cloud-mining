@@ -207,7 +207,7 @@ border-radius:5px;color:var(–text-dim);font-family:‘Orbitron’,monospace;fo
 .btn-lang:hover,.btn-lang.active{background:rgba(157,78,221,0.25);border-color:var(–purple-light);color:var(–purple-light)}
 
 .tab-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:0.8rem 0.8rem 5rem;-webkit-overflow-scrolling:touch;}
-.tab-page{display:none}.tab-page.active{display:block}
+.tab-page{display:none!important}.tab-page.active{display:block!important}#pgPkg.active{display:flex!important}
 
 .bottom-nav{
 display:flex;align-items:flex-end;
@@ -1612,7 +1612,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 </div>
 
 <!-- PACKAGES -->
-<div class="tab-page" id="pgPkg" style="display:flex;flex-direction:column;height:100%;overflow:hidden;padding:0.8rem 0.8rem 0;">
+<div class="tab-page" id="pgPkg" style="flex-direction:column;height:100%;overflow:hidden;padding:0.8rem 0.8rem 0;">
 ```
 
   <!-- Hero -->
