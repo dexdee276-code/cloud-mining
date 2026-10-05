@@ -1870,10 +1870,10 @@ function doRegister(){
 function doLogout(){
   if(_ud){
     _ud.lastSeen=Date.now();
-    // บันทึก ethReward ล่าสุดก่อน logout
     _ud.ethRewardSaved=_ud.ethReward||0;
   }
   saveUDForce(_ud);
+  stopDrip();
   if(window._scenePartInt){clearInterval(window._scenePartInt);window._scenePartInt=null;}
   const sc=document.getElementById('miningScene');if(sc)sc.style.display='none';stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
 
@@ -4296,31 +4296,30 @@ function calcOfflineEarnings(){
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
   if(!acs.length)return;
 
-  let totalMissed=0;
+  // คำนวณจาก lastSeen
+  const lastSeen=ud.lastSeen||now;
+  const offlineMs=now-lastSeen;
+  if(offlineMs<5000){ud.lastSeen=now;saveUD(ud);return;}
+
+  const offlineDays=offlineMs/1000/86400;
+  let totalEth=0;
+
   acs.forEach(p=>{
-    if(!p.bought) return;
-    const elapsedDays=(now-p.bought)/1000/86400;
-    const totalDaysEarned=Math.min(elapsedDays,p.days);
-    const totalEthShouldHave=(p.daily/ETH_RATE)*totalDaysEarned;
-    const daysAlreadyEarned=(p.days-p.remaining);
-    const ethAlreadyEarned=(p.daily/ETH_RATE)*daysAlreadyEarned;
-    // หัก ETH ที่แปลงไปแล้วออกด้วย
-    const ethConverted=ud.ethConverted||0;
-    const ethCurrentNet=(ud.ethReward||0)+ethConverted;
-    const ethMissed=totalEthShouldHave-ethCurrentNet;
-    if(ethMissed>0.000000001){
-      totalMissed+=ethMissed;
-      p.remaining=Math.max(0,p.days-totalDaysEarned);
-    }
+    const earnDays=Math.min(offlineDays,p.remaining);
+    if(earnDays<=0)return;
+    const eth=(p.daily/ETH_RATE)*earnDays;
+    totalEth+=eth;
+    p.remaining=Math.max(0,p.remaining-earnDays);
   });
 
-  if(totalMissed>0.000000001){
-    ud.ethReward=(ud.ethReward||0)+totalMissed;
+  ud.lastSeen=now;
+
+  if(totalEth>0.000000001){
+    ud.ethReward=(ud.ethReward||0)+totalEth;
+    saveUDForce(ud);
+    showToast(`⛏ ขุดออฟไลน์ +${totalEth.toFixed(6)} ETH`);
+  } else {
     saveUD(ud);
-    // แสดง toast เฉพาะถ้าออฟไลน์นานพอ (>1 นาที)
-    if(totalMissed>0.0000001){
-      showToast(`⛏ ขุดออฟไลน์ +${totalMissed.toFixed(6)} ETH`);
-    }
   }
 }
 function updateLastSeen(){
