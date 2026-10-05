@@ -1891,9 +1891,12 @@ function enterDash(user){
           const fresh=snap.val();
           // เก็บค่าที่ดีกว่าไว้
           if(_ud){
+            // ETH ใช้ค่าสูงกว่า (ขุดได้เพิ่ม)
             fresh.ethReward=Math.max(fresh.ethReward||0,_ud.ethReward||0);
+            // ethConverted ใช้ค่าสูงกว่า (แปลงแล้วไม่คืน)
             fresh.ethConverted=Math.max(fresh.ethConverted||0,_ud.ethConverted||0);
-            fresh.usd=Math.max(fresh.usd||0,_ud.usd||0);
+            // usd ใช้จาก Firebase เท่านั้น (Admin อาจหักหรือเติมได้)
+            // ไม่ใช้ Math.max เพราะ submit withdraw หัก usd แล้ว
           }
           _ud=fresh;
           try{localStorage.setItem('cm_ud_'+user,JSON.stringify(fresh));}catch(e){}
