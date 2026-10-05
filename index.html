@@ -1894,9 +1894,8 @@ function enterDash(user){
         if(snap.exists()){
           const fresh=snap.val();
           // เก็บค่าที่ดีกว่าไว้
-          // ใช้ ethRewardSaved เป็นจุดเริ่มต้น (บันทึกก่อน logout)
+          // ใช้ค่าสูงสุดระหว่าง ethReward และ ethRewardSaved
           fresh.ethReward=Math.max(fresh.ethReward||0, fresh.ethRewardSaved||0);
-          fresh.ethConverted=Math.max(fresh.ethConverted||0,0);
           _ud=fresh;
           try{localStorage.setItem('cm_ud_'+user,JSON.stringify(fresh));}catch(e){}
         }
@@ -1912,12 +1911,20 @@ function enterDash(user){
 
   // sync Firebase ทุก 60 วิ
   if(window._fbSyncInt) clearInterval(window._fbSyncInt);
+  // sync ethReward ทุก 5 วิ
   window._fbSyncInt=setInterval(()=>{
-    if(_ud&&window._db){
+    if(_ud&&window._db&&getSess()){
+      window._db.ref('users/'+getSess()+'/ethReward').set(_ud.ethReward||0).catch(()=>{});
+      window._db.ref('users/'+getSess()+'/ethConverted').set(_ud.ethConverted||0).catch(()=>{});
+    }
+  },5000);
+  // sync ข้อมูลทั้งหมดทุก 60 วิ
+  window._fbFullSyncInt=setInterval(()=>{
+    if(_ud&&window._db&&getSess()){
       _ud.ethRewardSaved=_ud.ethReward||0;
       window._db.ref('users/'+getSess()).set(_ud).catch(()=>{});
     }
-  },30000);
+  },60000);
   setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
 }
 
@@ -2865,7 +2872,12 @@ function tpConfirmDone(){
   });
 }
 
-function stopDrip(){if(dripInt){clearInterval(dripInt);dripInt=null;}if(window._displayInt){clearInterval(window._displayInt);window._displayInt=null;}}
+function stopDrip(){
+  if(dripInt){clearInterval(dripInt);dripInt=null;}
+  if(window._displayInt){clearInterval(window._displayInt);window._displayInt=null;}
+  if(window._fbSyncInt){clearInterval(window._fbSyncInt);window._fbSyncInt=null;}
+  if(window._fbFullSyncInt){clearInterval(window._fbFullSyncInt);window._fbFullSyncInt=null;}
+}
 // ETH Rain in machine section
 function spawnEthRain(){
   const c=document.getElementById('ethRainContainer');if(!c)return;
