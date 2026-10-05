@@ -1579,32 +1579,91 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 </div>
 
 <!-- PACKAGES -->
-<div class="tab-page" id="pgPkg">
+<div class="tab-page" id="pgPkg" style="padding:0;">
 ```
 
-  <div class="sec-title" data-i18n="pkg.title">⛏ สัญญาขุด ETH</div>
+  <!-- Hero -->
 
-  <!-- Input จำนวน USDT -->
-
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.2rem;margin-bottom:1rem;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.5rem;">💵 จำนวน USDT ที่ต้องการลงทุน ($100 - $100,000)</div>
-    <input type="number" id="miningAmtInput" min="100" max="100000" placeholder="เช่น 500, 1000, 5000..."
-      oninput="calcMiningPreview()"
-      style="width:100%;padding:0.85rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;outline:none;caret-color:var(--gold);margin-bottom:0.5rem;">
+  <div style="position:relative;padding:1.5rem 1rem 1rem;text-align:center;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(124,58,237,0.15),transparent 70%);pointer-events:none;"></div>
+    <!-- ETH Rain -->
+    <div id="pkgRain" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
 
 ```
-<!-- Preview -->
-<div id="miningPreview" style="display:none;background:rgba(0,0,0,0.2);border-radius:10px;padding:0.8rem;margin-top:0.8rem;">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;">
-    <div style="color:#A890CC;">📈 กำไร/วัน</div><div id="pvDaily" style="color:var(--green);text-align:right;"></div>
-    <div style="color:#A890CC;">⛏ ETH/วัน</div><div id="pvEthDaily" style="color:var(--green);text-align:right;"></div>
-    <div style="color:#A890CC;">📅 ระยะเวลา</div><div id="pvDays" style="color:var(--purple-light);text-align:right;"></div>
-    <div style="color:#A890CC;">💰 % กำไร/วัน</div><div id="pvPct" style="color:var(--gold);text-align:right;"></div>
-    <div style="color:#A890CC;">🏆 ได้คืนรวม</div><div id="pvTotal" style="color:#f87171;text-align:right;font-weight:700;"></div>
-  </div>
+<!-- RIG icon -->
+<div style="position:relative;display:inline-block;margin-bottom:0.8rem;">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.3),transparent);animation:pulse 2s ease-in-out infinite;pointer-events:none;"></div>
+  <span style="font-size:4rem;display:block;animation:floatEth 4s ease-in-out infinite;filter:drop-shadow(0 0 25px rgba(124,58,237,0.8));">⛏️</span>
 </div>
 
-<button class="btn btn-primary" style="width:100%;font-size:0.85rem;padding:1rem;margin-top:1rem;" onclick="startMiningInvestment()">⚡ เริ่มลงทุนเลย</button>
+<div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;background:linear-gradient(135deg,#c084fc,#818cf8,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px;margin-bottom:0.2rem;">CLOUD MINING</div>
+<div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-bottom:1rem;">ETH · AUTOMATED · 24/7</div>
+
+<!-- Live pills -->
+<div style="display:flex;justify-content:center;gap:0.4rem;flex-wrap:wrap;">
+  <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(74,222,128,0.25);border-radius:20px;padding:0.25rem 0.6rem;display:flex;align-items:center;gap:0.3rem;">
+    <div style="width:5px;height:5px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;animation:pulse 1s infinite;flex-shrink:0;"></div>
+    <span id="pkgMinerCount" style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:rgba(74,222,128,0.8);">กำลังขุดอยู่ 2,847 เครื่อง</span>
+  </div>
+  <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,215,0,0.2);border-radius:20px;padding:0.25rem 0.6rem;">
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:rgba(255,215,0,0.7);">ETH ≈ $${ETH_RATE.toLocaleString()}</span>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- Profit Box -->
+
+  <div style="margin:0 0.8rem 0.8rem;background:linear-gradient(145deg,rgba(10,5,25,0.95),rgba(20,10,40,0.95));border:1px solid rgba(157,78,221,0.3);border-radius:16px;padding:1rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(192,132,252,0.6),transparent);"></div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.48rem;color:rgba(192,132,252,0.5);letter-spacing:2px;text-align:center;margin-bottom:0.6rem;" id="pvLabel">⚡ กรอกจำนวนเพื่อดูกำไร</div>
+    <div style="text-align:center;margin-bottom:0.8rem;">
+      <div id="pvEthBig" style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:#4ade80;text-shadow:0 0 25px rgba(74,222,128,0.5);line-height:1;">0.000000</div>
+      <div id="pvUsdDay" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,215,0,0.6);margin-top:0.2rem;">ETH / วัน</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;">
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.1);border-radius:8px;padding:0.5rem;text-align:center;">
+        <div id="pvPct" style="font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#c084fc;">--%</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.4rem;color:rgba(255,255,255,0.3);margin-top:0.1rem;">กำไร/วัน</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.1);border-radius:8px;padding:0.5rem;text-align:center;">
+        <div id="pvDays" style="font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#c084fc;">-- วัน</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.4rem;color:rgba(255,255,255,0.3);margin-top:0.1rem;">ระยะเวลา</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,215,0,0.1);border-radius:8px;padding:0.5rem;text-align:center;">
+        <div id="pvTotal" style="font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#ffd700;">$--</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.4rem;color:rgba(255,255,255,0.3);margin-top:0.1rem;">ได้คืนรวม</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+
+  <div style="margin:0 0.8rem 0.8rem;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(192,132,252,0.6);margin-bottom:0.4rem;display:flex;justify-content:space-between;">
+      <span>💵 จำนวน USDT ที่ต้องการลงทุน</span>
+    </div>
+    <div style="position:relative;margin-bottom:0.6rem;">
+      <input type="number" id="miningAmtInput" min="100" max="100000" placeholder="100 - 100,000"
+        oninput="calcMiningPreview()"
+        style="width:100%;padding:0.85rem 4rem 0.85rem 1rem;background:rgba(0,0,0,0.4);border:2px solid rgba(157,78,221,0.3);border-radius:12px;color:#ffd700;font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;outline:none;transition:border-color 0.3s;">
+      <span style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,215,0,0.4);">USDT</span>
+    </div>
+
+```
+<!-- Quick amounts -->
+<div style="display:flex;gap:0.35rem;margin-bottom:0.8rem;flex-wrap:wrap;">
+  <button onclick="setMiningAmt(100)" class="qa-btn">$100</button>
+  <button onclick="setMiningAmt(500)" class="qa-btn">$500</button>
+  <button onclick="setMiningAmt(1000)" class="qa-btn">$1,000</button>
+  <button onclick="setMiningAmt(5000)" class="qa-btn">$5,000</button>
+  <button onclick="setMiningAmt(10000)" class="qa-btn">$10,000</button>
+</div>
+
+<button onclick="startMiningInvestment()" style="width:100%;padding:1rem;border:none;border-radius:14px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea);color:#fff;box-shadow:0 4px 30px rgba(124,58,237,0.5);">
+  ⚡ เริ่มขุด ETH เลย
+</button>
 ```
 
   </div>
@@ -1962,7 +2021,7 @@ function switchTab(i){
     const page=document.getElementById(id);if(page)page.classList.toggle('active',i===j);
     const btn=document.getElementById('bn'+j);if(btn)btn.classList.toggle('active',i===j);
   });
-  if(i===1)renderPkgs();if(i===2)renderWallet();
+  if(i===1){renderPkgs();startPkgRain();}if(i===2)renderWallet();
   if(i===3){renderTopupHistory();renderPendingList();}
 }
 
@@ -4012,20 +4071,43 @@ function resendOTPBrevo(){
 
 function calcMiningPreview(){
   const amt=parseFloat(document.getElementById('miningAmtInput')?.value)||0;
-  const preview=document.getElementById('miningPreview');
-  if(!preview) return;
-  if(amt<100){preview.style.display='none';return;}
+  if(amt<100){
+    const lbl=document.getElementById('pvLabel');if(lbl)lbl.textContent='⚡ กรอกจำนวนเพื่อดูกำไร';
+    const big=document.getElementById('pvEthBig');if(big)big.textContent='0.000000';
+    return;
+  }
   const pct=calcDailyPct(amt);
   const daily=calcDailyEarn(amt);
   const ethDaily=daily/ETH_RATE;
   const days=calcDays(amt);
   const total=amt+daily*days;
-  document.getElementById('pvDaily').textContent='$'+daily.toFixed(2)+' USDT';
-  document.getElementById('pvEthDaily').textContent=ethDaily.toFixed(6)+' ETH';
-  document.getElementById('pvDays').textContent=days+' วัน';
-  document.getElementById('pvPct').textContent=pct.toFixed(2)+'%/วัน';
-  document.getElementById('pvTotal').textContent='$'+total.toFixed(0)+' USDT';
-  preview.style.display='block';
+  // อัปเดต new UI
+  const lbl=document.getElementById('pvLabel');if(lbl)lbl.textContent=`⚡ กำไรตัวอย่าง ($${amt.toLocaleString()} USDT)`;
+  const big=document.getElementById('pvEthBig');if(big)big.textContent=ethDaily.toFixed(6);
+  const usdDay=document.getElementById('pvUsdDay');if(usdDay)usdDay.textContent=`≈ $${daily.toFixed(2)} USDT / วัน`;
+  const pvPct=document.getElementById('pvPct');if(pvPct)pvPct.textContent=pct.toFixed(2)+'%';
+  const pvDays=document.getElementById('pvDays');if(pvDays)pvDays.textContent=days+' วัน';
+  const pvTotal=document.getElementById('pvTotal');if(pvTotal)pvTotal.textContent='$'+total.toFixed(0);
+}
+function setMiningAmt(v){
+  const inp=document.getElementById('miningAmtInput');
+  if(inp){inp.value=v;calcMiningPreview();}
+  document.querySelectorAll('.qa-btn').forEach(b=>{
+    b.classList.toggle('sel',b.textContent.replace(/[^0-9]/g,'')==String(v).replace(/[^0-9]/g,''));
+  });
+}
+// ETH Rain in pgPkg
+let _pkgRainInt=null;
+function startPkgRain(){
+  if(_pkgRainInt) return;
+  _pkgRainInt=setInterval(()=>{
+    const c=document.getElementById('pkgRain');if(!c)return;
+    const el=document.createElement('div');
+    el.style.cssText=`position:absolute;left:${5+Math.random()*90}%;top:-10px;font-family:'Orbitron',monospace;font-size:${0.5+Math.random()*0.4}rem;color:rgba(74,222,128,${0.2+Math.random()*0.3});pointer-events:none;transition:none;`;
+    el.textContent=Math.random()>0.5?'Ξ':'+ETH';
+    c.appendChild(el);
+    let y=-10;const int=setInterval(()=>{y+=1.5;el.style.top=y+'px';if(y>250){clearInterval(int);el.remove();}},20);
+  },400);
 }
 
 function startMiningInvestment(){
