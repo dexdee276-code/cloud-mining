@@ -4115,7 +4115,11 @@ function startMiningInvestment(){
   const amt=parseFloat(document.getElementById('miningAmtInput')?.value)||0;
   if(amt<100||amt>100000){showToast('⚠ ใส่จำนวน $100 - $100,000');return;}
   const ud=getUD();if(!ud)return;
-  if((ud.usd||0)<amt){showToast('❌ USDT ไม่พอ กรุณาเติมเงินก่อน');switchTab(3);return;}
+  if((ud.usd||0)<amt){
+    showToast('❌ USDT ไม่พอ กรุณาเติมก่อนครับ');
+    setTimeout(()=>{switchTab(2);setTimeout(()=>showTopupPopup(),400);},300);
+    return;
+  }
   const pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt),total=amt+daily*days;
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup" style="text-align:center;">
