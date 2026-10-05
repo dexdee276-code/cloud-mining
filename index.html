@@ -1868,7 +1868,11 @@ function doRegister(){
 }
 
 function doLogout(){
-  if(_ud){_ud.lastSeen=Date.now();}
+  if(_ud){
+    _ud.lastSeen=Date.now();
+    // บันทึก ethReward ล่าสุดก่อน logout
+    _ud.ethRewardSaved=_ud.ethReward||0;
+  }
   saveUDForce(_ud);
   if(window._scenePartInt){clearInterval(window._scenePartInt);window._scenePartInt=null;}
   const sc=document.getElementById('miningScene');if(sc)sc.style.display='none';stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
@@ -1890,14 +1894,9 @@ function enterDash(user){
         if(snap.exists()){
           const fresh=snap.val();
           // เก็บค่าที่ดีกว่าไว้
-          if(_ud){
-            // ETH ใช้ค่าสูงกว่า (ขุดได้เพิ่ม)
-            fresh.ethReward=Math.max(fresh.ethReward||0,_ud.ethReward||0);
-            // ethConverted ใช้ค่าสูงกว่า (แปลงแล้วไม่คืน)
-            fresh.ethConverted=Math.max(fresh.ethConverted||0,_ud.ethConverted||0);
-            // usd ใช้จาก Firebase เท่านั้น (Admin อาจหักหรือเติมได้)
-            // ไม่ใช้ Math.max เพราะ submit withdraw หัก usd แล้ว
-          }
+          // ใช้ ethRewardSaved เป็นจุดเริ่มต้น (บันทึกก่อน logout)
+          fresh.ethReward=Math.max(fresh.ethReward||0, fresh.ethRewardSaved||0);
+          fresh.ethConverted=Math.max(fresh.ethConverted||0,0);
           _ud=fresh;
           try{localStorage.setItem('cm_ud_'+user,JSON.stringify(fresh));}catch(e){}
         }
@@ -1914,8 +1913,11 @@ function enterDash(user){
   // sync Firebase ทุก 60 วิ
   if(window._fbSyncInt) clearInterval(window._fbSyncInt);
   window._fbSyncInt=setInterval(()=>{
-    if(_ud&&window._db) window._db.ref('users/'+getSess()).set(_ud).catch(()=>{});
-  },60000);
+    if(_ud&&window._db){
+      _ud.ethRewardSaved=_ud.ethReward||0;
+      window._db.ref('users/'+getSess()).set(_ud).catch(()=>{});
+    }
+  },30000);
   setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
 }
 
