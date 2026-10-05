@@ -1883,8 +1883,30 @@ function enterDash(user){
   renderPkgs();
   switchTab(0);
   showToast(t('toast.welcome')+' '+user+'!');
-  // คำนวณออฟไลน์หลัง welcome toast
-  setTimeout(()=>calcOfflineEarnings(),3500);
+  // sync Firebase ก่อน แล้วค่อย calcOfflineEarnings
+  setTimeout(()=>{
+    if(window._db){
+      window._db.ref('users/'+user).once('value').then(snap=>{
+        if(snap.exists()){
+          const fresh=snap.val();
+          // เก็บค่าที่ดีกว่าไว้
+          if(_ud){
+            fresh.ethReward=Math.max(fresh.ethReward||0,_ud.ethReward||0);
+            fresh.ethConverted=Math.max(fresh.ethConverted||0,_ud.ethConverted||0);
+            fresh.usd=Math.max(fresh.usd||0,_ud.usd||0);
+          }
+          _ud=fresh;
+          try{localStorage.setItem('cm_ud_'+user,JSON.stringify(fresh));}catch(e){}
+        }
+        calcOfflineEarnings();
+        updateNav();
+        renderMachines();
+        renderWallet();
+      }).catch(()=>calcOfflineEarnings());
+    } else {
+      calcOfflineEarnings();
+    }
+  },1000);
 
   // sync Firebase ทุก 60 วิ
   if(window._fbSyncInt) clearInterval(window._fbSyncInt);
@@ -3102,11 +3124,14 @@ function renderAdminWithdraw(){
 function approveWithdraw(fbKey, username, amt){
   if(!window._db)return;
   window._db.ref('withdraw_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()});
-  // บันทึก tx
-  window._db.ref('users/'+username+'/txs').once('value').then(snap=>{
-    const txs=snap.exists()?(Array.isArray(snap.val())?snap.val():Object.values(snap.val()||{})):[];
-    txs.unshift({desc:`✅ ถอน $${parseFloat(amt).toFixed(2)} USDT สำเร็จ`,amount:-parseFloat(amt),unit:'USDT',time:Date.now()});
-    window._db.ref('users/'+username+'/txs').set(txs);
+  // อัปเดต user - usd ถูกหักไปแล้วตอน submitWithdraw แค่บันทึก tx
+  window._db.ref('users/'+username).once('value').then(snap=>{
+    if(!snap.exists())return;
+    const ud=snap.val();
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({desc:`✅ ถอน $${parseFloat(amt).toFixed(2)} USDT อนุมัติแล้ว`,amount:-parseFloat(amt),unit:'USDT',time:Date.now()});
+    window._db.ref('users/'+username).set(ud);
+    if(getSess()===username){_ud=ud;updateNav();}
   });
   setTimeout(()=>renderAdminWithdraw(),1000);
   showToast(`✅ อนุมัติถอน $${parseFloat(amt).toFixed(2)} USDT ให้ ${username}`);
@@ -4008,12 +4033,13 @@ function submitConvert(){
   const amt=parseFloat(document.getElementById('convertAmt')?.value)||0;
   if(amt<=0||amt>(ud.ethReward||0)){showToast('❌ จำนวนไม่ถูกต้อง');return;}
   ud.ethReward=parseFloat(((ud.ethReward||0)-amt).toFixed(6));
-  ud.ethConverted=(ud.ethConverted||0)+amt; // เก็บยอดที่แปลงแล้ว
+  ud.ethConverted=(ud.ethConverted||0)+amt;
   const usdt=parseFloat((amt*ETH_RATE).toFixed(2));
   ud.usd=(ud.usd||0)+usdt;
   ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:`💱 แปลง ${amt.toFixed(6)} ETH`,amount:usdt,unit:'USDT',time:Date.now()});
-  saveUD(ud);
+  ud.txs.unshift({desc:`💱 แปลง ${amt.toFixed(6)} ETH → $${usdt} USDT`,amount:usdt,unit:'USDT',time:Date.now()});
+  // sync Firebase ทันที
+  saveUDForce(ud);
   document.querySelectorAll('.overlay').forEach(o=>o.remove());
   updateNav();renderWallet();
   showToast(`✅ แปลงสำเร็จ! +$${usdt} USDT`);
