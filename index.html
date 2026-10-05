@@ -1724,13 +1724,13 @@ box-shadow:0 4px 20px rgba(16,185,129,0.5),0 0 40px rgba(16,185,129,0.2);”>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
       <span>หน้าหลัก</span>
     </button>
-    <button class="bnav" id="bnPkg" onclick="switchTab(1)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-      <span>สัญญาขุด</span>
-    </button>
-    <button class="bnav-mine" id="bnMining" onclick="switchTab(0);setTimeout(()=>{const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);">
-      <div class="bnav-mine-circle">⛏</div>
+    <button class="bnav" id="bnMining" onclick="switchTab(0);setTimeout(()=>{const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="3"/></svg>
       <span>เครื่องขุด</span>
+    </button>
+    <button class="bnav-mine" id="bnPkg" onclick="switchTab(1)">
+      <div class="bnav-mine-circle">⛏</div>
+      <span>สัญญาขุด</span>
     </button>
     <button class="bnav" id="bn2" onclick="switchTab(2)">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
