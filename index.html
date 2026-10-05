@@ -3060,62 +3060,73 @@ function rejectTopup(fbKey, username){
   showToast(`❌ ปฏิเสธคำขอของ ${username} แล้ว`);
 }
 function renderAdminWithdraw(){
-  const el=document.getElementById('adminWithdrawList'); if(!el) return;
-  const withdraws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  if(!withdraws.length){el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ยังไม่มีคำขอแลก ETH</div>';return;}
-  const methodName={bank:'🏦 โอนบัญชี',promptpay:'📱 PromptPay',bcel:'🏧 BCEL',other:'💬 อื่นๆ'};
-  el.innerHTML=withdraws.sort((a,b)=>b.time-a.time).map(r=>{
-    const d=new Date(r.time);
-    const t2=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-    const lakDisplay = r.lakAmt || Math.round((r.amt||r.ethAmt||0)*ETH_RATE*LAK_RATE).toLocaleString();
-    const ethDisplay = r.ethAmt || r.amt || 0;
-    return `<div class="req-card ${r.status}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem;">
-        <div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.88rem;color:var(--green);">${parseFloat(ethDisplay).toFixed(4)} ETH</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--gold);">${lakDisplay} ກີບ</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);">👤 ${r.user} · ${t2}</div>
+  const el=document.getElementById('adminWithdrawList');if(!el)return;
+  if(!window._db){el.innerHTML='<div style="color:red;padding:1rem;">❌ ไม่มี Firebase</div>';return;}
+  el.innerHTML='<div style="text-align:center;padding:1rem;font-family:monospace;color:#A890CC;font-size:0.7rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('withdraw_reqs').once('value').then(snap=>{
+    if(!snap.exists()){
+      el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:2rem;">ยังไม่มีคำขอถอน</div>';
+      return;
+    }
+    const reqs=Object.entries(snap.val()).map(([k,v])=>({...v,fbKey:k})).sort((a,b)=>b.time-a.time);
+    el.innerHTML=reqs.map(r=>{
+      const d=new Date(r.time);
+      const t2=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+      const statusCol=r.status==='pending'?'var(--gold)':r.status==='approved'?'var(--green)':'var(--red-bright)';
+      const statusTxt=r.status==='pending'?'⏳ รอดำเนินการ':r.status==='approved'?'✅ อนุมัติแล้ว':'❌ ปฏิเสธ';
+      return `<div class="req-card ${r.status}" style="margin-bottom:0.8rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+          <div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--gold);">$${(r.amt||0).toFixed(2)} USDT</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">👤 ${r.user||'-'} · ${t2}</div>
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:${statusCol};border:1px solid ${statusCol};border-radius:15px;padding:0.2rem 0.5rem;">${statusTxt}</div>
         </div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:${r.status==='pending'?'var(--gold)':r.status==='approved'?'var(--green)':'var(--red-bright)'};">
-          ${r.status==='pending'?'⏳ รออนุมัติ':r.status==='approved'?'✅ จ่ายแล้ว':'❌ ปฏิเสธ'}
+        <!-- ข้อมูลปลายทาง -->
+        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(74,222,128,0.15);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#A890CC;margin-bottom:0.3rem;">🌐 เครือข่าย: <span style="color:#627eea;">${r.network||'TRC20'}</span></div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--green);word-break:break-all;">${r.addr||'-'}</div>
+          ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.3rem;">📝 ${r.note}</div>`:''}
         </div>
-      </div>
-      <!-- ข้อมูลบัญชี -->
-      <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(157,78,221,0.12);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--purple-light);margin-bottom:0.3rem;">${methodName[r.method]||'💳 ช่องทางโอน'}</div>
-        ${r.bank?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text);">🏦 ${r.bank}</div>`:''}
-        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;margin-top:0.2rem;">${r.accNo||'-'}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);">👤 ${r.accName||'-'}</div>
-        ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.2rem;">📝 ${r.note}</div>`:''}
-      </div>
-      ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;">
-        <button onclick="approveWithdraw('${r.id}','${r.user}',${ethDisplay})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
-        <button onclick="rejectWithdraw('${r.id}','${r.user}')" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
-      </div>`:''}
-    </div>`;
-  }).join('');
+        ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;">
+          <button onclick="approveWithdraw('${r.fbKey}','${r.user}',${r.amt||0})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
+          <button onclick="rejectWithdraw('${r.fbKey}','${r.user}',${r.amt||0})" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
+        </div>`:''}
+      </div>`;
+    }).join('');
+  }).catch(()=>{
+    el.innerHTML='<div style="color:red;padding:1rem;">❌ โหลดไม่สำเร็จ</div>';
+  });
 }
-function approveWithdraw(reqId, username, ethAmt){
-  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  const w=ws.find(r=>r.id===reqId); if(!w) return;
-  w.status='approved'; w.approvedAt=Date.now();
-  localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
-  // หัก ETH จากผู้ใช้
-  const users=getU(); const ud=users[username];
-  if(ud){
-    ud.ethReward=Math.max(0,(ud.ethReward||0)-parseFloat(ethAmt));
-    ud.txs=ud.txs||[];
-    ud.txs.unshift({desc:`✅ แลก ${parseFloat(ethAmt).toFixed(4)} ETH สำเร็จ`,amount:-parseFloat(ethAmt).toFixed(4),unit:'ETH',time:Date.now()});
-    users[username]=ud; saveU(users);
-  }
-  updateNav(); renderAdminWithdraw();
-  showToast(`✅ อนุมัติแลก ${parseFloat(ethAmt).toFixed(4)} ETH ให้ ${username}`);
+
+function approveWithdraw(fbKey, username, amt){
+  if(!window._db)return;
+  window._db.ref('withdraw_reqs/'+fbKey).update({status:'approved',approvedAt:Date.now()});
+  // บันทึก tx
+  window._db.ref('users/'+username+'/txs').once('value').then(snap=>{
+    const txs=snap.exists()?(Array.isArray(snap.val())?snap.val():Object.values(snap.val()||{})):[];
+    txs.unshift({desc:`✅ ถอน $${parseFloat(amt).toFixed(2)} USDT สำเร็จ`,amount:-parseFloat(amt),unit:'USDT',time:Date.now()});
+    window._db.ref('users/'+username+'/txs').set(txs);
+  });
+  setTimeout(()=>renderAdminWithdraw(),1000);
+  showToast(`✅ อนุมัติถอน $${parseFloat(amt).toFixed(2)} USDT ให้ ${username}`);
 }
-function rejectWithdraw(reqId, username){
-  const ws=JSON.parse(localStorage.getItem('cm_withdraw_reqs')||'[]');
-  const w=ws.find(r=>r.id===reqId); if(w) w.status='rejected';
-  localStorage.setItem('cm_withdraw_reqs',JSON.stringify(ws));
-  renderAdminWithdraw(); showToast(`❌ ปฏิเสธคำขอแลก ETH ของ ${username}`);
+
+function rejectWithdraw(fbKey, username, amt){
+  if(!window._db)return;
+  window._db.ref('withdraw_reqs/'+fbKey).update({status:'rejected',rejectedAt:Date.now()});
+  // คืน USDT ให้ user
+  window._db.ref('users/'+username+'/usd').once('value').then(snap=>{
+    const cur=snap.val()||0;
+    window._db.ref('users/'+username+'/usd').set(cur+parseFloat(amt));
+    window._db.ref('users/'+username+'/txs').once('value').then(s=>{
+      const txs=s.exists()?(Array.isArray(s.val())?s.val():Object.values(s.val()||{})):[];
+      txs.unshift({desc:`❌ คืน $${parseFloat(amt).toFixed(2)} USDT (ปฏิเสธถอน)`,amount:+parseFloat(amt),unit:'USDT',time:Date.now()});
+      window._db.ref('users/'+username+'/txs').set(txs);
+    });
+  });
+  setTimeout(()=>renderAdminWithdraw(),1000);
+  showToast(`❌ ปฏิเสธคำขอถอน คืน $${parseFloat(amt).toFixed(2)} USDT ให้ ${username}`);
 }
 
 // ── Admin User Search ──
