@@ -972,6 +972,12 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
       box-shadow:0 4px 15px rgba(16,185,129,0.3);">💾 บันทึกที่อยู่ USDT</button>
   </div>
 
+  <!-- 2FA Settings -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:#c084fc;margin-bottom:0.8rem;">🔐 Two-Factor Authentication (2FA)</div>
+    <div id="twoFAStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;"></div>
+  </div>
+
   <!-- เปลี่ยนรหัส Admin -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.8rem;">🔐 เปลี่ยนรหัส Admin</div>
@@ -2184,6 +2190,17 @@ function doLogin(){
     if(cached){
       const ud=JSON.parse(cached);
       if(ud&&ud.pw===p){
+        // เช็ค 2FA
+        if(ud.twoFA?.enabled){
+          show2FALogin(u,ud,()=>{
+            _ud=ud;setSess(u);enterDash(u);
+            if(window._db)fbGetUser(u).then(fresh=>{if(fresh){
+              fresh.ethReward=Math.max(fresh.ethReward||0,fresh.ethRewardSaved||0);
+              _ud=fresh;try{localStorage.setItem('cm_ud_'+u,JSON.stringify(fresh));}catch(e){}
+            }});
+          });
+          return;
+        }
         _ud=ud;setSess(u);enterDash(u);
         if(window._db)fbGetUser(u).then(fresh=>{if(fresh){
           // เก็บ ethReward ปัจจุบันไว้ ถ้าสูงกว่า Firebase ให้ใช้ local
@@ -4752,7 +4769,13 @@ function showSettingsMenu(){
       <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showChangePassPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>🔐</span><span style="font-family:'Share Tech Mono',monospace;">เปลี่ยนรหัสผ่าน</span></button>
       <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showLangPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>🌐</span><span style="font-family:'Share Tech Mono',monospace;">เปลี่ยนภาษา</span></button>
       <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showAboutPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>ℹ️</span><span style="font-family:'Share Tech Mono',monospace;">เกี่ยวกับแอป</span></button>
-      <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showAdminPassPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:12px;color:rgba(255,215,0,0.5);cursor:pointer;text-align:left;width:100%;"><span>🔑</span><span style="font-family:'Share Tech Mono',monospace;">Admin Access</span></button>
+      
+    <!-- 2FA -->
+    <div style="background:rgba(192,132,252,0.05);border:1px solid rgba(192,132,252,0.15);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:#c084fc;margin-bottom:0.7rem;">🔐 ความปลอดภัย 2FA</div>
+      <div id="twoFAStatus"></div>
+    </div>
+    <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showAdminPassPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:12px;color:rgba(255,215,0,0.5);cursor:pointer;text-align:left;width:100%;"><span>🔑</span><span style="font-family:'Share Tech Mono',monospace;">Admin Access</span></button>
     </div>
   </div>`;
   document.body.appendChild(ov);
@@ -5060,6 +5083,179 @@ function spawnSceneParticle(){
   p.style.cssText=`position:absolute;width:${sz}px;height:${sz}px;border-radius:50%;background:${col};box-shadow:0 0 ${sz*2}px ${col};pointer-events:none;animation:scParticleFly 0.25s forwards ease-out;--px:${px}px;--py:${py}px;`;
   c.appendChild(p);
   setTimeout(()=>p.remove(),300);
+}
+
+
+// ── TOTP (Google Authenticator compatible) ──
+function base32ToBytes(base32){
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits=0,val=0;const bytes=[];
+  for(let i=0;i<base32.length;i++){
+    const c=base32.toUpperCase()[i];
+    if(c==='=')break;
+    val=(val<<5)|chars.indexOf(c);bits+=5;
+    if(bits>=8){bytes.push((val>>>(bits-8))&0xff);bits-=8;}
+  }
+  return bytes;
+}
+async function hmacSHA1(keyBytes,data){
+  const key=await crypto.subtle.importKey('raw',new Uint8Array(keyBytes),{name:'HMAC',hash:'SHA-1'},false,['sign']);
+  const sig=await crypto.subtle.sign('HMAC',key,new Uint8Array(data));
+  return new Uint8Array(sig);
+}
+async function generateTOTP(secret,timeStep=30){
+  const t=Math.floor(Date.now()/1000/timeStep);
+  const msg=new Array(8).fill(0);
+  for(let i=7;i>=0;i--){msg[i]=t&0xff;t>>>=8;}// fixed
+  // use proper counter
+  const counter=Math.floor(Date.now()/1000/timeStep);
+  const data=[0,0,0,0,(counter>>>24)&0xff,(counter>>>16)&0xff,(counter>>>8)&0xff,counter&0xff];
+  const keyBytes=base32ToBytes(secret);
+  const hmac=await hmacSHA1(keyBytes,data);
+  const offset=hmac[19]&0xf;
+  const code=((hmac[offset]&0x7f)<<24)|((hmac[offset+1]&0xff)<<16)|((hmac[offset+2]&0xff)<<8)|(hmac[offset+3]&0xff);
+  return String(code%1000000).padStart(6,'0');
+}
+function generateSecret(){
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let s='';for(let i=0;i<16;i++)s+=chars[Math.floor(Math.random()*32)];
+  return s;
+}
+async function verifyTOTP(secret,token){
+  // เช็ค window ±1 (30 วิก่อนและหลัง)
+  for(let w=-1;w<=1;w++){
+    const counter=Math.floor(Date.now()/1000/30)+w;
+    const data=[0,0,0,0,(counter>>>24)&0xff,(counter>>>16)&0xff,(counter>>>8)&0xff,counter&0xff];
+    const keyBytes=base32ToBytes(secret);
+    const hmac=await hmacSHA1(keyBytes,data);
+    const offset=hmac[19]&0xf;
+    const code=((hmac[offset]&0x7f)<<24)|((hmac[offset+1]&0xff)<<16)|((hmac[offset+2]&0xff)<<8)|(hmac[offset+3]&0xff);
+    if(String(code%1000000).padStart(6,'0')===String(token))return true;
+  }
+  return false;
+}
+
+// ── 2FA Setup Popup ──
+function show2FASetup(){
+  const ud=getUD();if(!ud)return;
+  const secret=generateSecret();
+  const user=getSess();
+  const issuer='CryptoMine';
+  const otpauth=`otpauth://totp/${issuer}:${user}?secret=${secret}&issuer=${issuer}`;
+  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(otpauth)}`;
+
+  const ov=document.createElement('div');ov.className='overlay';ov.id='twoFAOv';
+  ov.innerHTML=`<div class="popup" style="max-width:340px;">
+    <div class="pop-hd">
+      <div class="pop-title">🔐 ตั้งค่า 2FA</div>
+      <button class="pop-close" onclick="document.getElementById('twoFAOv').remove()">✕</button>
+    </div>
+
+    <div id="fa-step1">
+      <div style="text-align:center;margin-bottom:1rem;">
+        <div style="font-size:0.6rem;color:#A890CC;margin-bottom:0.8rem;line-height:1.7;">
+          1. เปิดแอป <b style="color:#c084fc;">Google Authenticator</b><br>
+          2. กด <b style="color:#ffd700;">+</b> → Scan QR Code<br>
+          3. สแกน QR ด้านล่าง
+        </div>
+        <img src="${qrUrl}" style="width:180px;height:180px;border-radius:12px;border:3px solid rgba(255,215,0,0.3);">
+        <div style="margin-top:0.6rem;font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:#A890CC;">หรือใส่ Manual Key:</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:#ffd700;letter-spacing:2px;margin-top:0.3rem;word-break:break-all;">${secret}</div>
+        <button onclick="navigator.clipboard?.writeText('${secret}').then(()=>showToast('📋 คัดลอกแล้ว!'))" 
+          style="margin-top:0.5rem;padding:0.3rem 0.8rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);border-radius:8px;color:rgba(255,215,0,0.7);font-size:0.55rem;cursor:pointer;">
+          📋 คัดลอก Key
+        </button>
+      </div>
+
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#A890CC;margin-bottom:0.4rem;">กรอก OTP 6 หลักจากแอปเพื่อยืนยัน</div>
+      <input type="number" id="fa-verify-code" placeholder="000000" maxlength="6"
+        style="width:100%;padding:0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(192,132,252,0.4);color:#c084fc;font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;letter-spacing:8px;text-align:center;outline:none;margin-bottom:1rem;">
+      <button onclick="confirm2FASetup('${secret}')" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.4);">
+        ✅ เปิดใช้งาน 2FA
+      </button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+async function confirm2FASetup(secret){
+  const code=document.getElementById('fa-verify-code')?.value;
+  if(!code||code.length<6){showToast('⚠️ กรอก OTP 6 หลัก');return;}
+  const valid=await verifyTOTP(secret,code);
+  if(!valid){showToast('❌ OTP ไม่ถูกต้อง ลองใหม่');return;}
+  // บันทึก secret ลง Firebase
+  const ud=getUD();if(!ud)return;
+  ud.twoFA={enabled:true,secret};
+  saveUDForce(ud);
+  if(window._db) window._db.ref('users/'+getSess()+'/twoFA').set({enabled:true,secret});
+  document.getElementById('twoFAOv').remove();
+  showToast('✅ เปิด 2FA สำเร็จ! ปลอดภัยแล้ว');
+  render2FAStatus();
+}
+
+function disable2FA(){
+  if(!confirm('ปิด 2FA จะทำให้บัญชีปลอดภัยน้อยลง ยืนยันไหม?'))return;
+  const ud=getUD();if(!ud)return;
+  ud.twoFA={enabled:false,secret:''};
+  saveUDForce(ud);
+  if(window._db) window._db.ref('users/'+getSess()+'/twoFA').set({enabled:false,secret:''});
+  showToast('⚠️ ปิด 2FA แล้ว');
+  render2FAStatus();
+}
+
+function render2FAStatus(){
+  const el=document.getElementById('twoFAStatus');if(!el)return;
+  const ud=getUD();if(!ud)return;
+  const on=ud.twoFA?.enabled;
+  el.innerHTML=on
+    ?`<div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:#4ade80;font-weight:900;">🔐 2FA เปิดอยู่</div>
+          <div style="font-size:0.52rem;color:rgba(74,222,128,0.5);margin-top:0.2rem;">บัญชีของคุณปลอดภัย</div>
+        </div>
+        <button onclick="disable2FA()" style="padding:0.4rem 0.8rem;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:8px;color:#f87171;font-size:0.55rem;cursor:pointer;font-family:'Share Tech Mono',monospace;">ปิด 2FA</button>
+      </div>`
+    :`<div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:#f87171;font-weight:900;">🔓 2FA ปิดอยู่</div>
+          <div style="font-size:0.52rem;color:rgba(248,113,113,0.5);margin-top:0.2rem;">แนะนำให้เปิดเพื่อความปลอดภัย</div>
+        </div>
+        <button onclick="show2FASetup()" style="padding:0.4rem 0.8rem;background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;border-radius:8px;color:#fff;font-size:0.55rem;cursor:pointer;font-family:'Orbitron',monospace;font-weight:700;">เปิด 2FA</button>
+      </div>`;
+}
+
+// ── 2FA Login Popup ──
+function show2FALogin(user,ud,onSuccess){
+  const ov=document.createElement('div');ov.className='overlay';ov.id='twoFALoginOv';
+  ov.innerHTML=`<div class="popup" style="max-width:300px;text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:0.8rem;">🔐</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:#c084fc;margin-bottom:0.3rem;">ยืนยัน 2FA</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:1rem;line-height:1.7;">
+      เปิด Google Authenticator<br>และกรอก OTP 6 หลัก
+    </div>
+    <input type="number" id="fa-login-code" placeholder="000000" maxlength="6"
+      style="width:100%;padding:0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(192,132,252,0.4);color:#c084fc;font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;letter-spacing:10px;text-align:center;outline:none;margin-bottom:1rem;">
+    <button onclick="verify2FALogin('${ud.twoFA.secret}')" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea);color:#fff;margin-bottom:0.5rem;">
+      ✅ ยืนยัน
+    </button>
+    <button onclick="document.getElementById('twoFALoginOv').remove()" style="width:100%;padding:0.6rem;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.3);font-size:0.6rem;cursor:pointer;">
+      ยกเลิก
+    </button>
+  </div>`;
+  document.body.appendChild(ov);
+  // เก็บ callback
+  window._2faCallback={user,ud,onSuccess};
+  setTimeout(()=>document.getElementById('fa-login-code')?.focus(),300);
+}
+
+async function verify2FALogin(secret){
+  const code=document.getElementById('fa-login-code')?.value;
+  if(!code||code.length<6){showToast('⚠️ กรอก OTP 6 หลัก');return;}
+  const valid=await verifyTOTP(secret,code);
+  if(!valid){showToast('❌ OTP ไม่ถูกต้อง');return;}
+  document.getElementById('twoFALoginOv').remove();
+  if(window._2faCallback?.onSuccess) window._2faCallback.onSuccess();
+  window._2faCallback=null;
 }
 
 </script>
