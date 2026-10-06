@@ -2263,7 +2263,14 @@ function doLogout(){
   stopDrip();
   const bn=document.getElementById('bottomNav');if(bn)bn.style.display='none';
   if(window._scenePartInt){clearInterval(window._scenePartInt);window._scenePartInt=null;}
-  const sc=document.getElementById('miningScene');if(sc)sc.style.display='none';stopMine();stopDrip();clrSess();document.getElementById('authScreen').classList.add('active');document.getElementById('dashScreen').classList.remove('active');showToast(t('toast.logout'))}
+  const sc=document.getElementById('miningScene');if(sc)sc.style.display='none';
+  stopMine();stopDrip();clrSess();
+  // ซ่อนทุก tab-page
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('authScreen').classList.add('active');
+  document.getElementById('dashScreen').classList.remove('active');
+  showToast(t('toast.logout'));
+}
 
 // ─── ENTER DASHBOARD ───
 function enterDash(user){
