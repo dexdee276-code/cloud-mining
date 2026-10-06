@@ -2346,7 +2346,7 @@ function startMine(){
   const btn=document.getElementById('mineBtn');btn.textContent='⏹ หยุดขุด';btn.classList.add('mining');
   document.getElementById('mineStatus').textContent='⛏️ กำลังขุดอยู่...';
   const hr=[90,130,170,200,250][Math.floor(Math.random()*5)];
-  document.getElementById('stHash').textContent=hr;
+  const stH=document.getElementById('stHash');if(stH)stH.textContent=hr;
   document.getElementById('mineRate').innerHTML=(0.0001*hr/100).toFixed(6)+' <span>ETH/นาที</span>';
   mineInt=setInterval(()=>{
     mineProg+=1.5+Math.random()*2;
@@ -2355,9 +2355,9 @@ function startMine(){
       const ud=getUD();if(!ud)return;
       ud.ethMine=(ud.ethMine||0)+earned;ud.sessions=(ud.sessions||0)+1;
       saveUD(ud);updateNav();
-      document.getElementById('stTotal').textContent=(ud.ethMine||0).toFixed(4);
-      document.getElementById('stUsd').textContent=((ud.ethMine||0)*ETH_RATE).toFixed(2);
-      document.getElementById('stSess').textContent=ud.sessions;
+      const stT=document.getElementById('stTotal');if(stT)stT.textContent=(ud.ethMine||0).toFixed(4);
+      const stU=document.getElementById('stUsd');if(stU)stU.textContent=((ud.ethMine||0)*ETH_RATE).toFixed(2);
+      const stSe=document.getElementById('stSess');if(stSe)stSe.textContent=ud.sessions;
       addAct('⛏️','ขุด Block สำเร็จ!','+'+earned.toFixed(4)+' ETH','ap');
       showToast(t('toast.mined')+' +'+earned.toFixed(4)+' ETH');
     }
@@ -2371,7 +2371,7 @@ function stopMine(){
   document.getElementById('mineStatus').textContent='⏸ รอการขุด';
   document.getElementById('mineRate').innerHTML='0.0000 <span>ETH/นาที</span>';
   document.getElementById('progFill').style.width='0%';document.getElementById('progPct').textContent='0%';
-  document.getElementById('stHash').textContent='0';
+  const stH0=document.getElementById('stHash');if(stH0)stH0.textContent='0';
 }
 
 // ─── ACTIVITY ───
@@ -3822,10 +3822,10 @@ function updateNav(){
   const ud=getUD();if(!ud)return;
   const navZkp=document.getElementById('navZkp');if(navZkp)navZkp.textContent=(ud.ethReward||0).toFixed(4);
   const navUsdEl=document.getElementById('navUsd');if(navUsdEl)navUsdEl.textContent=(ud.usd||0).toFixed(2);
-  document.getElementById('stTotal').textContent=(ud.ethMine||0).toFixed(4);
-  document.getElementById('stUsd').textContent=((ud.ethMine||0)*ETH_RATE).toFixed(2);
-  document.getElementById('stSess').textContent=(ud.sessions||0);
-  document.getElementById('stSucc').textContent=Math.min(98,60+(ud.sessions||0))+'%';
+  const e1=document.getElementById('stTotal');if(e1)e1.textContent=(ud.ethMine||0).toFixed(4);
+  const e2=document.getElementById('stUsd');if(e2)e2.textContent=((ud.ethMine||0)*ETH_RATE).toFixed(2);
+  const e3=document.getElementById('stSess');if(e3)e3.textContent=(ud.sessions||0);
+  const e4=document.getElementById('stSucc');if(e4)e4.textContent=Math.min(98,60+(ud.sessions||0))+'%';
 }
 
 // ─── TOAST ───
