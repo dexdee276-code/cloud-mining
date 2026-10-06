@@ -2910,44 +2910,60 @@ function showTopupPopup(){
     </div>
 
     <!-- Step 2: QR + ที่อยู่ -->
-    <div id="tpStep2" style="display:none;">
-      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
-        <button onclick="document.getElementById('tpStep1').style.display='block';document.getElementById('tpStep2').style.display='none';"
-          style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">← กลับ</button>
-        <div style="font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--purple-light);">โอน USDT</div>
+    <div id="tpStep2" style="display:none;margin:-1rem;">
+      <div class="tp4-card">
+        <div class="tp4-hd">
+          <button class="tp4-back" onclick="document.getElementById('tpStep1').style.display='block';document.getElementById('tpStep2').style.display='none';">← กลับ</button>
+          <div class="tp4-title">TRANSFER USDT</div>
+          <button class="tp4-x" onclick="document.getElementById('topupPopupOv').remove()">✕</button>
+        </div>
+        <div class="tp4-amt">
+          <div class="tp4-amt-lbl">AMOUNT TO TRANSFER</div>
+          <div class="tp4-amt-row">
+            <span class="tp4-amt-cur">$</span>
+            <span id="tpAmtDisplay" class="tp4-amt-num">0</span>
+          </div>
+          <div><div class="tp4-amt-tag">⬥ USDT ⬥</div></div>
+        </div>
+        <div class="tp4-qr-wrap">
+          <div class="tp4-orbit">
+            <div class="tp4-ring tp4-o1"></div>
+            <div class="tp4-ring tp4-o2"></div>
+            <div class="tp4-ring tp4-o3"></div>
+            <div class="tp4-qr-box">
+              <div class="tp4-scan"></div>
+              <div id="tpQRWrap" style="width:170px;height:170px;display:flex;align-items:center;justify-content:center;background:#fff;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="tp4-addr">
+          <div class="tp4-addr-inner">
+            <div class="tp4-addr-bar">
+              <div style="display:flex;align-items:center;gap:0.4rem;">
+                <div class="tp4-addr-dot"></div>
+                <span class="tp4-addr-lbl">WALLET ADDRESS</span>
+              </div>
+              <span class="tp4-addr-badge" id="tpNetworkDisplay">TRC20</span>
+            </div>
+            <div class="tp4-addr-text" id="tpAddrText">กำลังโหลด...</div>
+            <button class="tp4-copy" onclick="const addr=document.getElementById('tpAddrText').textContent;navigator.clipboard?.writeText(addr).then(()=>showToast('📋 คัดลอกแล้ว!')).catch(()=>showToast('❌ คัดลอกไม่ได้'));">
+              📋 &nbsp; COPY ADDRESS
+            </button>
+          </div>
+        </div>
+        <div class="tp4-net">
+          <span style="font-size:0.65rem;">⚠️</span>
+          <span class="tp4-net-t">โอนผ่านเครือข่าย</span>
+          <span class="tp4-net-chip">TRC20 · TRON</span>
+          <span class="tp4-net-t">เท่านั้น</span>
+        </div>
+        <div class="tp4-cta-wrap">
+          <button class="tp4-cta" onclick="tpConfirmDone()">
+            <span class="tp4-shine"></span>
+            ✅ &nbsp; โอนสำเร็จแล้ว
+          </button>
+        </div>
       </div>
-
-      <!-- จำนวน -->
-      <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:0.8rem;margin-bottom:1rem;text-align:center;">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.2rem;">จำนวนที่ต้องโอน</div>
-        <div id="tpAmtDisplay" style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:var(--gold);">$0 USDT</div>
-      </div>
-
-      <!-- QR Code -->
-      <div id="tpQRWrap" style="text-align:center;margin-bottom:1rem;"></div>
-
-      <!-- ที่อยู่ USDT -->
-      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(74,222,128,0.2);border-radius:12px;padding:0.8rem;margin-bottom:1rem;">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#A890CC;margin-bottom:0.4rem;">📋 ที่อยู่ USDT (TRC20)</div>
-        <div id="tpAddrText" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--green);word-break:break-all;margin-bottom:0.5rem;">กำลังโหลด...</div>
-        <button onclick="
-          const addr=document.getElementById('tpAddrText').textContent;
-          navigator.clipboard?.writeText(addr).then(()=>showToast('📋 คัดลอกแล้ว!')).catch(()=>showToast('❌ คัดลอกไม่ได้'));
-        " style="width:100%;padding:0.5rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:8px;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.62rem;cursor:pointer;">
-          📋 คัดลอกที่อยู่
-        </button>
-      </div>
-
-      <!-- เครือข่าย -->
-      <div style="background:rgba(98,126,234,0.07);border:1px solid rgba(98,126,234,0.2);border-radius:10px;padding:0.6rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#A890CC;text-align:center;">
-        ⚠️ โอนผ่าน <span id="tpNetworkDisplay" style="color:#627eea;font-weight:700;">TRC20 (TRON)</span> เท่านั้น
-      </div>
-
-      <button onclick="tpConfirmDone()" style="width:100%;padding:1rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;
-        background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
-        box-shadow:0 4px 20px rgba(16,185,129,0.5);">
-        ✅ โอนสำเร็จแล้ว
-      </button>
     </div>
 
     <!-- Step 3: รอ Admin -->
