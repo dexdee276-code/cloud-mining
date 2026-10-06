@@ -2255,21 +2255,23 @@ function doRegister(){
 }
 
 function doLogout(){
-  if(_ud){
-    _ud.lastSeen=Date.now();
-    _ud.ethRewardSaved=_ud.ethReward||0;
-  }
-  saveUDForce(_ud);
-  stopDrip();
-  const bn=document.getElementById('bottomNav');if(bn)bn.style.display='none';
-  if(window._scenePartInt){clearInterval(window._scenePartInt);window._scenePartInt=null;}
-  const sc=document.getElementById('miningScene');if(sc)sc.style.display='none';
-  stopMine();stopDrip();clrSess();
+  try{
+    if(_ud){_ud.lastSeen=Date.now();_ud.ethRewardSaved=_ud.ethReward||0;}
+    saveUDForce(_ud);
+  }catch(e){}
+  try{stopDrip();}catch(e){}
+  try{stopMine();}catch(e){}
+  try{clrSess();}catch(e){}
+  try{if(window._scenePartInt){clearInterval(window._scenePartInt);window._scenePartInt=null;}}catch(e){}
+  try{if(window._fbSyncInt){clearInterval(window._fbSyncInt);window._fbSyncInt=null;}}catch(e){}
+  try{if(window._fbFullSyncInt){clearInterval(window._fbFullSyncInt);window._fbFullSyncInt=null;}}catch(e){}
+  _ud=null;
+  // ซ่อน dashboard แสดง login
   document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
   document.getElementById('dashScreen').classList.remove('active');
   document.getElementById('authScreen').classList.add('active');
   const bnav=document.getElementById('bottomNav');if(bnav)bnav.style.display='none';
-  showToast(t('toast.logout'));
+  showToast('👋 ออกจากระบบแล้ว');
 }
 
 // ─── ENTER DASHBOARD ───
