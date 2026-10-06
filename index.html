@@ -705,6 +705,61 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 .ci-confirm:hover::after{transform:translateX(100%);}
 .ci-confirm:hover{box-shadow:0 6px 30px rgba(251,191,36,0.5);transform:translateY(-1px);}
 .ci-confirm:active{transform:scale(0.98);}
+
+/* ── Promo Home ── */
+@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+@keyframes promoGlow{0%,100%{text-shadow:0 0 20px rgba(192,132,252,0.5);}50%{text-shadow:0 0 40px rgba(192,132,252,1),0 0 80px rgba(192,132,252,0.3);}}
+.ticker-wrap{background:rgba(255,215,0,0.05);border-top:1px solid rgba(255,215,0,0.1);border-bottom:1px solid rgba(255,215,0,0.1);padding:0.35rem 0;overflow:hidden;white-space:nowrap;margin-bottom:0;}
+.ticker-inner2{display:inline-flex;gap:1.5rem;animation:marquee 25s linear infinite;}
+.ticker-item2{font-size:0.5rem;color:rgba(255,215,0,0.6);display:flex;align-items:center;gap:0.35rem;letter-spacing:1px;flex-shrink:0;}
+.tdot{width:4px;height:4px;border-radius:50%;flex-shrink:0;}
+.promo-hero{position:relative;padding:1.5rem 1rem 1.2rem;background:linear-gradient(160deg,#0a001a,#120030,#08001a);overflow:hidden;}
+.promo-hero-ring{position:absolute;border-radius:50%;border:1px solid rgba(124,58,237,0.07);animation:spin 30s linear infinite;}
+.phr1{width:280px;height:280px;top:-120px;right:-100px;}
+.phr2{width:180px;height:180px;top:-70px;right:-50px;animation-direction:reverse;animation-duration:20s;}
+.promo-eth-bg{position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);font-size:6rem;opacity:0.07;animation:float 4s ease-in-out infinite;color:#c084fc;font-family:‘Orbitron’,monospace;}
+.promo-tag{font-size:0.45rem;letter-spacing:4px;color:rgba(192,132,252,0.45);margin-bottom:0.45rem;display:flex;align-items:center;gap:0.35rem;}
+.promo-tag-dot{width:5px;height:5px;border-radius:50%;background:#a855f7;box-shadow:0 0 8px #a855f7;animation:pulse 1s infinite;flex-shrink:0;}
+.promo-title{font-family:‘Orbitron’,monospace;font-size:1.4rem;font-weight:900;line-height:1.25;margin-bottom:0.4rem;}
+.promo-title-g{background:linear-gradient(90deg,#c084fc,#818cf8,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.promo-sub{font-size:0.58rem;color:rgba(255,255,255,0.3);line-height:1.7;margin-bottom:1rem;}
+.promo-pills{display:flex;gap:0.35rem;flex-wrap:wrap;}
+.ppill{padding:0.25rem 0.6rem;border-radius:20px;font-size:0.45rem;font-family:‘Orbitron’,monospace;letter-spacing:1px;}
+.ppg{background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);color:#4ade80;}
+.ppp{background:rgba(192,132,252,0.08);border:1px solid rgba(192,132,252,0.18);color:#c084fc;}
+.ppb{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.18);color:#38bdf8;}
+.promo-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;padding:0.8rem 1rem;}
+.pstat{background:linear-gradient(145deg,rgba(10,5,25,0.9),rgba(18,8,40,0.8));border:1px solid rgba(157,78,221,0.12);border-radius:14px;padding:0.75rem 0.5rem;text-align:center;position:relative;overflow:hidden;}
+.pstat::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(192,132,252,0.25),transparent);}
+.pstat-icon{font-size:1.1rem;margin-bottom:0.25rem;}
+.pstat-num{font-family:‘Orbitron’,monospace;font-size:0.85rem;font-weight:900;margin-bottom:0.1rem;}
+.pstat-lbl{font-size:0.38rem;color:rgba(255,255,255,0.22);letter-spacing:1px;}
+.promo-feats{padding:0 1rem 0.8rem;}
+.pfeat-hd{font-family:‘Orbitron’,monospace;font-size:0.52rem;color:rgba(255,255,255,0.25);letter-spacing:3px;margin-bottom:0.65rem;text-align:center;}
+.pfeat{background:linear-gradient(135deg,rgba(8,4,20,0.95),rgba(15,8,35,0.9));border:1px solid rgba(157,78,221,0.1);border-radius:16px;padding:0.85rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.8rem;position:relative;overflow:hidden;}
+.pfeat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.pfi-p{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.18);}
+.pfi-g{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.18);}
+.pfi-y{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.18);}
+.pfi-b{background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.18);}
+.pfeat-name{font-family:‘Orbitron’,monospace;font-size:0.6rem;font-weight:900;color:#fff;margin-bottom:0.15rem;}
+.pfeat-desc{font-size:0.5rem;color:rgba(255,255,255,0.28);line-height:1.55;}
+.pfeat-badge{position:absolute;right:0.7rem;top:0.7rem;font-size:0.4rem;padding:0.12rem 0.4rem;border-radius:8px;}
+.pfb-hot{background:rgba(251,146,60,0.1);color:#fb923c;border:1px solid rgba(251,146,60,0.18);}
+.pfb-new{background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.18);}
+.promo-roi{margin:0 1rem 0.8rem;background:linear-gradient(135deg,rgba(255,215,0,0.05),rgba(255,180,0,0.02));border:1px solid rgba(255,215,0,0.1);border-radius:18px;padding:1rem;position:relative;overflow:hidden;}
+.promo-roi::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.35),transparent);}
+.proi-title{font-family:‘Orbitron’,monospace;font-size:0.5rem;color:rgba(255,215,0,0.4);letter-spacing:2px;margin-bottom:0.7rem;text-align:center;}
+.proi-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;}
+.proi-lbl{font-size:0.5rem;color:rgba(255,255,255,0.28);}
+.proi-val{font-family:‘Orbitron’,monospace;font-size:0.6rem;font-weight:700;}
+.proi-div{height:1px;background:rgba(255,215,0,0.06);margin:0.5rem 0;}
+.proi-total{display:flex;justify-content:space-between;align-items:center;}
+.proi-total-lbl{font-family:‘Orbitron’,monospace;font-size:0.5rem;color:rgba(255,215,0,0.4);}
+.proi-total-val{font-family:‘Orbitron’,monospace;font-size:1rem;font-weight:900;color:#ffd700;text-shadow:0 0 15px rgba(255,215,0,0.4);}
+.promo-cta{padding:0 1rem 1rem;}
+.promo-cta-btn{width:100%;padding:1rem;border:none;border-radius:16px;cursor:pointer;font-family:‘Orbitron’,monospace;font-size:0.72rem;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea);color:#fff;box-shadow:0 4px 25px rgba(124,58,237,0.4);}
+.promo-cta-sub{text-align:center;font-size:0.44rem;color:rgba(255,255,255,0.18);margin-top:0.4rem;letter-spacing:1px;}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -950,22 +1005,84 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <!-- HOME -->
     <div class="tab-page active" id="pgHome">
 
-```
-  <!-- เครื่องขุดอยู่บนสุด -->
-```
-
-<!-- ═══ MINING SCENE ═══ -->
-
 <div id="ethPopupLayer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;"></div>
 
 ```
-  <!-- สถิติ -->
-  <div class="sec-title" data-i18n="home.overview">📊 ภาพรวม</div>
-  <div class="stats-grid">
-    <div class="stat-card sc-purple"><span class="s-icon">⛏️</span><div class="s-lbl" data-i18n="home.hashrate">HASHRATE</div><div class="s-val" id="stHash">0</div><div class="s-sub" data-i18n="home.hashsub">H/s ปัจจุบัน</div></div>
-    <div class="stat-card sc-gold"><span class="s-icon">🔷</span><div class="s-lbl" data-i18n="home.ethtotal">ETH รวม</div><div class="s-val" id="stTotal">0.0000</div><div class="s-sub">≈ $<span id="stUsd">0.00</span></div></div>
-    <div class="stat-card sc-red"><span class="s-icon">🔥</span><div class="s-lbl" data-i18n="home.sessions">SESSIONS</div><div class="s-val" id="stSess">0</div><div class="s-sub" data-i18n="home.sesssub">ครั้งที่ขุด</div></div>
-    <div class="stat-card sc-green"><span class="s-icon">📈</span><div class="s-lbl" data-i18n="home.success">SUCCESS</div><div class="s-val" id="stSucc">60%</div><div class="s-sub" data-i18n="home.succsub">อัตราสำเร็จ</div></div>
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker-inner2">
+      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>ETH $2,672.47 ▲2.3%</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#f87171;box-shadow:0 0 5px #f87171;"></div>BTC $67,420 ▲1.1%</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#fbbf24;box-shadow:0 0 5px #fbbf24;"></div>กำลังขุดอยู่ <span id="aMiners" style="color:#fbbf24;">2,847</span> เครื่อง</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>กำไรเฉลี่ย 1.30%/วัน</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#c084fc;box-shadow:0 0 5px #c084fc;"></div>ETH ขุดวันนี้ 142.8 ETH</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>ETH $2,672.47 ▲2.3%</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#f87171;box-shadow:0 0 5px #f87171;"></div>BTC $67,420 ▲1.1%</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#fbbf24;box-shadow:0 0 5px #fbbf24;"></div>กำลังขุดอยู่ 2,847 เครื่อง</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>กำไรเฉลี่ย 1.30%/วัน</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#c084fc;box-shadow:0 0 5px #c084fc;"></div>ETH ขุดวันนี้ 142.8 ETH</div>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="promo-hero">
+    <div class="promo-hero-ring phr1"></div>
+    <div class="promo-hero-ring phr2"></div>
+    <div class="promo-eth-bg">Ξ</div>
+    <div class="promo-tag"><div class="promo-tag-dot"></div>CLOUD MINING PLATFORM</div>
+    <div class="promo-title"><span class="promo-title-g">ขุด ETH</span><br><span class="promo-title-g">รับกำไรทุกวัน</span></div>
+    <div class="promo-sub">ระบบขุด Ethereum อัตโนมัติ 24/7<br>ลงทุนครั้งเดียว รับกำไรทุกวัน ไม่ต้องดูแล</div>
+    <div class="promo-pills">
+      <div class="ppill ppg">✅ ปลอดภัย 100%</div>
+      <div class="ppill ppp">⚡ Auto 24/7</div>
+      <div class="ppill ppb">💎 ETH จริง</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="promo-stats">
+    <div class="pstat"><div class="pstat-icon">⛏️</div><div class="pstat-num" style="color:#c084fc;">2,847</div><div class="pstat-lbl">เครื่องขุด ACTIVE</div></div>
+    <div class="pstat"><div class="pstat-icon">💰</div><div class="pstat-num" style="color:#4ade80;">1.30%</div><div class="pstat-lbl">กำไร/วัน</div></div>
+    <div class="pstat"><div class="pstat-icon">👥</div><div class="pstat-num" style="color:#ffd700;">12K+</div><div class="pstat-lbl">สมาชิก</div></div>
+  </div>
+
+  <!-- Features -->
+  <div class="promo-feats">
+    <div class="pfeat-hd">⬥ ทำไมต้องเลือกเรา ⬥</div>
+    <div class="pfeat">
+      <div class="pfeat-icon pfi-p">⛏️</div>
+      <div><div class="pfeat-name">เครื่องขุดประสิทธิภาพสูง</div><div class="pfeat-desc">GPU ระดับ Enterprise ขุด ETH ได้สูงสุด รับรองผลตอบแทนทุกวัน</div></div>
+      <div class="pfeat-badge pfb-hot">🔥 HOT</div>
+    </div>
+    <div class="pfeat">
+      <div class="pfeat-icon pfi-g">📈</div>
+      <div><div class="pfeat-name">กำไรสม่ำเสมอทุกวัน</div><div class="pfeat-desc">รับ ETH ทุก 24 ชม. แปลงเป็น USDT ได้ทันที ถอนได้ตลอด</div></div>
+    </div>
+    <div class="pfeat">
+      <div class="pfeat-icon pfi-y">🔒</div>
+      <div><div class="pfeat-name">ระบบความปลอดภัยสูงสุด</div><div class="pfeat-desc">เงินทุนได้รับการคุ้มครอง SSL + 2FA ข้อมูลเข้ารหัสทั้งหมด</div></div>
+      <div class="pfeat-badge pfb-new">✨ NEW</div>
+    </div>
+    <div class="pfeat">
+      <div class="pfeat-icon pfi-b">⚡</div>
+      <div><div class="pfeat-name">ถอนเงินได้ทันที</div><div class="pfeat-desc">แปลง ETH → USDT แล้วถอนได้เลย ไม่มีขั้นต่ำ ไม่มีล็อค</div></div>
+    </div>
+  </div>
+
+  <!-- ROI -->
+  <div class="promo-roi">
+    <div class="proi-title">💰 ตัวอย่างกำไร (ลงทุน $1,000)</div>
+    <div class="proi-row"><span class="proi-lbl">กำไร/วัน</span><span class="proi-val" style="color:#4ade80;">+$13.00 USDT</span></div>
+    <div class="proi-row"><span class="proi-lbl">กำไร/เดือน</span><span class="proi-val" style="color:#4ade80;">+$390.00 USDT</span></div>
+    <div class="proi-row"><span class="proi-lbl">ระยะเวลา</span><span class="proi-val" style="color:#c084fc;">270 วัน</span></div>
+    <div class="proi-div"></div>
+    <div class="proi-total"><span class="proi-total-lbl">🏆 ได้คืนรวม</span><span class="proi-total-val">$3,510</span></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="promo-cta">
+    <button class="promo-cta-btn" onclick="switchTab(1)">⚡ เริ่มขุด ETH เลย</button>
+    <div class="promo-cta-sub">ลงทุนขั้นต่ำเพียง $100 · ถอนได้ทุกเวลา</div>
   </div>
 
   <!-- Mining widget -->
