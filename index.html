@@ -933,7 +933,9 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 <!-- Tab 3: ตั้งค่า -->
 <div class="admin-page" id="apg3">
   <div class="sec-title">⚙️ ตั้งค่าระบบ</div>
+```
 
+```
   <!-- QR Code -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📱 QR Code / PromptPay</div>
@@ -5519,48 +5521,97 @@ function checkBanned(username,cb){
 
 </script>
 
-</body>
-</html>
-    <!-- Tab 4: Dashboard -->
+```
+<!-- Tab 4: Dashboard -->
     <div class="admin-page" id="apg4">
       <div class="sec-title">📊 Dashboard สรุปยอดรวม</div>
       <div id="adminDashboard">⏳ กำลังโหลด...</div>
     </div>
 
-```
-<!-- Tab 5: Announcement -->
-<div class="admin-page" id="apg5">
-  <div class="sec-title">📢 ส่งประกาศ</div>
-  <div style="margin-bottom:1rem;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">หัวข้อประกาศ</div>
-    <input type="text" id="annTitle" placeholder="เช่น: ระบบปิดปรับปรุง"
-      style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.3);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.8rem;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">ข้อความ</div>
-    <textarea id="annBody" placeholder="รายละเอียดประกาศ..." rows="4"
-      style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.2);border-radius:8px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;resize:none;margin-bottom:0.8rem;"></textarea>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">ประเภท</div>
-    <select id="annType" style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.2);border-radius:8px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;appearance:none;">
-      <option value="info">ℹ️ ข้อมูลทั่วไป</option>
-      <option value="warning">⚠️ คำเตือน</option>
-      <option value="success">✅ ข่าวดี</option>
-      <option value="maintenance">🔧 ปิดปรับปรุง</option>
-    </select>
-    <button onclick="sendAnnouncement()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;box-shadow:0 4px 20px rgba(59,130,246,0.4);">
-      📢 ส่งประกาศถึงลูกค้าทั้งหมด
-    </button>
-  </div>
-  <div class="sec-title" style="margin-top:1rem;">📋 ประกาศที่ผ่านมา</div>
-  <div id="annList">⏳ กำลังโหลด...</div>
-</div>
+    <!-- Tab 5: Announcement -->
+    <div class="admin-page" id="apg5">
+      <div class="sec-title">📢 ส่งประกาศ</div>
+      <div style="margin-bottom:1rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">หัวข้อประกาศ</div>
+        <input type="text" id="annTitle" placeholder="เช่น: ระบบปิดปรับปรุง"
+          style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.3);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.8rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">ข้อความ</div>
+        <textarea id="annBody" placeholder="รายละเอียดประกาศ..." rows="4"
+          style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.2);border-radius:8px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;resize:none;margin-bottom:0.8rem;"></textarea>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">ประเภท</div>
+        <select id="annType" style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.2);border-radius:8px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;appearance:none;">
+          <option value="info">ℹ️ ข้อมูลทั่วไป</option>
+          <option value="warning">⚠️ คำเตือน</option>
+          <option value="success">✅ ข่าวดี</option>
+          <option value="maintenance">🔧 ปิดปรับปรุง</option>
+        </select>
+        <button onclick="sendAnnouncement()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;box-shadow:0 4px 20px rgba(59,130,246,0.4);">
+          📢 ส่งประกาศถึงลูกค้าทั้งหมด
+        </button>
+      </div>
+      <div class="sec-title" style="margin-top:1rem;">📋 ประกาศที่ผ่านมา</div>
+      <div id="annList">⏳ กำลังโหลด...</div>
+    </div>
 
-<!-- Tab 6: Ban/Block -->
-<div class="admin-page" id="apg6">
-  <div class="sec-title">🚫 ระงับ / แบนผู้ใช้</div>
-  <div style="position:relative;margin-bottom:0.8rem;">
-    <input type="text" id="banSearchInput" placeholder="🔍 ค้นหาชื่อผู้ใช้..."
-      oninput="filterBanUsers(this.value)"
-      style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:1px solid rgba(230,57,70,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;box-sizing:border-box;">
-  </div>
-  <div id="banUserList">⏳ กำลังโหลด...</div>
-</div>
+    <!-- Tab 6: Ban/Block -->
+    <div class="admin-page" id="apg6">
+      <div class="sec-title">🚫 ระงับ / แบนผู้ใช้</div>
+      <div style="position:relative;margin-bottom:0.8rem;">
+        <input type="text" id="banSearchInput" placeholder="🔍 ค้นหาชื่อผู้ใช้..."
+          oninput="filterBanUsers(this.value)"
+          style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:1px solid rgba(230,57,70,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;box-sizing:border-box;">
+      </div>
+      <div id="banUserList">⏳ กำลังโหลด...</div>
+    </div>
+</body>
+</html
+<!-- Tab 4: Dashboard -->
+    <div class="admin-page" id="apg4">
+      <div class="sec-title">📊 Dashboard สรุปยอดรวม</div>
+      <div id="adminDashboard">⏳ กำลังโหลด...</div>
+    </div>
+
+    <!-- Tab 5: Announcement -->
+    <div class="admin-page" id="apg5">
+      <div class="sec-title">📢 ส่งประกาศ</div>
+      <div style="margin-bottom:1rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">หัวข้อประกาศ</div>
+        <input type="text" id="annTitle" placeholder="เช่น: ระบบปิดปรับปรุง"
+          style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.3);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.8rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">ข้อความ</div>
+        <textarea id="annBody" placeholder="รายละเอียดประกาศ..." rows="4"
+          style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.2);border-radius:8px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;resize:none;margin-bottom:0.8rem;"></textarea>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">ประเภท</div>
+        <select id="annType" style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.2);border-radius:8px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;appearance:none;">
+          <option value="info">ℹ️ ข้อมูลทั่วไป</option>
+          <option value="warning">⚠️ คำเตือน</option>
+          <option value="success">✅ ข่าวดี</option>
+          <option value="maintenance">🔧 ปิดปรับปรุง</option>
+        </select>
+        <button onclick="sendAnnouncement()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;box-shadow:0 4px 20px rgba(59,130,246,0.4);">
+          📢 ส่งประกาศถึงลูกค้าทั้งหมด
+        </button>
+      </div>
+      <div class="sec-title" style="margin-top:1rem;">📋 ประกาศที่ผ่านมา</div>
+      <div id="annList">⏳ กำลังโหลด...</div>
+    </div>
+
+    <!-- Tab 6: Ban/Block -->
+    <div class="admin-page" id="apg6">
+      <div class="sec-title">🚫 ระงับ / แบนผู้ใช้</div>
+      <div style="position:relative;margin-bottom:0.8rem;">
+        <input type="text" id="banSearchInput" placeholder="🔍 ค้นหาชื่อผู้ใช้..."
+          oninput="filterBanUsers(this.value)"
+          style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:1px solid rgba(230,57,70,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;box-sizing:border-box;">
+      </div>
+      <div id="banUserList">⏳ กำลังโหลด...</div>
+    </div>
+
+
+
+</body>
+</html>
 ```
+
+</body>
+</html>
