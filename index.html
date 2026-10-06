@@ -664,6 +664,47 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 .s3-cta-wrap{padding:0 1rem 1.2rem;}
 .s3-cta{width:100%;padding:0.9rem;border:1px solid rgba(16,185,129,0.2);border-radius:16px;cursor:pointer;font-family:‘Orbitron’,monospace;font-size:0.65rem;font-weight:900;letter-spacing:2px;background:rgba(16,185,129,0.08);color:rgba(52,211,153,0.7);transition:all 0.3s;}
 .s3-cta:hover{background:rgba(16,185,129,0.14);color:#10b981;}
+
+/* ── confirm invest styles ── */
+@keyframes goldGlow2{0%,100%{text-shadow:0 0 20px rgba(255,215,0,0.4);}50%{text-shadow:0 0 50px rgba(255,215,0,0.9),0 0 100px rgba(255,215,0,0.3);}}
+@keyframes borderFlow2{0%,100%{border-color:rgba(16,185,129,0.2);}50%{border-color:rgba(16,185,129,0.5);}}
+.ci-card{background:linear-gradient(160deg,#080008,#100015,#080008);border-radius:28px;overflow:hidden;position:relative;border:1px solid rgba(255,215,0,0.15);box-shadow:0 30px 80px rgba(0,0,0,0.9),0 0 60px rgba(255,215,0,0.04);}
+.ci-card::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.6),rgba(255,255,255,0.3),rgba(255,215,0,0.6),transparent);}
+.ci-hd{padding:0.9rem 1rem;background:linear-gradient(135deg,rgba(255,215,0,0.06),rgba(124,58,237,0.04));border-bottom:1px solid rgba(255,215,0,0.07);text-align:center;}
+.ci-hd-tag{font-size:0.42rem;letter-spacing:4px;color:rgba(255,215,0,0.3);font-family:‘Orbitron’,monospace;margin-bottom:0.2rem;}
+.ci-hd-title{font-family:‘Orbitron’,monospace;font-size:0.8rem;font-weight:900;background:linear-gradient(90deg,#ffd700,#fff8dc,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;}
+.ci-amt{padding:1.2rem 1rem 0.8rem;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(255,215,0,0.08) 0%,transparent 65%);position:relative;overflow:hidden;}
+.ci-orbit{position:relative;display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;margin:0 auto 0.7rem;}
+.ci-r1{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(255,215,0,0.15);animation:spin 10s linear infinite;}
+.ci-r1::after{content:‘⬥’;position:absolute;top:-4px;left:50%;transform:translateX(-50%);font-size:7px;color:rgba(255,215,0,0.5);}
+.ci-r2{position:absolute;inset:-10px;border-radius:50%;border:1px dashed rgba(255,215,0,0.07);animation:spinR 15s linear infinite;}
+.ci-icon{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#78350f,#b45309,#d97706,#fbbf24);display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 0 25px rgba(251,191,36,0.4);animation:float 3s ease-in-out infinite;position:relative;z-index:1;}
+.ci-lbl{font-size:0.42rem;letter-spacing:3px;color:rgba(255,215,0,0.35);font-family:‘Orbitron’,monospace;margin-bottom:0.3rem;}
+.ci-val{font-family:‘Orbitron’,monospace;font-size:2.4rem;font-weight:900;color:#ffd700;animation:goldGlow2 2.5s ease-in-out infinite;letter-spacing:-1px;line-height:1;}
+.ci-unit{font-size:0.48rem;color:rgba(255,215,0,0.35);letter-spacing:3px;margin-top:0.2rem;}
+.ci-stats{margin:0 1rem 0.7rem;display:grid;grid-template-columns:1fr 1fr;gap:0.45rem;}
+.ci-stat{background:linear-gradient(135deg,rgba(0,0,0,0.5),rgba(20,10,40,0.4));border:1px solid rgba(157,78,221,0.12);border-radius:14px;padding:0.65rem 0.75rem;position:relative;overflow:hidden;}
+.ci-stat::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(192,132,252,0.25),transparent);}
+.ci-stat-icon{font-size:0.8rem;margin-bottom:0.25rem;display:block;}
+.ci-stat-lbl{font-size:0.4rem;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-bottom:0.2rem;font-family:‘Orbitron’,monospace;}
+.ci-stat-val{font-family:‘Orbitron’,monospace;font-size:0.72rem;font-weight:900;color:#c084fc;}
+.ci-stat-unit{font-size:0.38rem;color:rgba(192,132,252,0.4);margin-left:0.15rem;}
+.ci-profit{margin:0 1rem 0.7rem;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(5,150,105,0.05));border:1px solid rgba(16,185,129,0.2);border-radius:14px;padding:0.75rem 0.9rem;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;animation:borderFlow2 3s ease-in-out infinite;}
+.ci-profit::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(16,185,129,0.5),transparent);}
+.ci-profit-val{font-family:‘Orbitron’,monospace;font-size:1rem;font-weight:900;color:#10b981;text-shadow:0 0 15px rgba(16,185,129,0.5);}
+.ci-profit-lbl{font-size:0.4rem;color:rgba(16,185,129,0.4);margin-top:0.1rem;}
+.ci-balance{margin:0 1rem 0.8rem;display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);border-radius:12px;}
+.ci-bal-l{display:flex;align-items:center;gap:0.35rem;font-size:0.46rem;color:rgba(255,255,255,0.22);}
+.ci-bal-dot{width:4px;height:4px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px #4ade80;flex-shrink:0;}
+.ci-bal-val{font-family:‘Orbitron’,monospace;font-size:0.6rem;font-weight:700;color:rgba(74,222,128,0.7);}
+.ci-btns{padding:0 1rem 1.1rem;display:flex;gap:0.5rem;}
+.ci-cancel{flex:1;padding:0.85rem;border:1px solid rgba(255,255,255,0.07);border-radius:14px;background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.3);font-family:‘Orbitron’,monospace;font-size:0.58rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
+.ci-cancel:hover{background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.2);color:#f87171;}
+.ci-confirm{flex:2;padding:0.85rem;border:none;border-radius:14px;background:linear-gradient(135deg,#78350f,#b45309,#d97706,#fbbf24);color:#000;font-family:‘Orbitron’,monospace;font-size:0.62rem;font-weight:900;letter-spacing:2px;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 20px rgba(251,191,36,0.35),inset 0 1px 0 rgba(255,255,255,0.2);position:relative;overflow:hidden;}
+.ci-confirm::after{content:’’;position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transform:translateX(-100%);transition:0.6s;}
+.ci-confirm:hover::after{transform:translateX(100%);}
+.ci-confirm:hover{box-shadow:0 6px 30px rgba(251,191,36,0.5);transform:translateY(-1px);}
+.ci-confirm:active{transform:scale(0.98);}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -4344,23 +4385,53 @@ function startMiningInvestment(){
   }
   const pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt),total=amt+daily*days;
   const ov=document.createElement('div');ov.className='overlay';
-  ov.innerHTML=`<div class="popup" style="text-align:center;">
-    <div style="font-size:2rem;margin-bottom:0.5rem;">⛏</div>
-    <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);margin-bottom:1rem;">ยืนยันการลงทุน</div>
-    <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;text-align:left;">
-        <div style="color:#A890CC;">💵 ลงทุน</div><div style="color:var(--gold);text-align:right;">$${amt.toLocaleString()}</div>
-        <div style="color:#A890CC;">📈 กำไร/วัน</div><div style="color:var(--green);text-align:right;">$${daily.toFixed(2)}</div>
-        <div style="color:#A890CC;">⏱ ระยะเวลา</div><div style="color:var(--purple-light);text-align:right;">${days} วัน</div>
-        <div style="color:#A890CC;">🏆 ได้คืนรวม</div><div style="color:#f87171;text-align:right;">$${total.toFixed(0)}</div>
+  ov.innerHTML=`<div class="ci-card">
+    <div class="ci-hd">
+      <div class="ci-hd-tag">INVESTMENT CONFIRMATION</div>
+      <div class="ci-hd-title">ยืนยันการลงทุน</div>
+    </div>
+    <div class="ci-amt">
+      <div class="ci-orbit">
+        <div class="ci-r1"></div>
+        <div class="ci-r2"></div>
+        <div class="ci-icon">💵</div>
+      </div>
+      <div class="ci-lbl">จำนวนเงินลงทุน</div>
+      <div class="ci-val">$${amt.toLocaleString()}</div>
+      <div class="ci-unit">U · S · D · T</div>
+    </div>
+    <div class="ci-stats">
+      <div class="ci-stat">
+        <span class="ci-stat-icon">📈</span>
+        <div class="ci-stat-lbl">กำไร/วัน</div>
+        <div class="ci-stat-val">$${daily.toFixed(2)}<span class="ci-stat-unit">USDT</span></div>
+      </div>
+      <div class="ci-stat">
+        <span class="ci-stat-icon">⏱</span>
+        <div class="ci-stat-lbl">ระยะเวลา</div>
+        <div class="ci-stat-val">${days}<span class="ci-stat-unit">วัน</span></div>
       </div>
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,100,100,0.8);margin-bottom:1rem;">
-      USDT คงเหลือ: $${((ud.usd||0)-amt).toFixed(2)}
+    <div class="ci-profit">
+      <div style="display:flex;align-items:center;gap:0.4rem;">
+        <span style="font-size:1.1rem;">🏆</span>
+        <div>
+          <div style="font-size:0.44rem;color:rgba(16,185,129,0.45);font-family:'Orbitron',monospace;letter-spacing:1px;">ได้คืนรวม</div>
+          <div class="ci-profit-val">$${total.toFixed(0)}</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.55rem;color:rgba(16,185,129,0.6);">ROI</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#34d399;">${((total/amt-1)*100).toFixed(0)}%</div>
+      </div>
     </div>
-    <div style="display:flex;gap:0.5rem;">
-      <button onclick="this.closest('.overlay').remove()" style="flex:1;padding:0.8rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.7rem;cursor:pointer;">ยกเลิก</button>
-      <button onclick="confirmMiningInvestment(${amt})" class="btn btn-primary" style="flex:1;padding:0.8rem;">✅ ยืนยัน</button>
+    <div class="ci-balance">
+      <div class="ci-bal-l"><div class="ci-bal-dot"></div>USDT คงเหลือหลังลงทุน</div>
+      <div class="ci-bal-val">$${((ud.usd||0)-amt).toFixed(2)}</div>
+    </div>
+    <div class="ci-btns">
+      <button class="ci-cancel" onclick="this.closest('.overlay').remove()">✕ ยกเลิก</button>
+      <button class="ci-confirm" onclick="confirmMiningInvestment(${amt})">⚡ ยืนยันเลย</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
