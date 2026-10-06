@@ -956,7 +956,140 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 
 <!-- ═══ MINING SCENE ═══ -->
 
-<div id="miningScene" style="display:none;margin-bottom:1rem;">
+<div id="ethPopupLayer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;"></div>
+
+```
+  <!-- สถิติ -->
+  <div class="sec-title" data-i18n="home.overview">📊 ภาพรวม</div>
+  <div class="stats-grid">
+    <div class="stat-card sc-purple"><span class="s-icon">⛏️</span><div class="s-lbl" data-i18n="home.hashrate">HASHRATE</div><div class="s-val" id="stHash">0</div><div class="s-sub" data-i18n="home.hashsub">H/s ปัจจุบัน</div></div>
+    <div class="stat-card sc-gold"><span class="s-icon">🔷</span><div class="s-lbl" data-i18n="home.ethtotal">ETH รวม</div><div class="s-val" id="stTotal">0.0000</div><div class="s-sub">≈ $<span id="stUsd">0.00</span></div></div>
+    <div class="stat-card sc-red"><span class="s-icon">🔥</span><div class="s-lbl" data-i18n="home.sessions">SESSIONS</div><div class="s-val" id="stSess">0</div><div class="s-sub" data-i18n="home.sesssub">ครั้งที่ขุด</div></div>
+    <div class="stat-card sc-green"><span class="s-icon">📈</span><div class="s-lbl" data-i18n="home.success">SUCCESS</div><div class="s-val" id="stSucc">60%</div><div class="s-sub" data-i18n="home.succsub">อัตราสำเร็จ</div></div>
+  </div>
+
+  <!-- Mining widget -->
+  <div class="mine-widget">
+    <div class="sec-title" style="width:100%" data-i18n="home.mining">⛏️ การขุดเหรียญ ETH</div>
+    <div class="coin-wrap">
+      <div class="c-ring"></div><div class="c-ring2"></div>
+      <div class="coin">Z</div>
+      <div class="pick1">⛏️</div><div class="pick2">⛏️</div>
+    </div>
+    <div class="mine-status" id="mineStatus" data-i18n="home.waiting">⏸ รอการขุด</div>
+    <div class="mine-rate" id="mineRate">0.0000 <span>ETH/นาที</span></div>
+    <div class="prog-wrap">
+      <div class="prog-hd"><span data-i18n="home.progress">Block Progress</span><span id="progPct">0%</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+    <button class="btn-mine" id="mineBtn" data-i18n="home.start" onclick="toggleMine()">▶ เริ่มขุด</button>
+  </div>
+  <div class="act-widget">
+    <div class="sec-title" data-i18n="home.activity">📋 กิจกรรมล่าสุด</div>
+    <div class="act-list" id="actList"><div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;"><span data-i18n="home.noact">ยังไม่มีกิจกรรม... เริ่มขุดเพื่อสร้างประวัติ</span></div></div>
+  </div>
+</div>
+
+<!-- PACKAGES -->
+<div class="tab-page" id="pgPkg" style="flex-direction:column;height:100%;overflow:hidden;padding:0.8rem 0.8rem 0;">
+```
+
+  <!-- Hero -->
+
+  <div class="pkg-hero">
+    <div class="pkg-rig">⛏️</div>
+    <div class="pkg-hero-r">
+      <div class="pkg-hero-title">CLOUD<br>MINING ETH</div>
+      <div class="pkg-hero-sub">AUTOMATED · 24/7</div>
+      <div class="pkg-pills">
+        <div class="pkg-pill"><div class="pkg-dot"></div><span id="pkgCnt">2,847 เครื่อง</span></div>
+        <div class="pkg-pill pkg-pill-g">ETH ≈ $2,672</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profit Card -->
+
+  <div class="profit-card2">
+    <div class="profit-lbl2" id="pvLabel2">กรอกจำนวนเพื่อดูกำไร</div>
+    <div class="profit-center2">
+      <div class="profit-eth2" id="pvEthBig">0.000000</div>
+      <div class="profit-eth-unit2">ETH/วัน</div>
+    </div>
+    <div class="profit-usdt2" id="pvUsdDay">≈ $0.00 USDT / วัน</div>
+    <div class="stats-row2">
+      <div class="stat-box2"><div class="stat-val2" id="pvPct">--%</div><div class="stat-lbl2">กำไร/วัน</div></div>
+      <div class="stat-box2"><div class="stat-val2" id="pvDays">-- วัน</div><div class="stat-lbl2">ระยะเวลา</div></div>
+      <div class="stat-box2"><div class="stat-val2" id="pvTotal" style="color:#ffd700;">$--</div><div class="stat-lbl2">ได้คืนรวม</div></div>
+    </div>
+  </div>
+
+  <!-- Input -->
+
+  <div class="input-card2">
+    <div class="input-lbl2">
+      <span>💵 จำนวน USDT ที่ต้องการลงทุน</span>
+      <span style="color:rgba(74,222,128,0.6);">$100 - $100,000</span>
+    </div>
+    <div class="input-wrap2">
+      <input type="number" id="miningAmtInput" min="100" max="100000" placeholder="0" oninput="calcMiningPreview()">
+      <span class="input-unit2">USDT</span>
+    </div>
+    <div class="quick-row2">
+      <button class="qb2" onclick="setMiningAmt(100)">$100</button>
+      <button class="qb2" onclick="setMiningAmt(500)">$500</button>
+      <button class="qb2" onclick="setMiningAmt(1000)">$1K</button>
+      <button class="qb2" onclick="setMiningAmt(5000)">$5K</button>
+      <button class="qb2" onclick="setMiningAmt(10000)">$10K</button>
+      <button class="qb2" onclick="setMiningAmt(50000)">$50K</button>
+    </div>
+  </div>
+
+  <!-- CTA -->
+
+<button class="cta2" onclick="startMiningInvestment()">⚡ เริ่มขุด ETH เลย</button>
+
+</div>
+
+<div class="tab-page" id="pgWallet">
+      <div class="wb wb-usd">
+        <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USDT</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
+        <div class="wb-amt" id="wUsd">0.00</div>
+        <div class="wb-equiv">USDT</div>
+        <button class="btn btn-gold" style="width:100%;padding:0.85rem;margin-bottom:0.5rem;" onclick="showTopupPopup()">💵 เติม USDT</button>
+        <button onclick="showWithdrawPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;
+  background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
+  box-shadow:0 4px 20px rgba(16,185,129,0.4),0 0 30px rgba(16,185,129,0.15);">📤 ถอนออก</button>
+      </div>
+      <div class="wb wb-eth">
+        <div class="wb-head">
+          <div class="wb-ibox">🔷</div>
+          <div><div class="wb-title" data-i18n="wal.eth.title">กระเป๋ารางวัล ETH</div><div class="wb-sub" data-i18n="wal.eth.sub">กำไรจากสัญญาขุด → แลกกับผู้ดูแล</div></div>
+          <div class="wb-live">LIVE</div>
+        </div>
+        <div class="wb-amt" id="wZkp">0.000000</div>
+        <div class="wb-equiv">≈ $<span id="wZkpUsd">0.00</span> USDT</div>
+        <div class="wb-daily"><span data-i18n="wal.daily">⚡ รับ/วัน:</span><span class="wb-dv"><span id="wDaily">0</span> ETH · +$<span id="wDailyUsd">0.00</span></span></div>
+        <!-- แปลง ETH → USDT -->
+        <button onclick="showConvertPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;margin-bottom:0.5rem;
+  background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
+  box-shadow:0 4px 20px rgba(59,130,246,0.4),0 0 30px rgba(59,130,246,0.15);">💱 แปลง ETH → USDT</button>
+
+```
+  </div>
+  <div class="w-grid">
+    <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
+    <div class="w-stat"><div class="ws-l" data-i18n="wal.profit">กำไรสะสม</div><div class="ws-v wv-green" id="wProfit">$0.00</div><div class="ws-s" data-i18n="wal.profitsub">USD จากสัญญา</div></div>
+  </div>
+  <div class="sec-title" data-i18n="wal.history">📋 ประวัติธุรกรรม</div>
+  <div id="txHist"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace"><span data-i18n="wal.nohist">ยังไม่มีประวัติ</span></div></div>
+</div>
+
+<!-- TOPUP -->
+<div class="tab-page" id="pgRig">
+```
+
+  <div id="miningScene" style="display:none;margin-bottom:1rem;">
 <div style="position:relative;width:100%;height:300px;border-radius:24px;overflow:hidden;margin-bottom:1rem;border:2px solid rgba(98,126,234,0.5);animation:borderGlow 3s ease-in-out infinite;">
   <canvas id="sky" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
 
@@ -1707,141 +1840,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
   </div>
 </div>
 </div>
-
-<div id="ethPopupLayer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;"></div>
-
-```
-  <!-- สถิติ -->
-  <div class="sec-title" data-i18n="home.overview">📊 ภาพรวม</div>
-  <div class="stats-grid">
-    <div class="stat-card sc-purple"><span class="s-icon">⛏️</span><div class="s-lbl" data-i18n="home.hashrate">HASHRATE</div><div class="s-val" id="stHash">0</div><div class="s-sub" data-i18n="home.hashsub">H/s ปัจจุบัน</div></div>
-    <div class="stat-card sc-gold"><span class="s-icon">🔷</span><div class="s-lbl" data-i18n="home.ethtotal">ETH รวม</div><div class="s-val" id="stTotal">0.0000</div><div class="s-sub">≈ $<span id="stUsd">0.00</span></div></div>
-    <div class="stat-card sc-red"><span class="s-icon">🔥</span><div class="s-lbl" data-i18n="home.sessions">SESSIONS</div><div class="s-val" id="stSess">0</div><div class="s-sub" data-i18n="home.sesssub">ครั้งที่ขุด</div></div>
-    <div class="stat-card sc-green"><span class="s-icon">📈</span><div class="s-lbl" data-i18n="home.success">SUCCESS</div><div class="s-val" id="stSucc">60%</div><div class="s-sub" data-i18n="home.succsub">อัตราสำเร็จ</div></div>
-  </div>
-
-  <!-- Mining widget -->
-  <div class="mine-widget">
-    <div class="sec-title" style="width:100%" data-i18n="home.mining">⛏️ การขุดเหรียญ ETH</div>
-    <div class="coin-wrap">
-      <div class="c-ring"></div><div class="c-ring2"></div>
-      <div class="coin">Z</div>
-      <div class="pick1">⛏️</div><div class="pick2">⛏️</div>
-    </div>
-    <div class="mine-status" id="mineStatus" data-i18n="home.waiting">⏸ รอการขุด</div>
-    <div class="mine-rate" id="mineRate">0.0000 <span>ETH/นาที</span></div>
-    <div class="prog-wrap">
-      <div class="prog-hd"><span data-i18n="home.progress">Block Progress</span><span id="progPct">0%</span></div>
-      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-    </div>
-    <button class="btn-mine" id="mineBtn" data-i18n="home.start" onclick="toggleMine()">▶ เริ่มขุด</button>
-  </div>
-  <div class="act-widget">
-    <div class="sec-title" data-i18n="home.activity">📋 กิจกรรมล่าสุด</div>
-    <div class="act-list" id="actList"><div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;"><span data-i18n="home.noact">ยังไม่มีกิจกรรม... เริ่มขุดเพื่อสร้างประวัติ</span></div></div>
-  </div>
-</div>
-
-<!-- PACKAGES -->
-<div class="tab-page" id="pgPkg" style="flex-direction:column;height:100%;overflow:hidden;padding:0.8rem 0.8rem 0;">
-```
-
-  <!-- Hero -->
-
-  <div class="pkg-hero">
-    <div class="pkg-rig">⛏️</div>
-    <div class="pkg-hero-r">
-      <div class="pkg-hero-title">CLOUD<br>MINING ETH</div>
-      <div class="pkg-hero-sub">AUTOMATED · 24/7</div>
-      <div class="pkg-pills">
-        <div class="pkg-pill"><div class="pkg-dot"></div><span id="pkgCnt">2,847 เครื่อง</span></div>
-        <div class="pkg-pill pkg-pill-g">ETH ≈ $2,672</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Profit Card -->
-
-  <div class="profit-card2">
-    <div class="profit-lbl2" id="pvLabel2">กรอกจำนวนเพื่อดูกำไร</div>
-    <div class="profit-center2">
-      <div class="profit-eth2" id="pvEthBig">0.000000</div>
-      <div class="profit-eth-unit2">ETH/วัน</div>
-    </div>
-    <div class="profit-usdt2" id="pvUsdDay">≈ $0.00 USDT / วัน</div>
-    <div class="stats-row2">
-      <div class="stat-box2"><div class="stat-val2" id="pvPct">--%</div><div class="stat-lbl2">กำไร/วัน</div></div>
-      <div class="stat-box2"><div class="stat-val2" id="pvDays">-- วัน</div><div class="stat-lbl2">ระยะเวลา</div></div>
-      <div class="stat-box2"><div class="stat-val2" id="pvTotal" style="color:#ffd700;">$--</div><div class="stat-lbl2">ได้คืนรวม</div></div>
-    </div>
-  </div>
-
-  <!-- Input -->
-
-  <div class="input-card2">
-    <div class="input-lbl2">
-      <span>💵 จำนวน USDT ที่ต้องการลงทุน</span>
-      <span style="color:rgba(74,222,128,0.6);">$100 - $100,000</span>
-    </div>
-    <div class="input-wrap2">
-      <input type="number" id="miningAmtInput" min="100" max="100000" placeholder="0" oninput="calcMiningPreview()">
-      <span class="input-unit2">USDT</span>
-    </div>
-    <div class="quick-row2">
-      <button class="qb2" onclick="setMiningAmt(100)">$100</button>
-      <button class="qb2" onclick="setMiningAmt(500)">$500</button>
-      <button class="qb2" onclick="setMiningAmt(1000)">$1K</button>
-      <button class="qb2" onclick="setMiningAmt(5000)">$5K</button>
-      <button class="qb2" onclick="setMiningAmt(10000)">$10K</button>
-      <button class="qb2" onclick="setMiningAmt(50000)">$50K</button>
-    </div>
-  </div>
-
-  <!-- CTA -->
-
-<button class="cta2" onclick="startMiningInvestment()">⚡ เริ่มขุด ETH เลย</button>
-
-</div>
-
-<div class="tab-page" id="pgWallet">
-      <div class="wb wb-usd">
-        <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USDT</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
-        <div class="wb-amt" id="wUsd">0.00</div>
-        <div class="wb-equiv">USDT</div>
-        <button class="btn btn-gold" style="width:100%;padding:0.85rem;margin-bottom:0.5rem;" onclick="showTopupPopup()">💵 เติม USDT</button>
-        <button onclick="showWithdrawPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;
-  background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
-  box-shadow:0 4px 20px rgba(16,185,129,0.4),0 0 30px rgba(16,185,129,0.15);">📤 ถอนออก</button>
-      </div>
-      <div class="wb wb-eth">
-        <div class="wb-head">
-          <div class="wb-ibox">🔷</div>
-          <div><div class="wb-title" data-i18n="wal.eth.title">กระเป๋ารางวัล ETH</div><div class="wb-sub" data-i18n="wal.eth.sub">กำไรจากสัญญาขุด → แลกกับผู้ดูแล</div></div>
-          <div class="wb-live">LIVE</div>
-        </div>
-        <div class="wb-amt" id="wZkp">0.000000</div>
-        <div class="wb-equiv">≈ $<span id="wZkpUsd">0.00</span> USDT</div>
-        <div class="wb-daily"><span data-i18n="wal.daily">⚡ รับ/วัน:</span><span class="wb-dv"><span id="wDaily">0</span> ETH · +$<span id="wDailyUsd">0.00</span></span></div>
-        <!-- แปลง ETH → USDT -->
-        <button onclick="showConvertPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;margin-bottom:0.5rem;
-  background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
-  box-shadow:0 4px 20px rgba(59,130,246,0.4),0 0 30px rgba(59,130,246,0.15);">💱 แปลง ETH → USDT</button>
-
-```
-  </div>
-  <div class="w-grid">
-    <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
-    <div class="w-stat"><div class="ws-l" data-i18n="wal.profit">กำไรสะสม</div><div class="ws-v wv-green" id="wProfit">$0.00</div><div class="ws-s" data-i18n="wal.profitsub">USD จากสัญญา</div></div>
-  </div>
-  <div class="sec-title" data-i18n="wal.history">📋 ประวัติธุรกรรม</div>
-  <div id="txHist"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace"><span data-i18n="wal.nohist">ยังไม่มีประวัติ</span></div></div>
-</div>
-
-<!-- TOPUP -->
-<div class="tab-page" id="pgRig">
-```
-
-  <div id="machSec" style="display:none;margin-bottom:1.1rem;position:relative;overflow:hidden;">
+<div id="machSec" style="display:none;margin-bottom:1.1rem;position:relative;overflow:hidden;">
     <div id="ethRainContainer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;max-width:100%;"></div>
     <div class="mach-header">
       <div class="mach-hdr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
@@ -2208,7 +2207,7 @@ function switchTab(i){
     const page=document.getElementById(id);if(page)page.classList.toggle('active',i===j);
     const btn=document.getElementById('bn'+j);if(btn)btn.classList.toggle('active',i===j);
   });
-  if(i===1){renderPkgs();startPkgRain();}if(i===2)renderWallet();if(i===4)renderMachines();
+  if(i===1){renderPkgs();startPkgRain();}if(i===2)renderWallet();if(i===4){renderMachines();setTimeout(()=>{const ud=getUD();if(ud&&ud.packages&&ud.packages.filter(p=>p.remaining>0).length>0){const sc=document.getElementById('miningScene');if(sc)sc.style.display='block';initMiningScene(ud.packages.filter(p=>p.remaining>0));}},200);}
   if(i===3){renderTopupHistory();renderPendingList();}
 }
 
