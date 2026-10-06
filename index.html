@@ -4779,6 +4779,7 @@ function showSettingsMenu(){
     </div>
   </div>`;
   document.body.appendChild(ov);
+  setTimeout(()=>render2FAStatus(),100);
 }
 function showProfilePopup(){
   const ud=getUD();if(!ud)return;
@@ -5204,9 +5205,12 @@ function disable2FA(){
 }
 
 function render2FAStatus(){
-  const el=document.getElementById('twoFAStatus');if(!el)return;
+  // อัปเดตทุก element ที่มี id นี้
+  const els=document.querySelectorAll('#twoFAStatus');
+  if(!els.length)return;
   const ud=getUD();if(!ud)return;
   const on=ud.twoFA?.enabled;
+  els.forEach(el=>{
   el.innerHTML=on
     ?`<div style="display:flex;align-items:center;justify-content:space-between;">
         <div>
@@ -5222,6 +5226,7 @@ function render2FAStatus(){
         </div>
         <button onclick="show2FASetup()" style="padding:0.4rem 0.8rem;background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;border-radius:8px;color:#fff;font-size:0.55rem;cursor:pointer;font-family:'Orbitron',monospace;font-weight:700;">เปิด 2FA</button>
       </div>`;
+  });
 }
 
 // ── 2FA Login Popup ──
