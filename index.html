@@ -49,8 +49,8 @@ background-size:40px 40px}
 .tab-content { scrollbar-width:none; }
 
 /* ── SCREENS ── */
-.screen { display:none!important; position:fixed; inset:0; z-index:1; width:100%; overflow:hidden; }
-.screen.active { display:flex!important; flex-direction:column; position:fixed; inset:0; }
+.screen { display:none; position:fixed; inset:0; z-index:1; width:100%; overflow:hidden; }
+.screen.active { display:flex; flex-direction:column; position:fixed; inset:0; }
 #authScreen { overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; width:100%; box-sizing:border-box; }
 
 /* ── AUTH ── */
@@ -207,7 +207,7 @@ border-radius:5px;color:var(–text-dim);font-family:‘Orbitron’,monospace;fo
 .btn-lang:hover,.btn-lang.active{background:rgba(157,78,221,0.25);border-color:var(–purple-light);color:var(–purple-light)}
 
 .tab-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:0.8rem 0.8rem 5rem;-webkit-overflow-scrolling:touch;}
-.tab-page{display:none!important}.tab-page.active{display:block!important}#pgPkg.active{display:flex!important}
+.tab-page{display:none}.tab-page.active{display:block}#pgPkg.active{display:flex}
 
 .bottom-nav{
 display:flex;align-items:flex-end;
@@ -1003,7 +1003,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 
   <div class="tab-content">
     <!-- HOME -->
-    <div class="tab-page active" id="pgHome">
+    <div class="tab-page" id="pgHome">
 
 <div id="ethPopupLayer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;"></div>
 
@@ -2277,6 +2277,7 @@ function enterDash(user){
   document.getElementById('authScreen').classList.remove('active');
   document.getElementById('dashScreen').classList.add('active');
   const bn=document.getElementById('bottomNav');if(bn)bn.style.display='flex';
+  switchTab(0);
   updateNav();
   startDrip();
   renderMachines();
