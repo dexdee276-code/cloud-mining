@@ -668,7 +668,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 /* ── confirm invest styles ── */
 @keyframes goldGlow2{0%,100%{text-shadow:0 0 20px rgba(255,215,0,0.4);}50%{text-shadow:0 0 50px rgba(255,215,0,0.9),0 0 100px rgba(255,215,0,0.3);}}
 @keyframes borderFlow2{0%,100%{border-color:rgba(16,185,129,0.2);}50%{border-color:rgba(16,185,129,0.5);}}
-.ci-card{background:linear-gradient(160deg,#080008,#100015,#080008);border-radius:28px;overflow:hidden;position:relative;border:1px solid rgba(255,215,0,0.15);box-shadow:0 30px 80px rgba(0,0,0,0.9),0 0 60px rgba(255,215,0,0.04);}
+.ci-card{background:linear-gradient(160deg,#080008,#100015,#080008);border-radius:28px;overflow:hidden;position:relative;border:1px solid rgba(255,215,0,0.15);box-shadow:0 30px 80px rgba(0,0,0,0.9),0 0 60px rgba(255,215,0,0.04);width:100%;max-width:370px;max-height:88vh;overflow-y:auto;}
 .ci-card::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.6),rgba(255,255,255,0.3),rgba(255,215,0,0.6),transparent);}
 .ci-hd{padding:0.9rem 1rem;background:linear-gradient(135deg,rgba(255,215,0,0.06),rgba(124,58,237,0.04));border-bottom:1px solid rgba(255,215,0,0.07);text-align:center;}
 .ci-hd-tag{font-size:0.42rem;letter-spacing:4px;color:rgba(255,215,0,0.3);font-family:‘Orbitron’,monospace;margin-bottom:0.2rem;}
@@ -4385,7 +4385,7 @@ function startMiningInvestment(){
   }
   const pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt),total=amt+daily*days;
   const ov=document.createElement('div');ov.className='overlay';
-  ov.innerHTML=`<div class="ci-card">
+  ov.innerHTML=`<div class="ci-card" style="width:calc(100vw - 2rem);max-width:370px;">
     <div class="ci-hd">
       <div class="ci-hd-tag">INVESTMENT CONFIRMATION</div>
       <div class="ci-hd-title">ยืนยันการลงทุน</div>
