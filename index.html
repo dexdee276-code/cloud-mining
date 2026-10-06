@@ -1709,27 +1709,8 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 </div>
 
 <div id="ethPopupLayer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;"></div>
-<div id="machSec" style="display:none;margin-bottom:1.1rem;position:relative;overflow:hidden;">
-  <div id="ethRainContainer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;max-width:100%;"></div>
-        <div class="mach-header">
-          <div class="mach-hdr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-          <div><div class="mach-hdr-t" data-i18n="home.machtitle">⚙️ เครื่องขุดของฉัน</div><div class="mach-hdr-s" data-i18n="home.machsub">ACTIVE MINING RIGS</div></div>
-          <div class="mach-count" id="machCount">0 RIG</div>
-        </div>
-        <div id="machList"></div>
-      </div>
 
 ```
-  <!-- ถ้าไม่มีเครื่องขุด แสดงข้อความแนะนำ -->
-  <div id="noMachMsg" style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:1.1rem;">
-    <div style="font-size:2.5rem;margin-bottom:0.6rem;">⛏️</div>
-    <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;margin-bottom:0.4rem;">ยังไม่มีเครื่องขุด</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">เติม USDT แล้วลงทุนเช่ากำลังขุด<br>ระบบขุด ETH ให้อัตโนมัติทุกวัน</div>
-    <button onclick="switchTab(1)" class="btn btn-primary" style="padding:0.7rem 1.5rem;font-size:0.8rem;">
-      🛒 ดูสัญญาขุด
-    </button>
-  </div>
-
   <!-- สถิติ -->
   <div class="sec-title" data-i18n="home.overview">📊 ภาพรวม</div>
   <div class="stats-grid">
@@ -1857,9 +1838,32 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 </div>
 
 <!-- TOPUP -->
-<div class="tab-page" id="pgTopup">
-  <div class="sec-title">💵 เติม USDT</div>
+<div class="tab-page" id="pgRig">
+```
 
+  <div id="machSec" style="display:none;margin-bottom:1.1rem;position:relative;overflow:hidden;">
+    <div id="ethRainContainer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;max-width:100%;"></div>
+    <div class="mach-header">
+      <div class="mach-hdr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      <div><div class="mach-hdr-t">⚙️ เครื่องขุดของฉัน</div><div class="mach-hdr-s">ACTIVE MINING RIGS</div></div>
+      <div class="mach-count" id="machCount">0 RIG</div>
+    </div>
+    <div id="machList"></div>
+  </div>
+  <div id="noMachMsg" style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:1.1rem;">
+    <div style="font-size:2.5rem;margin-bottom:0.6rem;">⛏️</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;margin-bottom:0.4rem;">ยังไม่มีเครื่องขุด</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">เติม USDT แล้วลงทุนเช่ากำลังขุด<br>ระบบขุด ETH ให้อัตโนมัติทุกวัน</div>
+    <button onclick="switchTab(1)" class="btn btn-primary" style="padding:0.7rem 1.5rem;font-size:0.8rem;">
+      🛒 ดูสัญญาขุด
+    </button>
+  </div>
+</div>
+
+<div class="tab-page" id="pgTopup">
+      <div class="sec-title">💵 เติม USDT</div>
+
+```
   <!-- Step 1: ใส่จำนวน -->
   <div class="topup-step" id="stepAmount">
     <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);border-radius:12px;padding:1rem;margin-bottom:1rem;">
@@ -1966,7 +1970,7 @@ box-shadow:0 4px 20px rgba(16,185,129,0.5),0 0 40px rgba(16,185,129,0.2);”>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
       <span>หน้าหลัก</span>
     </button>
-    <button class="bnav" id="bnMining" onclick="switchTab(0);setTimeout(()=>{const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);">
+    <button class="bnav" id="bnMining" onclick="switchTab(4);renderMachines();">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="3"/></svg>
       <span>เครื่องขุด</span>
     </button>
@@ -2198,13 +2202,13 @@ function enterDash(user){
 }
 
 // ─── NAVIGATION ───
-const PAGES=['pgHome','pgPkg','pgWallet','pgTopup'];
+const PAGES=['pgHome','pgPkg','pgWallet','pgTopup','pgRig'];
 function switchTab(i){
   PAGES.forEach((id,j)=>{
     const page=document.getElementById(id);if(page)page.classList.toggle('active',i===j);
     const btn=document.getElementById('bn'+j);if(btn)btn.classList.toggle('active',i===j);
   });
-  if(i===1){renderPkgs();startPkgRain();}if(i===2)renderWallet();
+  if(i===1){renderPkgs();startPkgRain();}if(i===2)renderWallet();if(i===4)renderMachines();
   if(i===3){renderTopupHistory();renderPendingList();}
 }
 
