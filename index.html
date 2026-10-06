@@ -889,6 +889,9 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <button class="admin-tab" id="atn1" onclick="switchAdminTab(1)">💱 แลก ETH</button>
     <button class="admin-tab" id="atn2" onclick="switchAdminTab(2)">👥 สมาชิก</button>
     <button class="admin-tab" id="atn3" onclick="switchAdminTab(3)">⚙️ ตั้งค่า</button>
+    <button class="admin-tab" id="atn4" onclick="switchAdminTab(4)">📊 Dashboard</button>
+    <button class="admin-tab" id="atn5" onclick="switchAdminTab(5)">📢 ประกาศ</button>
+    <button class="admin-tab" id="atn6" onclick="switchAdminTab(6)">🚫 แบน</button>
   </div>
 
   <div style="flex:1;overflow-y:auto;padding:1rem;">
@@ -972,11 +975,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
       box-shadow:0 4px 15px rgba(16,185,129,0.3);">💾 บันทึกที่อยู่ USDT</button>
   </div>
 
-  <!-- 2FA Settings -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
-    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:#c084fc;margin-bottom:0.8rem;">🔐 Two-Factor Authentication (2FA)</div>
-    <div id="twoFAStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;"></div>
-  </div>
+  <!-- 2FA Settings (Admin view only - no 2FA for admin) -->
 
   <!-- เปลี่ยนรหัส Admin -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
@@ -2190,25 +2189,31 @@ function doLogin(){
     if(cached){
       const ud=JSON.parse(cached);
       if(ud&&ud.pw===p){
-        // เช็ค 2FA
-        if(ud.twoFA?.enabled){
-          show2FALogin(u,ud,()=>{
-            _ud=ud;setSess(u);enterDash(u);
-            if(window._db)fbGetUser(u).then(fresh=>{if(fresh){
-              fresh.ethReward=Math.max(fresh.ethReward||0,fresh.ethRewardSaved||0);
-              _ud=fresh;try{localStorage.setItem('cm_ud_'+u,JSON.stringify(fresh));}catch(e){}
-            }});
-          });
-          return;
-        }
-        _ud=ud;setSess(u);enterDash(u);
-        if(window._db)fbGetUser(u).then(fresh=>{if(fresh){
-          // เก็บ ethReward ปัจจุบันไว้ ถ้าสูงกว่า Firebase ให้ใช้ local
-          const curEth=_ud?(_ud.ethReward||0):0;
-          fresh.ethReward=Math.max(fresh.ethReward||0,curEth);
-          _ud=fresh;
-          try{localStorage.setItem('cm_ud_'+u,JSON.stringify(fresh));}catch(e){}
-        }});
+        // เช็คแบน
+        checkBanned(u,(banned)=>{
+          if(banned){
+            showMsg('loginMsg','🚫 บัญชีนี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแล','error');
+            return;
+          }
+          // เช็ค 2FA
+          if(ud.twoFA?.enabled){
+            show2FALogin(u,ud,()=>{
+              _ud=ud;setSess(u);enterDash(u);
+              if(window._db)fbGetUser(u).then(fresh=>{if(fresh){
+                fresh.ethReward=Math.max(fresh.ethReward||0,fresh.ethRewardSaved||0);
+                _ud=fresh;try{localStorage.setItem('cm_ud_'+u,JSON.stringify(fresh));}catch(e){}
+              }});
+            });
+            return;
+          }
+          _ud=ud;setSess(u);enterDash(u);
+          if(window._db)fbGetUser(u).then(fresh=>{if(fresh){
+            const curEth=_ud?(_ud.ethReward||0):0;
+            fresh.ethReward=Math.max(fresh.ethReward||0,curEth);
+            _ud=fresh;
+            try{localStorage.setItem('cm_ud_'+u,JSON.stringify(fresh));}catch(e){}
+          }});
+        });
         return;
       }
     }
@@ -2297,6 +2302,7 @@ function enterDash(user){
   document.getElementById('dashScreen').classList.add('active');
   const bn=document.getElementById('bottomNav');if(bn)bn.style.display='flex';
   switchTab(0);
+  setTimeout(()=>checkAnnouncements(),2000);
   updateNav();
   startDrip();
   renderMachines();
@@ -3520,6 +3526,9 @@ function doAdminLogout(){
   showToast('👋 ออกจาก Admin Mode');
 }
 function switchAdminTab(i){
+  if(i===4)setTimeout(()=>renderAdminDashboard(),100);
+  if(i===5)setTimeout(()=>renderAnnList(),100);
+  if(i===6)setTimeout(()=>renderBanUsers(),100);
   adminTabIdx = i;
   ['atn0','atn1','atn2','atn3'].forEach((id,j)=>{
     document.getElementById(id).classList.toggle('active', i===j);
@@ -5263,7 +5272,295 @@ async function verify2FALogin(secret){
   window._2faCallback=null;
 }
 
+
+// ══════════════════════════════════════
+// ── ADMIN DASHBOARD ──
+// ══════════════════════════════════════
+function renderAdminDashboard(){
+  const el=document.getElementById('adminDashboard');if(!el)return;
+  if(!window._db){el.innerHTML='<div style="color:red;">❌ ไม่มี Firebase</div>';return;}
+  el.innerHTML='<div style="text-align:center;padding:2rem;color:#A890CC;font-size:0.7rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('users').once('value').then(snap=>{
+    if(!snap.exists()){el.innerHTML='ไม่มีข้อมูล';return;}
+    const users=snap.val();
+    const keys=Object.keys(users);
+    let totalUsd=0,totalEth=0,totalPkgs=0,activeUsers=0;
+    keys.forEach(u=>{
+      const ud=users[u];
+      totalUsd+=(ud.usd||0);
+      totalEth+=(ud.ethReward||0);
+      const pkgs=(ud.packages||[]).filter(p=>p.remaining>0);
+      totalPkgs+=pkgs.length;
+      if(pkgs.length>0)activeUsers++;
+    });
+    el.innerHTML=`
+      <!-- Stats Grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1rem;">
+        <div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,180,0,0.04));border:1px solid rgba(255,215,0,0.2);border-radius:14px;padding:1rem;text-align:center;">
+          <div style="font-size:1.5rem;margin-bottom:0.3rem;">👥</div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;color:#ffd700;">${keys.length}</div>
+          <div style="font-size:0.45rem;color:rgba(255,215,0,0.5);letter-spacing:1px;">สมาชิกทั้งหมด</div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(74,222,128,0.08),rgba(16,185,129,0.04));border:1px solid rgba(74,222,128,0.2);border-radius:14px;padding:1rem;text-align:center;">
+          <div style="font-size:1.5rem;margin-bottom:0.3rem;">⛏️</div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;color:#4ade80;">${activeUsers}</div>
+          <div style="font-size:0.45rem;color:rgba(74,222,128,0.5);letter-spacing:1px;">กำลังขุดอยู่</div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(37,99,235,0.04));border:1px solid rgba(59,130,246,0.2);border-radius:14px;padding:1rem;text-align:center;">
+          <div style="font-size:1.5rem;margin-bottom:0.3rem;">💵</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#38bdf8;">$${totalUsd.toFixed(0)}</div>
+          <div style="font-size:0.45rem;color:rgba(56,189,248,0.5);letter-spacing:1px;">USDT รวมในระบบ</div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(192,132,252,0.08),rgba(124,58,237,0.04));border:1px solid rgba(192,132,252,0.2);border-radius:14px;padding:1rem;text-align:center;">
+          <div style="font-size:1.5rem;margin-bottom:0.3rem;">Ξ</div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#c084fc;">${totalEth.toFixed(4)}</div>
+          <div style="font-size:0.45rem;color:rgba(192,132,252,0.5);letter-spacing:1px;">ETH รวมทั้งหมด</div>
+        </div>
+      </div>
+
+      <!-- Pending requests -->
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.15);border-radius:14px;padding:1rem;margin-bottom:0.8rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:#c084fc;margin-bottom:0.8rem;">📋 คำขอที่รอดำเนินการ</div>
+        <div id="dashPending">⏳ กำลังโหลด...</div>
+      </div>
+
+      <!-- Top investors -->
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,215,0,0.12);border-radius:14px;padding:1rem;">
+        <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:#ffd700;margin-bottom:0.8rem;">🏆 Top 5 นักลงทุน</div>
+        ${keys.sort((a,b)=>{
+          const aTotal=(users[a].packages||[]).reduce((s,p)=>s+(p.price||0),0);
+          const bTotal=(users[b].packages||[]).reduce((s,p)=>s+(p.price||0),0);
+          return bTotal-aTotal;
+        }).slice(0,5).map((u,i)=>{
+          const ud=users[u];
+          const inv=(ud.packages||[]).reduce((s,p)=>s+(p.price||0),0);
+          const medal=['🥇','🥈','🥉','4️⃣','5️⃣'][i];
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.04);">'
+            +'<div style="display:flex;align-items:center;gap:0.5rem;">'
+            +'<span style="font-size:0.9rem;">'+medal+'</span>'
+            +'<span style="font-family:Share Tech Mono,monospace;font-size:0.65rem;color:#fff;">'+u+'</span>'
+            +'</div>'
+            +'<span style="font-family:Orbitron,monospace;font-size:0.65rem;color:#ffd700;">$'+inv.toLocaleString()+'</span>'
+            +'</div>';
+        }).join('')}
+      </div>
+    `;
+    // โหลด pending requests
+    loadDashPending();
+  });
+}
+
+function loadDashPending(){
+  const el=document.getElementById('dashPending');if(!el||!window._db)return;
+  Promise.all([
+    window._db.ref('topup_reqs').orderByChild('status').equalTo('pending').once('value'),
+    window._db.ref('withdraw_reqs').orderByChild('status').equalTo('pending').once('value')
+  ]).then(([topSnap,wdSnap])=>{
+    const topups=topSnap.exists()?Object.keys(topSnap.val()).length:0;
+    const withdraws=wdSnap.exists()?Object.keys(wdSnap.val()).length:0;
+    el.innerHTML=`<div style="display:flex;gap:0.5rem;">
+      <div onclick="switchAdminTab(0)" style="flex:1;padding:0.6rem;background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.15);border-radius:10px;text-align:center;cursor:pointer;">
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;color:#ffd700;font-weight:900;">${topups}</div>
+        <div style="font-size:0.45rem;color:rgba(255,215,0,0.5);">คำขอเติมเงิน</div>
+      </div>
+      <div onclick="switchAdminTab(1)" style="flex:1;padding:0.6rem;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.15);border-radius:10px;text-align:center;cursor:pointer;">
+        <div style="font-family:'Orbitron',monospace;font-size:1rem;color:#10b981;font-weight:900;">${withdraws}</div>
+        <div style="font-size:0.45rem;color:rgba(16,185,129,0.5);">คำขอถอนเงิน</div>
+      </div>
+    </div>`;
+  });
+}
+
+// ══════════════════════════════════════
+// ── ANNOUNCEMENT ──
+// ══════════════════════════════════════
+function sendAnnouncement(){
+  const title=document.getElementById('annTitle')?.value.trim();
+  const body=document.getElementById('annBody')?.value.trim();
+  const type=document.getElementById('annType')?.value||'info';
+  if(!title){showToast('⚠️ กรอกหัวข้อก่อน');return;}
+  if(!body){showToast('⚠️ กรอกข้อความก่อน');return;}
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  const ann={title,body,type,time:Date.now(),by:'admin'};
+  window._db.ref('announcements').push(ann).then(()=>{
+    showToast('✅ ส่งประกาศสำเร็จ!');
+    document.getElementById('annTitle').value='';
+    document.getElementById('annBody').value='';
+    renderAnnList();
+  });
+}
+
+function renderAnnList(){
+  const el=document.getElementById('annList');if(!el||!window._db)return;
+  window._db.ref('announcements').orderByChild('time').limitToLast(10).once('value').then(snap=>{
+    if(!snap.exists()){el.innerHTML='<div style="color:#A890CC;font-size:0.7rem;text-align:center;padding:1rem;">ยังไม่มีประกาศ</div>';return;}
+    const anns=Object.entries(snap.val()).map(([k,v])=>({...v,key:k})).reverse();
+    const colors={info:'#38bdf8',warning:'#fbbf24',success:'#4ade80',maintenance:'#c084fc'};
+    const icons={info:'ℹ️',warning:'⚠️',success:'✅',maintenance:'🔧'};
+    el.innerHTML=anns.map(a=>{
+      const d=new Date(a.time);
+      const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+      return `<div style="background:rgba(0,0,0,0.3);border:1px solid rgba(${colors[a.type]||'157,78,221'},0.2);border-radius:12px;padding:0.8rem;margin-bottom:0.6rem;position:relative;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+          <div style="display:flex;align-items:center;gap:0.4rem;">
+            <span>${icons[a.type]||'📢'}</span>
+            <span style="font-family:'Orbitron',monospace;font-size:0.62rem;color:#fff;font-weight:700;">${a.title}</span>
+          </div>
+          <button onclick="deleteAnn('${a.key}')" style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);border-radius:6px;color:#f87171;font-size:0.55rem;padding:0.15rem 0.4rem;cursor:pointer;">ลบ</button>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.4);margin-bottom:0.3rem;">${a.body}</div>
+        <div style="font-size:0.45rem;color:rgba(255,255,255,0.2);">${t}</div>
+      </div>`;
+    }).join('');
+  });
+}
+
+function deleteAnn(key){
+  if(!window._db)return;
+  window._db.ref('announcements/'+key).remove().then(()=>{
+    showToast('🗑️ ลบประกาศแล้ว');
+    renderAnnList();
+  });
+}
+
+// แสดงประกาศให้ลูกค้าเห็นตอน login
+function checkAnnouncements(){
+  if(!window._db)return;
+  window._db.ref('announcements').orderByChild('time').limitToLast(1).once('value').then(snap=>{
+    if(!snap.exists())return;
+    const ann=Object.values(snap.val())[0];
+    const lastSeen=localStorage.getItem('cm_last_ann');
+    if(lastSeen&&ann.time<=parseInt(lastSeen))return;
+    localStorage.setItem('cm_last_ann',ann.time);
+    const colors={info:'rgba(56,189,248,0.15)',warning:'rgba(251,191,36,0.12)',success:'rgba(74,222,128,0.12)',maintenance:'rgba(192,132,252,0.12)'};
+    const borders={info:'rgba(56,189,248,0.3)',warning:'rgba(251,191,36,0.3)',success:'rgba(74,222,128,0.3)',maintenance:'rgba(192,132,252,0.3)'};
+    const icons={info:'ℹ️',warning:'⚠️',success:'✅',maintenance:'🔧'};
+    const ov=document.createElement('div');ov.className='overlay';
+    ov.innerHTML=`<div class="popup" style="max-width:320px;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:0.8rem;">${icons[ann.type]||'📢'}</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:#fff;margin-bottom:0.6rem;">${ann.title}</div>
+      <div style="background:${colors[ann.type]||'rgba(157,78,221,0.1)'};border:1px solid ${borders[ann.type]||'rgba(157,78,221,0.2)'};border-radius:10px;padding:0.8rem;margin-bottom:1rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.7);line-height:1.7;">${ann.body}</div>
+      </div>
+      <button onclick="this.closest('.overlay').remove()" class="btn btn-primary" style="width:100%;">✅ รับทราบ</button>
+    </div>`;
+    document.body.appendChild(ov);
+  });
+}
+
+// ══════════════════════════════════════
+// ── BAN / BLOCK USERS ──
+// ══════════════════════════════════════
+let _allBanUsers={};
+
+function renderBanUsers(){
+  const el=document.getElementById('banUserList');if(!el||!window._db)return;
+  el.innerHTML='<div style="text-align:center;padding:1rem;color:#A890CC;font-size:0.7rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('users').once('value').then(snap=>{
+    if(!snap.exists()){el.innerHTML='ไม่มีข้อมูล';return;}
+    _allBanUsers=snap.val();
+    filterBanUsers('');
+  });
+}
+
+function filterBanUsers(q){
+  const el=document.getElementById('banUserList');if(!el)return;
+  const query=q.toLowerCase().trim();
+  const keys=Object.keys(_allBanUsers).filter(u=>!query||u.toLowerCase().includes(query));
+  if(!keys.length){el.innerHTML='<div style="color:#A890CC;text-align:center;padding:1rem;font-size:0.7rem;">ไม่พบผู้ใช้</div>';return;}
+  el.innerHTML=keys.map(u=>{
+    const ud=_allBanUsers[u];
+    const banned=ud.banned||false;
+    return `<div style="background:rgba(0,0,0,0.3);border:1px solid ${banned?'rgba(248,113,113,0.25)':'rgba(157,78,221,0.12)'};border-radius:12px;padding:0.8rem;margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.2rem;">
+          <span style="font-size:0.75rem;">${banned?'🚫':'👤'}</span>
+          <span style="font-family:'Orbitron',monospace;font-size:0.65rem;color:${banned?'#f87171':'#fff'};font-weight:700;">${u}</span>
+          ${banned?'<span style="font-size:0.42rem;background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:0.1rem 0.35rem;color:#f87171;">BANNED</span>':''}
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:rgba(255,255,255,0.25);">
+          USDT: $${(ud.usd||0).toFixed(2)} · ETH: ${(ud.ethReward||0).toFixed(4)}
+        </div>
+      </div>
+      <div style="display:flex;gap:0.4rem;">
+        ${banned
+          ?`<button onclick="unbanUser('${u}')" style="padding:0.4rem 0.7rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2);border-radius:8px;color:#4ade80;font-size:0.52rem;cursor:pointer;font-family:'Share Tech Mono',monospace;">✅ ปลดแบน</button>`
+          :`<button onclick="banUser('${u}')" style="padding:0.4rem 0.7rem;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);border-radius:8px;color:#f87171;font-size:0.52rem;cursor:pointer;font-family:'Share Tech Mono',monospace;">🚫 แบน</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function banUser(username){
+  if(!window._db)return;
+  if(!confirm('แบน '+username+' ?'))return;
+  window._db.ref('users/'+username+'/banned').set(true).then(()=>{
+    showToast('🚫 แบน '+username+' แล้ว');
+    renderBanUsers();
+  });
+}
+
+function unbanUser(username){
+  if(!window._db)return;
+  window._db.ref('users/'+username+'/banned').set(false).then(()=>{
+    showToast('✅ ปลดแบน '+username+' แล้ว');
+    renderBanUsers();
+  });
+}
+
+// เช็คแบนตอน login
+function checkBanned(username,cb){
+  if(!window._db){cb(false);return;}
+  window._db.ref('users/'+username+'/banned').once('value').then(snap=>{
+    cb(snap.val()===true);
+  });
+}
+
 </script>
 
 </body>
 </html>
+    <!-- Tab 4: Dashboard -->
+    <div class="admin-page" id="apg4">
+      <div class="sec-title">📊 Dashboard สรุปยอดรวม</div>
+      <div id="adminDashboard">⏳ กำลังโหลด...</div>
+    </div>
+
+```
+<!-- Tab 5: Announcement -->
+<div class="admin-page" id="apg5">
+  <div class="sec-title">📢 ส่งประกาศ</div>
+  <div style="margin-bottom:1rem;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">หัวข้อประกาศ</div>
+    <input type="text" id="annTitle" placeholder="เช่น: ระบบปิดปรับปรุง"
+      style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.3);color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.8rem;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">ข้อความ</div>
+    <textarea id="annBody" placeholder="รายละเอียดประกาศ..." rows="4"
+      style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.2);border-radius:8px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;resize:none;margin-bottom:0.8rem;"></textarea>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">ประเภท</div>
+    <select id="annType" style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.2);border-radius:8px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;appearance:none;">
+      <option value="info">ℹ️ ข้อมูลทั่วไป</option>
+      <option value="warning">⚠️ คำเตือน</option>
+      <option value="success">✅ ข่าวดี</option>
+      <option value="maintenance">🔧 ปิดปรับปรุง</option>
+    </select>
+    <button onclick="sendAnnouncement()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;box-shadow:0 4px 20px rgba(59,130,246,0.4);">
+      📢 ส่งประกาศถึงลูกค้าทั้งหมด
+    </button>
+  </div>
+  <div class="sec-title" style="margin-top:1rem;">📋 ประกาศที่ผ่านมา</div>
+  <div id="annList">⏳ กำลังโหลด...</div>
+</div>
+
+<!-- Tab 6: Ban/Block -->
+<div class="admin-page" id="apg6">
+  <div class="sec-title">🚫 ระงับ / แบนผู้ใช้</div>
+  <div style="position:relative;margin-bottom:0.8rem;">
+    <input type="text" id="banSearchInput" placeholder="🔍 ค้นหาชื่อผู้ใช้..."
+      oninput="filterBanUsers(this.value)"
+      style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:1px solid rgba(230,57,70,0.3);border-radius:10px;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;box-sizing:border-box;">
+  </div>
+  <div id="banUserList">⏳ กำลังโหลด...</div>
+</div>
+```
