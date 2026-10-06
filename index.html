@@ -49,8 +49,8 @@ background-size:40px 40px}
 .tab-content { scrollbar-width:none; }
 
 /* ── SCREENS ── */
-.screen { display:none; position:fixed; inset:0; z-index:1; width:100%; overflow:hidden; }
-.screen.active { display:flex; flex-direction:column; position:fixed; inset:0; }
+.screen { display:none!important; position:fixed; inset:0; z-index:1; width:100%; overflow:hidden; }
+.screen.active { display:flex!important; flex-direction:column; position:fixed; inset:0; }
 #authScreen { overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; width:100%; box-sizing:border-box; }
 
 /* ── AUTH ── */
@@ -2265,23 +2265,17 @@ function doLogout(){
   if(window._scenePartInt){clearInterval(window._scenePartInt);window._scenePartInt=null;}
   const sc=document.getElementById('miningScene');if(sc)sc.style.display='none';
   stopMine();stopDrip();clrSess();
-  // ซ่อนทุก tab-page และ dashScreen
-  document.querySelectorAll('.tab-page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
-  const dash=document.getElementById('dashScreen');
-  if(dash){dash.classList.remove('active');dash.style.display='none';}
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('dashScreen').classList.remove('active');
+  document.getElementById('authScreen').classList.add('active');
   const bnav=document.getElementById('bottomNav');if(bnav)bnav.style.display='none';
-  const auth=document.getElementById('authScreen');
-  if(auth){auth.classList.add('active');auth.style.display='';}
   showToast(t('toast.logout'));
 }
 
 // ─── ENTER DASHBOARD ───
 function enterDash(user){
   document.getElementById('authScreen').classList.remove('active');
-  const dash=document.getElementById('dashScreen');
-  if(dash){dash.classList.add('active');dash.style.display='';}
-  // reset tab-page display
-  document.querySelectorAll('.tab-page').forEach(p=>{p.style.display='';});
+  document.getElementById('dashScreen').classList.add('active');
   const bn=document.getElementById('bottomNav');if(bn)bn.style.display='flex';
   updateNav();
   startDrip();
