@@ -816,7 +816,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <div class="auth-logo">⛏ CRYPTOMINE</div>
   </div>
   <div class="auth-sub">MINE ETH · EARN USDT · DOMINATE</div>
-  <div id="fbStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,100,100,0.8);text-align:center;margin-bottom:0.5rem;">⏳ กำลังเชื่อมต่อ Firebase...</div>
+  <div id="fbStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,100,100,0.8);text-align:center;margin-bottom:0.5rem;" data-i18n="auth.connecting">⏳ กำลังเชื่อมต่อ Firebase...</div>
   <div class="auth-card">
     <div class="auth-bar">
       <div class="auth-bar-dot"></div><div class="auth-bar-dot"></div><div class="auth-bar-dot"></div>
@@ -846,7 +846,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     </div>
     <div class="auth-form" id="regForm">
       <div class="form-group">
-        <label class="form-label">USERNAME</label>
+        <label class="form-label" data-i18n="auth.lbl.user">USERNAME</label>
         <div class="field-icon">👤</div>
         <input class="form-input" id="regUser" data-i18n-ph="auth.ph.reguser" type="text" placeholder="choose_identity" autocomplete="off">
       </div>
@@ -856,7 +856,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
         <input class="form-input" id="regEmail" data-i18n-ph="auth.ph.email" type="email" placeholder="node@network.io">
       </div>
       <div class="form-group">
-        <label class="form-label">PASSWORD</label>
+        <label class="form-label" data-i18n="auth.lbl.pass">PASSWORD</label>
         <div class="field-icon">🔐</div>
         <input class="form-input" id="regPass" data-i18n-ph="auth.ph.regpass" type="password" placeholder="min 6 chars">
       </div>
@@ -1119,13 +1119,13 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <div class="ticker-inner2">
       <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>ETH $2,672.47 ▲2.3%</div>
       <div class="ticker-item2"><div class="tdot" style="background:#f87171;box-shadow:0 0 5px #f87171;"></div>BTC $67,420 ▲1.1%</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#fbbf24;box-shadow:0 0 5px #fbbf24;"></div>กำลังขุดอยู่ <span id="aMiners" style="color:#fbbf24;">2,847</span> เครื่อง</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>กำไรเฉลี่ย 1.30%/วัน</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#fbbf24;box-shadow:0 0 5px #fbbf24;"></div><span data-i18n="ticker.mining">กำลังขุดอยู่</span> <span id="aMiners" style="color:#fbbf24;">2,847</span> <span data-i18n="ticker.unit">เครื่อง</span></div>
+      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div><span data-i18n="ticker.profit">กำไรเฉลี่ย 1.30%/วัน</span></div>
       <div class="ticker-item2"><div class="tdot" style="background:#c084fc;box-shadow:0 0 5px #c084fc;"></div>ETH ขุดวันนี้ 142.8 ETH</div>
       <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>ETH $2,672.47 ▲2.3%</div>
       <div class="ticker-item2"><div class="tdot" style="background:#f87171;box-shadow:0 0 5px #f87171;"></div>BTC $67,420 ▲1.1%</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#fbbf24;box-shadow:0 0 5px #fbbf24;"></div>กำลังขุดอยู่ 2,847 เครื่อง</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>กำไรเฉลี่ย 1.30%/วัน</div>
+      <div class="ticker-item2"><div class="tdot" style="background:#fbbf24;box-shadow:0 0 5px #fbbf24;"></div><span data-i18n="ticker.mining">กำลังขุดอยู่</span> 2,847 <span data-i18n="ticker.unit">เครื่อง</span></div>
+      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div><span data-i18n="ticker.profit">กำไรเฉลี่ย 1.30%/วัน</span></div>
       <div class="ticker-item2"><div class="tdot" style="background:#c084fc;box-shadow:0 0 5px #c084fc;"></div>ETH ขุดวันนี้ 142.8 ETH</div>
     </div>
   </div>
@@ -1137,7 +1137,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <div class="promo-eth-bg">Ξ</div>
     <div class="promo-tag"><div class="promo-tag-dot"></div>CLOUD MINING PLATFORM</div>
     <div class="promo-title"><span class="promo-title-g">ขุด ETH</span><br><span class="promo-title-g" data-i18n="promo.title2">รับกำไรทุกวัน</span></div>
-    <div class="promo-sub">ระบบขุด Ethereum อัตโนมัติ 24/7<br>ลงทุนครั้งเดียว รับกำไรทุกวัน ไม่ต้องดูแล</div>
+    <div class="promo-sub" data-i18n-html="promo.sub2">ระบบขุด Ethereum อัตโนมัติ 24/7<br>ลงทุนครั้งเดียว รับกำไรทุกวัน ไม่ต้องดูแล</div>
     <div class="promo-pills">
       <div class="ppill ppg" data-i18n="promo.pill1">✅ ปลอดภัย 100%</div>
       <div class="ppill ppp" data-i18n="promo.pill2">⚡ Auto 24/7</div>
@@ -1237,12 +1237,12 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <div class="profit-lbl2" id="pvLabel2">กรอกจำนวนเพื่อดูกำไร</div>
     <div class="profit-center2">
       <div class="profit-eth2" id="pvEthBig">0.000000</div>
-      <div class="profit-eth-unit2">ETH/วัน</div>
+      <div class="profit-eth-unit2" data-i18n="pkg2.ethday">ETH/วัน</div>
     </div>
     <div class="profit-usdt2" id="pvUsdDay">≈ $0.00 USDT / วัน</div>
     <div class="stats-row2">
-      <div class="stat-box2"><div class="stat-val2" id="pvPct">--%</div><div class="stat-lbl2">กำไร/วัน</div></div>
-      <div class="stat-box2"><div class="stat-val2" id="pvDays">-- วัน</div><div class="stat-lbl2">ระยะเวลา</div></div>
+      <div class="stat-box2"><div class="stat-val2" id="pvPct">--%</div><div class="stat-lbl2" data-i18n="pkg2.pct">กำไร/วัน</div></div>
+      <div class="stat-box2"><div class="stat-val2" id="pvDays">-- วัน</div><div class="stat-lbl2" data-i18n="pkg2.duration">ระยะเวลา</div></div>
       <div class="stat-box2"><div class="stat-val2" id="pvTotal" style="color:#ffd700;">$--</div><div class="stat-lbl2">ได้คืนรวม</div></div>
     </div>
   </div>
@@ -1251,8 +1251,8 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 
   <div class="input-card2">
     <div class="input-lbl2">
-      <span>💵 จำนวน USDT ที่ต้องการลงทุน</span>
-      <span style="color:rgba(74,222,128,0.6);">$100 - $100,000</span>
+      <span data-i18n="pkg2.input.lbl">💵 จำนวน USDT ที่ต้องการลงทุน</span>
+      <span data-i18n="pkg2.range" style="color:rgba(74,222,128,0.6);">$100 - $100,000</span>
     </div>
     <div class="input-wrap2">
       <input type="number" id="miningAmtInput" min="100" max="100000" placeholder="0" oninput="calcMiningPreview()">
@@ -1296,7 +1296,7 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
         <!-- แปลง ETH → USDT -->
         <button onclick="showConvertPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;margin-bottom:0.5rem;
   background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
-  box-shadow:0 4px 20px rgba(59,130,246,0.4),0 0 30px rgba(59,130,246,0.15);">💱 แปลง ETH → USDT</button>
+  box-shadow:0 4px 20px rgba(59,130,246,0.4),0 0 30px rgba(59,130,246,0.15);" data-i18n="wal.convert.btn">💱 แปลง ETH → USDT</button>
 
 ```
   </div>
@@ -2067,15 +2067,15 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <div id="ethRainContainer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;max-width:100%;"></div>
     <div class="mach-header">
       <div class="mach-hdr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-      <div><div class="mach-hdr-t">⚙️ เครื่องขุดของฉัน</div><div class="mach-hdr-s">ACTIVE MINING RIGS</div></div>
+      <div><div class="mach-hdr-t" data-i18n="mach.title">⚙️ เครื่องขุดของฉัน</div><div class="mach-hdr-s" data-i18n="mach.sub">ACTIVE MINING RIGS</div></div>
       <div class="mach-count" id="machCount">0 RIG</div>
     </div>
     <div id="machList"></div>
   </div>
   <div id="noMachMsg" style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:1.1rem;">
     <div style="font-size:2.5rem;margin-bottom:0.6rem;">⛏️</div>
-    <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;margin-bottom:0.4rem;">ยังไม่มีเครื่องขุด</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">เติม USDT แล้วลงทุนเช่ากำลังขุด<br>ระบบขุด ETH ให้อัตโนมัติทุกวัน</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;margin-bottom:0.4rem;" data-i18n="mach.empty">ยังไม่มีเครื่องขุด</div>
+    <div data-i18n-html="mach.empty.sub" style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">เติม USDT แล้วลงทุนเช่ากำลังขุด<br>ระบบขุด ETH ให้อัตโนมัติทุกวัน</div>
     <button onclick="switchTab(1)" class="btn btn-primary" style="padding:0.7rem 1.5rem;font-size:0.8rem;">
       🛒 ดูสัญญาขุด
     </button>
@@ -2526,7 +2526,7 @@ function buyPkg(key){
   if(!ud.packages)ud.packages=[];
   ud.packages.push({key,price:def.price,days:def.days,daily:def.daily,profit:def.profit,bought:Date.now(),remaining:def.days});
   if(!ud.txs)ud.txs=[];
-  ud.txs.unshift({desc:'เช่ากำลังขุด '+def.name,amount:-def.price,unit:'USDT',time:Date.now()});
+  ud.txs.unshift({desc:t('wal.tx.mine')+' $'+amt+' USDT',amount:-def.price,unit:'USDT',time:Date.now()});
   saveUD(ud);showToast(def.price===0?t('toast.freepkg'):t('toast.startpkg')+' '+def.name+'!');
   updateNav();startDrip();switchTab(0);
   setTimeout(()=>{renderMachines();const el=document.getElementById('machSec');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},300);
@@ -3472,7 +3472,7 @@ function showHistoryPopup(){
   const ov=document.createElement('div');ov.className='overlay';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd">
-      <div class="pop-title">📋 ประวัติการทำรายการ</div>
+      <div class="pop-title" id="histPopupTitle">${t('hist.title')}</div>
       <button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button>
     </div>
     <div style="max-height:65vh;overflow-y:auto;">
@@ -4536,6 +4536,24 @@ function applyLang(){
   document.querySelectorAll('[data-i18n-html]').forEach(el=>{
     el.innerHTML=t(el.getAttribute('data-i18n-html'));
   });
+
+  // keys ที่มี HTML (<br>) ต้องใช้ innerHTML
+  const htmlKeys=['promo.sub2','mach.empty.sub'];
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(htmlKeys.includes(key)) el.innerHTML=t(key);
+  });
+
+  // Re-render ticker text
+  document.querySelectorAll('.ticker-item2').forEach(el=>{
+    el.querySelectorAll('[data-i18n]').forEach(span=>{
+      span.textContent=t(span.getAttribute('data-i18n'));
+    });
+  });
+
+  // History popup title ถ้าเปิดอยู่
+  const histTitle=document.getElementById('histPopupTitle');
+  if(histTitle) histTitle.textContent=t('hist.title');
 
   // data-i18n-ph: update placeholder
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
