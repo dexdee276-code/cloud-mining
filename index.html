@@ -1237,13 +1237,13 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
     <div class="profit-lbl2" id="pvLabel2">กรอกจำนวนเพื่อดูกำไร</div>
     <div class="profit-center2">
       <div class="profit-eth2" id="pvEthBig">0.000000</div>
-      <div class="profit-eth-unit2" data-i18n="pkg2.ethday">ETH/วัน</div>
+      <div class="profit-eth-unit2" id="pvEthUnit">ETH/วัน</div>
     </div>
     <div class="profit-usdt2" id="pvUsdDay">≈ $0.00 USDT / วัน</div>
     <div class="stats-row2">
-      <div class="stat-box2"><div class="stat-val2" id="pvPct">--%</div><div class="stat-lbl2" data-i18n="pkg2.pct">กำไร/วัน</div></div>
-      <div class="stat-box2"><div class="stat-val2" id="pvDays">-- วัน</div><div class="stat-lbl2" data-i18n="pkg2.duration">ระยะเวลา</div></div>
-      <div class="stat-box2"><div class="stat-val2" id="pvTotal" style="color:#ffd700;">$--</div><div class="stat-lbl2">ได้คืนรวม</div></div>
+      <div class="stat-box2"><div class="stat-val2" id="pvPct">--%</div><div class="stat-lbl2" id="pvLblPct">กำไร/วัน</div></div>
+      <div class="stat-box2"><div class="stat-val2" id="pvDays">-- วัน</div><div class="stat-lbl2" id="pvLblDur">ระยะเวลา</div></div>
+      <div class="stat-box2"><div class="stat-val2" id="pvTotal" style="color:#ffd700;">$--</div><div class="stat-lbl2" id="pvLblTotal">ได้คืนรวม</div></div>
     </div>
   </div>
 
@@ -1251,8 +1251,8 @@ padding:0.28rem 0.6rem;color:var(–text-dim);font-family:‘Share Tech Mono’,
 
   <div class="input-card2">
     <div class="input-lbl2">
-      <span data-i18n="pkg2.input.lbl">💵 จำนวน USDT ที่ต้องการลงทุน</span>
-      <span data-i18n="pkg2.range" style="color:rgba(74,222,128,0.6);">$100 - $100,000</span>
+      <span id="pkgInputLbl">💵 จำนวน USDT ที่ต้องการลงทุน</span>
+      <span id="pkgRangeLbl" style="color:rgba(74,222,128,0.6);">$100 - $100,000</span>
     </div>
     <div class="input-wrap2">
       <input type="number" id="miningAmtInput" min="100" max="100000" placeholder="0" oninput="calcMiningPreview()">
@@ -4570,6 +4570,28 @@ function applyLang(){
   renderMachines();
   renderPkgs();
   if(document.getElementById('pgWallet')?.classList.contains('active')) renderWallet();
+
+  // Update pkg2 labels
+  const pvEthUnit=document.getElementById('pvEthUnit');
+  if(pvEthUnit) pvEthUnit.textContent=t('pkg2.ethday');
+  const pvLblPct=document.getElementById('pvLblPct');
+  if(pvLblPct) pvLblPct.textContent=t('pkg2.pct');
+  const pvLblDur=document.getElementById('pvLblDur');
+  if(pvLblDur) pvLblDur.textContent=t('pkg2.duration');
+  const pvLblTotal=document.getElementById('pvLblTotal');
+  if(pvLblTotal) pvLblTotal.textContent=t('pkg2.total');
+  const pkgInputLbl=document.getElementById('pkgInputLbl');
+  if(pkgInputLbl) pkgInputLbl.textContent=t('pkg2.input.lbl');
+  const pkgRangeLbl=document.getElementById('pkgRangeLbl');
+  if(pkgRangeLbl) pkgRangeLbl.textContent=t('pkg2.range');
+  const pvUsdDay=document.getElementById('pvUsdDay');
+  if(pvUsdDay&&pvUsdDay.textContent.includes('วัน')) pvUsdDay.textContent=pvUsdDay.textContent.replace('/วัน','/'+(LANG==='en'?'Day':'วัน'));
+  // Update mach empty sub
+  const mechEmptySub=document.querySelector('[data-i18n-html="mach.empty.sub"]');
+  if(mechEmptySub) mechEmptySub.innerHTML=t('mach.empty.sub');
+  // Update pkg live stats label
+  const pkgCnt=document.getElementById('pkgCnt');
+  if(pkgCnt){const n=pkgCnt.textContent.replace(/[^0-9,]/g,'');pkgCnt.textContent=n+' '+t('ticker.unit');}
 }
 
 // ─── INIT ───
@@ -4731,10 +4753,14 @@ function calcMiningPreview(){
   // อัปเดต new UI
   const lbl=document.getElementById('pvLabel2');if(lbl)lbl.textContent=`⚡ กำไรตัวอย่าง ($${amt.toLocaleString()} USDT)`;
   const big=document.getElementById('pvEthBig');if(big)big.textContent=ethDaily.toFixed(6);
-  const usdDay=document.getElementById('pvUsdDay');if(usdDay)usdDay.textContent=`≈ $${daily.toFixed(2)} USDT / วัน`;
+  const usdDay=document.getElementById('pvUsdDay');if(usdDay)usdDay.textContent='≈ $'+daily.toFixed(2)+' USDT / '+(LANG==='en'?'Day':'วัน');
   const pvPct=document.getElementById('pvPct');if(pvPct)pvPct.textContent=pct.toFixed(2)+'%';
-  const pvDays=document.getElementById('pvDays');if(pvDays)pvDays.textContent=days+' วัน';
+  const pvDays=document.getElementById('pvDays');if(pvDays)pvDays.textContent=days+' '+(LANG==='en'?'days':'วัน');
   const pvTotal=document.getElementById('pvTotal');if(pvTotal)pvTotal.textContent='$'+total.toFixed(0);
+  // update labels
+  const pvLblPct=document.getElementById('pvLblPct');if(pvLblPct)pvLblPct.textContent=t('pkg2.pct');
+  const pvLblDur=document.getElementById('pvLblDur');if(pvLblDur)pvLblDur.textContent=t('pkg2.duration');
+  const pvLblTotal=document.getElementById('pvLblTotal');if(pvLblTotal)pvLblTotal.textContent=t('pkg2.total');
 }
 function setMiningAmt(v){
   const inp=document.getElementById('miningAmtInput');
