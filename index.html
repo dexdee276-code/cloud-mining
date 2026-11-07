@@ -953,6 +953,7 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <button class="admin-tab" id="atn4" onclick="switchAdminTab(4)">📊 Dashboard</button>
     <button class="admin-tab" id="atn5" onclick="switchAdminTab(5)">📢 ประกาศ</button>
     <button class="admin-tab" id="atn6" onclick="switchAdminTab(6)">🚫 แบน</button>
+    <button class="admin-tab" id="atn7" onclick="switchAdminTab(7)">📜 ประวัติ</button>
   </div>
 
   <div style="flex:1;overflow-y:auto;padding:1rem;">
@@ -1128,6 +1129,17 @@ body:has(#adminScreen.active) #contactFab{display:none}
     </div>
 
     <!-- Tab 6: Ban/Block -->
+    <div class="admin-page" id="apg7">
+      <div class="sec-title">📜 ประวัติลูกค้าทั้งหมด</div>
+      <input type="text" id="hxSearch" placeholder="🔍 ค้นหาชื่อผู้ใช้หรืออีเมล..." oninput="hxRender()" style="width:100%;box-sizing:border-box;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:10px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;margin-bottom:0.6rem;">
+      <div id="hxChips" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.6rem;"></div>
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.7rem;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;">
+        <input type="date" id="hxFrom" onchange="hxRender()" style="flex:1;min-width:0;padding:0.5rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:var(--text);">ถึง
+        <input type="date" id="hxTo" onchange="hxRender()" style="flex:1;min-width:0;padding:0.5rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:var(--text);">
+      </div>
+      <div id="hxTotals" style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.4rem;margin-bottom:0.7rem;"></div>
+      <div id="hxList"></div>
+    </div>
     <div class="admin-page" id="apg6">
       <div class="sec-title">🚫 ระงับ / แบนผู้ใช้</div>
       <div style="position:relative;margin-bottom:0.8rem;">
@@ -2909,6 +2921,7 @@ function wdLakPreview(){
     ?'<span style="color:var(--text-dim);">'+rl+'</span><br>จะได้รับ ≈ <b style="color:var(--green);font-size:1.05rem;">₭ '+fmtLak(wdLakOf(u,_wdRate))+'</b>'
     :'<span style="color:var(--text-dim);">'+rl+'</span>';
 }
+const WD_MIN_NEXT=10;let _wdMinChecked=false;
 function submitWithdraw(){
   if(_wdSubmitting)return;
   const ud=getUD(); if(!ud) return;
@@ -2924,6 +2937,17 @@ function submitWithdraw(){
   if(!window._db){showToast('❌ ไม่มี Firebase กรุณาลองใหม่');return;}
   const lak=wdLakOf(usdAmt,_wdRate);
   if(!(lak>0)){showToast('⚠️ จำนวนน้อยเกินไป');return;}
+  // ถอนครั้งแรก: ไม่มีขั้นต่ำ · ครั้งต่อๆไป: ขั้นต่ำ $WD_MIN_NEXT
+  if(usdAmt<WD_MIN_NEXT&&!_wdMinChecked){
+    _wdSubmitting=true;
+    window._db.ref('userreqs/'+getSess()).once('value').then(function(sn){
+      _wdSubmitting=false;
+      const n=sn.exists()?Object.values(sn.val()).filter(function(x){return x&&x.t==='withdraw';}).length:0;
+      if(n>0){showToast('⚠️ ถอนครั้งต่อไปขั้นต่ำ $'+WD_MIN_NEXT);return;}
+      _wdMinChecked=true;try{submitWithdraw();}finally{_wdMinChecked=false;}
+    }).catch(function(){_wdSubmitting=false;showToast('❌ ตรวจสอบไม่สำเร็จ กรุณาลองใหม่');});
+    return;
+  }
   _wdSubmitting=true;
   const req={
     id:'wd_'+Date.now(), user:getSess(),
@@ -4334,7 +4358,7 @@ function helpTabHtml(tab,d){
       +q('อัตราแลกเปลี่ยนเท่าไหร่?','ปัจจุบัน 1 USDT = ₭'+fmtN(rate)+' อัตรานี้ผู้ให้บริการกำหนดและเปลี่ยนได้ ระบบคำนวณ USDT ตอนแอดมินอนุมัติจากอัตราปัจจุบัน และปัดเศษลง')
       +q('ถอนใช้เวลากี่ชั่วโมง?',escHtml(site.proc||'ตามที่ผู้ให้บริการแจ้ง สอบถามสถานะได้ที่แท็บติดต่อ')+'<br>คุณดูสถานะคำขอได้ที่ ประวัติ → สถานะคำขอเติม/ถอนของฉัน')
       +q('มีค่าธรรมเนียมไหม?','ระบบไม่หักค่าธรรมเนียมการเติมและการถอน ค่าธรรมเนียมของธนาคาร (ถ้ามี) เป็นไปตามที่ธนาคารกำหนด')
-      +q('ขั้นต่ำและสูงสุด?','เติมเงินขั้นต่ำ $'+TOPUP_MIN+' (≈ ₭'+fmtN(TOPUP_MIN*rate)+') · ลงทุน $10 – $100,000 ต่อครั้ง · ถอนต้องมากกว่า $0')
+      +q('ขั้นต่ำและสูงสุด?','เติมเงินขั้นต่ำ $'+TOPUP_MIN+' (≈ ₭'+fmtN(TOPUP_MIN*rate)+') · ลงทุน $10 – $100,000 ต่อครั้ง · ถอนครั้งแรกไม่มีขั้นต่ำ ครั้งต่อไปขั้นต่ำ $'+WD_MIN_NEXT+'')
       +q('กำไรคิดยังไง?','คำนวณจากยอดลงทุนตามสูตรของระบบ ตัวอย่าง:<br>'+ex+'<br><b>เป็นประมาณการ ไม่ใช่การรับประกันผลตอบแทน</b>')
       +q('มีโบนัสอะไรบ้าง?',bonus)
       +q('บัญชีถูกระงับ?','อาจเกิดจากการฝ่าฝืนเงื่อนไข เช่น สร้างหลายบัญชีเพื่อรับโบนัส ติดต่อผู้ให้บริการที่แท็บติดต่อ');
@@ -4546,10 +4570,10 @@ function doAdminLogout(){
 }
 function switchAdminTab(i){
   adminTabIdx = i;
-  ['atn0','atn1','atn2','atn3','atn4','atn5','atn6'].forEach((id,j)=>{
+  ['atn0','atn1','atn2','atn3','atn4','atn5','atn6','atn7'].forEach((id,j)=>{
     const el=document.getElementById(id);if(el)el.classList.toggle('active', i===j);
   });
-  ['apg0','apg1','apg2','apg3','apg4','apg5','apg6'].forEach((id,j)=>{
+  ['apg0','apg1','apg2','apg3','apg4','apg5','apg6','apg7'].forEach((id,j)=>{
     const el=document.getElementById(id);if(el)el.classList.toggle('active', i===j);
   });
   if(i===0) renderAdminTopup(currentFilter);
@@ -4559,6 +4583,7 @@ function switchAdminTab(i){
   if(i===4) setTimeout(()=>renderAdminDashboard(),100);
   if(i===5) setTimeout(()=>renderAnnList(),100);
   if(i===6) setTimeout(()=>renderBanUsers(),100);
+  if(i===7) hxLoad();
 }
 function filterReqs(f){
   currentFilter = f;
@@ -5734,24 +5759,93 @@ function updateLastSeen(){
   ud.lastSeen=Date.now();
   saveUD(ud);
 }
-function adminViewTx(username){
-  if(!window._db)return;
-  window._db.ref('users/'+username+'/txs').once('value').then(snap=>{
-    const txs=snap.exists()?(Array.isArray(snap.val())?snap.val():Object.values(snap.val()||{})):[];
-    const ov=document.createElement('div');ov.className='overlay';
-    ov.innerHTML=`<div class="popup">
-      <div class="pop-hd"><div class="pop-title">💳 ${username}</div><button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button></div>
-      <div style="max-height:60vh;overflow-y:auto;">
-        ${txs.length?txs.slice(0,20).map(tx=>`<div style="padding:0.6rem 0;border-bottom:1px solid rgba(157,78,221,0.1);font-family:'Share Tech Mono',monospace;font-size:0.7rem;">
-          <div style="color:#A890CC;">${new Date(tx.time||0).toLocaleDateString('th-TH')}</div>
-          <div style="color:#fff;">${tx.desc||'-'}</div>
-          <div style="color:${(tx.amount||0)>=0?'var(--green)':'var(--red-bright)'};">${(tx.amount||0)>=0?'+':''}${tx.amount} ${tx.unit||'USDT'}</div>
-        </div>`).join(''):'<div style="text-align:center;color:var(--text-dim);padding:1rem;">ไม่มีประวัติ</div>'}
-      </div>
-    </div>`;
-    document.body.appendChild(ov);
-  });
+// ═══ ประวัติลูกค้าทั้งหมด (แอดมิน) ═══
+const HX_TYPES=[['all','ทั้งหมด','#c084fc'],['topup','💵 เติมเงิน','#4ade80'],['withdraw','📤 ถอน','#f87171'],['invest','⛏ ลงทุน','#ffd700'],['bonus','🎁 โบนัส','#38bdf8'],['other','อื่นๆ','#A890CC']];
+let _hx={rows:[],users:{},type:'all',shown:100};
+function hxType(desc){
+  const d=String(desc||'');
+  if(/^Admin/.test(d))return 'other';
+  if(/โบนัส|🎁/.test(d))return 'bonus';
+  if(/ถอน/.test(d))return 'withdraw';
+  if(/เริ่มขุด|ลงทุน|เช่ากำลังขุด/.test(d))return 'invest';
+  if(/เติม/.test(d))return 'topup';
+  return 'other';
 }
+function hxLoad(){
+  const el=document.getElementById('hxList');if(!el)return;
+  if(!window._db){el.innerHTML='<div style="color:red;padding:1rem;">❌ ไม่มี Firebase</div>';return;}
+  el.innerHTML='<div style="text-align:center;padding:1rem;color:#A890CC;font-size:0.7rem;">⏳ กำลังโหลด...</div>';
+  window._db.ref('users').once('value').then(function(sn){
+    const users=sn.exists()?sn.val():{};_hx.users=users;const rows=[];
+    Object.keys(users).forEach(function(u){
+      const t=users[u].txs;const arr=Array.isArray(t)?t:Object.values(t||{});
+      arr.forEach(function(x){if(x)rows.push({u:u,desc:x.desc||'',amt:parseFloat(x.amount)||0,unit:x.unit||'USDT',time:x.time||0,type:hxType(x.desc)});});
+    });
+    rows.sort(function(a,b){return b.time-a.time;});
+    _hx.rows=rows;_hx.shown=100;hxRender();
+  }).catch(function(){el.innerHTML='<div style="color:red;padding:1rem;">❌ โหลดไม่สำเร็จ</div>';});
+}
+function hxSetType(t){_hx.type=t;_hx.shown=100;hxRender();}
+function hxMore(){_hx.shown+=100;hxRender();}
+function hxRender(){
+  const ch=document.getElementById('hxChips'),tot=document.getElementById('hxTotals'),list=document.getElementById('hxList');
+  if(!ch||!list)return;
+  ch.innerHTML=HX_TYPES.map(function(t){const on=_hx.type===t[0];return '<button onclick="hxSetType(\''+t[0]+'\')" style="padding:0.4rem 0.7rem;border-radius:999px;font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;cursor:pointer;background:'+(on?t[2]:'transparent')+';color:'+(on?'#000':t[2])+';border:1px solid '+t[2]+';">'+t[1]+'</button>';}).join('');
+  const q=(document.getElementById('hxSearch').value||'').toLowerCase().trim();
+  const f=document.getElementById('hxFrom').value,to=document.getElementById('hxTo').value;
+  const t0=f?new Date(f+'T00:00:00').getTime():0,t1=to?new Date(to+'T23:59:59').getTime():Infinity;
+  const rows=_hx.rows.filter(function(r){
+    if(r.time<t0||r.time>t1)return false;
+    if(q&&r.u.toLowerCase().indexOf(q)<0&&String((_hx.users[r.u]||{}).email||'').toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+  const sum=function(ty){return rows.filter(function(r){return r.type===ty&&r.unit==='USDT';}).reduce(function(a,r){return a+Math.abs(r.amt);},0);};
+  const box=function(l,v,c){return '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.5rem;text-align:center;"><div style="font-family:Orbitron,monospace;font-size:0.8rem;color:'+c+';">$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:0.55rem;color:#A890CC;">'+l+'</div></div>';};
+  tot.innerHTML=box('เติมเงินรวม',sum('topup'),'#4ade80')+box('ถอนรวม',sum('withdraw'),'#f87171')+box('ลงทุนรวม',sum('invest'),'#ffd700')+box('โบนัสรวม',sum('bonus'),'#38bdf8');
+  const vis=rows.filter(function(r){return _hx.type==='all'||r.type===_hx.type;});
+  if(!vis.length){list.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:2rem;font-size:0.75rem;">ไม่พบรายการ</div>';return;}
+  const meta={}; HX_TYPES.forEach(function(t){meta[t[0]]=t;});
+  list.innerHTML='<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:#A890CC;margin-bottom:0.5rem;">พบ '+vis.length.toLocaleString()+' รายการ</div>'
+    +vis.slice(0,_hx.shown).map(function(r){
+      const c=meta[r.type][2],pos=r.amt>=0;
+      return '<div style="padding:0.65rem 0;border-bottom:1px solid rgba(157,78,221,0.1);font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;display:flex;gap:0.6rem;justify-content:space-between;">'
+        +'<div style="min-width:0;"><a href="#" onclick="adminCustomer(\''+escHtml(r.u).replace(/'/g,'')+'\');return false;" style="color:#fff;font-weight:700;text-decoration:underline;">👤 '+escHtml(r.u)+'</a> <span style="color:'+c+';font-size:0.58rem;">'+meta[r.type][1]+'</span>'
+        +'<div style="color:#c9b8e8;margin-top:0.15rem;word-break:break-word;">'+escHtml(r.desc)+'</div>'
+        +'<div style="color:#A890CC;font-size:0.58rem;margin-top:0.15rem;">'+(r.time?new Date(r.time).toLocaleString('th-TH'):'-')+'</div></div>'
+        +'<div style="color:'+(pos?'var(--green)':'var(--red-bright)')+';white-space:nowrap;font-weight:700;">'+(pos?'+':'−')+Math.abs(r.amt).toLocaleString('en-US',{maximumFractionDigits:6})+' '+escHtml(r.unit)+'</div></div>';
+    }).join('')
+    +(vis.length>_hx.shown?'<button onclick="hxMore()" style="width:100%;margin-top:0.7rem;padding:0.7rem;background:rgba(157,78,221,0.1);border:1px solid rgba(157,78,221,0.3);border-radius:10px;color:var(--purple-light);font-family:\'Share Tech Mono\',monospace;cursor:pointer;">แสดงเพิ่ม</button>':'');
+}
+// ข้อมูลลูกค้า: ชื่อ อีเมล ยอด + รีเซ็ตรหัสผ่าน (ไม่แสดงรหัสผ่านเดิม) + ประวัติทั้งหมด
+function adminCustomer(username){
+  if(!window._db)return;
+  window._db.ref('users/'+username).once('value').then(function(sn){
+    if(!sn.exists()){showToast('ไม่พบผู้ใช้');return;}
+    const ud=sn.val(),t=ud.txs,txs=(Array.isArray(t)?t:Object.values(t||{})).filter(Boolean).sort(function(a,b){return (b.time||0)-(a.time||0);});
+    const pk=(Array.isArray(ud.packages)?ud.packages:Object.values(ud.packages||{}));
+    const act=pk.filter(function(p){return p.remaining>0;});
+    const rowI=function(l,v){return '<div style="display:flex;justify-content:space-between;gap:0.6rem;padding:0.45rem 0;border-bottom:1px solid rgba(157,78,221,0.1);font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;"><span style="color:#A890CC;">'+l+'</span><span style="color:#fff;text-align:right;word-break:break-all;">'+v+'</span></div>';};
+    const ov=document.createElement('div');ov.className='overlay';
+    ov.innerHTML='<div class="popup"><div class="pop-hd"><div class="pop-title">👤 '+escHtml(username)+'</div><button class="pop-close" onclick="this.closest(\'.overlay\').remove()">✕</button></div>'
+      +'<div style="max-height:70vh;overflow-y:auto;">'
+      +rowI('ชื่อผู้ใช้',escHtml(username))+rowI('อีเมล',escHtml(ud.email||'-'))
+      +rowI('ยอด USDT','$'+(ud.usd||0).toFixed(2))+rowI('ETH รางวัล',(ud.ethReward||0).toFixed(6))
+      +rowI('เครื่องขุดที่ทำงาน',act.length+' เครื่อง · ลงทุน $'+act.reduce(function(a,p){return a+(p.price||0);},0).toLocaleString())
+      +rowI('ผู้แนะนำ',escHtml(ud.refBy||'-'))
+      +'<button onclick="adminResetPw(\''+escHtml(username).replace(/'/g,'')+'\')" style="width:100%;margin:0.8rem 0;padding:0.65rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;cursor:pointer;">🔑 ตั้งรหัสผ่านใหม่ให้ลูกค้า</button>'
+      +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--gold);margin:0.4rem 0;">ประวัติทั้งหมด ('+txs.length+')</div>'
+      +(txs.length?txs.map(function(x){const a=parseFloat(x.amount)||0;return '<div style="padding:0.5rem 0;border-bottom:1px solid rgba(157,78,221,0.1);font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;"><div style="color:#A890CC;">'+(x.time?new Date(x.time).toLocaleString('th-TH'):'-')+'</div><div style="color:#fff;">'+escHtml(x.desc||'-')+'</div><div style="color:'+(a>=0?'var(--green)':'var(--red-bright)')+';">'+(a>=0?'+':'')+a+' '+escHtml(x.unit||'USDT')+'</div></div>';}).join(''):'<div style="text-align:center;color:var(--text-dim);padding:1rem;">ไม่มีประวัติ</div>')
+      +'</div></div>';
+    document.body.appendChild(ov);
+  }).catch(function(){showToast('❌ โหลดไม่สำเร็จ');});
+}
+function adminResetPw(username){
+  const p=prompt('ตั้งรหัสผ่านใหม่ให้ '+username+' (อย่างน้อย 6 ตัว):');
+  if(p===null)return;
+  if(p.length<6){showToast('⚠️ รหัสต้องมีอย่างน้อย 6 ตัว');return;}
+  window._db.ref('users/'+username+'/pw').set(p).then(function(){showToast('✅ ตั้งรหัสผ่านใหม่ให้ '+username+' แล้ว แจ้งลูกค้าให้เปลี่ยนรหัสเอง');}).catch(function(){showToast('❌ ไม่สำเร็จ');});
+}
+function adminViewTx(username){adminCustomer(username);}
 
 
 // ─── MINING SCENE ───
