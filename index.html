@@ -4243,6 +4243,9 @@ function saveSiteInfo(){
     if(v.length>200){showToast('⚠ ข้อความยาวเกินไป (สูงสุด 200 ตัวอักษร)');return;}
     o[f]=v;
   }
+  ['wa','phone'].forEach(function(k){if(o[k])o[k]=o[k].replace(/[^0-9+\- ]/g,'').trim();});
+  if(o.fb&&!/^[a-z]+:/i.test(o.fb))o.fb='https://'+o.fb.replace(/^\/+/,'');
+  if(o.line&&/^(line\.me|lin\.ee)\//i.test(o.line))o.line='https://'+o.line;
   if(o.line&&/^[a-z]+:/i.test(o.line)&&!/^https?:\/\//i.test(o.line)){showToast('⚠ ลิงก์ LINE ต้องขึ้นต้นด้วย http:// หรือ https://');return;}
   if(o.fb&&!/^https?:\/\//i.test(o.fb)){showToast('⚠ ลิงก์ Facebook ต้องขึ้นต้นด้วย http:// หรือ https://');return;}
   if(o.wa&&!/^[+0-9 \-]{6,20}$/.test(o.wa)){showToast('⚠ เบอร์ WhatsApp ใส่ได้เฉพาะตัวเลข + และ -');return;}
@@ -4282,7 +4285,7 @@ function helpTabHtml(tab,d){
   const note=function(t){return '<div style="'+f+'font-size:0.68rem;color:#A890CC;line-height:1.7;margin-bottom:0.6rem;">'+t+'</div>';};
   if(tab==='contact'){
     let h='';
-    if(site.line)h+=helpRow('💬','LINE',site.line,/^https?:\/\//i.test(site.line)?site.line:'');
+    if(site.line)h+=helpRow('💬','LINE',site.line,/^https?:\/\//i.test(site.line)?site.line:(/^[A-Za-z0-9._@-]{3,40}$/.test(site.line)?'https://line.me/R/ti/p/'+(site.line[0]==='@'?'%40'+site.line.slice(1):'~'+site.line):''));
     if(site.fb&&/^https?:\/\//i.test(site.fb))h+=helpRow('📘','Facebook',site.fb,site.fb);
     if(site.wa)h+=helpRow('🟢','WhatsApp',site.wa,'https://wa.me/'+site.wa.replace(/[^0-9]/g,''));
     if(site.phone)h+=helpRow('📞','โทรศัพท์',site.phone,'tel:'+site.phone.replace(/[^0-9+]/g,''));
