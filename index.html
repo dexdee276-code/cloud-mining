@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#1A0020">
 <meta name="format-detection" content="telephone=no">
 <title>CryptoMine — Cloud ETH Mining</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
 
 :root{
@@ -799,6 +799,13 @@ background:linear-gradient(135deg,#7c3aed,#c084fc);box-shadow:0 8px 28px rgba(12
 #authScreen .lg-stats .auth-stat-lbl{font-family:inherit;font-size:0.62rem;letter-spacing:0;text-transform:none;color:#a99bc7}
 .lg-links{text-align:center;margin-top:1.1rem;font-size:0.76rem;color:#8a7bb0;line-height:1.9}
 body:has(#authScreen.active) #contactFab{display:none}
+
+/* ── RIG PAGE REDESIGN ── */
+#miningScene{display:none!important}
+@keyframes rgPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(1.5)}}
+@keyframes rgBar{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+.rg{font-family:'Noto Sans Thai',system-ui,sans-serif;color:#f3ecff;display:flex;flex-direction:column;gap:16px;padding-bottom:8px}
+.rg-num{font-family:'Space Grotesk','Noto Sans Thai',sans-serif}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -2076,22 +2083,34 @@ body:has(#adminScreen.active) #contactFab{display:none}
   </div>
 </div>
 </div>
-<div id="machSec" style="display:none;margin-bottom:1.1rem;position:relative;overflow:hidden;">
-    <div id="ethRainContainer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;max-width:100%;"></div>
-    <div class="mach-header">
-      <div class="mach-hdr-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-      <div><div class="mach-hdr-t">⚙️ เครื่องขุดของฉัน</div><div class="mach-hdr-s">ACTIVE MINING RIGS</div></div>
-      <div class="mach-count" id="machCount">0 RIG</div>
+<div id="machSec" style="display:none;position:relative;"><div id="machList"></div></div>
+  <div id="noMachMsg" class="rg" style="display:none;">
+    <div>
+      <div style="font-size:13px;color:#b6a7d6;margin-bottom:4px">เครื่องขุดของฉัน</div>
+      <div style="font-size:24px;font-weight:700;line-height:1.2">ยังไม่มีเครื่องขุด</div>
     </div>
-    <div id="machList"></div>
-  </div>
-  <div id="noMachMsg" style="background:rgba(40,5,70,0.98);border:2px solid rgba(200,100,255,0.45);border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:1.1rem;">
-    <div style="font-size:2.5rem;margin-bottom:0.6rem;">⛏️</div>
-    <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;margin-bottom:0.4rem;">ยังไม่มีเครื่องขุด</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#A890CC;margin-bottom:1rem;line-height:1.6;">เติม USDT แล้วลงทุนเช่ากำลังขุด<br>ระบบขุด ETH ให้อัตโนมัติทุกวัน</div>
-    <button onclick="switchTab(1)" class="btn btn-primary" style="padding:0.7rem 1.5rem;font-size:0.8rem;">
-      🛒 ดูสัญญาขุด
-    </button>
+    <div style="margin-top:8px;border-radius:24px;padding:32px 24px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(168,85,247,.3);display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
+      <div style="width:84px;height:84px;border-radius:24px;background:rgba(124,58,237,.18);border:1px solid rgba(168,85,247,.4);display:flex;align-items:center;justify-content:center">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+      </div>
+      <div style="font-size:19px;font-weight:700">เริ่มต้นเครื่องขุดเครื่องแรก</div>
+      <div style="font-size:14px;color:#c9b8e8;line-height:1.7">ลงทุนขั้นต่ำ $10 เลือกจำนวนเงินได้เอง<br>ระบบคำนวณกำไรให้ทุกวัน และแสดงสถานะที่หน้านี้</div>
+      <div style="width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px">
+        <div style="border-radius:14px;padding:12px;background:rgba(0,0,0,.28);text-align:left">
+          <div style="font-size:11px;color:#b6a7d6;margin-bottom:4px">ตัวอย่าง ลงทุน $10</div>
+          <div class="rg-num" style="font-size:18px;font-weight:700;color:#4ade80">+$0.10/วัน</div>
+          <div style="font-size:11px;color:#b6a7d6">สัญญา 30 วัน</div>
+        </div>
+        <div style="border-radius:14px;padding:12px;background:rgba(0,0,0,.28);text-align:left">
+          <div style="font-size:11px;color:#b6a7d6;margin-bottom:4px">ตัวอย่าง ลงทุน $100</div>
+          <div class="rg-num" style="font-size:18px;font-weight:700;color:#4ade80">+$0.75/วัน</div>
+          <div style="font-size:11px;color:#b6a7d6">สัญญา 90 วัน</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#a99bc7;line-height:1.6">เป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน</div>
+    </div>
+    <button onclick="switchTab(1)" style="display:flex;align-items:center;justify-content:center;height:52px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 22px rgba(124,58,237,.45)">เลือกแพ็กเกจลงทุน</button>
+    <div style="text-align:center;font-size:13px;"><a href="#" onclick="showHelpCenter('terms');return false;" style="color:#ffd700;text-decoration:none">อ่านเงื่อนไขและความเสี่ยง</a></div>
   </div>
 </div>
 
@@ -2469,7 +2488,7 @@ function switchTab(i){
     const page=document.getElementById(id);if(page)page.classList.toggle('active',i===j);
     const btn=document.getElementById('bn'+j);if(btn)btn.classList.toggle('active',i===j);
   });
-  if(i===1){renderPkgs();startPkgRain();}if(i===2)renderWallet();if(i===4){renderMachines();setTimeout(()=>{const ud=getUD();if(ud&&ud.packages&&ud.packages.filter(p=>p.remaining>0).length>0){const sc=document.getElementById('miningScene');if(sc)sc.style.display='block';initMiningScene(ud.packages.filter(p=>p.remaining>0));}},200);}
+  if(i===1){renderPkgs();startPkgRain();}if(i===2)renderWallet();if(i===4){renderMachines();}
 }
 
 // ─── MINING ───
@@ -2608,272 +2627,111 @@ function renderMachines(){
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
   const sec=document.getElementById('machSec');
   const list=document.getElementById('machList');
-  const cnt=document.getElementById('machCount');
   const noMsg=document.getElementById('noMachMsg');
-
+  if(_ethRainInt){clearInterval(_ethRainInt);_ethRainInt=null;}
   if(!acs.length){
     if(sec)sec.style.display='none';
-    if(noMsg)noMsg.style.display='block';
-    if(_ethRainInt){clearInterval(_ethRainInt);_ethRainInt=null;}
+    if(noMsg)noMsg.style.display='flex';
     return;
   }
   if(sec)sec.style.display='block';
   if(noMsg)noMsg.style.display='none';
-  if(cnt)cnt.textContent=acs.length+' RIG'+(acs.length>1?'S':'');
 
+  const money=function(n,d){return (parseFloat(n)||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});};
   const totalEth=ud.ethReward||0;
-  const totalDailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
   const totalDailyUsdt=acs.reduce((s,p)=>s+(p.daily||0),0);
+  const totalDailyEth=totalDailyUsdt/ETH_RATE;
   const totalInv=acs.reduce((s,p)=>s+(p.price||0),0);
+  const minLeft=Math.max(0,Math.round(Math.min.apply(null,acs.map(p=>p.remaining))));
+  const nearEnd=acs.filter(p=>p.remaining<=7).length;
+  const cols=['#4ade80','#ffd700','#c084fc','#38bdf8'];
+  const bar='<span style="width:4px;height:24px;border-radius:2px;background:#a855f7;transform-origin:bottom;animation:rgBar 1.1s ease-in-out DELAYs infinite"></span>';
 
-  if(!_ethRainInt) _ethRainInt=setInterval(spawnEthRain,280);
-  // Show mining scene
-  setTimeout(()=>initMiningScene(acs),100);
-
-  // ── SUMMARY ──
-  const summary=`
-  <div style="background:linear-gradient(145deg,#020018,#030025,#020018);border:1.5px solid rgba(74,222,128,0.4);border-radius:22px;padding:1.1rem;margin-bottom:1rem;animation:borderPulse 3s ease-in-out infinite;position:relative;overflow:hidden;width:100%;box-sizing:border-box;">
-    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(74,222,128,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(74,222,128,0.03) 1px,transparent 1px);background-size:20px 20px;pointer-events:none;"></div>
-    <div style="position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:250px;height:100px;background:radial-gradient(ellipse,rgba(74,222,128,0.1),transparent);pointer-events:none;"></div>
-    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;position:relative;">
-      <div style="position:relative;flex-shrink:0;">
-        <div style="width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 15px #4ade80;animation:pulse 0.7s infinite;"></div>
-        <div style="position:absolute;inset:-4px;border-radius:50%;border:1.5px solid rgba(74,222,128,0.3);animation:pulse 0.7s infinite 0.15s;"></div>
-        <div style="position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(74,222,128,0.1);animation:pulse 0.7s infinite 0.3s;"></div>
-      </div>
-      <span style="font-family:'Orbitron',monospace;font-size:0.7rem;color:#4ade80;letter-spacing:3px;font-weight:700;">MINING ACTIVE</span>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:4px;background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);border-radius:20px;padding:0.15rem 0.6rem;">
-        <div style="width:5px;height:5px;border-radius:50%;background:#4ade80;animation:pulse 1s infinite;"></div>
-        <span style="font-family:'Share Tech Mono',monospace;font-size:0.5rem;color:rgba(74,222,128,0.8);">${acs.length} RIG${acs.length>1?'S':''} ONLINE</span>
-      </div>
+  const head=`
+  <div style="display:flex;align-items:flex-end;justify-content:space-between">
+    <div>
+      <div style="font-size:13px;color:#b6a7d6;margin-bottom:4px">เครื่องขุดของฉัน</div>
+      <div style="font-size:24px;font-weight:700;line-height:1.2">${acs.length} เครื่อง กำลังทำงาน</div>
     </div>
-    <div style="text-align:center;margin-bottom:1rem;position:relative;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:rgba(74,222,128,0.4);letter-spacing:3px;margin-bottom:0.4rem;">⛏ ETH MINED TOTAL</div>
-      <div id="dashEthTotal" style="font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:#4ade80;animation:numberTick 2s ease-in-out infinite;line-height:1;letter-spacing:2px;">${totalEth.toFixed(6)}</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:0.3rem;">
-        <div style="height:1px;width:30px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.4));"></div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.4);">≈ $${(totalEth*ETH_RATE).toFixed(2)} USDT</div>
-        <div style="height:1px;width:30px;background:linear-gradient(90deg,rgba(255,215,0,0.4),transparent);"></div>
-      </div>
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35)">
+      <span style="width:8px;height:8px;border-radius:50%;background:#4ade80;animation:rgPulse 1.6s ease-in-out infinite"></span>
+      <span style="font-size:12px;font-weight:600;color:#86efac">ออนไลน์</span>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;position:relative;">
-      <div style="background:linear-gradient(135deg,rgba(74,222,128,0.08),rgba(74,222,128,0.02));border:1px solid rgba(74,222,128,0.2);border-radius:12px;padding:0.55rem;text-align:center;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(74,222,128,0.5),transparent);"></div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#4ade80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">+${totalDailyEth.toFixed(5)}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.44rem;color:rgba(74,222,128,0.4);margin-top:0.1rem;">ETH/วัน</div>
-      </div>
-      <div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:0.55rem;text-align:center;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.5),transparent);"></div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#ffd700;">+$${totalDailyUsdt.toFixed(2)}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.44rem;color:rgba(255,215,0,0.4);margin-top:0.1rem;">USDT/วัน</div>
-      </div>
-      <div style="background:linear-gradient(135deg,rgba(192,132,252,0.08),rgba(192,132,252,0.02));border:1px solid rgba(192,132,252,0.2);border-radius:12px;padding:0.55rem;text-align:center;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(192,132,252,0.5),transparent);"></div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#c084fc;">$${totalInv.toLocaleString()}</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.44rem;color:rgba(192,132,252,0.4);margin-top:0.1rem;">ลงทุนรวม</div>
-      </div>
+  </div>
+  <div style="border-radius:24px;padding:22px 20px 20px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(168,85,247,.35);box-shadow:0 16px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:13px;color:#c9b8e8">ETH ที่ขุดได้ทั้งหมด</div>
+    <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+      <span id="dashEthTotal" class="rg-num" style="font-size:40px;font-weight:700;color:#4ade80;letter-spacing:-1px;line-height:1.1">${totalEth.toFixed(6)}</span>
+      <span style="font-size:16px;font-weight:600;color:#86efac">ETH</span>
+    </div>
+    <div id="dashEthUsdt" style="font-size:15px;color:#ffd700;font-weight:600">≈ $${money(totalEth*ETH_RATE,2)} USDT</div>
+    <div style="height:1px;background:rgba(255,255,255,.08);margin:12px 0 8px"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+      <div style="font-size:12px;color:#b6a7d6">กำไรต่อวัน (ทุกเครื่องรวมกัน)</div>
+      <div class="rg-num" style="font-size:16px;font-weight:700;color:#fff">+$${money(totalDailyUsdt,2)} <span style="font-size:12px;font-weight:500;color:#b6a7d6">≈ ${totalDailyEth.toFixed(6)} ETH</span></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+    <div style="border-radius:16px;padding:14px 12px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div style="font-size:11px;color:#b6a7d6;margin-bottom:6px">ลงทุนรวม</div><div class="rg-num" style="font-size:17px;font-weight:700;word-break:break-all">$${money(totalInv,0)}</div></div>
+    <div style="border-radius:16px;padding:14px 12px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div style="font-size:11px;color:#b6a7d6;margin-bottom:6px">กำไรสะสม</div><div class="rg-num" style="font-size:17px;font-weight:700;color:#4ade80;word-break:break-all">+$${money(totalEth*ETH_RATE,2)}</div></div>
+    <div style="border-radius:16px;padding:14px 12px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div style="font-size:11px;color:#b6a7d6;margin-bottom:6px">ครบสัญญาเร็วสุด</div><div class="rg-num" style="font-size:17px;font-weight:700;color:#ffd700">${minLeft} วัน</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:rgba(124,58,237,.1);border:1px solid rgba(168,85,247,.25)">
+    <div style="display:flex;align-items:flex-end;gap:3px;height:24px" aria-hidden="true">${[0,.15,.3,.45,.6].map(d=>bar.replace('DELAY',d)).join('')}</div>
+    <div style="font-size:13px;color:#d9ccf2;line-height:1.5">กำไรสะสมเพิ่มขึ้นตลอดวัน<br><span style="color:#b6a7d6;font-size:12px">แต่ละเครื่องคำนวณตามสัญญาของตัวเอง</span></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+    <div style="font-size:17px;font-weight:700">รายการเครื่องขุด</div>
+    <div style="display:flex;gap:6px">
+      <span style="font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;background:#7c3aed;color:#fff">ทั้งหมด ${acs.length}</span>
+      <span style="font-size:12px;padding:6px 12px;border-radius:999px;background:#150b28;border:1px solid rgba(255,255,255,.1);color:#c9b8e8">ใกล้ครบ ${nearEnd}</span>
     </div>
   </div>`;
 
-  // ── RIG COLORS ──
-  const cols=['#4ade80','#ffd700','#c084fc','#38bdf8'];
-  const bgs=['linear-gradient(165deg,#010d05,#020f07,#011006)','linear-gradient(165deg,#0d0a00,#120e00,#0a0800)','linear-gradient(165deg,#0a0015,#0d0020,#080012)','linear-gradient(165deg,#001520,#001a28,#001018)'];
-  const bds=['rgba(74,222,128,0.4)','rgba(255,215,0,0.4)','rgba(192,132,252,0.4)','rgba(56,189,248,0.4)'];
-  const glows=['rgba(74,222,128','rgba(255,215,0','rgba(192,132,252','rgba(56,189,248'];
-
   const rigs=acs.map((p,i)=>{
-    const c=cols[i%4],bg=bgs[i%4],bd=bds[i%4],glow=glows[i%4];
-    const pct=Math.min(100,Math.round((1-(p.remaining/(p.days||1)))*100));
-    const daysPassed=Math.max(0,Math.round((p.days||1)-p.remaining));
-    const ethMined=(((p.daily||0)/ETH_RATE)*daysPassed).toFixed(6);
-    const hashRate=((p.price||0)/1000*0.5).toFixed(2);
-
-    return `<div style="background:${bg};border:1.5px solid ${bd};border-radius:20px;padding:0.9rem;margin-bottom:0.9rem;overflow:hidden;width:100%;box-sizing:border-box;position:relative;animation:borderPulse 4s ease-in-out infinite ${i*0.5}s;">
-      <div style="position:absolute;inset:0;background-image:linear-gradient(${glow},0.02) 1px,transparent 1px),linear-gradient(90deg,${glow},0.02) 1px,transparent 1px);background-size:15px 15px;pointer-events:none;"></div>
-      <!-- Corner accents -->
-      <div style="position:absolute;top:0;left:0;width:18px;height:18px;border-top:2px solid ${c};border-left:2px solid ${c};border-radius:18px 0 0 0;opacity:0.7;"></div>
-      <div style="position:absolute;top:0;right:0;width:18px;height:18px;border-top:2px solid ${c};border-right:2px solid ${c};border-radius:0 18px 0 0;opacity:0.7;"></div>
-      <div style="position:absolute;bottom:0;left:0;width:18px;height:18px;border-bottom:2px solid ${c};border-left:2px solid ${c};border-radius:0 0 0 18px;opacity:0.7;"></div>
-      <div style="position:absolute;bottom:0;right:0;width:18px;height:18px;border-bottom:2px solid ${c};border-right:2px solid ${c};border-radius:0 0 18px 0;opacity:0.7;"></div>
-
-      <!-- Header -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;position:relative;">
-        <div style="display:flex;align-items:center;gap:0.5rem;">
-          <div style="position:relative;flex-shrink:0;">
-            <div style="width:11px;height:11px;border-radius:50%;background:${c};box-shadow:0 0 12px ${c};animation:pulse 0.8s infinite ${i*0.2}s;"></div>
-            <div style="position:absolute;inset:-4px;border-radius:50%;border:1px solid ${c};opacity:0.3;animation:pulse 0.8s infinite ${i*0.2+0.2}s;"></div>
-          </div>
-          <div>
-            <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:900;color:#fff;letter-spacing:1px;">RIG <span style="color:${c};">#${i+1}</span></div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.44rem;color:${c};opacity:0.5;letter-spacing:1px;">CLOUD ETH MINER</div>
-          </div>
-        </div>
-        <div style="text-align:right;background:rgba(0,0,0,0.4);border:1px solid ${bd};border-radius:10px;padding:0.3rem 0.6rem;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:${c};font-weight:700;">$${(p.price||0).toLocaleString()}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.42rem;color:${c};opacity:0.5;">${(p.dailyPct||0).toFixed(2)}%/วัน</div>
+    const c=cols[i%4];
+    const days=p.days||1;
+    const passed=Math.max(0,Math.min(days,Math.round(days-p.remaining)));
+    const left=Math.max(0,Math.round(p.remaining));
+    const pct=Math.min(100,Math.round(passed/days*100));
+    const pctDay=(p.dailyPct!=null&&p.dailyPct>0)?p.dailyPct:((p.price>0)?(p.daily||0)/p.price*100:0);
+    const ethMined=((p.daily||0)/ETH_RATE)*passed;
+    return `
+  <div style="border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:10px;height:10px;border-radius:50%;background:${c};flex-shrink:0"></span>
+        <div>
+          <div style="font-size:15px;font-weight:700">เครื่องขุด #${i+1}</div>
+          <div style="font-size:12px;color:#b6a7d6">${pctDay.toFixed(2)}% ต่อวัน · สัญญา ${days} วัน</div>
         </div>
       </div>
-
-      <!-- Machine -->
-      <div style="background:linear-gradient(145deg,rgba(0,0,0,0.7),rgba(0,0,0,0.3));border:1px solid ${bd};opacity:0.9;border-radius:14px;padding:0.7rem;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.65rem;overflow:hidden;width:100%;box-sizing:border-box;position:relative;">
-        <div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${c},transparent);opacity:0.15;animation:scanline 3s linear infinite;pointer-events:none;z-index:0;"></div>
-        <svg width="60" height="50" viewBox="0 0 75 56" style="flex-shrink:0;display:block;animation:drillBounce 0.1s ease-in-out infinite;max-width:60px;overflow:hidden;">
-          <rect x="4" y="4" width="67" height="32" rx="5" fill="#010802" stroke="${c}" stroke-width="1.5"/>
-          <rect x="7" y="7" width="61" height="26" rx="3" fill="rgba(0,0,0,0.4)" stroke="${c}" stroke-width="0.5" opacity="0.3"/>
-          <rect x="10" y="11" width="18" height="13" rx="3" fill="#000d05" stroke="${c}" stroke-width="1"/>
-          <rect x="11" y="12" width="16" height="11" rx="2" fill="#001308"/>
-          <text x="19" y="19.5" text-anchor="middle" font-family="monospace" font-size="5" fill="${c}" font-weight="bold">ETH</text>
-          <text x="19" y="23.5" text-anchor="middle" font-family="monospace" font-size="3.5" fill="${c}" opacity="0.6">MINE</text>
-          <rect x="32" y="11" width="18" height="13" rx="3" fill="#000d05" stroke="${c}" stroke-width="1" opacity="0.8"/>
-          <rect x="33" y="12" width="16" height="11" rx="2" fill="rgba(0,10,5,0.8)"/>
-          <text x="41" y="18" text-anchor="middle" font-family="monospace" font-size="3.5" fill="${c}" opacity="0.8">${hashRate}</text>
-          <text x="41" y="22.5" text-anchor="middle" font-family="monospace" font-size="3" fill="${c}" opacity="0.5">TH/s</text>
-          <g transform="translate(19,39)">
-            <circle r="9" fill="#010802" stroke="${c}" stroke-width="1" opacity="0.5"/>
-            <g style="animation:spinFan 0.13s linear infinite;transform-origin:0 0;">
-              <path d="M0,-8.5 Q3,-4 0,0 Q-3,-4 0,-8.5" fill="${c}" opacity="0.95"/>
-              <path d="M8.5,0 Q4,3 0,0 Q4,-3 8.5,0" fill="${c}" opacity="0.95"/>
-              <path d="M0,8.5 Q-3,4 0,0 Q3,4 0,8.5" fill="${c}" opacity="0.95"/>
-              <path d="M-8.5,0 Q-4,-3 0,0 Q-4,3 -8.5,0" fill="${c}" opacity="0.95"/>
-            </g>
-            <circle r="2.5" fill="${c}"/><circle r="1.2" fill="#fff" opacity="0.8"/>
-          </g>
-          <g transform="translate(56,39)">
-            <circle r="9" fill="#010802" stroke="${c}" stroke-width="1" opacity="0.5"/>
-            <g style="animation:spinFan 0.1s linear infinite reverse;transform-origin:0 0;">
-              <path d="M0,-8.5 Q3,-4 0,0 Q-3,-4 0,-8.5" fill="${c}" opacity="0.9"/>
-              <path d="M8.5,0 Q4,3 0,0 Q4,-3 8.5,0" fill="${c}" opacity="0.9"/>
-              <path d="M0,8.5 Q-3,4 0,0 Q3,4 0,8.5" fill="${c}" opacity="0.9"/>
-              <path d="M-8.5,0 Q-4,-3 0,0 Q-4,3 -8.5,0" fill="${c}" opacity="0.9"/>
-            </g>
-            <circle r="2.5" fill="${c}"/><circle r="1.2" fill="#fff" opacity="0.8"/>
-          </g>
-          <circle cx="8" cy="8" r="2.5" fill="${c}" style="animation:ledFlicker 3s infinite;"/>
-          <circle cx="14" cy="8" r="2.5" fill="#ffd700" style="animation:ledFlicker 4s infinite 0.5s;"/>
-          <circle cx="20" cy="8" r="2.5" fill="#f87171" style="animation:pulse 0.6s infinite 0.3s;"/>
-          <circle cx="26" cy="8" r="2.5" fill="#c084fc" style="animation:pulse 0.9s infinite 0.6s;"/>
-          <rect x="64" y="13" width="7" height="4.5" rx="1.5" fill="#010802" stroke="${c}" stroke-width="0.8" opacity="0.6"/>
-          <rect x="64" y="21" width="7" height="4.5" rx="1.5" fill="#010802" stroke="${c}" stroke-width="0.8" opacity="0.6"/>
-          <rect x="64" y="29" width="7" height="4.5" rx="1.5" fill="#010802" stroke="${c}" stroke-width="0.6" opacity="0.4"/>
-          <line x1="53" y1="11" x2="53" y2="23" stroke="${c}" stroke-width="0.8" opacity="0.2"/>
-          <line x1="56" y1="11" x2="56" y2="23" stroke="${c}" stroke-width="0.8" opacity="0.2"/>
-          <line x1="59" y1="11" x2="59" y2="23" stroke="${c}" stroke-width="0.6" opacity="0.15"/>
-        </svg>
-        <div style="flex:1;min-width:0;overflow:hidden;">
-          <div style="display:flex;align-items:center;gap:0.3rem;margin-bottom:0.3rem;">
-            <div style="width:5px;height:5px;border-radius:50%;background:${c};animation:pulse 0.6s infinite;flex-shrink:0;"></div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:${c};white-space:nowrap;overflow:hidden;animation:pulse 2.5s infinite;">⚡ HASHING ETH...</div>
-          </div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.44rem;color:${c};opacity:0.4;margin-bottom:0.25rem;">${hashRate} TH/s</div>
-          <div style="width:100%;height:5px;background:rgba(0,0,0,0.7);border-radius:3px;overflow:hidden;margin-bottom:0.3rem;border:1px solid ${bd};opacity:0.5;position:relative;">
-            <div style="position:absolute;top:0;left:-50%;width:50%;height:100%;background:linear-gradient(90deg,transparent,${c},transparent);animation:shimmer 1.3s linear infinite;border-radius:3px;"></div>
-          </div>
-          <div style="display:flex;gap:2px;align-items:flex-end;height:18px;overflow:hidden;">
-            ${Array.from({length:10},(_,j)=>`<div style="width:3px;flex-shrink:0;background:linear-gradient(to top,rgba(0,0,0,0.3),${c});border-radius:2px;transform-origin:bottom;animation:heatRise ${0.55+j*0.08}s infinite ${j*0.07}s;"></div>`).join('')}
-          </div>
-        </div>
+      <div class="rg-num" style="font-size:16px;font-weight:700;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.06)">$${money(p.price,0)}</div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#b6a7d6;margin-bottom:8px"><span>วันที่ ${passed} จาก ${days}</span><span style="color:#fff;font-weight:600">เหลือ ${left} วัน</span></div>
+      <div style="height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden"><div style="height:100%;border-radius:4px;background:${c};width:${pct}%"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:10px">
+      <div style="border-radius:14px;padding:12px;background:rgba(0,0,0,.28)">
+        <div style="font-size:11px;color:#b6a7d6;margin-bottom:4px">ขุดได้แล้ว</div>
+        <div class="rg-num" style="font-size:16px;font-weight:700;color:#4ade80"><span id="rig_eth_${i}">${ethMined.toFixed(6)}</span> <span style="font-size:11px;font-weight:500">ETH</span></div>
+        <div id="rig_usdt_${i}" style="font-size:12px;color:#ffd700">≈ $${money(ethMined*ETH_RATE,2)}</div>
       </div>
-
-      <!-- ETH mined - premium counter -->
-      <div style="background:linear-gradient(145deg,rgba(0,0,0,0.7),${glow},0.05));border:1px solid ${bd};border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;width:100%;box-sizing:border-box;overflow:hidden;position:relative;animation:borderPulse 3s ease-in-out infinite ${i*0.7}s;">
-        <!-- Scanline -->
-        <div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${c},transparent);opacity:0.1;animation:scanline 4s linear infinite;pointer-events:none;"></div>
-        <!-- Grid -->
-        <div style="position:absolute;inset:0;background-image:linear-gradient(${glow},0.02) 1px,transparent 1px),linear-gradient(90deg,${glow},0.02) 1px,transparent 1px);background-size:10px 10px;pointer-events:none;"></div>
-        <!-- Top line -->
-        <div style="position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,${c},transparent);opacity:0.5;"></div>
-
-        <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;position:relative;">
-          <div style="display:flex;align-items:center;gap:0.3rem;">
-            <div style="width:6px;height:6px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c};animation:pulse 0.7s infinite;flex-shrink:0;"></div>
-            <span style="font-family:'Orbitron',monospace;font-size:0.5rem;color:${c};opacity:0.6;letter-spacing:2px;">⛏ ETH MINED</span>
-          </div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.42rem;color:${c};opacity:0.4;background:${glow},0.06);border:1px solid ${glow},0.15);border-radius:8px;padding:0.1rem 0.35rem;">LIVE</div>
-        </div>
-
-        <!-- Big ETH number -->
-        <div style="text-align:center;position:relative;margin-bottom:0.4rem;">
-          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:180px;height:50px;background:radial-gradient(ellipse,${glow},0.07),transparent);pointer-events:none;border-radius:50%;"></div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.46rem;color:${c};opacity:0.4;letter-spacing:3px;margin-bottom:0.15rem;">Ξ ETHEREUM</div>
-          <div style="position:relative;display:inline-block;">
-            <div id="rig_eth_${i}" style="font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;color:${c};animation:ethGlow 2s ease-in-out infinite ${i*0.3}s;letter-spacing:2px;line-height:1;position:relative;z-index:1;">${ethMined}</div>
-            <!-- Shimmer -->
-            <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;">
-              <div style="position:absolute;top:0;bottom:0;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);animation:ethShimmer 2.5s linear infinite;"></div>
-            </div>
-            <!-- Float particles -->
-            <div id="rig_float_${i}" style="position:absolute;inset:0;pointer-events:none;overflow:visible;"></div>
-          </div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;color:${c};opacity:0.5;margin-top:0.1rem;">ETH</div>
-        </div>
-
-        <!-- USDT value -->
-        <div style="text-align:center;margin-bottom:0.6rem;">
-          <div style="display:inline-flex;align-items:center;gap:0.3rem;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:20px;padding:0.2rem 0.6rem;">
-            <span style="font-size:0.6rem;">💵</span>
-            <span id="rig_usdt_${i}" style="font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:700;color:#ffd700;">≈ $${(parseFloat(ethMined)*ETH_RATE).toFixed(2)}</span>
-            <span style="font-family:'Share Tech Mono',monospace;font-size:0.4rem;color:rgba(255,215,0,0.4);">USDT</span>
-          </div>
-        </div>
-
-        <!-- Mini stats -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.25rem;">
-          <div style="background:rgba(0,0,0,0.4);border:1px solid ${glow},0.12);border-radius:8px;padding:0.35rem;text-align:center;overflow:hidden;position:relative;">
-            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${c},transparent);opacity:0.3;"></div>
-            <div style="font-family:'Orbitron',monospace;font-size:0.46rem;color:${c};font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">+${((p.daily||0)/ETH_RATE/86400).toFixed(8)}</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.38rem;color:${c};opacity:0.35;margin-top:0.05rem;">ETH/วินาที</div>
-          </div>
-          <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,215,0,0.12);border-radius:8px;padding:0.35rem;text-align:center;overflow:hidden;position:relative;">
-            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.3),transparent);"></div>
-            <div style="font-family:'Orbitron',monospace;font-size:0.46rem;color:#ffd700;font-weight:700;">+$${(p.daily||0).toFixed(2)}</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.38rem;color:rgba(255,215,0,0.35);margin-top:0.05rem;">USDT/วัน</div>
-          </div>
-          <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(192,132,252,0.12);border-radius:8px;padding:0.35rem;text-align:center;overflow:hidden;position:relative;">
-            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(192,132,252,0.3),transparent);"></div>
-            <div style="font-family:'Orbitron',monospace;font-size:0.46rem;color:#c084fc;font-weight:700;">${Math.max(0,p.remaining).toFixed(0)} วัน</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.38rem;color:rgba(192,132,252,0.35);margin-top:0.05rem;">คงเหลือ</div>
-          </div>
-        </div>
+      <div style="border-radius:14px;padding:12px;background:rgba(0,0,0,.28)">
+        <div style="font-size:11px;color:#b6a7d6;margin-bottom:4px">กำไรต่อวัน</div>
+        <div class="rg-num" style="font-size:16px;font-weight:700">+$${money(p.daily,2)}</div>
+        <div style="font-size:12px;color:#b6a7d6">USDT</div>
       </div>
-
-      <!-- Stats 2x2 -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem;margin-bottom:0.8rem;width:100%;box-sizing:border-box;">
-        <div style="background:${glow},0.07);border:1px solid ${glow},0.18);border-radius:11px;padding:0.5rem;text-align:center;overflow:hidden;position:relative;">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${c},transparent);opacity:0.4;"></div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:${c};font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">+${((p.daily||0)/ETH_RATE).toFixed(5)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.42rem;color:${c};opacity:0.4;margin-top:0.1rem;">ETH ต่อวัน</div>
-        </div>
-        <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.18);border-radius:11px;padding:0.5rem;text-align:center;overflow:hidden;position:relative;">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.4),transparent);"></div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:#ffd700;font-weight:700;">+$${(p.daily||0).toFixed(2)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.42rem;color:rgba(255,215,0,0.4);margin-top:0.1rem;">USDT ต่อวัน</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:11px;padding:0.5rem;text-align:center;overflow:hidden;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:#e2e8f0;font-weight:700;">${daysPassed} วัน</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.42rem;color:rgba(255,255,255,0.25);margin-top:0.1rem;">ผ่านมาแล้ว</div>
-        </div>
-        <div style="background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.18);border-radius:11px;padding:0.5rem;text-align:center;overflow:hidden;position:relative;">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(248,113,113,0.4),transparent);"></div>
-          <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:#f87171;font-weight:700;">${Math.max(0,p.remaining).toFixed(0)} วัน</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.42rem;color:rgba(248,113,113,0.4);margin-top:0.1rem;">คงเหลือ</div>
-        </div>
-      </div>
-
-      <!-- Progress -->
-      <div style="display:flex;justify-content:space-between;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:${c};opacity:0.35;margin-bottom:0.35rem;">
-        <span>MINING PROGRESS</span>
-        <span style="opacity:1;font-weight:700;font-size:0.52rem;">${pct}% · ${Math.max(0,p.remaining).toFixed(0)} วันเหลือ</span>
-      </div>
-      <div style="width:100%;height:8px;background:rgba(0,0,0,0.6);border-radius:4px;overflow:hidden;border:1px solid ${glow},0.1);position:relative;">
-        <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,${c},rgba(255,255,255,0.3));border-radius:4px;box-shadow:0 0 12px ${c};max-width:100%;position:relative;">
-          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);animation:shimmer 1s linear infinite;"></div>
-        </div>
-      </div>
-    </div>`;
+    </div>
+  </div>`;
   }).join('');
 
-  list.innerHTML=summary+rigs;
+  const foot=`
+  <div style="font-size:12px;color:#a99bc7;line-height:1.7;text-align:center;padding:4px 8px 8px">ตัวเลขกำไรเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน<br>การลงทุนมีความเสี่ยง</div>
+  <button onclick="switchTab(1)" style="display:flex;align-items:center;justify-content:center;width:100%;height:52px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 22px rgba(124,58,237,.45)">ซื้อเครื่องขุดเพิ่ม</button>`;
+
+  list.innerHTML='<div class="rg">'+head+rigs+foot+'</div>';
 }
 
 function showDetail(idx){
