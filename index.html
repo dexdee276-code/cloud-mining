@@ -805,6 +805,8 @@ body:has(#authScreen.active) #contactFab{display:none}
 @keyframes rgPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(1.5)}}
 @keyframes rgBar{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
 .rg{font-family:'Noto Sans Thai',system-ui,sans-serif;color:#f3ecff;display:flex;flex-direction:column;gap:16px;padding-bottom:8px}
+.hm-mine{display:flex;align-items:center;justify-content:center;gap:8px;height:48px;width:100%;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.hm-mine.mining{background:rgba(248,113,113,.14);border:1px solid rgba(248,113,113,.5);color:#fca5a5}
 .rg-num{font-family:'Space Grotesk','Noto Sans Thai',sans-serif}
 
 .pk-chip{height:44px;border-radius:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#d9ccf2;padding:0}
@@ -1154,96 +1156,87 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <div class="tab-page" id="pgHome">
 
 <div id="ethPopupLayer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;"></div>
+<div class="rg" id="hmRoot" style="padding:12px 0 8px">
 
-  <!-- Ticker -->
-  <div class="ticker-wrap">
-    <div class="ticker-inner2" id="tickerInner"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+    <div style="min-width:0"><div style="font-size:13px;color:#b6a7d6;margin-bottom:2px">สวัสดี</div><div id="hmUser" style="font-size:24px;font-weight:700;line-height:1.2;word-break:break-all">-</div></div>
+    <div id="hmRigChip" style="display:none;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35);flex-shrink:0">
+      <span style="width:8px;height:8px;border-radius:50%;background:#4ade80;animation:rgPulse 1.6s ease-in-out infinite"></span>
+      <span id="hmRigTxt" style="font-size:12px;font-weight:600;color:#86efac"></span></div>
   </div>
 
-  <!-- Hero -->
-  <div class="promo-hero">
-    <div class="promo-hero-ring phr1"></div>
-    <div class="promo-hero-ring phr2"></div>
-    <div class="promo-eth-bg">Ξ</div>
-    <div class="promo-tag"><div class="promo-tag-dot"></div>CLOUD MINING PLATFORM</div>
-    <div class="promo-title"><span class="promo-title-g">ขุด ETH</span><br><span class="promo-title-g">รับกำไรทุกวัน</span></div>
-    <div class="promo-sub">ระบบ Cloud Mining ลงทุนขั้นต่ำ $10<br>กำไรคำนวณรายวันตามสูตรของระบบ (ประมาณการ ไม่รับประกันผลตอบแทน)</div>
-    <div class="promo-pills">
-      <div class="ppill ppg">📄 ตรวจสอบสถานะคำขอได้</div>
-      <div class="ppill ppp">💵 เติม/ถอนเป็นกีบ</div>
-      <div class="ppill ppb">🛟 มีศูนย์ช่วยเหลือ</div>
+  <div style="border-radius:24px;padding:22px 20px 20px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(168,85,247,.35);box-shadow:0 16px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:13px;color:#c9b8e8">ยอดคงเหลือ</div>
+    <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span id="hmUsd" class="rg-num" style="font-size:42px;font-weight:700;color:#ffd700;letter-spacing:-1px;line-height:1.1">0.00</span><span style="font-size:16px;font-weight:600;color:#fde68a">USDT</span></div>
+    <div style="display:flex;gap:16px;font-size:13px;color:#b6a7d6;margin-top:2px;flex-wrap:wrap">
+      <span>รางวัล ETH <b id="hmEth" class="rg-num" style="color:#4ade80">0.000000</b></span>
+      <span>≈ <b id="hmEthUsd" class="rg-num" style="color:#fff">$0.00</b></span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px">
+      <button type="button" onclick="showTopupPopup()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:72px;border-radius:16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#d97706,#fbbf24);color:#1a0a00"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>เติมเงิน</button>
+      <button type="button" onclick="switchTab(1)" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:72px;border-radius:16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>ลงทุน</button>
+      <button type="button" onclick="showWithdrawPopup()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:72px;border-radius:16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.45);color:#86efac"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>ถอนเงิน</button>
     </div>
   </div>
 
-  <!-- Stats -->
-  <div class="promo-stats" style="grid-template-columns:1fr;">
-    <div class="pstat" style="display:flex;align-items:center;justify-content:center;gap:0.9rem;padding:0.9rem 1rem;"><div class="pstat-icon" style="margin:0;font-size:1.6rem;">👥</div><div style="text-align:left;"><div class="pstat-num" id="pstMembers" style="color:#ffd700;font-size:1.3rem;margin:0;">-</div><div class="pstat-lbl">สมาชิกทั้งหมด</div></div></div>
-  </div>
-  <div style="margin:0 1rem 1rem;background:linear-gradient(145deg,rgba(10,5,25,0.9),rgba(18,8,40,0.8));border:1px solid rgba(157,78,221,0.12);border-radius:14px;padding:0.9rem 1rem;">
-    <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--gold);margin-bottom:0.6rem;">🏆 อันดับลงทุนสูงสุด 15 อันดับ</div>
-    <div id="rankList" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;">รอข้อมูลอันดับ</div>
-  </div>
-
-  <!-- Features -->
-  <div class="promo-feats">
-    <div class="pfeat-hd">⬥ ทำไมต้องเลือกเรา ⬥</div>
-    <div class="pfeat">
-      <div class="pfeat-icon pfi-p">⛏️</div>
-      <div><div class="pfeat-name">แพ็กเกจที่เริ่มได้ตั้งแต่ $10</div><div class="pfeat-desc">ลงทุนผ่านแพ็กเกจของระบบ กำไรคำนวณรายวันตามสูตรที่แสดงในแอป</div></div>
-      <div class="pfeat-badge pfb-hot">🔥 HOT</div>
+  <div style="border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:15px;font-weight:700">กำไรของคุณวันนี้</div>
+      <button type="button" onclick="switchTab(4)" style="background:none;border:none;padding:4px 0;font-family:inherit;font-size:13px;color:#ffd700;font-weight:600;cursor:pointer">ดูเครื่องขุด ›</button>
     </div>
-    <div class="pfeat">
-      <div class="pfeat-icon pfi-g">📈</div>
-      <div><div class="pfeat-name">กำไรสะสมรายวัน</div><div class="pfeat-desc">กำไรสะสมรายวัน แปลงเป็น USDT ได้ในแอป</div></div>
-    </div>
-    <div class="pfeat">
-      <div class="pfeat-icon pfi-y">🔒</div>
-      <div><div class="pfeat-name">ความปลอดภัยบัญชี</div><div class="pfeat-desc">เชื่อมต่อแบบ HTTPS และเปิด 2FA ให้บัญชีของคุณได้ที่ตั้งค่า</div></div>
-      <div class="pfeat-badge pfb-new">✨ NEW</div>
-    </div>
-    <div class="pfeat">
-      <div class="pfeat-icon pfi-b">⚡</div>
-      <div><div class="pfeat-name">ถอนเป็นเงินกีบ มีสถานะให้ติดตาม</div><div class="pfeat-desc">ถอนเป็นเงินกีบเข้าบัญชีธนาคาร แอดมินตรวจสอบก่อนโอน ดูสถานะได้ในแอป</div></div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+      <div style="border-radius:14px;padding:12px;background:rgba(0,0,0,.28)"><div style="font-size:11px;color:#b6a7d6;margin-bottom:4px">กำไรต่อวัน</div><div id="hmDaily" class="rg-num" style="font-size:20px;font-weight:700;color:#4ade80">+$0.00</div><div id="hmDailyEth" style="font-size:11px;color:#b6a7d6">≈ 0.000000 ETH</div></div>
+      <div style="border-radius:14px;padding:12px;background:rgba(0,0,0,.28)"><div style="font-size:11px;color:#b6a7d6;margin-bottom:4px">ลงทุนรวม</div><div id="hmInv" class="rg-num" style="font-size:20px;font-weight:700">$0</div><div id="hmEnd" style="font-size:11px;color:#b6a7d6">ยังไม่มีสัญญา</div></div>
     </div>
   </div>
 
-  <!-- ROI -->
-  <div class="promo-roi">
-    <div class="proi-title">💰 ตัวอย่างประมาณการ (ลงทุน $1,000)</div>
-    <div class="proi-row"><span class="proi-lbl">กำไร/วัน</span><span class="proi-val" id="roiDaily" style="color:#4ade80;">-</span></div>
-    <div class="proi-row"><span class="proi-lbl">กำไร/30 วัน</span><span class="proi-val" id="roiMonth" style="color:#4ade80;">-</span></div>
-    <div class="proi-row"><span class="proi-lbl">ระยะเวลา</span><span class="proi-val" id="roiDays" style="color:#c084fc;">-</span></div>
-    <div class="proi-div"></div>
-    <div class="proi-total"><span class="proi-total-lbl">รวมเงินต้น+กำไร (ประมาณการ)</span><span class="proi-total-val" id="roiTotal">-</span></div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.56rem;color:#A890CC;margin-top:0.6rem;line-height:1.6;">⚠ ตัวเลขนี้เป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยงที่จะเสียเงินลงทุน</div>
+  <div style="border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div><div style="font-size:15px;font-weight:700">เซสชันขุด</div><div id="mineStatus" style="font-size:12px;color:#b6a7d6;margin-top:2px">⏸ รอการขุด</div></div>
+      <div id="mineRate" class="rg-num" style="font-size:14px;color:#c9b8e8">0.0000 <span style="font-size:11px">ETH/นาที</span></div>
+    </div>
+    <div><div style="display:flex;justify-content:space-between;font-size:12px;color:#b6a7d6;margin-bottom:8px"><span>ความคืบหน้าบล็อก</span><span id="progPct" style="color:#fff;font-weight:600">0%</span></div>
+      <div style="height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden"><div id="progFill" style="width:0%;height:100%;background:#a855f7;transition:width .2s"></div></div></div>
+    <button type="button" id="mineBtn" class="hm-mine" onclick="toggleMine()">▶ เริ่มขุด</button>
   </div>
 
-  <!-- CTA -->
-  <div class="promo-cta">
-    <button class="promo-cta-btn" onclick="switchTab(1)">⚡ เริ่มขุด ETH เลย</button>
-    <div class="promo-cta-sub">ลงทุนขั้นต่ำ $10 · ถอนผ่านการตรวจสอบของแอดมิน · <a href="#" onclick="showHelpCenter('terms');return false;" style="color:var(--gold);">อ่านเงื่อนไข/ความเสี่ยง</a></div>
+  <button type="button" id="hmBonus" onclick="switchTab(3)" style="display:none;text-align:left;width:100%;font-family:inherit;color:inherit;border-radius:20px;padding:16px;background:linear-gradient(135deg,rgba(255,215,0,.14),rgba(124,58,237,.14));border:1px solid rgba(255,215,0,.35);align-items:center;gap:14px;cursor:pointer">
+    <div style="width:46px;height:46px;border-radius:14px;background:rgba(255,215,0,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
+    <div style="flex-grow:1;min-width:0"><div id="hmBonusT" style="font-size:15px;font-weight:700"></div><div id="hmBonusD" style="font-size:12px;color:#d9ccf2;line-height:1.5;margin-top:2px"></div></div>
+    <div style="font-size:13px;color:#ffd700;font-weight:700">รับ ›</div>
+  </button>
+
+  <div style="display:flex;align-items:center;gap:14px;border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08)">
+    <div style="width:46px;height:46px;border-radius:14px;background:rgba(168,85,247,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M17 11a3 3 0 1 0 0-6M22 20c0-2.8-1.8-4.8-4.5-5.6"/></svg></div>
+    <div style="flex-grow:1"><div style="font-size:12px;color:#b6a7d6">สมาชิกทั้งหมด</div><div id="pstMembers" class="rg-num" style="font-size:26px;font-weight:700;color:#ffd700;line-height:1.2">-</div></div>
+    <div style="font-size:12px;color:#8f80b3;text-align:right;line-height:1.5">นับจากบัญชี<br>ในระบบจริง</div>
   </div>
 
-  <!-- Mining widget -->
-  <div class="mine-widget">
-    <div class="sec-title" style="width:100%" data-i18n="home.mining">⛏️ การขุดเหรียญ ETH</div>
-    <div class="coin-wrap">
-      <div class="c-ring"></div><div class="c-ring2"></div>
-      <div class="coin">Z</div>
-      <div class="pick1">⛏️</div><div class="pick2">⛏️</div>
-    </div>
-    <div class="mine-status" id="mineStatus" data-i18n="home.waiting">⏸ รอการขุด</div>
-    <div class="mine-rate" id="mineRate">0.0000 <span>ETH/นาที</span></div>
-    <div class="prog-wrap">
-      <div class="prog-hd"><span data-i18n="home.progress">Block Progress</span><span id="progPct">0%</span></div>
-      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-    </div>
-    <button class="btn-mine" id="mineBtn" data-i18n="home.start" onclick="toggleMine()">▶ เริ่มขุด</button>
+  <div id="hmRankBox" style="border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div style="font-size:15px;font-weight:700">อันดับลงทุนสูงสุด</div><div style="font-size:11px;color:#8f80b3">ปกปิดชื่อบางส่วน</div></div>
+    <div id="rankList"><div style="padding:14px 0;text-align:center;font-size:13px;color:#8f80b3">รอข้อมูลอันดับ</div></div>
+    <button type="button" id="rankMore" onclick="toggleRankAll()" style="display:none;align-items:center;justify-content:center;width:100%;height:44px;margin-top:10px;border:none;border-radius:12px;background:rgba(255,255,255,.05);font-family:inherit;font-size:14px;font-weight:600;color:#ffd700;cursor:pointer"></button>
   </div>
-  <div class="act-widget">
-    <div class="sec-title" data-i18n="home.activity">📋 กิจกรรมล่าสุด</div>
-    <div class="act-list" id="actList"><div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:1.2rem;font-family:'Share Tech Mono',monospace;"><span data-i18n="home.noact">ยังไม่มีกิจกรรม... เริ่มขุดเพื่อสร้างประวัติ</span></div></div>
+
+  <div style="margin-top:6px;font-size:17px;font-weight:700">เริ่มลงทุนง่ายๆ 3 ขั้นตอน</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;gap:14px;align-items:flex-start;border-radius:18px;padding:14px 16px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div class="rg-num" style="width:34px;height:34px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">1</div><div><div style="font-size:15px;font-weight:700">เติมเงินเป็นกีบ</div><div style="font-size:13px;color:#c9b8e8;line-height:1.6;margin-top:2px">โอนตาม QR แนบสลิป แอดมินตรวจสอบแล้ว USDT เข้ากระเป๋า</div></div></div><div style="display:flex;gap:14px;align-items:flex-start;border-radius:18px;padding:14px 16px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div class="rg-num" style="width:34px;height:34px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">2</div><div><div style="font-size:15px;font-weight:700">เลือกจำนวนที่จะลงทุน</div><div style="font-size:13px;color:#c9b8e8;line-height:1.6;margin-top:2px">ขั้นต่ำ $10 เห็นประมาณการกำไรก่อนยืนยัน</div></div></div><div style="display:flex;gap:14px;align-items:flex-start;border-radius:18px;padding:14px 16px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div class="rg-num" style="width:34px;height:34px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">3</div><div><div style="font-size:15px;font-weight:700">รับกำไรและถอน</div><div style="font-size:13px;color:#c9b8e8;line-height:1.6;margin-top:2px">กำไรสะสมรายวัน ถอนเป็นเงินกีบเข้าบัญชีธนาคาร ดูสถานะได้ในแอป</div></div></div>
   </div>
+
+  <div style="border-radius:20px;padding:18px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(255,215,0,.25);display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:15px;font-weight:700">ตัวอย่างประมาณการ · ลงทุน $1,000</div>
+    <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#b6a7d6">กำไรต่อวัน</span><span id="roiDaily" class="rg-num" style="font-weight:700;color:#4ade80">-</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#b6a7d6">กำไร 30 วัน</span><span id="roiMonth" class="rg-num" style="font-weight:700;color:#4ade80">-</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#b6a7d6">ระยะสัญญา</span><span id="roiDays" class="rg-num" style="font-weight:700">-</span></div>
+    <div style="height:1px;background:rgba(255,255,255,.08)"></div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;color:#c9b8e8">เงินต้น + กำไร</span><span id="roiTotal" class="rg-num" style="font-size:22px;font-weight:700;color:#ffd700">-</span></div>
+    <div style="font-size:11px;color:#a99bc7;line-height:1.6">ประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง</div>
+  </div>
+
+  <div style="margin-top:6px;font-size:17px;font-weight:700">กิจกรรมล่าสุด</div>
+  <div id="actList" style="border-radius:20px;background:#150b28;border:1px solid rgba(255,255,255,.08);padding:4px 16px"></div>
+
+  <div style="text-align:center;font-size:13px;color:#a99bc7;line-height:1.8;padding:8px 8px 4px">มีคำถามหรือพบปัญหา? <a href="#" onclick="showHelpCenter('contact');return false;" style="color:#ffd700;font-weight:600;text-decoration:none">ติดต่อแอดมิน</a> · <a href="#" onclick="showHelpCenter('faq');return false;" style="color:#ffd700;font-weight:600;text-decoration:none">คำถามที่พบบ่อย</a><br>การลงทุนมีความเสี่ยง ลงทุนเฉพาะเงินที่พร้อมจะเสียได้</div>
+</div>
 </div>
 
 <!-- PACKAGES -->
@@ -2517,7 +2510,7 @@ function switchTab(i){
     const page=document.getElementById(id);if(page)page.classList.toggle('active',i===j);
     const btn=document.getElementById('bn'+j);if(btn)btn.classList.toggle('active',i===j);
   });
-  if(i===1){renderPkgs();calcMiningPreview();}if(i===2)renderWallet();if(i===4){renderMachines();}
+  if(i===0)renderHome();if(i===1){renderPkgs();calcMiningPreview();}if(i===2)renderWallet();if(i===4){renderMachines();}
 }
 
 // ─── MINING ───
@@ -2559,9 +2552,76 @@ function stopMine(){
 // ─── ACTIVITY ───
 const ACTS=[];
 function addAct(icon,txt,amt,cls){
-  const t=new Date();const ts=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
-  ACTS.unshift({icon,txt,amt,cls,ts});if(ACTS.length>20)ACTS.pop();
-  document.getElementById('actList').innerHTML=ACTS.map(a=>`<div class="act-item"><span style="font-size:1rem">${a.icon}</span><div class="act-inf"><div class="act-txt">${a.txt}</div><div class="act-time">${a.ts}</div></div><div class="act-amt ${a.cls}">${a.amt}</div></div>`).join('');
+  ACTS.unshift({icon,txt,amt,cls,time:Date.now()});if(ACTS.length>20)ACTS.pop();
+  renderActs();
+}
+function actTimeText(ms){
+  const d=new Date(ms),n=new Date(),hm=d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+  const day=function(x){return new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime();};
+  const diff=Math.round((day(n)-day(d))/86400000);
+  if(diff<=0)return 'วันนี้ '+hm;if(diff===1)return 'เมื่อวาน '+hm;
+  return d.getDate()+'/'+(d.getMonth()+1)+' '+hm;
+}
+function renderActs(){
+  const el=document.getElementById('actList');if(!el)return;
+  const ud=getUD()||{};
+  const items=ACTS.map(a=>({icon:a.icon,t:a.txt,v:a.amt,time:a.time,pos:true}));
+  (ud.txs||[]).slice(0,8).forEach(x=>{
+    const amt=parseFloat(x.amount)||0;
+    items.push({icon:amt>=0?'+':'−',t:String(x.desc||'').replace(/<[^>]*>/g,''),v:(amt>=0?'+':'−')+'$'+Math.abs(amt).toFixed(2),time:x.time||0,pos:amt>=0});
+  });
+  items.sort((p,q)=>(q.time||0)-(p.time||0));
+  const rows=items.slice(0,5);
+  if(!rows.length){el.innerHTML='<div style="padding:22px 0;text-align:center;font-size:13px;color:#8f80b3">ยังไม่มีกิจกรรม</div>';return;}
+  el.innerHTML=rows.map((r,k)=>{
+    const fg=r.pos?'#4ade80':'#f87171',bg=r.pos?'rgba(74,222,128,.14)':'rgba(248,113,113,.14)';
+    return '<div style="display:flex;align-items:center;gap:12px;padding:13px 0;'+(k<rows.length-1?'border-bottom:1px solid rgba(255,255,255,.06)':'')+'"><div style="width:36px;height:36px;border-radius:12px;background:'+bg+';display:flex;align-items:center;justify-content:center;color:'+fg+';font-size:17px;font-weight:700;flex-shrink:0">'+escHtml(r.icon)+'</div><div style="flex-grow:1;min-width:0"><div style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(r.t)+'</div><div style="font-size:12px;color:#8f80b3;margin-top:2px">'+(r.time?actTimeText(r.time):'')+'</div></div><div class="rg-num" style="font-size:14px;font-weight:700;color:'+fg+';flex-shrink:0">'+escHtml(r.v)+'</div></div>';
+  }).join('');
+}
+
+// ─── HOME ───
+function renderHome(){
+  const ud=getUD();if(!ud)return;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  const money=(n,d)=>(parseFloat(n)||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  set('hmUser',getSess()||'-');
+  set('hmUsd',money(ud.usd,2));set('hmEth',(ud.ethReward||0).toFixed(6));set('hmEthUsd','$'+money((ud.ethReward||0)*ETH_RATE,2));
+  const acs=(ud.packages||[]).filter(p=>p.remaining>0);
+  const chip=document.getElementById('hmRigChip');
+  if(chip){chip.style.display=acs.length?'flex':'none';set('hmRigTxt',acs.length+' เครื่องทำงานอยู่');}
+  const daily=acs.reduce((s,p)=>s+(p.daily||0),0),inv=acs.reduce((s,p)=>s+(p.price||0),0);
+  set('hmDaily','+$'+money(daily,2));set('hmDailyEth','≈ '+(daily/ETH_RATE).toFixed(6)+' ETH');
+  set('hmInv','$'+money(inv,0));
+  set('hmEnd',acs.length?'ครบสัญญาเร็วสุด '+Math.max(0,Math.round(Math.min.apply(null,acs.map(p=>p.remaining))))+' วัน':'ยังไม่มีสัญญา');
+  renderActs();
+  renderHomeBonus();
+}
+function renderHomeBonus(){
+  const el=document.getElementById('hmBonus'),u=getSess();
+  if(!el)return;
+  el.style.display='none';
+  if(!u||!window._db)return;
+  Promise.all([window._db.ref('settings').once('value'),window._db.ref('firstdep/'+u).once('value'),window._db.ref('stats/firstBonusCount').once('value')]).then(function(r){
+    const c=firstSettingsOf(r[0].exists()?r[0].val():{});
+    const used=parseInt(r[2].exists()?r[2].val():0,10)||0;
+    if(!(c.bonus>0)||r[1].exists()||(c.max>0&&used>=c.max))return;
+    document.getElementById('hmBonusT').textContent='โบนัสเติมเงินครั้งแรก $'+c.bonus;
+    document.getElementById('hmBonusD').textContent='เติมครั้งแรกขั้นต่ำ $'+c.min+' · จำกัด '+c.max+' คนแรก';
+    el.style.display='flex';
+  }).catch(function(){});
+}
+let _rankAll=false;
+function toggleRankAll(){_rankAll=!_rankAll;paintRank();}
+function paintRank(){
+  const rl=document.getElementById('rankList'),mb=document.getElementById('rankMore');
+  if(!rl)return;
+  const rank=_pub.rank||[];
+  if(!rank.length){rl.innerHTML='<div style="padding:14px 0;text-align:center;font-size:13px;color:#8f80b3">รอข้อมูลอันดับ</div>';if(mb)mb.style.display='none';return;}
+  const medal=[['rgba(255,215,0,.2)','#ffd700'],['rgba(203,213,225,.18)','#e2e8f0'],['rgba(251,146,60,.2)','#fdba74']],plain=['rgba(255,255,255,.06)','#c9b8e8'];
+  const shown=_rankAll?rank:rank.slice(0,5);
+  rl.innerHTML=shown.map(function(x,i){const m=medal[i]||plain;
+    return '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06)"><div class="rg-num" style="width:30px;height:30px;border-radius:10px;background:'+m[0]+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:'+m[1]+';flex-shrink:0">'+(i+1)+'</div><div style="flex-grow:1;font-size:14px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis">'+escHtml(x.u||'-')+'</div><div class="rg-num" style="font-size:15px;font-weight:700;color:#4ade80">$'+fmtUsd(x.v)+'</div></div>';}).join('');
+  if(mb){if(rank.length>5){mb.style.display='flex';mb.textContent=_rankAll?'ย่อรายการ ‹':'ดูทั้ง '+rank.length+' อันดับ ›';}else mb.style.display='none';}
 }
 
 // ─── PACKAGES ───
@@ -4138,9 +4198,7 @@ function paintPublicStats(){
   const lsr=document.getElementById('lsRow');if(lsr)lsr.style.display=_pub.members>0?'flex':'none';
   set('lsMembers',fmtN(_pub.members));set('lsWd',wd);set('lsWdCount',fmtN(_pub.wdCount));
   set('pstMembers',fmtN(_pub.members));set('pstWd',wd);set('pstWdCount',fmtN(_pub.wdCount));
-  renderTicker();
-  const rl=document.getElementById('rankList');
-  if(rl&&_pub.rank.length){const md=['🥇','🥈','🥉'];rl.innerHTML=_pub.rank.map(function(x,i){return '<div style="display:flex;justify-content:space-between;padding:0.18rem 0;"><span style="color:#fff;">'+(md[i]||('<span style=\"display:inline-block;min-width:1.5em;text-align:center;color:#A890CC;\">'+(i+1)+'</span>'))+' '+escHtml(x.u||'-')+'</span><span style="color:var(--green);font-weight:700;">$'+fmtUsd(x.v)+'</span></div>';}).join('');}
+  paintRank();
   const box=document.getElementById('recentWdBox'),list=document.getElementById('recentWdList');
   if(box&&list){
     box.style.display=_pub.recent.length?'block':'none';
@@ -4614,6 +4672,7 @@ function changeAdminPass(){
 function renderAdminPanel(){ showAdmin(); } // legacy compat
 function updateNav(){
   const ud=getUD();if(!ud)return;
+  if(typeof renderHome==='function'&&document.getElementById('pgHome')&&document.getElementById('pgHome').classList.contains('active'))renderHome();
   const navZkp=document.getElementById('navZkp');if(navZkp)navZkp.textContent=(ud.ethReward||0).toFixed(4);
   const navUsdEl=document.getElementById('navUsd');if(navUsdEl)navUsdEl.textContent=(ud.usd||0).toFixed(2);
   const e1=document.getElementById('stTotal');if(e1)e1.textContent=(ud.ethMine||0).toFixed(4);
