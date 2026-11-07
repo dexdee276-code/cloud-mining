@@ -950,6 +950,33 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;">ใส่เฉพาะ QR ก็ได้ ถ้าไม่ใส่บัญชี ลูกค้าจะเห็นแค่ QR</div>
   </div>
 
+  <!-- โบนัสเติมครั้งแรก -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">🎁 โบนัสเติมครั้งแรก</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">โบนัส (USDT) · 0 = ปิด</div>
+    <input type="number" id="fbBonusInput" inputmode="decimal" step="0.5" min="0" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">เติมครั้งแรกขั้นต่ำ (USDT) ถึงจะได้โบนัส</div>
+    <input type="number" id="fbMinInput" inputmode="decimal" min="0" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">จำกัดจำนวนคนทั้งระบบ</div>
+    <input type="number" id="fbMaxInput" inputmode="numeric" min="0" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.3rem;outline:none;">
+    <div id="fbCountHint" style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--green);margin-bottom:0.6rem;"></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">ต้องลงทุนกี่เท่าของโบนัส ถึงถอนโบนัสได้ (0 = ถอนได้เลย)</div>
+    <input type="number" id="fbTurnInput" inputmode="decimal" min="0" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.8rem;outline:none;">
+    <button onclick="saveFirstSettings()" class="btn btn-gold" style="width:100%;padding:0.7rem;">💾 บันทึกโบนัสเติมครั้งแรก</button>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;">จ่ายเมื่อแอดมินอนุมัติการเติมครั้งแรก ครั้งเดียวต่อคน ผู้ที่ได้ไปแล้วไม่ถูกเปลี่ยนย้อนหลัง</div>
+  </div>
+
+  <!-- โบนัสแนะนำเพื่อน -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);margin-bottom:0.8rem;">🎁 โบนัสแนะนำเพื่อน</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">โบนัสต่อคน (USDT) ให้ทั้งผู้แนะนำและเพื่อน · 0 = ปิด</div>
+    <input type="number" id="refBonusInput" inputmode="decimal" step="0.5" min="0" max="100" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">รับโบนัสได้สูงสุดกี่คนต่อผู้แนะนำ</div>
+    <input type="number" id="refMaxInput" inputmode="numeric" min="0" max="10000" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.8rem;outline:none;">
+    <button onclick="saveRefSettings()" class="btn btn-gold" style="width:100%;padding:0.7rem;">💾 บันทึกโบนัส</button>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;">มีผลกับการอนุมัติเติมเงินครั้งต่อไป ผู้ที่ได้โบนัสไปแล้วไม่ถูกเปลี่ยนย้อนหลัง</div>
+  </div>
+
   <!-- QR Code -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📱 QR Code รับโอนเงินกีบ (BCEL OnePay ฯลฯ)</div>
@@ -1120,7 +1147,7 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
   <!-- CTA -->
   <div class="promo-cta">
     <button class="promo-cta-btn" onclick="switchTab(1)">⚡ เริ่มขุด ETH เลย</button>
-    <div class="promo-cta-sub">ลงทุนขั้นต่ำเพียง $100 · ถอนได้ทุกเวลา</div>
+    <div class="promo-cta-sub">ลงทุนขั้นต่ำเพียง $10 · ถอนได้ทุกเวลา</div>
   </div>
 
   <!-- Mining widget -->
@@ -1183,19 +1210,19 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
   <div class="input-card2">
     <div class="input-lbl2">
       <span>💵 จำนวน USDT ที่ต้องการลงทุน</span>
-      <span style="color:rgba(74,222,128,0.6);">$100 - $100,000</span>
+      <span style="color:rgba(74,222,128,0.6);">$10 - $100,000</span>
     </div>
     <div class="input-wrap2">
-      <input type="number" id="miningAmtInput" min="100" max="100000" placeholder="0" oninput="calcMiningPreview()">
+      <input type="number" id="miningAmtInput" min="10" max="100000" placeholder="0" oninput="calcMiningPreview()">
       <span class="input-unit2">USDT</span>
     </div>
     <div class="quick-row2">
+      <button class="qb2" onclick="setMiningAmt(10)">$10</button>
       <button class="qb2" onclick="setMiningAmt(100)">$100</button>
       <button class="qb2" onclick="setMiningAmt(500)">$500</button>
       <button class="qb2" onclick="setMiningAmt(1000)">$1K</button>
       <button class="qb2" onclick="setMiningAmt(5000)">$5K</button>
       <button class="qb2" onclick="setMiningAmt(10000)">$10K</button>
-      <button class="qb2" onclick="setMiningAmt(50000)">$50K</button>
     </div>
   </div>
 
@@ -2441,6 +2468,7 @@ function buyPkg(key){
   if(bought>=def.limit){showToast(t('toast.full'));return}
   if((ud.usd||0)<def.price){showToast(t('toast.nousd'));switchTab(3);return}
   ud.usd=(ud.usd||0)-def.price;
+  consumeBonusTurnover(ud,def.price);
   if(!ud.packages)ud.packages=[];
   ud.packages.push({key,price:def.price,days:def.days,daily:def.daily,profit:def.profit,bought:Date.now(),remaining:def.days});
   if(!ud.txs)ud.txs=[];
@@ -2848,6 +2876,7 @@ function submitWithdraw(){
   const fullName=g('wdName'), bank=g('wdBank'), accNo=g('wdAccNo'), note=g('wdNote');
   if(!(usdAmt>0)){showToast('⚠️ กรอกจำนวน USDT ที่ต้องการถอน');return;}
   if(usdAmt>(ud.usd||0)+1e-9){showToast('⚠️ จำนวนเกินกว่าที่มีในกระเป๋า');return;}
+  if(usdAmt>withdrawableOf(ud)+1e-9){showToast('🔒 ถอนได้สูงสุด $'+withdrawableOf(ud)+' (โบนัสที่ล็อกถอนได้เมื่อลงทุนครบเงื่อนไข)');return;}
   if(fullName.length<2){showToast('⚠️ กรุณากรอกชื่อจริง-นามสกุล ตามบัญชีธนาคาร');return;}
   if(bank.length<2){showToast('⚠️ กรุณากรอกชื่อธนาคาร');return;}
   if(!/^[0-9][0-9\- ]{5,24}$/.test(accNo)){showToast('⚠️ เลขบัญชีไม่ถูกต้อง (ตัวเลข 6–25 หลัก)');return;}
@@ -2988,6 +3017,8 @@ function showWithdrawPopup(){
       <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--gold);">$${usd.toFixed(2)} USDT</div>
     </div>
 
+    <div id="wdLockNote" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--gold);margin:-0.5rem 0 0.8rem;line-height:1.5;"></div>
+
     <!-- จำนวนที่ต้องการถอน -->
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">💰 จำนวนที่ต้องการถอน (USDT)</div>
     <input type="number" id="wdAmt" inputmode="decimal" oninput="wdLakPreview()" placeholder="เช่น 100" max="${usd.toFixed(2)}"
@@ -3022,7 +3053,7 @@ function showWithdrawPopup(){
     </button>
   </div>`;
   document.body.appendChild(ov);
-  _wdRate=DEFAULT_LAK_RATE;wdLakPreview();
+  _wdRate=DEFAULT_LAK_RATE;wdLakPreview();wdLockNote();
   loadTopupInfo(function(i){_wdRate=lakRateOf(i);wdLakPreview();});
 }
 
@@ -3266,6 +3297,7 @@ function startCreditListener(){
   stopCreditListener();
   const u=getSess();
   if(!u||!window._db)return;
+  ensureRefCode();
   _creditRef=window._db.ref('credits/'+u);
   _creditRef.on('value',function(snap){
     _credits=snap.exists()?snap.val():{};
@@ -3291,6 +3323,8 @@ function reconcileCredits(){
     if(!ud.txs)ud.txs=[];
     ud.txs.unshift({desc:c.desc||(a>=0?'✅ เติม USDT':'Admin หัก USDT'),amount:a,unit:'USDT',time:c.time||Date.now()});
     ud.appliedCredits[k]=1;
+    if(c.lock>0){ud.bonusLocked=(ud.bonusLocked||0)+(parseFloat(c.lock)||0);ud.bonusNeed=(ud.bonusNeed||0)+(parseFloat(c.need)||0);}
+    if(k.indexOf('refb_')===0){ud.refCount=(ud.refCount||0)+1;ud.refEarned=(ud.refEarned||0)+a;}
     net+=a;
   });
   saveUDForce(ud);
@@ -3310,9 +3344,6 @@ function claimRequest(path,to,cb){
   },function(err,committed,s){
     cb(!err&&committed&&!!s&&s.val()===to);
   },false);
-}
-function adminCredit(username,key,amt,desc){
-  return window._db.ref('credits/'+username+'/'+key).set({amt:amt,desc:desc,time:Date.now()});
 }
 function rejectTopup(fbKey){
   if(!window._db||!fbKey)return;
@@ -3463,7 +3494,7 @@ function uploadAdminQR(e){
 function loadAdminQRPreview(){
   const wrap=document.getElementById('adminQRPreview');
   if(!wrap||!window._db)return;
-  loadLakSettings();
+  loadLakSettings();loadRefSettings();loadFirstSettings();
   const btn=document.getElementById('delQRBtn');
   const show=function(src){
     wrap.innerHTML='<img src="'+src+'" style="width:160px;height:160px;border-radius:10px;border:2px solid rgba(255,215,0,0.3);object-fit:contain;background:#fff;">';
@@ -3686,6 +3717,8 @@ function approveTopup(fbKey){
       adminCredit(user,fbKey,amt,desc).then(function(){
         showToast('✅ อนุมัติ $'+amt.toLocaleString()+' USDT ให้ '+user+' แล้ว');
         renderAdminTopup(currentFilter);
+        grantFirstDepositBonus(user,amt,function(ok,b){if(ok)showToast('🎁 ให้โบนัสเติมครั้งแรก $'+b+' แก่ '+user+' แล้ว');});
+        grantReferralBonus(user,function(ok,ref,bn){if(ok)showToast('🎁 ให้โบนัสแนะนำเพื่อน $'+bn+' แก่ '+user+' และ '+ref+' แล้ว');});
       }).catch(function(){
         reqRef.child('status').set('pending');
         showToast('❌ เติมยอดไม่สำเร็จ คืนสถานะ "รออนุมัติ" แล้ว ลองใหม่อีกครั้ง');
@@ -3715,6 +3748,171 @@ function loadLakSettings(){
   }).catch(function(){});
 }
 
+// ═══════════════════════════════════════════════
+// ─── โบนัสแนะนำเพื่อน: เพื่อนเติมครั้งแรกสำเร็จ → ได้ $1 ทั้งผู้แนะนำและเพื่อน ───
+// จ่ายผ่าน credits ด้วยคีย์ตายตัว (refb_/refw_) จึงจ่ายซ้ำไม่ได้ และผู้แนะนำรับได้ไม่เกิน REF_MAX คน
+// ═══════════════════════════════════════════════
+const REF_BONUS=1, REF_MAX=20;
+(function(){try{
+  const r=new URLSearchParams(location.search).get('ref');
+  if(r&&/^[A-Za-z0-9]{4,12}$/.test(r))localStorage.setItem('cm_pending_ref',r.toUpperCase());
+}catch(e){}})();
+function getPendingRef(){
+  try{
+    const r=new URLSearchParams(location.search).get('ref')||localStorage.getItem('cm_pending_ref')||'';
+    return /^[A-Za-z0-9]{4,12}$/.test(r)?r.toUpperCase():'';
+  }catch(e){return '';}
+}
+function reserveRefCode(code,user){
+  if(!window._db||!code||!user||!/^[A-Za-z0-9]{4,12}$/.test(code))return;
+  window._db.ref('refcodes/'+code.toUpperCase()).transaction(function(cur){
+    if(cur===null||cur===user)return user;
+    return;
+  },function(){},false);
+}
+function ensureRefCode(){
+  const u=getSess();
+  if(!u||!_ud||!window._db)return;
+  if(!_ud.refCode)_ud.refCode=(u.toUpperCase().replace(/[^A-Z0-9]/g,'X')+'XXXX').slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+  reserveRefCode(_ud.refCode,u);
+}
+function refSettingsOf(info){
+  info=info||{};
+  const b=parseFloat(info.refBonus), m=parseInt(info.refMax,10);
+  return {bonus:(isFinite(b)&&b>=0)?b:REF_BONUS, max:(isFinite(m)&&m>=0)?m:REF_MAX};
+}
+function grantReferralBonus(friend,cb){
+  const db=window._db; cb=cb||function(){};
+  if(!db||!friend){cb(false);return;}
+  db.ref('settings').once('value').then(function(st){
+    const cfg=refSettingsOf(st.exists()?st.val():{});
+    if(!(cfg.bonus>0)){cb(false,'off');return;}
+    return db.ref('users/'+friend+'/refBy').once('value').then(function(s){
+      const code=s.exists()?String(s.val()).toUpperCase():'';
+      if(!/^[A-Z0-9]{4,12}$/.test(code)){cb(false);return;}
+      return db.ref('refcodes/'+code).once('value').then(function(rs){
+        const ref=rs.exists()?rs.val():'';
+        if(!ref||ref===friend){cb(false);return;}
+        return db.ref('credits/'+ref).once('value').then(function(cs){
+          const keys=Object.keys(cs.exists()?cs.val():{});
+          if(keys.indexOf('refb_'+friend)>=0){cb(false);return;}
+          if(keys.filter(function(k){return k.indexOf('refb_')===0;}).length>=cfg.max){cb(false,'max');return;}
+          return Promise.all([
+            adminCredit(ref,'refb_'+friend,cfg.bonus,'🎁 โบนัสแนะนำเพื่อน +$'+cfg.bonus+' ('+friend+')'),
+            adminCredit(friend,'refw_'+friend,cfg.bonus,'🎁 โบนัสสมาชิกใหม่ เติมครั้งแรก +$'+cfg.bonus)
+          ]).then(function(){cb(true,ref,cfg.bonus);});
+        });
+      });
+    });
+  }).catch(function(){cb(false);});
+}
+function saveRefSettings(){
+  const bonus=parseFloat(document.getElementById('refBonusInput')?document.getElementById('refBonusInput').value:'');
+  const max=parseInt(document.getElementById('refMaxInput')?document.getElementById('refMaxInput').value:'',10);
+  if(!isFinite(bonus)||bonus<0||bonus>100){showToast('⚠ โบนัสต้องอยู่ระหว่าง 0–100 ดอลลาร์ (0 = ปิดโบนัส)');return;}
+  if(!isFinite(max)||max<0||max>10000){showToast('⚠ จำนวนคนสูงสุดต้องเป็นตัวเลข 0–10,000');return;}
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  window._db.ref('settings').update({refBonus:Math.round(bonus*100)/100,refMax:max}).then(function(){
+    showToast(bonus>0?'✅ บันทึกโบนัสแนะนำเพื่อนแล้ว':'✅ ปิดโบนัสแนะนำเพื่อนแล้ว');
+  }).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
+}
+function loadRefSettings(){
+  if(!window._db)return;
+  window._db.ref('settings').once('value').then(function(s){
+    const c=refSettingsOf(s.exists()?s.val():{});
+    const b=document.getElementById('refBonusInput'),m=document.getElementById('refMaxInput');
+    if(b)b.value=c.bonus; if(m)m.value=c.max;
+  }).catch(function(){});
+}
+function adminCredit(username,key,amt,desc,extra){
+  return window._db.ref('credits/'+username+'/'+key).set(Object.assign({amt:amt,desc:desc,time:Date.now()},extra||{}));
+}
+// ═══════════════════════════════════════════════
+// ─── โบนัสเติมครั้งแรก ───
+// จ่ายครั้งเดียวต่อคน (ตัวล็อก firstdep/{ชื่อ}) และจำกัดจำนวนคนทั้งระบบ (stats/firstBonusCount)
+// โบนัสถูกล็อก ถอนไม่ได้จนกว่าจะลงทุนครบ "โบนัส × เท่าที่ตั้ง" กันคนสร้างหลายบัญชีมาฟาร์มโบนัส
+// ═══════════════════════════════════════════════
+const FB_DEFAULT={bonus:5,min:10,max:100,turn:10};
+function firstSettingsOf(info){
+  info=info||{};
+  const b=parseFloat(info.fbBonus),mn=parseFloat(info.fbMin),mx=parseInt(info.fbMax,10),t=parseFloat(info.fbTurn);
+  return {
+    bonus:(isFinite(b)&&b>=0)?b:FB_DEFAULT.bonus,
+    min:(isFinite(mn)&&mn>=0)?mn:FB_DEFAULT.min,
+    max:(isFinite(mx)&&mx>=0)?mx:FB_DEFAULT.max,
+    turn:(isFinite(t)&&t>=0)?t:FB_DEFAULT.turn
+  };
+}
+function grantFirstDepositBonus(user,amt,cb){
+  const db=window._db; cb=cb||function(){};
+  if(!db||!user){cb(false);return;}
+  db.ref('settings').once('value').then(function(st){
+    const cfg=firstSettingsOf(st.exists()?st.val():{});
+    db.ref('firstdep/'+user).transaction(function(c){
+      if(c===null)return {amt:amt,time:Date.now()};
+      return;
+    },function(err,committed){
+      if(err||!committed){cb(false);return;}            // ไม่ใช่การเติมครั้งแรก
+      if(!(cfg.bonus>0)||amt<cfg.min){cb(false);return;}
+      db.ref('stats/firstBonusCount').transaction(function(n){
+        n=n||0;
+        if(n>=cfg.max)return;
+        return n+1;
+      },function(err2,ok2){
+        if(err2||!ok2){cb(false,'max');return;}
+        adminCredit(user,'fdb_'+user,cfg.bonus,'🎁 โบนัสเติมครั้งแรก +$'+cfg.bonus,{lock:cfg.bonus,need:Math.round(cfg.bonus*cfg.turn*100)/100})
+          .then(function(){cb(true,cfg.bonus);}).catch(function(){cb(false);});
+      },false);
+    },false);
+  }).catch(function(){cb(false);});
+}
+function consumeBonusTurnover(ud,amt){
+  if(!ud||!(ud.bonusLocked>0))return;
+  ud.bonusNeed=Math.max(0,(ud.bonusNeed||0)-amt);
+  if(ud.bonusNeed<=0){ud.bonusLocked=0;ud.bonusNeed=0;}
+}
+function withdrawableOf(ud){
+  const usd=ud.usd||0,locked=Math.min(usd,ud.bonusLocked||0);
+  return Math.max(0,Math.round((usd-locked)*100)/100);
+}
+function wdLockNote(){
+  const el=document.getElementById('wdLockNote'),ud=getUD();
+  if(!el||!ud)return;
+  el.textContent=(ud.bonusLocked>0)?('🔒 โบนัส $'+ud.bonusLocked+' ยังถอนไม่ได้ จนกว่าจะลงทุนอีก $'+(Math.round((ud.bonusNeed||0)*100)/100)+' · ถอนได้ตอนนี้สูงสุด $'+withdrawableOf(ud)):'';
+}
+function tpFirstBonusNote(info){
+  const el=document.getElementById('tpBonusNote'),u=getSess();
+  if(!el||!u||!window._db)return;
+  const c=firstSettingsOf(info);
+  if(!(c.bonus>0)){el.textContent='';return;}
+  window._db.ref('firstdep/'+u).once('value').then(function(s){
+    if(s.exists()){el.textContent='';return;}
+    el.textContent='🎁 เติมครั้งแรก ขั้นต่ำ $'+c.min+' รับโบนัส $'+c.bonus+' เมื่อแอดมินอนุมัติ (ถอนโบนัสได้เมื่อลงทุนครบ $'+(Math.round(c.bonus*c.turn*100)/100)+' · จำนวนจำกัด)';
+  }).catch(function(){});
+}
+function saveFirstSettings(){
+  const g=function(id){const e=document.getElementById(id);return e?parseFloat(e.value):NaN;};
+  const bonus=g('fbBonusInput'),min=g('fbMinInput'),max=Math.round(g('fbMaxInput')),turn=g('fbTurnInput');
+  if(!isFinite(bonus)||bonus<0||bonus>1000){showToast('⚠ โบนัสต้องอยู่ระหว่าง 0–1,000 ดอลลาร์ (0 = ปิด)');return;}
+  if(!isFinite(min)||min<0){showToast('⚠ ขั้นต่ำการเติมครั้งแรกไม่ถูกต้อง');return;}
+  if(!isFinite(max)||max<0||max>100000){showToast('⚠ จำนวนคนสูงสุดต้องเป็นตัวเลข 0–100,000');return;}
+  if(!isFinite(turn)||turn<0||turn>1000){showToast('⚠ เงื่อนไขลงทุนต้องอยู่ระหว่าง 0–1,000 เท่า');return;}
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  window._db.ref('settings').update({fbBonus:Math.round(bonus*100)/100,fbMin:min,fbMax:max,fbTurn:turn}).then(function(){
+    showToast(bonus>0?'✅ บันทึกโบนัสเติมครั้งแรกแล้ว':'✅ ปิดโบนัสเติมครั้งแรกแล้ว');
+  }).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
+}
+function loadFirstSettings(){
+  if(!window._db)return;
+  Promise.all([window._db.ref('settings').once('value'),window._db.ref('stats/firstBonusCount').once('value')]).then(function(r){
+    const c=firstSettingsOf(r[0].exists()?r[0].val():{});
+    const set=function(id,v){const e=document.getElementById(id);if(e)e.value=v;};
+    set('fbBonusInput',c.bonus);set('fbMinInput',c.min);set('fbMaxInput',c.max);set('fbTurnInput',c.turn);
+    const h=document.getElementById('fbCountHint');
+    if(h)h.textContent='จ่ายโบนัสไปแล้ว '+(r[1].exists()?r[1].val():0)+' / '+c.max+' คน';
+  }).catch(function(){});
+}
+
 function showTopupPopup(){
   const ov=document.createElement('div');ov.className='overlay';ov.id='topupPopupOv';
   ov.innerHTML=`<div class="popup">
@@ -3726,6 +3924,7 @@ function showTopupPopup(){
     <!-- Step 1: ใส่จำนวน -->
     <div id="tpStep1">
       <div id="tpLastReq" style="margin-bottom:0.8rem;"></div>
+      <div id="tpBonusNote" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--green);line-height:1.6;margin-bottom:0.6rem;"></div>
       <div id="tpRateLine" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--gold);margin-bottom:0.6rem;">กำลังโหลดอัตรา...</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">จำนวนเงินกีบ (LAK) ที่ต้องการโอน</div>
       <input type="number" id="tpAmt" inputmode="numeric" placeholder="เช่น 500000" oninput="tpLakPreview()"
@@ -3870,7 +4069,7 @@ function showTopupPopup(){
   document.body.appendChild(ov);
   renderTopupBanner();
   _tpSlip=null;
-  loadTopupInfo(function(i){_tpInfo=i||{};tpLakPreview();});
+  loadTopupInfo(function(i){_tpInfo=i||{};tpLakPreview();tpFirstBonusNote(_tpInfo);});
 }
 
 let _tpCurrentAmt=0;
@@ -4698,8 +4897,12 @@ function saveUDForce(ud){
 
 // ─── ETH MINING CALC ───
 const ETH_RATE=2672.47;
-function calcDailyPct(amt){return 0.75+(amt/100000)*2.75;}
+function calcDailyPct(amt){
+  if(amt<100)return 1.0;   // ยอดต่ำกว่า $100: 1%/วัน ($10 = $0.10/วัน)
+  return 0.75+(amt/100000)*2.75;
+}
 function calcDays(amt){
+  if(amt<100)return 30;
   if(amt<1000)return 90;
   if(amt<5000)return 90;
   if(amt<10000)return 180;
@@ -4760,10 +4963,11 @@ function verifyOTP(){
   if(msg){msg.style.color='var(--green)';msg.textContent='✅ กำลังสร้างบัญชี...';}
   const u=_pendingUser,e=_pendingEmail,p=_pendingPass;
   const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
-  const refBy=new URLSearchParams(window.location.search).get('ref')||localStorage.getItem('cm_pending_ref')||'';
+  const refBy=getPendingRef();
   const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
   if(window._db){
     window._db.ref('users/'+u).set(nd).then(()=>{
+      reserveRefCode(refCode,u);
       document.querySelectorAll('.overlay').forEach(o=>o.remove());
       _ud=nd;setTimeout(()=>{setSess(u);enterDash(u);},300);
     });
@@ -4793,7 +4997,7 @@ function resendOTPBrevo(){
 
 function calcMiningPreview(){
   const amt=parseFloat(document.getElementById('miningAmtInput')?.value)||0;
-  if(amt<100){
+  if(amt<10){
     const lbl=document.getElementById('pvLabel');if(lbl)lbl.textContent='⚡ กรอกจำนวนเพื่อดูกำไร';
     const big=document.getElementById('pvEthBig');if(big)big.textContent='0.000000';
     return;
@@ -4834,7 +5038,7 @@ function startPkgRain(){
 
 function startMiningInvestment(){
   const amt=parseFloat(document.getElementById('miningAmtInput')?.value)||0;
-  if(amt<100||amt>100000){showToast('⚠ ใส่จำนวน $100 - $100,000');return;}
+  if(amt<10||amt>100000){showToast('⚠ ใส่จำนวน $10 - $100,000');return;}
   const ud=getUD();if(!ud)return;
   if((ud.usd||0)<amt){
     const ov=document.createElement('div');ov.className='overlay';
@@ -4914,6 +5118,7 @@ function confirmMiningInvestment(amt){
   const ud=getUD();if(!ud)return;
   if((ud.usd||0)<amt){showToast('❌ USDT ไม่พอ');return;}
   ud.usd=(ud.usd||0)-amt;
+  consumeBonusTurnover(ud,amt);
   const daily=calcDailyEarn(amt),days=calcDays(amt),dailyPct=calcDailyPct(amt);
   ud.packages=ud.packages||[];
   ud.packages.push({key:'mining',price:amt,days,daily,dailyPct,profit:daily*days,bought:Date.now(),remaining:days});
@@ -5171,8 +5376,15 @@ function renderReferral(){
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.5rem;">🔗 Referral</div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.5rem;word-break:break-all;">${link}</div>
     <button onclick="copyRefLink()" class="btn btn-primary" style="width:100%;padding:0.6rem;font-size:0.65rem;">📋 คัดลอกลิงก์</button>
+    <div id="refRuleText" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--green);margin-top:0.5rem;line-height:1.6;"></div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-top:0.5rem;">แนะนำ: ${ud.refCount||0} คน · ได้: $${(ud.refEarned||0).toFixed(2)}</div>
   </div>`;
+  const paint=function(c){
+    const t=document.getElementById('refRuleText');
+    if(t)t.textContent=c.bonus>0?('🎁 เพื่อนสมัครผ่านลิงก์นี้และเติมเงินครั้งแรกสำเร็จ ได้ $'+c.bonus+' ทั้งคุณและเพื่อน (สูงสุด '+c.max+' คน)'):'';
+  };
+  paint(refSettingsOf({}));
+  if(window._db)window._db.ref('settings').once('value').then(function(s){paint(refSettingsOf(s.exists()?s.val():{}));}).catch(function(){});
 }
 function calcOfflineEarnings(){
   const ud=getUD();if(!ud)return;
