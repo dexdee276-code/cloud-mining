@@ -3781,6 +3781,7 @@ function tpuSubmit(){
   if(amt<TOPUP_MIN){showToast('⚠ เติมขั้นต่ำ $'+TOPUP_MIN);return;}
   if(amt>TOPUP_MAX){showToast('⚠ เติมสูงสุด $'+TOPUP_MAX.toLocaleString()+' ต่อครั้ง');return;}
   if(!/^(0x)?[A-Za-z0-9]{16,100}$/.test(tx)){showToast('⚠ กรอก TXID ให้ถูกต้อง (วางรหัสธุรกรรมจากแอปกระเป๋า)');return;}
+  if(!_tpSlip){showToast('⚠ กรุณาแนบภาพหลักฐานการโอนก่อน');return;}
   const btn=document.getElementById('tpuBtn');if(btn){btn.disabled=true;btn.style.opacity='0.6';}
   const net=_tpInfo.usdtNetwork||'TRC20';
   submitTopupRequest(amt,function(){
@@ -4127,7 +4128,7 @@ function showTopupPopupBase(){
       <input type="number" id="tpuAmt" inputmode="decimal" placeholder="เช่น 50" style="width:100%;box-sizing:border-box;padding:0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.1rem;outline:none;margin-bottom:0.7rem;">
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">TXID (รหัสธุรกรรม) หลังโอนเสร็จ</div>
       <input type="text" id="tpuTx" autocomplete="off" spellcheck="false" placeholder="วางรหัสธุรกรรม" style="width:100%;box-sizing:border-box;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.72rem;outline:none;margin-bottom:0.7rem;">
-      <label style="display:block;padding:0.6rem;text-align:center;background:rgba(255,215,0,0.06);border:1px dashed rgba(255,215,0,0.35);border-radius:10px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.68rem;cursor:pointer;">📎 แนบภาพหลักฐาน (ไม่บังคับ)<input type="file" accept="image/*" style="display:none" onchange="tpuSlipChange(event)"></label>
+      <label style="display:block;padding:0.6rem;text-align:center;background:rgba(255,215,0,0.06);border:1px dashed rgba(255,215,0,0.35);border-radius:10px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.68rem;cursor:pointer;">📎 แนบภาพหลักฐาน (จำเป็น)<input type="file" accept="image/*" style="display:none" onchange="tpuSlipChange(event)"></label>
       <div id="tpuSlipPrev" style="margin:0.5rem 0;"></div>
       <button id="tpuBtn" onclick="tpuSubmit()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;background:linear-gradient(135deg,#065f46,#10b981);color:#fff;margin-top:0.4rem;">✅ ส่งคำขอเติม USDT</button>
     </div>
