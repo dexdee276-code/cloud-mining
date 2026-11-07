@@ -1302,39 +1302,69 @@ body:has(#adminScreen.active) #contactFab{display:none}
 </div>
 
 <div class="tab-page" id="pgWallet">
-      <div class="wb wb-usd">
-        <div class="wb-head"><div class="wb-ibox">💵</div><div><div class="wb-title" data-i18n="wal.usd.title">กระเป๋า USDT</div><div class="wb-sub" data-i18n="wal.usd.sub">ใช้สำหรับเช่ากำลังขุดเท่านั้น</div></div></div>
-        <div class="wb-amt" id="wUsd">0.00</div>
-        <div class="wb-equiv">USDT</div>
-        <button class="btn btn-gold" style="width:100%;padding:0.85rem;margin-bottom:0.5rem;" onclick="showTopupPopup()">💵 เติม USDT</button>
-        <button onclick="showWithdrawPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;
-  background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
-  box-shadow:0 4px 20px rgba(16,185,129,0.4),0 0 30px rgba(16,185,129,0.15);">📤 ถอนออก</button>
+  <div class="rg" style="padding:8px 4px 100px;">
+    <div>
+      <div style="font-size:13px;color:#b6a7d6;margin-bottom:4px">กระเป๋าของฉัน</div>
+      <div style="font-size:24px;font-weight:700;line-height:1.25">ยอดเงินและรางวัล</div>
+    </div>
+
+    <div style="border-radius:24px;padding:22px 20px 20px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(168,85,247,.35);box-shadow:0 16px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="font-size:13px;color:#c9b8e8">ยอดคงเหลือ USDT</div>
+        <div style="font-size:11px;color:#b6a7d6;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.06)">ใช้ซื้อสัญญาและถอนได้</div>
       </div>
-      <div class="wb wb-eth">
-        <div class="wb-head">
-          <div class="wb-ibox">🔷</div>
-          <div><div class="wb-title" data-i18n="wal.eth.title">กระเป๋ารางวัล ETH</div><div class="wb-sub" data-i18n="wal.eth.sub">กำไรจากสัญญาขุด → แลกกับผู้ดูแล</div></div>
-          <div class="wb-live">LIVE</div>
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <span id="wUsd" class="rg-num" style="font-size:42px;font-weight:700;color:#ffd700;letter-spacing:-1px;line-height:1.1">0.00</span>
+        <span style="font-size:16px;font-weight:600;color:#fde68a">USDT</span>
+      </div>
+      <div id="wUsdLak" style="font-size:13px;color:#b6a7d6"></div>
+
+      <div style="margin-top:12px;border-radius:14px;padding:12px 14px;background:rgba(0,0,0,.28);display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#b6a7d6">ถอนได้ตอนนี้</span><span id="wWdable" class="rg-num" style="font-weight:700;color:#86efac">$0.00</span></div>
+        <div id="wLockBox" style="display:none;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;align-items:center"><span style="color:#b6a7d6;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>โบนัสที่ล็อกอยู่</span><span id="wLockAmt" class="rg-num" style="font-weight:700;color:#fda4af">$0</span></div>
+          <div id="wLockNote" style="font-size:11px;color:#8f80b3;line-height:1.5"></div>
         </div>
-        <div class="wb-amt" id="wZkp">0.000000</div>
-        <div class="wb-equiv">≈ $<span id="wZkpUsd">0.00</span> USDT</div>
-        <div class="wb-daily"><span data-i18n="wal.daily">⚡ รับ/วัน:</span><span class="wb-dv"><span id="wDaily">0</span> ETH · +$<span id="wDailyUsd">0.00</span></span></div>
-        <!-- แปลง ETH → USDT -->
-        <button onclick="showConvertPopup()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:1px;margin-bottom:0.5rem;
-  background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
-  box-shadow:0 4px 20px rgba(59,130,246,0.4),0 0 30px rgba(59,130,246,0.15);">💱 แปลง ETH → USDT</button>
+      </div>
 
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px">
+        <button type="button" onclick="showTopupPopup()" style="display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border:none;border-radius:14px;background:linear-gradient(135deg,#d97706,#fbbf24);color:#1a0a00;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>เติมเงิน</button>
+        <button type="button" onclick="showWithdrawPopup()" style="display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:14px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.45);color:#86efac;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>ถอนเงิน</button>
+      </div>
+    </div>
+
+    <div style="border-radius:24px;padding:20px;background:#150b28;border:1px solid rgba(98,126,234,.35);display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="font-size:13px;color:#c9b8e8">รางวัล ETH ที่ขุดได้</div>
+        <div style="font-size:11px;color:#b6a7d6;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.06)">แปลงเป็น USDT ได้</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <span id="wZkp" class="rg-num" style="font-size:34px;font-weight:700;color:#4ade80;letter-spacing:-1px;line-height:1.1">0.000000</span>
+        <span style="font-size:15px;font-weight:600;color:#86efac">ETH</span>
+      </div>
+      <div style="font-size:14px;color:#ffd700;font-weight:600">≈ $<span id="wZkpUsd">0.00</span> USDT</div>
+      <span id="wZkpLak" style="display:none"></span>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;border-radius:14px;padding:12px 14px;background:rgba(0,0,0,.28);gap:8px">
+        <span style="font-size:13px;color:#b6a7d6">รับต่อวัน</span>
+        <span class="rg-num" style="font-size:14px;font-weight:700;text-align:right"><span id="wDaily">0</span> ETH <span style="color:#86efac">· +$<span id="wDailyUsd">0.00</span></span></span>
+      </div>
+      <button type="button" onclick="showConvertPopup()" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border:none;border-radius:14px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg>แปลง ETH เป็น USDT</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+      <div style="border-radius:16px;padding:14px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div style="font-size:12px;color:#b6a7d6;margin-bottom:6px">สัญญาที่ทำงานอยู่</div><div id="wActive" class="rg-num" style="font-size:24px;font-weight:700">0</div></div>
+      <div style="border-radius:16px;padding:14px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div style="font-size:12px;color:#b6a7d6;margin-bottom:6px">กำไรรวมเมื่อครบสัญญา</div><div id="wProfit" class="rg-num" style="font-size:22px;font-weight:700;color:#4ade80;word-break:break-all">$0.00</div></div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:8px">
+      <div style="font-size:17px;font-weight:700">ประวัติล่าสุด</div>
+      <button type="button" onclick="showMyRequests()" style="background:none;border:none;font-family:inherit;font-size:13px;color:#ffd700;font-weight:600;cursor:pointer;padding:6px 0">สถานะคำขอเติม/ถอน ›</button>
+    </div>
+    <div id="txHist" style="border-radius:20px;background:#150b28;border:1px solid rgba(255,255,255,.08);padding:4px 16px"></div>
+
+    <div style="font-size:12px;color:#a99bc7;line-height:1.7;text-align:center;padding:0 8px 8px">การถอนต้องผ่านการตรวจสอบของแอดมินก่อนโอนเข้าบัญชีธนาคาร<br>ดูเวลาดำเนินการได้ที่ <a href="#" onclick="showHelpCenter('faq');return false;" style="color:#ffd700;text-decoration:none">ศูนย์ช่วยเหลือ</a></div>
   </div>
-  <div class="w-grid">
-    <div class="w-stat"><div class="ws-l" data-i18n="wal.active">สัญญา Active</div><div class="ws-v wv-red" id="wActive">0</div><div class="ws-s" data-i18n="wal.activesub">สัญญาขุด</div></div>
-    <div class="w-stat"><div class="ws-l" data-i18n="wal.profit">กำไรสะสม</div><div class="ws-v wv-green" id="wProfit">$0.00</div><div class="ws-s" data-i18n="wal.profitsub">USD จากสัญญา</div></div>
-  </div>
-  <div class="sec-title" data-i18n="wal.history">📋 ประวัติธุรกรรม</div>
-  <div id="txHist"><div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace"><span data-i18n="wal.nohist">ยังไม่มีประวัติ</span></div></div>
 </div>
-
-<!-- TOPUP -->
 <div class="tab-page" id="pgRig">
 
   <div id="miningScene" style="display:none;margin-bottom:1rem;">
@@ -2752,25 +2782,56 @@ function showDetail(idx){
 }
 
 // ─── WALLET ───
+let _wLakRate=0,_wLakAt=0;
+function walletLakRate(cb){
+  if(_wLakRate>0&&Date.now()-_wLakAt<300000){cb(_wLakRate);return;}
+  if(!window._db){cb(DEFAULT_LAK_RATE);return;}
+  window._db.ref('settings/lakRate').once('value').then(function(sn){
+    const v=sn.exists()?parseFloat(sn.val()):0;
+    _wLakRate=v>0?v:DEFAULT_LAK_RATE;_wLakAt=Date.now();cb(_wLakRate);
+  }).catch(function(){cb(DEFAULT_LAK_RATE);});
+}
 function renderWallet(){
   const ud=getUD();if(!ud)return;
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
+  const fm=function(n,d){return (parseFloat(n)||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});};
+  const set=function(id,v){const e=document.getElementById(id);if(e)e.textContent=v;};
   const dailyEth=acs.reduce((s,p)=>s+(p.daily||0)/ETH_RATE,0);
   const totalP=acs.reduce((s,p)=>s+(p.profit||0),0);
-  const usdEl=document.getElementById('wUsd');if(usdEl)usdEl.textContent=(ud.usd||0).toFixed(2);
-  const rw=ud.ethReward||0;
-  const zkpEl=document.getElementById('wZkp');if(zkpEl)zkpEl.textContent=rw.toFixed(6);
-  const zkpUsdEl=document.getElementById('wZkpUsd');if(zkpUsdEl)zkpUsdEl.textContent=(rw*ETH_RATE).toFixed(2);
-  const lakEl=document.getElementById('wZkpLak');if(lakEl)lakEl.textContent='';
-  const dEl=document.getElementById('wDaily');if(dEl)dEl.textContent=dailyEth.toFixed(6);
-  const dUEl=document.getElementById('wDailyUsd');if(dUEl)dUEl.textContent=(dailyEth*ETH_RATE).toFixed(2);
-  const aEl=document.getElementById('wActive');if(aEl)aEl.textContent=acs.length;
-  const pEl=document.getElementById('wProfit');if(pEl)pEl.textContent='$'+totalP.toFixed(2);
-  const txs=ud.txs||[];const txEl=document.getElementById('txHist');
-  if(!txs.length){txEl.innerHTML=`<div style="color:var(--text-dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace">${t('wal.nohist')}</div>`;return}
-  txEl.innerHTML=txs.slice(0,10).map(tx=>{
-    const d=new Date(tx.time);const t=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-    return `<div class="tx-item"><div><div class="tx-d">${tx.desc}</div><div class="tx-t">${t}</div></div><div class="tx-a ${tx.amount>0?'tp':'tn'}">${tx.amount>0?'+':''}${tx.amount} ${tx.unit||'USDT'}</div></div>`;
+  const usd=ud.usd||0,rw=ud.ethReward||0;
+  set('wUsd',usd.toFixed(2));
+  set('wWdable','$'+fm(withdrawableOf(ud),2));
+  const lockBox=document.getElementById('wLockBox');
+  if(lockBox){
+    const lk=Math.min(usd,ud.bonusLocked||0);
+    lockBox.style.display=lk>0?'flex':'none';
+    if(lk>0){set('wLockAmt','$'+fm(lk,2));set('wLockNote','โบนัสถอนได้เมื่อลงทุนครบเงื่อนไข เหลือลงทุนอีก $'+fm(ud.bonusNeed||0,2));}
+  }
+  walletLakRate(function(rate){set('wUsdLak','≈ ₭ '+Math.floor(usd*rate).toLocaleString('en-US')+'  ·  1 USDT = ₭ '+Math.round(rate).toLocaleString('en-US'));});
+  set('wZkp',rw.toFixed(6));set('wZkpUsd',fm(rw*ETH_RATE,2));set('wZkpLak','');
+  set('wDaily',dailyEth.toFixed(6));set('wDailyUsd',fm(dailyEth*ETH_RATE,2));
+  set('wActive',acs.length);set('wProfit','$'+fm(totalP,2));
+  const txs=ud.txs||[];const txEl=document.getElementById('txHist');if(!txEl)return;
+  if(!txs.length){txEl.innerHTML='<div style="padding:18px 0;text-align:center;font-size:13px;color:#8f80b3">ยังไม่มีประวัติ</div>';return;}
+  const mon=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  txEl.innerHTML=txs.slice(0,10).map(function(tx,idx){
+    const d=new Date(tx.time||0);
+    const ts=d.getDate()+' '+mon[d.getMonth()]+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    const amt=parseFloat(tx.amount)||0,pos=amt>0,unit=tx.unit||'USDT';
+    let title=String(tx.desc||'').replace(/^[^A-Za-z0-9฀-๿຀-໿]+/,'');
+    let status='',sc='#86efac';
+    const m=title.match(/\s*\(([^)]*)\)\s*$/);
+    if(m){status=m[1];title=title.slice(0,m.index);sc=/ตรวจสอบ|รอ/.test(status)?'#ffd700':'#c9b8e8';}
+    const pend=/ตรวจสอบ|รอ/.test(status);
+    const bg=pend?'rgba(255,215,0,.14)':(pos?'rgba(74,222,128,.14)':'rgba(253,164,175,.12)');
+    const fg=pend?'#ffd700':(pos?'#4ade80':'#fda4af');
+    const icon=pend?'↑':(pos?'+':'−');
+    const val=(unit==='USDT')?(pos?'+':'−')+'$'+fm(Math.abs(amt),2):(pos?'+':'−')+Math.abs(amt)+' '+unit;
+    return '<div style="display:flex;align-items:center;gap:12px;padding:14px 0;'+(idx<Math.min(10,txs.length)-1?'border-bottom:1px solid rgba(255,255,255,.06);':'')+'">'
+      +'<div style="width:38px;height:38px;border-radius:12px;background:'+bg+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;font-weight:700;color:'+fg+'">'+icon+'</div>'
+      +'<div style="flex-grow:1;min-width:0"><div style="font-size:14px;font-weight:600;overflow-wrap:anywhere">'+escHtml(title)+'</div>'
+      +'<div style="font-size:12px;color:#8f80b3;margin-top:2px">'+ts+(status?' · <span style="color:'+sc+'">'+escHtml(status)+'</span>':'')+'</div></div>'
+      +'<div class="rg-num" style="font-size:15px;font-weight:700;color:'+fg+';text-align:right;flex-shrink:0">'+val+'</div></div>';
   }).join('');
 }
 // ═══════════════════════════════════════════════
