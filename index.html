@@ -797,6 +797,14 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
 <body>
 
 <div class="toast" id="toast"></div>
+<button id="contactFab" onclick="showHelpCenter('contact')" aria-label="ติดต่อแอดมิน">💬<span>ติดต่อแอดมิน</span></button>
+<style>
+#contactFab{position:fixed;right:12px;bottom:76px;z-index:150;display:flex;align-items:center;gap:0.4rem;padding:0.6rem 0.9rem;border:none;border-radius:999px;background:linear-gradient(135deg,#78350f,#ffd700);color:#1a0a00;font-family:'Share Tech Mono',monospace;font-size:0.72rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.5);}
+#contactFab span{white-space:nowrap}
+body:has(#adminScreen.active) #contactFab{display:none}
+#authScreen.active ~ #contactFab{bottom:16px}
+</style>
+
 <div class="eth-popup" id="ethPopup" style="display:none;">
   <div class="eth-popup-icon">⛏</div>
   <div class="eth-popup-label">ETH MINED</div>
@@ -983,6 +991,7 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.4rem;">🛟 ข้อมูลติดต่อ & ผู้ให้บริการ</div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.8rem;line-height:1.6;">กรอกเฉพาะข้อมูลจริง ช่องที่ว่างจะไม่แสดงให้ลูกค้า</div>
     <input type="text" id="site_line" maxlength="200" placeholder="ลิงก์ LINE (https://line.me/ti/p/...)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <input type="text" id="site_fb" maxlength="200" placeholder="ลิงก์เพจ/โปรไฟล์ Facebook (https://facebook.com/...)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
     <input type="text" id="site_wa" maxlength="200" placeholder="WhatsApp (เช่น +8562012345678)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
     <input type="text" id="site_phone" maxlength="200" placeholder="เบอร์โทร" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
     <input type="text" id="site_email" maxlength="200" placeholder="อีเมลติดต่อ" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
@@ -4225,7 +4234,7 @@ function recountStats(){
 }
 
 // ── ข้อมูลติดต่อ/ผู้ให้บริการ (แอดมินตั้ง เก็บที่ site/) ──
-const SITE_FIELDS=['line','wa','phone','email','hours','name','addr','reg','proc'];
+const SITE_FIELDS=['line','fb','wa','phone','email','hours','name','addr','reg','proc'];
 function saveSiteInfo(){
   const o={};
   for(const f of SITE_FIELDS){
@@ -4235,6 +4244,7 @@ function saveSiteInfo(){
     o[f]=v;
   }
   if(o.line&&/^[a-z]+:/i.test(o.line)&&!/^https?:\/\//i.test(o.line)){showToast('⚠ ลิงก์ LINE ต้องขึ้นต้นด้วย http:// หรือ https://');return;}
+  if(o.fb&&!/^https?:\/\//i.test(o.fb)){showToast('⚠ ลิงก์ Facebook ต้องขึ้นต้นด้วย http:// หรือ https://');return;}
   if(o.wa&&!/^[+0-9 \-]{6,20}$/.test(o.wa)){showToast('⚠ เบอร์ WhatsApp ใส่ได้เฉพาะตัวเลข + และ -');return;}
   if(o.phone&&!/^[+0-9 \-]{6,20}$/.test(o.phone)){showToast('⚠ เบอร์โทรใส่ได้เฉพาะตัวเลข + และ -');return;}
   if(o.email&&!/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(o.email)){showToast('⚠ อีเมลไม่ถูกต้อง');return;}
@@ -4273,6 +4283,7 @@ function helpTabHtml(tab,d){
   if(tab==='contact'){
     let h='';
     if(site.line)h+=helpRow('💬','LINE',site.line,/^https?:\/\//i.test(site.line)?site.line:'');
+    if(site.fb&&/^https?:\/\//i.test(site.fb))h+=helpRow('📘','Facebook',site.fb,site.fb);
     if(site.wa)h+=helpRow('🟢','WhatsApp',site.wa,'https://wa.me/'+site.wa.replace(/[^0-9]/g,''));
     if(site.phone)h+=helpRow('📞','โทรศัพท์',site.phone,'tel:'+site.phone.replace(/[^0-9+]/g,''));
     if(site.email)h+=helpRow('✉️','อีเมล',site.email,'mailto:'+site.email);
