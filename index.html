@@ -940,19 +940,19 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">₭ เติมด้วยกีบลาว (LAK)</div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">อัตรา: 1 USDT = กี่กีบ</div>
     <input type="number" id="lakRateInput" inputmode="decimal" placeholder="ค่าเริ่มต้น 22700" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--gold);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">ธนาคาร</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">ธนาคาร (ไม่บังคับ)</div>
     <input type="text" id="lakBankInput" placeholder="เช่น BCEL" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">ชื่อบัญชี</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">ชื่อบัญชี (ไม่บังคับ)</div>
     <input type="text" id="lakAccNameInput" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">เลขบัญชี</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">เลขบัญชี (ไม่บังคับ)</div>
     <input type="text" id="lakAccNoInput" inputmode="numeric" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.8rem;outline:none;">
     <button onclick="saveLakSettings()" class="btn btn-gold" style="width:100%;padding:0.7rem;">💾 บันทึกอัตราและบัญชี</button>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;">QR ที่อัปโหลดด้านล่างจะแสดงให้ลูกค้าสแกนโอนกีบ</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;">ใส่เฉพาะ QR ก็ได้ ถ้าไม่ใส่บัญชี ลูกค้าจะเห็นแค่ QR</div>
   </div>
 
   <!-- QR Code -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
-    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📱 QR Code / PromptPay</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📱 QR Code รับโอนเงินกีบ (BCEL OnePay ฯลฯ)</div>
     <div style="text-align:center;margin-bottom:0.8rem;" id="adminQRPreview">
       <div style="width:160px;height:160px;margin:0 auto;background:rgba(255,255,255,0.04);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;">
         <div style="font-size:2.5rem;">📱</div>
@@ -960,35 +960,10 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
       </div>
     </div>
     <label style="display:block;width:100%;padding:0.65rem;text-align:center;background:linear-gradient(135deg,#78350f,var(--gold));border-radius:8px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#000;margin-bottom:0.4rem;">
-      📷 อัปโหลด QR Code ใหม่
+      📷 อัปโหลด QR Code รับเงินกีบ
       <input type="file" accept="image/*" style="display:none" onchange="uploadAdminQR(event)">
     </label>
     <button id="delQRBtn" onclick="deleteQR()" style="display:none;width:100%;padding:0.5rem;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">🗑️ ลบ QR Code</button>
-  </div>
-
-  <!-- ที่อยู่ USDT -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
-    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);margin-bottom:0.8rem;">💵 ที่อยู่ USDT สำหรับรับโอน</div>
-
-    <!-- เครือข่าย -->
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">เครือข่าย</div>
-    <select id="usdtNetwork" style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.8rem;appearance:none;cursor:pointer;">
-      <option value="TRC20">TRC20 (TRON) — ค่าธรรมเนียมต่ำ</option>
-      <option value="ERC20">ERC20 (Ethereum)</option>
-      <option value="BEP20">BEP20 (BSC)</option>
-    </select>
-
-    <!-- ที่อยู่ -->
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">ที่อยู่ Wallet</div>
-    <input type="text" id="usdtAddrInput" placeholder="กรอกที่อยู่ USDT..."
-      style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.3);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.75rem;outline:none;margin-bottom:0.8rem;word-break:break-all;">
-
-    <!-- Preview -->
-    <div id="usdtAddrPreview" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(74,222,128,0.5);margin-bottom:0.8rem;word-break:break-all;"></div>
-
-    <button onclick="saveUsdtAddr()" style="width:100%;padding:0.7rem;border:none;border-radius:10px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;
-      background:linear-gradient(135deg,#065f46,#059669,#10b981);color:#fff;
-      box-shadow:0 4px 15px rgba(16,185,129,0.3);">💾 บันทึกที่อยู่ USDT</button>
   </div>
 
   <!-- 2FA Settings (Admin view only - no 2FA for admin) -->
@@ -3140,7 +3115,7 @@ function fillTopupInfo(info,o){
       img.style.cssText='width:'+o.qrSize+'px;height:'+o.qrSize+'px;object-fit:contain;background:#fff;padding:8px;border-radius:10px;margin:0 auto;display:block;';
       w.innerHTML='';w.appendChild(img);
     } else {
-      w.innerHTML='<div style="font-family:monospace;font-size:0.65rem;color:#A890CC;text-align:center;padding:0.5rem;">ไม่มี QR Code · ใช้ที่อยู่ด้านล่างโอนได้เลย</div>';
+      w.innerHTML='<div style="font-family:monospace;font-size:0.65rem;color:#A890CC;text-align:center;padding:0.5rem;">ยังไม่มี QR Code กรุณาติดต่อ Admin</div>';
     }
   }
 }
@@ -3317,6 +3292,7 @@ function renderAdminTopup(filter){
         +'<div><div style="font-family:\'Orbitron\',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);">'+escHtml(topupAmtLabel(r))+'</div>'
         +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem;">👤 '+escHtml(r.user||'-')+' · '+timeStr+'</div></div>'
         +'<div style="background:rgba(0,0,0,0.2);border:1px solid '+st+';border-radius:20px;padding:0.2rem 0.55rem;font-family:\'Orbitron\',monospace;font-size:0.48rem;color:'+st+';">'+escHtml(statusText[r.status]||r.status)+'</div></div>'
+        +(r.hasSlip?'<button data-k="'+k+'" onclick="viewTopupSlip(this.dataset.k)" style="width:100%;margin-top:0.3rem;padding:0.5rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:8px;color:var(--gold);font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;cursor:pointer;">🧾 ดูสลิปโอนเงิน</button>':'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--red-bright);margin-top:0.3rem;">⚠ ไม่มีสลิปแนบ</div>')
         +(r.status==='pending'
           ?'<div style="display:flex;gap:0.5rem;margin-top:0.4rem;">'
             +'<button data-k="'+k+'" onclick="approveTopup(this.dataset.k)" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:\'Orbitron\',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>'
@@ -3466,26 +3442,28 @@ function showTopupQR(){
     const nm=document.getElementById('tpAccName');
     if(nm)nm.textContent=_tpInfo.lakAccName?('ชื่อบัญชี: '+_tpInfo.lakAccName):'';
     const ac=document.getElementById('tpAddrText');
-    if(ac){
-      const n=_tpInfo.lakAccNo||'';
-      ac.textContent=n||'ยังไม่ได้ตั้งค่า กรุณาติดต่อ Admin';
-      ac.setAttribute('data-addr',n);
-    }
+    const n=_tpInfo.lakAccNo||'';
+    if(ac){ac.textContent=n;ac.setAttribute('data-addr',n);}
+    const box=document.querySelector('#tpStep2 .tp4-addr');
+    if(box)box.style.display=(n||_tpInfo.lakAccName||_tpInfo.lakBank)?'':'none';
+    const cp=document.querySelector('#tpStep2 .tp4-copy');
+    if(cp)cp.style.display=n?'':'none';
     fillTopupInfo({qrImage:_tpInfo.qrImage},{qr:'tpQRWrap',qrSize:180,addr:'__none__'});
   });
 }
 function tpConfirmDone(){
   const q=_tpPending;
   if(!q){showToast('⚠ ไม่พบจำนวน');return;}
+  if(!_tpSlip){showToast('⚠ กรุณาแนบสลิปโอนเงินก่อน');return;}
   const btn=document.getElementById('tpCtaBtn');
   if(btn){btn.disabled=true;btn.style.opacity='0.6';}
   submitTopupRequest(q.usdt,function(){
     document.getElementById('tpStep2').style.display='none';
     document.getElementById('tpStep3').style.display='block';
-    _tpPending=null;
+    _tpPending=null;_tpSlip=null;
   },function(){
     if(btn){btn.disabled=false;btn.style.opacity='1';}
-  },{currency:'LAK',lak:q.lak,rate:q.rate});
+  },{currency:'LAK',lak:q.lak,rate:q.rate,_slip:_tpSlip});
 }
 function submitTopupRequest(amt,onOk,onFail,extra){
   if(_tpSubmitting)return;
@@ -3493,8 +3471,13 @@ function submitTopupRequest(amt,onOk,onFail,extra){
   const user=getSess();
   if(!user){showToast('❌ กรุณาเข้าสู่ระบบใหม่');if(onFail)onFail();return;}
   _tpSubmitting=true;
+  const ex=Object.assign({},extra||{});
+  const slip=ex._slip; delete ex._slip;
   const ref=window._db.ref('topup_reqs').push();
-  ref.set(Object.assign({id:ref.key,user:user,amt:amt,time:Date.now(),status:'pending'},extra||{})).then(function(){
+  const writeSlip=slip?window._db.ref('topup_slips/'+ref.key).set(slip):Promise.resolve();
+  writeSlip.then(function(){
+    return ref.set(Object.assign({id:ref.key,user:user,amt:amt,time:Date.now(),status:'pending',hasSlip:!!slip},ex));
+  }).then(function(){
     _tpSubmitting=false;
     if(_ud)_ud.lastTopupKey=ref.key;
     try{window._db.ref('users/'+user+'/lastTopupKey').set(ref.key);}catch(e){}
@@ -3504,6 +3487,61 @@ function submitTopupRequest(amt,onOk,onFail,extra){
     showToast('❌ ส่งคำขอไม่สำเร็จ กรุณาลองใหม่');
     if(onFail)onFail();
   });
+}
+// ── สลิปโอนเงิน ──
+let _tpSlip=null;
+function compressImage(file,maxSide,quality,cb){
+  const rd=new FileReader();
+  rd.onerror=function(){cb(null);};
+  rd.onload=function(ev){
+    const img=new Image();
+    img.onerror=function(){cb(null);};
+    img.onload=function(){
+      const k=Math.min(1,maxSide/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(img.width*k));c.height=Math.max(1,Math.round(img.height*k));
+      const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
+      let q=quality,d=c.toDataURL('image/jpeg',q);
+      while(d.length>400000&&q>0.35){q-=0.1;d=c.toDataURL('image/jpeg',q);}
+      cb(d.length>600000?null:d);
+    };
+    img.src=ev.target.result;
+  };
+  rd.readAsDataURL(file);
+}
+function tpSlipChange(e){
+  const f=e.target.files&&e.target.files[0];
+  if(!f)return;
+  const pv=document.getElementById('tpSlipPrev');
+  if(pv)pv.textContent='กำลังประมวลผลรูป...';
+  compressImage(f,900,0.7,function(d){
+    if(!d){_tpSlip=null;if(pv)pv.textContent='';showToast('❌ อ่านรูปสลิปไม่ได้ ลองรูปอื่น');return;}
+    _tpSlip=d;
+    if(pv){
+      pv.innerHTML='';
+      const im=document.createElement('img');im.src=d;
+      im.style.cssText='max-width:100%;max-height:150px;border-radius:8px;object-fit:contain;display:block;margin:0 auto;';
+      const t=document.createElement('div');t.textContent='✅ แนบสลิปแล้ว (กดเพื่อเปลี่ยนรูป)';
+      t.style.cssText='font-family:monospace;font-size:0.6rem;color:var(--green);text-align:center;margin-top:0.3rem;';
+      pv.appendChild(im);pv.appendChild(t);
+    }
+  });
+}
+function viewTopupSlip(key){
+  if(!window._db||!key)return;
+  window._db.ref('topup_slips/'+key).once('value').then(function(s){
+    const d=s.exists()?s.val():'';
+    if(typeof d!=='string'||d.indexOf('data:image/')!==0){showToast('⚠ ไม่พบสลิป');return;}
+    const ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;padding:1rem;';
+    const im=document.createElement('img');im.src=d;
+    im.style.cssText='max-width:100%;max-height:88vh;object-fit:contain;border-radius:10px;';
+    const x=document.createElement('button');x.textContent='✕';
+    x.style.cssText='position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:1.2rem;padding:0.3rem 0.8rem;border-radius:8px;cursor:pointer;';
+    x.onclick=function(){ov.remove();};
+    ov.onclick=function(e){if(e.target===ov)ov.remove();};
+    ov.appendChild(im);ov.appendChild(x);document.body.appendChild(ov);
+  }).catch(function(){showToast('❌ โหลดสลิปไม่สำเร็จ');});
 }
 function topupAmtLabel(r){
   if(r.currency==='LAK'){
@@ -3569,12 +3607,11 @@ function approveTopup(fbKey){
 // ── แอดมิน: ตั้งอัตรา/บัญชีรับโอน ──
 function saveLakSettings(){
   const g=function(id){const e=document.getElementById(id);return e?e.value.trim():'';};
-  const rate=parseFloat(g('lakRateInput'));
-  const bank=g('lakBankInput'), name=g('lakAccNameInput'), no=g('lakAccNoInput');
-  if(!(rate>0)||!isFinite(rate)){showToast('⚠ กรอกอัตรา (กีบต่อ 1 USDT) เป็นตัวเลขมากกว่า 0');return;}
-  if(!bank||!name||!no){showToast('⚠ กรอกธนาคาร ชื่อบัญชี และเลขบัญชีให้ครบ');return;}
+  const raw=g('lakRateInput');
+  const rate=raw===''?DEFAULT_LAK_RATE:parseFloat(raw);
+  if(!(rate>0)||!isFinite(rate)){showToast('⚠ อัตรา (กีบต่อ 1 USDT) ต้องเป็นตัวเลขมากกว่า 0');return;}
   if(!window._db){showToast('❌ ไม่มี Firebase');return;}
-  window._db.ref('settings').update({lakRate:rate,lakBank:bank,lakAccName:name,lakAccNo:no}).then(function(){
+  window._db.ref('settings').update({lakRate:rate,lakBank:g('lakBankInput'),lakAccName:g('lakAccNameInput'),lakAccNo:g('lakAccNoInput')}).then(function(){
     showToast('✅ บันทึกอัตราและบัญชีรับโอนแล้ว');
   }).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
 }
@@ -3651,7 +3688,7 @@ function showTopupPopup(){
               </div>
               <span class="tp4-addr-badge" id="tpNetworkDisplay">TRC20</span>
             </div>
-            <div id="tpAccName" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#fff;margin-bottom:0.3rem;"></div>
+            <div id="tpAccName" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#fff;padding:0.6rem 0.9rem 0;"></div>
             <div class="tp4-addr-text" id="tpAddrText">กำลังโหลด...</div>
             <button class="tp4-copy" onclick="copyTopupAddr('tpAddrText')">
               📋 &nbsp; COPY ACCOUNT NO.
@@ -3662,6 +3699,13 @@ function showTopupPopup(){
           <span style="font-size:0.65rem;">⚠️</span>
           <span class="tp4-net-t" id="tpRateNote">โอนตามจำนวนกีบให้ตรง</span>
           <span class="tp4-net-t">· ยอด USDT คำนวณตอนแอดมินตรวจสอบ</span>
+        </div>
+        <div style="padding:0 1rem 0.8rem;">
+          <label style="display:block;padding:0.7rem;text-align:center;background:rgba(255,215,0,0.08);border:1px dashed rgba(255,215,0,0.45);border-radius:12px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
+            📎 แนบสลิปโอนเงิน (จำเป็น)
+            <input type="file" accept="image/*" style="display:none" onchange="tpSlipChange(event)">
+          </label>
+          <div id="tpSlipPrev" style="margin-top:0.5rem;"></div>
         </div>
         <div class="tp4-cta-wrap">
           <button class="tp4-cta" id="tpCtaBtn" onclick="tpConfirmDone()">
@@ -3735,6 +3779,7 @@ function showTopupPopup(){
   </div>`;
   document.body.appendChild(ov);
   renderTopupBanner();
+  _tpSlip=null;
   loadTopupInfo(function(i){_tpInfo=i||{};tpLakPreview();});
 }
 
