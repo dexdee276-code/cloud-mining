@@ -761,6 +761,43 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
 .promo-cta{padding:0 1rem 1rem;}
 .promo-cta-btn{width:100%;padding:1rem;border:none;border-radius:16px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea);color:#fff;box-shadow:0 4px 25px rgba(124,58,237,0.4);}
 .promo-cta-sub{text-align:center;font-size:0.44rem;color:rgba(255,255,255,0.18);margin-top:0.4rem;letter-spacing:1px;}
+
+/* ── LOGIN REDESIGN ── */
+#authScreen{overflow-y:auto;-webkit-overflow-scrolling:touch;justify-content:flex-start;align-items:stretch;padding:3.2rem 1.1rem 1.5rem;
+background:radial-gradient(ellipse 90% 50% at 50% 0%,rgba(124,58,237,0.38) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 90% 100%,rgba(255,215,0,0.07) 0%,transparent 70%),#07000f}
+#authScreen .lg-wrap{margin:auto;width:100%;max-width:400px;font-family:system-ui,-apple-system,'Noto Sans Thai','Sarabun',sans-serif}
+.lg-brand{text-align:center;margin-bottom:1.4rem}
+.lg-mark{width:60px;height:60px;margin:0 auto 0.8rem;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.9rem;font-weight:700;color:#fff;
+background:linear-gradient(135deg,#7c3aed,#c084fc);box-shadow:0 8px 28px rgba(124,58,237,0.5),inset 0 1px 0 rgba(255,255,255,0.3)}
+.lg-name{font-size:1.7rem;font-weight:700;color:#fff;letter-spacing:0.5px}
+.lg-tag{font-size:0.8rem;color:#b9a6dd;margin-top:0.3rem;line-height:1.5}
+#authScreen .lg-card{max-width:none;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:1.2rem;backdrop-filter:blur(14px);box-shadow:0 12px 40px rgba(0,0,0,0.45)}
+#authScreen .lg-card::before{display:none}
+#authScreen .lg-tabs{display:flex;gap:4px;padding:4px;margin-bottom:1.2rem;background:rgba(0,0,0,0.35);border:none;border-radius:13px}
+#authScreen .lg-tabs .auth-tab{box-shadow:none;flex:1;padding:0.7rem 0.4rem;border:none;border-radius:10px;background:transparent;color:#a99bc7;font-family:inherit;font-size:0.9rem;font-weight:600;letter-spacing:0;text-transform:none;clip-path:none;transition:all .2s}
+#authScreen .lg-tabs .auth-tab.active{background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;box-shadow:0 4px 14px rgba(124,58,237,0.45)}
+.lg-field{margin-bottom:0.95rem}
+.lg-label{display:block;font-size:0.78rem;color:#c9b8e8;margin-bottom:0.4rem;font-weight:600}
+.lg-in{position:relative}
+.lg-ic{position:absolute;left:0.9rem;top:50%;transform:translateY(-50%);font-size:0.95rem;pointer-events:none;opacity:0.85}
+.lg-input{width:100%;height:48px;padding:0 2.8rem 0 2.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.13);border-radius:12px;color:#fff;font-family:inherit;font-size:1rem;outline:none;transition:border-color .2s,box-shadow .2s}
+.lg-input::placeholder{color:rgba(185,166,221,0.45)}
+.lg-input:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,0.22)}
+.lg-eye{position:absolute;right:0.4rem;top:50%;transform:translateY(-50%);width:38px;height:38px;border:none;background:none;color:#b9a6dd;font-size:1rem;cursor:pointer;opacity:0.8}
+.lg-btn{width:100%;height:50px;margin-top:0.4rem;border:none;border-radius:12px;cursor:pointer;font-family:inherit;font-size:1rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#7c3aed,#a855f7);box-shadow:0 6px 20px rgba(124,58,237,0.45);transition:transform .15s,box-shadow .15s}
+.lg-btn:active{transform:scale(0.98)}
+.lg-terms{margin-top:0.8rem;font-size:0.72rem;color:#a99bc7;text-align:center;line-height:1.6}
+.lg-terms a,.lg-links a{color:#ffd700;text-decoration:none}
+#authScreen .auth-msg{font-family:inherit;font-size:0.82rem;border-radius:8px}
+.lg-status{text-align:center;font-size:0.68rem;margin:0.9rem 0 0.2rem;color:#a99bc7}
+.lg-trust{display:flex;justify-content:space-between;gap:0.4rem;margin-top:0.9rem}
+.lg-trust div{flex:1;text-align:center;font-size:0.66rem;color:#b9a6dd;line-height:1.4;padding:0.6rem 0.3rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px}
+.lg-trust span{display:block;font-size:1.1rem;margin-bottom:0.2rem}
+#authScreen .lg-stats{display:none;margin-top:1rem;padding:0.7rem 0.5rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;gap:0.5rem;justify-content:space-around}
+#authScreen .lg-stats .auth-stat-val{font-family:inherit;font-size:1rem;color:#fff}
+#authScreen .lg-stats .auth-stat-lbl{font-family:inherit;font-size:0.62rem;letter-spacing:0;text-transform:none;color:#a99bc7}
+.lg-links{text-align:center;margin-top:1.1rem;font-size:0.76rem;color:#8a7bb0;line-height:1.9}
+body:has(#authScreen.active) #contactFab{display:none}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -821,66 +858,66 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <button class="btn-lang" id="alEn" onclick="setLang('en')">EN</button>
     <button class="btn-lang" id="alLo" onclick="setLang('lo')">ລາວ</button>
   </div>
-  <div style="text-align:center;margin-bottom:0.3rem">
-    <div class="auth-logo">⛏ CRYPTOMINE</div>
+  <div class="lg-wrap">
+    <div class="lg-brand">
+      <div class="lg-mark">Ξ</div>
+      <div class="lg-name">CryptoMine</div>
+      <div class="lg-tag" data-i18n="auth.sub">แพลตฟอร์ม Cloud Mining</div>
+    </div>
+    <div class="auth-card lg-card">
+      <div class="auth-tabs lg-tabs">
+        <button class="auth-tab active" id="tabL" data-i18n="auth.tab.login" onclick="switchAuthTab('login')">เข้าสู่ระบบ</button>
+        <button class="auth-tab" id="tabR" data-i18n="auth.tab.reg" onclick="switchAuthTab('register')">สมัครสมาชิก</button>
+      </div>
+      <span id="promptTxt" style="display:none"></span>
+      <div class="auth-form active" id="loginForm">
+        <div class="lg-field">
+          <label class="lg-label" data-i18n="auth.lbl.user">ชื่อผู้ใช้</label>
+          <div class="lg-in"><span class="lg-ic">👤</span>
+            <input class="lg-input" id="loginUser" data-i18n-ph="auth.ph.user" type="text" placeholder="กรอกชื่อผู้ใช้" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()"></div>
+        </div>
+        <div class="lg-field">
+          <label class="lg-label" data-i18n="auth.lbl.pass">รหัสผ่าน</label>
+          <div class="lg-in"><span class="lg-ic">🔒</span>
+            <input class="lg-input" id="loginPass" data-i18n-ph="auth.ph.pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+            <button type="button" class="lg-eye" onclick="lgToggle('loginPass',this)" aria-label="แสดง/ซ่อนรหัสผ่าน">👁</button></div>
+        </div>
+        <button class="lg-btn" data-i18n="auth.btn.login" onclick="doLogin()">เข้าสู่ระบบ</button>
+        <div class="auth-msg" id="loginMsg"></div>
+      </div>
+      <div class="auth-form" id="regForm">
+        <div class="lg-field">
+          <label class="lg-label" data-i18n="auth.lbl.user">ชื่อผู้ใช้</label>
+          <div class="lg-in"><span class="lg-ic">👤</span>
+            <input class="lg-input" id="regUser" data-i18n-ph="auth.ph.reguser" type="text" placeholder="ตั้งชื่อผู้ใช้" autocomplete="username" autocapitalize="none"></div>
+        </div>
+        <div class="lg-field">
+          <label class="lg-label" data-i18n="auth.lbl.email">อีเมล</label>
+          <div class="lg-in"><span class="lg-ic">✉️</span>
+            <input class="lg-input" id="regEmail" data-i18n-ph="auth.ph.email" type="email" placeholder="name@email.com" autocomplete="email"></div>
+        </div>
+        <div class="lg-field">
+          <label class="lg-label" data-i18n="auth.lbl.pass">รหัสผ่าน</label>
+          <div class="lg-in"><span class="lg-ic">🔒</span>
+            <input class="lg-input" id="regPass" data-i18n-ph="auth.ph.regpass" type="password" placeholder="อย่างน้อย 6 ตัวอักษร" autocomplete="new-password">
+            <button type="button" class="lg-eye" onclick="lgToggle('regPass',this)" aria-label="แสดง/ซ่อนรหัสผ่าน">👁</button></div>
+        </div>
+        <button class="lg-btn" data-i18n="auth.btn.reg" onclick="doRegister()">สร้างบัญชี</button>
+        <div class="lg-terms">การสมัครถือว่าคุณรับทราบ <a href="#" onclick="showHelpCenter('terms');return false;">เงื่อนไขและความเสี่ยง</a> แล้ว</div>
+        <div class="auth-msg" id="regMsg"></div>
+      </div>
+    </div>
+    <div id="fbStatus" class="lg-status">⏳ กำลังเชื่อมต่อ...</div>
+    <div class="lg-trust">
+      <div><span>🔒</span>เชื่อมต่อ HTTPS</div>
+      <div><span>📄</span>ติดตามสถานะเติม/ถอน</div>
+      <div><span>💬</span>ติดต่อแอดมินได้</div>
+    </div>
+    <div class="auth-footer lg-stats" id="lsRow">
+      <div class="auth-stat"><div class="auth-stat-val" id="lsMembers">-</div><div class="auth-stat-lbl">สมาชิกทั้งหมด</div></div>
+    </div>
+    <div class="lg-links"><a href="#" onclick="showHelpCenter('contact');return false;">ติดต่อแอดมิน</a> · <a href="#" onclick="showHelpCenter('faq');return false;">คำถามที่พบบ่อย</a> · <a href="#" onclick="showHelpCenter('terms');return false;">เงื่อนไข</a> · <a href="#" onclick="showHelpCenter('about');return false;">ผู้ให้บริการ</a></div>
   </div>
-  <div class="auth-sub">MINE ETH · EARN USDT · DOMINATE</div>
-  <div id="fbStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,100,100,0.8);text-align:center;margin-bottom:0.5rem;">⏳ กำลังเชื่อมต่อ Firebase...</div>
-  <div class="auth-card">
-    <div class="auth-bar">
-      <div class="auth-bar-dot"></div><div class="auth-bar-dot"></div><div class="auth-bar-dot"></div>
-      <div class="auth-bar-title" data-i18n="auth.terminal">SECURE_AUTH_TERMINAL</div>
-    </div>
-    <div class="auth-prompt">
-      <span style="color:var(--red-bright)">root@cryptomine</span><span style="color:rgba(157,78,221,0.5)">:~$</span>
-      <span id="promptTxt"></span><span class="p-cursor"></span>
-    </div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tabL" data-i18n="auth.tab.login" onclick="switchAuthTab('login')">LOGIN</button>
-      <button class="auth-tab" id="tabR" data-i18n="auth.tab.reg" onclick="switchAuthTab('register')">REGISTER</button>
-    </div>
-    <div class="auth-form active" id="loginForm">
-      <div class="form-group">
-        <label class="form-label" data-i18n="auth.lbl.user">USERNAME</label>
-        <div class="field-icon">👤</div>
-        <input class="form-input" id="loginUser" data-i18n-ph="auth.ph.user" type="text" placeholder="enter_username" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-i18n="auth.lbl.pass">PASSWORD</label>
-        <div class="field-icon">🔑</div>
-        <input class="form-input" id="loginPass" data-i18n-ph="auth.ph.pass" type="password" placeholder="••••••••">
-      </div>
-      <button class="btn-auth" data-i18n="auth.btn.login" onclick="doLogin()">⚡ AUTHENTICATE</button>
-      <div class="auth-msg" id="loginMsg"></div>
-    </div>
-    <div class="auth-form" id="regForm">
-      <div class="form-group">
-        <label class="form-label">USERNAME</label>
-        <div class="field-icon">👤</div>
-        <input class="form-input" id="regUser" data-i18n-ph="auth.ph.reguser" type="text" placeholder="choose_identity" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-i18n="auth.lbl.email">EMAIL</label>
-        <div class="field-icon">📡</div>
-        <input class="form-input" id="regEmail" data-i18n-ph="auth.ph.email" type="email" placeholder="node@network.io">
-      </div>
-      <div class="form-group">
-        <label class="form-label">PASSWORD</label>
-        <div class="field-icon">🔐</div>
-        <input class="form-input" id="regPass" data-i18n-ph="auth.ph.regpass" type="password" placeholder="min 6 chars">
-      </div>
-      <button class="btn-auth" data-i18n="auth.btn.reg" onclick="doRegister()">🚀 CREATE NODE</button>
-      <div class="auth-msg" id="regMsg"></div>
-    </div>
-  </div>
-  <div class="auth-footer">
-    <div class="auth-stat"><div class="auth-stat-val" id="lsMembers">-</div><div class="auth-stat-lbl">สมาชิก</div></div>
-    <div class="auth-footer-div"></div>
-    <div class="auth-stat"><div class="auth-stat-val" id="lsWd">-</div><div class="auth-stat-lbl">ถอนสำเร็จรวม</div></div>
-    <div class="auth-footer-div"></div>
-    <div class="auth-stat"><div class="auth-stat-val" id="lsWdCount">-</div><div class="auth-stat-lbl">ครั้งที่ถอน</div></div>
-  </div>
-  <div style="text-align:center;margin-top:1rem;"><button onclick="showHelpCenter('contact')" style="background:none;border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:0.5rem 1.1rem;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.68rem;cursor:pointer;">🛟 ติดต่อ · FAQ · เงื่อนไข · ข้อมูลผู้ให้บริการ</button></div>
 </div>
 
 <!-- ADMIN SCREEN -->
@@ -1127,14 +1164,8 @@ body:has(#adminScreen.active) #contactFab{display:none}
   </div>
 
   <!-- Stats -->
-  <div class="promo-stats">
-    <div class="pstat"><div class="pstat-icon">👥</div><div class="pstat-num" id="pstMembers" style="color:#ffd700;">-</div><div class="pstat-lbl">สมาชิก</div></div>
-    <div class="pstat"><div class="pstat-icon">💸</div><div class="pstat-num" id="pstWd" style="color:#4ade80;">-</div><div class="pstat-lbl">ถอนสำเร็จรวม</div></div>
-    <div class="pstat"><div class="pstat-icon">🧾</div><div class="pstat-num" id="pstWdCount" style="color:#c084fc;">-</div><div class="pstat-lbl">ครั้งที่ถอน</div></div>
-  </div>
-  <div id="recentWdBox" style="display:none;margin:0 1rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem;">
-    <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--gold);margin-bottom:0.4rem;">💸 ถอนล่าสุด (ข้อมูลจริง ปกปิดชื่อ)</div>
-    <div id="recentWdList"></div>
+  <div class="promo-stats" style="justify-content:center;">
+    <div class="pstat"><div class="pstat-icon">👥</div><div class="pstat-num" id="pstMembers" style="color:#ffd700;">-</div><div class="pstat-lbl">สมาชิกทั้งหมด</div></div>
   </div>
 
   <!-- Features -->
@@ -2237,6 +2268,7 @@ function getUD(){
 // ─── AUTH ───
 let ptTimer;
 let _ud = null;
+function lgToggle(id,btn){const e=document.getElementById(id);if(!e)return;const show=e.type==='password';e.type=show?'text':'password';btn.style.opacity=show?'1':'0.8';}
 function switchAuthTab(t){
   document.getElementById('tabL').classList.toggle('active',t==='login');
   document.getElementById('tabR').classList.toggle('active',t==='register');
@@ -4145,7 +4177,7 @@ function maskName(n){
   return n.slice(0,2)+'***'+n.slice(-1);
 }
 function fmtN(n){return Math.round(parseFloat(n)||0).toLocaleString('en-US');}
-function fmtUsd(n){return (Math.round((parseFloat(n)||0)*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});}
+function fmtUsd(n){return (parseFloat(n)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function agoText(t){
   const m=Math.floor((Date.now()-(t||0))/60000);
   if(m<1)return 'เมื่อสักครู่';
@@ -4179,6 +4211,7 @@ function loadPublicStats(){
 function paintPublicStats(){
   const set=function(id,v){const e=document.getElementById(id);if(e)e.textContent=v;};
   const wd='$'+fmtUsd(_pub.wdTotal);
+  const lsr=document.getElementById('lsRow');if(lsr)lsr.style.display=_pub.members>0?'flex':'none';
   set('lsMembers',fmtN(_pub.members));set('lsWd',wd);set('lsWdCount',fmtN(_pub.wdCount));
   set('pstMembers',fmtN(_pub.members));set('pstWd',wd);set('pstWdCount',fmtN(_pub.wdCount));
   renderTicker();
@@ -4197,7 +4230,6 @@ function renderTicker(){
   const el=document.getElementById('tickerInner');if(!el)return;
   const items=[
     ['#4ade80','สมาชิก '+fmtN(_pub.members)+' คน'],
-    ['#fbbf24','ถอนสำเร็จแล้ว $'+fmtUsd(_pub.wdTotal)],
     ['#c084fc','1 USDT = ₭ '+fmtN(_pub.rate)],
     ['#4ade80','เติมและลงทุนขั้นต่ำ $'+TOPUP_MIN]
   ];
@@ -4670,20 +4702,20 @@ if(!['th','en','lo'].includes(LANG)) LANG = 'th';
 const I18N = {
   th: {
     // Auth
-    'auth.sub':        'MINE ETH · EARN USDT · DOMINATE',
+    'auth.sub':        'แพลตฟอร์ม Cloud Mining',
     'auth.terminal':   'SECURE_AUTH_TERMINAL',
-    'auth.tab.login':  'LOGIN',
-    'auth.tab.reg':    'REGISTER',
-    'auth.lbl.user':   'USERNAME',
-    'auth.lbl.pass':   'PASSWORD',
-    'auth.lbl.email':  'EMAIL',
-    'auth.btn.login':  '⚡ AUTHENTICATE',
-    'auth.btn.reg':    '🚀 CREATE NODE',
-    'auth.ph.user':    'enter_username',
+    'auth.tab.login':  'เข้าสู่ระบบ',
+    'auth.tab.reg':    'สมัครสมาชิก',
+    'auth.lbl.user':   'ชื่อผู้ใช้',
+    'auth.lbl.pass':   'รหัสผ่าน',
+    'auth.lbl.email':  'อีเมล',
+    'auth.btn.login':  'เข้าสู่ระบบ',
+    'auth.btn.reg':    'สร้างบัญชี',
+    'auth.ph.user':    'กรอกชื่อผู้ใช้',
     'auth.ph.pass':    '••••••••',
-    'auth.ph.reguser': 'choose_identity',
-    'auth.ph.email':   'node@network.io',
-    'auth.ph.regpass': 'min 6 chars',
+    'auth.ph.reguser': 'ตั้งชื่อผู้ใช้',
+    'auth.ph.email':   'name@email.com',
+    'auth.ph.regpass': 'อย่างน้อย 6 ตัวอักษร',
     'auth.stat.miners':'Active Miners',
     'auth.stat.eth':   'ETH Today',
     'auth.stat.up':    'Uptime',
@@ -4811,20 +4843,20 @@ const I18N = {
     'toast.expired3':  'ครั้งเพื่อปลดล็อกถัดไป',
   },
   en: {
-    'auth.sub':        'MINE ETH · EARN USDT · DOMINATE',
+    'auth.sub':        'Cloud Mining Platform',
     'auth.terminal':   'SECURE_AUTH_TERMINAL',
-    'auth.tab.login':  'LOGIN',
-    'auth.tab.reg':    'REGISTER',
-    'auth.lbl.user':   'USERNAME',
-    'auth.lbl.pass':   'PASSWORD',
-    'auth.lbl.email':  'EMAIL',
-    'auth.btn.login':  '⚡ AUTHENTICATE',
-    'auth.btn.reg':    '🚀 CREATE NODE',
-    'auth.ph.user':    'enter_username',
+    'auth.tab.login':  'Log in',
+    'auth.tab.reg':    'Sign up',
+    'auth.lbl.user':   'Username',
+    'auth.lbl.pass':   'Password',
+    'auth.lbl.email':  'Email',
+    'auth.btn.login':  'Log in',
+    'auth.btn.reg':    'Create account',
+    'auth.ph.user':    'Enter username',
     'auth.ph.pass':    '••••••••',
-    'auth.ph.reguser': 'choose_identity',
-    'auth.ph.email':   'node@network.io',
-    'auth.ph.regpass': 'min 6 chars',
+    'auth.ph.reguser': 'Choose a username',
+    'auth.ph.email':   'name@email.com',
+    'auth.ph.regpass': 'At least 6 characters',
     'auth.stat.miners':'Active Miners',
     'auth.stat.eth':   'ETH Today',
     'auth.stat.up':    'Uptime',
@@ -4943,20 +4975,20 @@ const I18N = {
     'toast.expired3':  'more time(s) to unlock next',
   },
   lo: {
-    'auth.sub':        'ຂຸດ · ໄດ້ຮັບ · ຄອບງໍາ',
+    'auth.sub':        'ແພລດຟອມ Cloud Mining',
     'auth.terminal':   'SECURE_AUTH_TERMINAL',
     'auth.tab.login':  'ເຂົ້າສູ່ລະບົບ',
-    'auth.tab.reg':    'ສະໝັກ',
+    'auth.tab.reg':    'ສະໝັກສະມາຊິກ',
     'auth.lbl.user':   'ຊື່ຜູ້ໃຊ້',
     'auth.lbl.pass':   'ລະຫັດຜ່ານ',
     'auth.lbl.email':  'ອີເມວ',
-    'auth.btn.login':  '⚡ ເຂົ້າສູ່ລະບົບ',
-    'auth.btn.reg':    '🚀 ສ້າງບັນຊີ',
+    'auth.btn.login':  'ເຂົ້າສູ່ລະບົບ',
+    'auth.btn.reg':    'ສ້າງບັນຊີ',
     'auth.ph.user':    'ປ້ອນຊື່ຜູ້ໃຊ້',
     'auth.ph.pass':    '••••••••',
-    'auth.ph.reguser': 'ເລືອກຊື່ຜູ້ໃຊ້',
-    'auth.ph.email':   'node@network.io',
-    'auth.ph.regpass': 'ຢ່າງໜ້ອຍ 6 ຕົວ',
+    'auth.ph.reguser': 'ຕັ້ງຊື່ຜູ້ໃຊ້',
+    'auth.ph.email':   'name@email.com',
+    'auth.ph.regpass': 'ຢ່າງໜ້ອຍ 6 ຕົວອັກສອນ',
     'auth.stat.miners':'ຜູ້ຂຸດທີ່ໃຊ້ງານ',
     'auth.stat.eth':   'ETH ວັນນີ້',
     'auth.stat.up':    'ອັບໄທມ໌',
