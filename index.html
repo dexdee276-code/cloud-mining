@@ -791,7 +791,8 @@ background:linear-gradient(135deg,#7c3aed,#c084fc);box-shadow:0 8px 28px rgba(12
 #authScreen .auth-msg{font-family:inherit;font-size:0.82rem;border-radius:8px}
 .lg-status{text-align:center;font-size:0.68rem;margin:0.9rem 0 0.2rem;color:#a99bc7}
 .lg-trust{display:flex;justify-content:space-between;gap:0.4rem;margin-top:0.9rem}
-.lg-trust div{flex:1;text-align:center;font-size:0.66rem;color:#b9a6dd;line-height:1.4;padding:0.6rem 0.3rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px}
+.lg-trust button{font-family:inherit;cursor:pointer;flex:1;text-align:center;font-size:0.66rem;color:#b9a6dd;line-height:1.4;padding:0.6rem 0.3rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px}
+.lg-trust button:active{background:rgba(255,215,0,0.1)}
 .lg-trust span{display:block;font-size:1.1rem;margin-bottom:0.2rem}
 #authScreen .lg-stats{display:none;margin-top:1rem;padding:0.7rem 0.5rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;gap:0.5rem;justify-content:space-around}
 #authScreen .lg-stats .auth-stat-val{font-family:inherit;font-size:1rem;color:#fff}
@@ -909,9 +910,9 @@ body:has(#adminScreen.active) #contactFab{display:none}
     </div>
     <div id="fbStatus" class="lg-status">⏳ กำลังเชื่อมต่อ...</div>
     <div class="lg-trust">
-      <div><span>🔒</span>เชื่อมต่อ HTTPS</div>
-      <div><span>📄</span>ติดตามสถานะเติม/ถอน</div>
-      <div><span>💬</span>ติดต่อแอดมินได้</div>
+      <button type="button" onclick="showHelpCenter('terms')"><span>🔒</span>เชื่อมต่อ HTTPS</button>
+      <button type="button" onclick="showHelpCenter('faq')"><span>📄</span>ติดตามสถานะเติม/ถอน</button>
+      <button type="button" onclick="showHelpCenter('contact')"><span>💬</span>ติดต่อแอดมิน</button>
     </div>
     <div class="auth-footer lg-stats" id="lsRow">
       <div class="auth-stat"><div class="auth-stat-val" id="lsMembers">-</div><div class="auth-stat-lbl">สมาชิกทั้งหมด</div></div>
