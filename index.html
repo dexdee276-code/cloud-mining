@@ -806,6 +806,10 @@ body:has(#authScreen.active) #contactFab{display:none}
 @keyframes rgBar{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
 .rg{font-family:'Noto Sans Thai',system-ui,sans-serif;color:#f3ecff;display:flex;flex-direction:column;gap:16px;padding-bottom:8px}
 .rg-num{font-family:'Space Grotesk','Noto Sans Thai',sans-serif}
+
+.pk-chip{height:44px;border-radius:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#d9ccf2;padding:0}
+.pk-chip.on{background:#7c3aed;border-color:#a855f7;color:#fff}
+.pk-amt:focus-within{border-color:#a855f7!important;box-shadow:0 0 0 3px rgba(168,85,247,.22)}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1243,63 +1247,58 @@ body:has(#adminScreen.active) #contactFab{display:none}
 </div>
 
 <!-- PACKAGES -->
-<div class="tab-page" id="pgPkg" style="flex-direction:column;height:100%;overflow:hidden;padding:0.8rem 0.8rem 0;">
+<div class="tab-page" id="pgPkg" style="flex-direction:column;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem 0.8rem 0;">
+  <div class="rg" style="padding:8px 4px 100px;">
+    <div>
+      <div style="font-size:13px;color:#b6a7d6;margin-bottom:4px">สัญญาขุด ETH</div>
+      <div style="font-size:24px;font-weight:700;line-height:1.25">เลือกจำนวนเงินที่จะลงทุน</div>
+      <div style="font-size:13px;color:#c9b8e8;margin-top:6px">เริ่มต้นเพียง $10 · เห็นประมาณการกำไรก่อนยืนยัน</div>
+    </div>
 
-  <!-- Hero -->
-
-  <div class="pkg-hero">
-    <div class="pkg-rig">⛏️</div>
-    <div class="pkg-hero-r">
-      <div class="pkg-hero-title">CLOUD<br>MINING ETH</div>
-      <div class="pkg-hero-sub">AUTOMATED · 24/7</div>
-      <div class="pkg-pills">
-        <div class="pkg-pill"><div class="pkg-dot"></div><span id="pkgCnt">2,847 เครื่อง</span></div>
-        <div class="pkg-pill pkg-pill-g">ETH ≈ $2,672</div>
+    <div style="border-radius:24px;padding:22px 20px 18px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(168,85,247,.35);box-shadow:0 16px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:13px;color:#c9b8e8">ประมาณการกำไรต่อวัน</div>
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <span id="pvDaily" class="rg-num" style="font-size:42px;font-weight:700;color:#4ade80;letter-spacing:-1px;line-height:1.1">--</span>
+        <span style="font-size:16px;font-weight:600;color:#86efac">USDT</span>
+      </div>
+      <div style="font-size:13px;color:#b6a7d6">≈ <span id="pvEth">--</span> ETH ต่อวัน</div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px">
+        <div style="border-radius:14px;padding:12px 8px;background:rgba(0,0,0,.28);text-align:center"><div id="pvPct" class="rg-num" style="font-size:16px;font-weight:700;color:#ffd700">--</div><div style="font-size:11px;color:#b6a7d6;margin-top:2px">ต่อวัน</div></div>
+        <div style="border-radius:14px;padding:12px 8px;background:rgba(0,0,0,.28);text-align:center"><div id="pvDays" class="rg-num" style="font-size:16px;font-weight:700;color:#fff">--</div><div style="font-size:11px;color:#b6a7d6;margin-top:2px">ระยะสัญญา</div></div>
+        <div style="border-radius:14px;padding:12px 8px;background:rgba(0,0,0,.28);text-align:center"><div id="pvProfit" class="rg-num" style="font-size:16px;font-weight:700;color:#c084fc;word-break:break-all">--</div><div style="font-size:11px;color:#b6a7d6;margin-top:2px">กำไรรวม</div></div>
+      </div>
+      <div style="height:1px;background:rgba(255,255,255,.08);margin:14px 0 10px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+        <div style="font-size:13px;color:#c9b8e8">เงินต้น + กำไร เมื่อครบสัญญา</div>
+        <div id="pvTotal" class="rg-num" style="font-size:19px;font-weight:700">--</div>
       </div>
     </div>
+
+    <div style="border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <label for="miningAmtInput" style="font-size:14px;font-weight:600">จำนวนที่ต้องการลงทุน</label>
+        <span style="font-size:12px;color:#b6a7d6">$10 – $100,000</span>
+      </div>
+      <div class="pk-amt" style="display:flex;align-items:center;height:60px;padding:0 16px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14)">
+        <span class="rg-num" style="font-size:24px;font-weight:700;color:#b6a7d6;margin-right:6px">$</span>
+        <input type="number" id="miningAmtInput" inputmode="decimal" min="10" max="100000" placeholder="0" oninput="calcMiningPreview()" style="flex-grow:1;min-width:0;border:none;background:none;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;outline:none;padding:0;box-shadow:none;">
+        <span style="font-size:14px;color:#b6a7d6;margin-left:8px">USDT</span>
+      </div>
+      <div id="pvHint" style="font-size:12px;line-height:1.5;color:#b6a7d6">เลือกจำนวนด้านล่าง หรือพิมพ์เอง</div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+        <button type="button" class="pk-chip" data-v="10" onclick="setMiningAmt(10)">$10</button>
+        <button type="button" class="pk-chip" data-v="100" onclick="setMiningAmt(100)">$100</button>
+        <button type="button" class="pk-chip" data-v="500" onclick="setMiningAmt(500)">$500</button>
+        <button type="button" class="pk-chip" data-v="1000" onclick="setMiningAmt(1000)">$1K</button>
+        <button type="button" class="pk-chip" data-v="5000" onclick="setMiningAmt(5000)">$5K</button>
+        <button type="button" class="pk-chip" data-v="10000" onclick="setMiningAmt(10000)">$10K</button>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:#a99bc7;line-height:1.7;text-align:center;padding:0 8px">ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน<br>การลงทุนมีความเสี่ยง · <a href="#" onclick="showHelpCenter('terms');return false;" style="color:#ffd700;text-decoration:none">อ่านเงื่อนไข</a></div>
+
+    <button type="button" id="pvCta" onclick="startMiningInvestment()" style="display:flex;align-items:center;justify-content:center;width:100%;height:54px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 22px rgba(124,58,237,.45);opacity:.45">กรอกจำนวนเพื่อเริ่มลงทุน</button>
   </div>
-
-  <!-- Profit Card -->
-
-  <div class="profit-card2">
-    <div class="profit-lbl2" id="pvLabel2">กรอกจำนวนเพื่อดูกำไร</div>
-    <div class="profit-center2">
-      <div class="profit-eth2" id="pvEthBig">0.000000</div>
-      <div class="profit-eth-unit2">ETH/วัน</div>
-    </div>
-    <div class="profit-usdt2" id="pvUsdDay">≈ $0.00 USDT / วัน</div>
-    <div class="stats-row2">
-      <div class="stat-box2"><div class="stat-val2" id="pvPct">--%</div><div class="stat-lbl2">กำไร/วัน</div></div>
-      <div class="stat-box2"><div class="stat-val2" id="pvDays">-- วัน</div><div class="stat-lbl2">ระยะเวลา</div></div>
-      <div class="stat-box2"><div class="stat-val2" id="pvTotal" style="color:#ffd700;">$--</div><div class="stat-lbl2">ได้คืนรวม</div></div>
-    </div>
-  </div>
-
-  <!-- Input -->
-
-  <div class="input-card2">
-    <div class="input-lbl2">
-      <span>💵 จำนวน USDT ที่ต้องการลงทุน</span>
-      <span style="color:rgba(74,222,128,0.6);">$10 - $100,000</span>
-    </div>
-    <div class="input-wrap2">
-      <input type="number" id="miningAmtInput" min="10" max="100000" placeholder="0" oninput="calcMiningPreview()">
-      <span class="input-unit2">USDT</span>
-    </div>
-    <div class="quick-row2">
-      <button class="qb2" onclick="setMiningAmt(10)">$10</button>
-      <button class="qb2" onclick="setMiningAmt(100)">$100</button>
-      <button class="qb2" onclick="setMiningAmt(500)">$500</button>
-      <button class="qb2" onclick="setMiningAmt(1000)">$1K</button>
-      <button class="qb2" onclick="setMiningAmt(5000)">$5K</button>
-      <button class="qb2" onclick="setMiningAmt(10000)">$10K</button>
-    </div>
-  </div>
-
-  <!-- CTA -->
-
-<button class="cta2" onclick="startMiningInvestment()">⚡ เริ่มขุด ETH เลย</button>
-
 </div>
 
 <div class="tab-page" id="pgWallet">
@@ -2488,7 +2487,7 @@ function switchTab(i){
     const page=document.getElementById(id);if(page)page.classList.toggle('active',i===j);
     const btn=document.getElementById('bn'+j);if(btn)btn.classList.toggle('active',i===j);
   });
-  if(i===1){renderPkgs();startPkgRain();}if(i===2)renderWallet();if(i===4){renderMachines();}
+  if(i===1){renderPkgs();calcMiningPreview();}if(i===2)renderWallet();if(i===4){renderMachines();}
 }
 
 // ─── MINING ───
@@ -5187,31 +5186,31 @@ function resendOTPBrevo(){
 // ─── MINING INVESTMENT ───
 
 function calcMiningPreview(){
-  const amt=parseFloat(document.getElementById('miningAmtInput')?.value)||0;
-  if(amt<10){
-    const lbl=document.getElementById('pvLabel');if(lbl)lbl.textContent='⚡ กรอกจำนวนเพื่อดูกำไร';
-    const big=document.getElementById('pvEthBig');if(big)big.textContent='0.000000';
-    return;
+  const raw=document.getElementById('miningAmtInput')?document.getElementById('miningAmtInput').value:'';
+  const amt=parseFloat(raw)||0;
+  const ok=amt>=10&&amt<=100000;
+  const set=function(id,v){const e=document.getElementById(id);if(e)e.textContent=v;};
+  const fm=function(n,d){return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});};
+  let hint='เลือกจำนวนด้านล่าง หรือพิมพ์เอง',hc='#b6a7d6';
+  if(raw!==''&&amt>0&&amt<10){hint='ขั้นต่ำ $10';hc='#fda4af';}
+  if(amt>100000){hint='สูงสุด $100,000 ต่อครั้ง';hc='#fda4af';}
+  if(ok){
+    const pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt),profit=daily*days;
+    set('pvDaily','+'+fm(daily,2));set('pvEth',(daily/ETH_RATE).toFixed(6));
+    set('pvPct',pct.toFixed(2)+'%');set('pvDays',days+' วัน');
+    set('pvProfit','+$'+fm(profit,2));set('pvTotal','$'+fm(amt+profit,2));
+    hint='สัญญา '+days+' วัน · อัตรา '+pct.toFixed(2)+'% ต่อวัน';hc='#86efac';
+  } else {
+    ['pvDaily','pvEth','pvPct','pvDays','pvProfit','pvTotal'].forEach(function(id){set(id,'--');});
   }
-  const pct=calcDailyPct(amt);
-  const daily=calcDailyEarn(amt);
-  const ethDaily=daily/ETH_RATE;
-  const days=calcDays(amt);
-  const total=amt+daily*days;
-  // อัปเดต new UI
-  const lbl=document.getElementById('pvLabel2');if(lbl)lbl.textContent=`⚡ กำไรตัวอย่าง ($${amt.toLocaleString()} USDT)`;
-  const big=document.getElementById('pvEthBig');if(big)big.textContent=ethDaily.toFixed(6);
-  const usdDay=document.getElementById('pvUsdDay');if(usdDay)usdDay.textContent=`≈ $${daily.toFixed(2)} USDT / วัน`;
-  const pvPct=document.getElementById('pvPct');if(pvPct)pvPct.textContent=pct.toFixed(2)+'%';
-  const pvDays=document.getElementById('pvDays');if(pvDays)pvDays.textContent=days+' วัน';
-  const pvTotal=document.getElementById('pvTotal');if(pvTotal)pvTotal.textContent='$'+total.toFixed(0);
+  const h=document.getElementById('pvHint');if(h){h.textContent=hint;h.style.color=hc;}
+  const cta=document.getElementById('pvCta');
+  if(cta){cta.textContent=ok?'เริ่มลงทุน $'+fm(amt,amt%1?2:0):'กรอกจำนวนเพื่อเริ่มลงทุน';cta.style.opacity=ok?'1':'.45';}
+  document.querySelectorAll('.pk-chip').forEach(function(b){b.classList.toggle('on',ok&&parseFloat(b.getAttribute('data-v'))===amt);});
 }
 function setMiningAmt(v){
   const inp=document.getElementById('miningAmtInput');
   if(inp){inp.value=v;calcMiningPreview();}
-  document.querySelectorAll('.qb2').forEach(b=>{
-    b.classList.toggle('on',b.textContent.replace(/[^0-9]/g,'')==String(v).replace(/[^0-9]/g,''));
-  });
 }
 // ETH Rain in pgPkg
 let _pkgRainInt=null;
