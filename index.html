@@ -2825,6 +2825,136 @@ function renderWallet(){
     return `<div class="tx-item"><div><div class="tx-d">${tx.desc}</div><div class="tx-t">${t}</div></div><div class="tx-a ${tx.amount>0?'tp':'tn'}">${tx.amount>0?'+':''}${tx.amount} ${tx.unit||'USDT'}</div></div>`;
   }).join('');
 }
+// ═══════════════════════════════════════════════
+// ─── ถอนเงิน: กรอก USDT → คิดเป็นกีบ → โอนเข้าบัญชีธนาคารลูกค้า ───
+// ═══════════════════════════════════════════════
+const DEFAULT_LAK_RATE=22700;   // ค่าเริ่มต้น ถ้าแอดมินยังไม่ตั้งอัตราในแท็บตั้งค่า
+let _wdRate=DEFAULT_LAK_RATE, _wdSubmitting=false;
+function wdLakOf(usdt,rate){return Math.floor((parseFloat(usdt)||0)*rate);}
+function wdLakPreview(){
+  const el=document.getElementById('wdLakPrev');
+  if(!el)return;
+  const u=Math.round((parseFloat(document.getElementById('wdAmt')?document.getElementById('wdAmt').value:0)||0)*100)/100;
+  const rl='อัตรา 1 USDT = ₭ '+fmtLak(_wdRate);
+  el.innerHTML=u>0
+    ?'<span style="color:var(--text-dim);">'+rl+'</span><br>จะได้รับ ≈ <b style="color:var(--green);font-size:1.05rem;">₭ '+fmtLak(wdLakOf(u,_wdRate))+'</b>'
+    :'<span style="color:var(--text-dim);">'+rl+'</span>';
+}
+function submitWithdraw(){
+  if(_wdSubmitting)return;
+  const ud=getUD(); if(!ud) return;
+  const g=function(id){const e=document.getElementById(id);return e?e.value.trim():'';};
+  const usdAmt=Math.round((parseFloat(g('wdAmt'))||0)*100)/100;
+  const fullName=g('wdName'), bank=g('wdBank'), accNo=g('wdAccNo'), note=g('wdNote');
+  if(!(usdAmt>0)){showToast('⚠️ กรอกจำนวน USDT ที่ต้องการถอน');return;}
+  if(usdAmt>(ud.usd||0)+1e-9){showToast('⚠️ จำนวนเกินกว่าที่มีในกระเป๋า');return;}
+  if(fullName.length<2){showToast('⚠️ กรุณากรอกชื่อจริง-นามสกุล ตามบัญชีธนาคาร');return;}
+  if(bank.length<2){showToast('⚠️ กรุณากรอกชื่อธนาคาร');return;}
+  if(!/^[0-9][0-9\- ]{5,24}$/.test(accNo)){showToast('⚠️ เลขบัญชีไม่ถูกต้อง (ตัวเลข 6–25 หลัก)');return;}
+  if(!window._db){showToast('❌ ไม่มี Firebase กรุณาลองใหม่');return;}
+  const lak=wdLakOf(usdAmt,_wdRate);
+  if(!(lak>0)){showToast('⚠️ จำนวนน้อยเกินไป');return;}
+  _wdSubmitting=true;
+  const req={
+    id:'wd_'+Date.now(), user:getSess(),
+    amt:usdAmt, unit:'USDT', currency:'LAK', lak:lak, rate:_wdRate,
+    fullName:fullName, bank:bank, accNo:accNo, note:note,
+    time:Date.now(), status:'pending'
+  };
+  window._db.ref('withdraw_reqs').push(req).then(function(){
+    _wdSubmitting=false;
+    ud.usd=Math.max(0,Math.round(((ud.usd||0)-usdAmt)*100)/100);
+    ud.txs=ud.txs||[];
+    ud.txs.unshift({desc:'📤 แจ้งถอน $'+usdAmt.toFixed(2)+' USDT ≈ ₭'+fmtLak(lak)+' → '+bank+' (กำลังตรวจสอบ)',amount:-usdAmt,unit:'USDT',time:Date.now()});
+    saveUDForce(ud);
+    const ov=document.getElementById('withdrawOv'); if(ov)ov.remove();
+    showToast('📤 ส่งคำขอถอน $'+usdAmt.toFixed(2)+' ≈ ₭'+fmtLak(lak)+' แล้ว!');
+    renderWallet();
+  }).catch(function(){
+    _wdSubmitting=false;
+    showToast('❌ ส่งคำขอไม่สำเร็จ ยังไม่ได้หักยอด กรุณาลองใหม่');
+  });
+}
+function withdrawDestHtml(r){
+  const f='font-family:\'Share Tech Mono\',monospace;';
+  if(r.currency==='LAK'){
+    return '<div style="'+f+'font-size:0.62rem;color:#A890CC;margin-bottom:0.25rem;">👤 ชื่อบัญชี</div>'
+      +'<div style="'+f+'font-size:0.8rem;color:#fff;margin-bottom:0.4rem;">'+escHtml(r.fullName||'-')+'</div>'
+      +'<div style="'+f+'font-size:0.62rem;color:#A890CC;margin-bottom:0.25rem;">🏦 ธนาคาร</div>'
+      +'<div style="'+f+'font-size:0.8rem;color:var(--gold);margin-bottom:0.4rem;">'+escHtml(r.bank||'-')+'</div>'
+      +'<div style="'+f+'font-size:0.62rem;color:#A890CC;margin-bottom:0.25rem;">🔢 เลขบัญชี</div>'
+      +'<div style="'+f+'font-size:0.9rem;color:var(--green);letter-spacing:1px;word-break:break-all;">'+escHtml(r.accNo||'-')+'</div>'
+      +(r.note?'<div style="'+f+'font-size:0.58rem;color:var(--text-dim);margin-top:0.4rem;">📝 '+escHtml(r.note)+'</div>':'');
+  }
+  return '<div style="'+f+'font-size:0.58rem;color:#A890CC;margin-bottom:0.3rem;">🌐 เครือข่าย: <span style="color:#627eea;">'+escHtml(r.network||'TRC20')+'</span></div>'
+    +'<div style="'+f+'font-size:0.65rem;color:var(--green);word-break:break-all;">'+escHtml(r.addr||'-')+'</div>'
+    +(r.note?'<div style="'+f+'font-size:0.58rem;color:var(--text-dim);margin-top:0.3rem;">📝 '+escHtml(r.note)+'</div>':'');
+}
+function renderAdminWithdraw(){
+  const el=document.getElementById('adminWithdrawList');if(!el)return;
+  if(!window._db){el.innerHTML='<div style="color:red;padding:1rem;">❌ ไม่มี Firebase</div>';return;}
+  el.innerHTML='<div style="text-align:center;padding:1rem;font-family:monospace;color:#A890CC;font-size:0.7rem;">⏳ กำลังโหลด...</div>';
+  Promise.all([window._db.ref('withdraw_reqs').once('value'),window._db.ref('settings/lakRate').once('value')]).then(function(res){
+    const snap=res[0];
+    const rate=parseFloat(res[1].exists()?res[1].val():0)||DEFAULT_LAK_RATE;
+    if(!snap.exists()){
+      el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:2rem;">ยังไม่มีคำขอถอน</div>';
+      return;
+    }
+    const reqs=Object.entries(snap.val()).map(function(e){return Object.assign({},e[1],{fbKey:e[0]});}).sort(function(a,b){return (b.time||0)-(a.time||0);});
+    const sc={pending:'var(--gold)',approved:'var(--green)',rejected:'var(--red-bright)'};
+    const st={pending:'⏳ รอดำเนินการ',approved:'✅ อนุมัติแล้ว',rejected:'❌ ปฏิเสธ'};
+    el.innerHTML=reqs.map(function(r){
+      const d=new Date(r.time||0);
+      const t2=d.getDate()+'/'+(d.getMonth()+1)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      const col=sc[r.status]||'var(--border)';
+      const k=escHtml(r.fbKey);
+      const amt=parseFloat(r.amt)||0;
+      const lakNow=wdLakOf(amt,rate);
+      const diff=(r.currency==='LAK'&&(parseFloat(r.rate)||0)!==rate)
+        ?'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.56rem;color:var(--red-bright);margin-top:0.2rem;">⚠ ลูกค้าเห็นอัตรา ₭'+fmtLak(r.rate)+' (≈ ₭'+fmtLak(r.lak)+') ต่างจากปัจจุบัน</div>':'';
+      return '<div class="req-card '+escHtml(r.status)+'" style="margin-bottom:0.8rem;">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">'
+        +'<div><div style="font-family:\'Orbitron\',monospace;font-size:0.9rem;color:var(--gold);">$'+amt.toFixed(2)+' USDT</div>'
+        +'<div style="font-family:\'Orbitron\',monospace;font-size:0.8rem;color:var(--green);margin-top:0.15rem;">โอน ₭ '+fmtLak(lakNow)+'</div>'
+        +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:0.15rem;">👤 '+escHtml(r.user||'-')+' · '+t2+'</div>'+diff+'</div>'
+        +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.55rem;color:'+col+';border:1px solid '+col+';border-radius:15px;padding:0.2rem 0.5rem;">'+escHtml(st[r.status]||r.status)+'</div></div>'
+        +'<div style="background:rgba(0,0,0,0.3);border:1px solid rgba(74,222,128,0.15);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;">'+withdrawDestHtml(r)+'</div>'
+        +(r.status==='pending'
+          ?'<div style="display:flex;gap:0.5rem;">'
+            +'<button data-k="'+k+'" onclick="approveWithdraw(this.dataset.k)" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:\'Orbitron\',monospace;font-size:0.62rem;font-weight:700;cursor:pointer;">✅ โอนแล้ว/อนุมัติ</button>'
+            +'<button data-k="'+k+'" onclick="rejectWithdraw(this.dataset.k)" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:\'Orbitron\',monospace;font-size:0.62rem;cursor:pointer;">❌ ปฏิเสธ+คืนเงิน</button></div>'
+          :'')
+        +'</div>';
+    }).join('');
+  }).catch(function(){
+    el.innerHTML='<div style="color:red;padding:1rem;">❌ โหลดไม่สำเร็จ</div>';
+  });
+}
+function approveWithdraw(fbKey){
+  if(!window._db||!fbKey)return;
+  const ref=window._db.ref('withdraw_reqs/'+fbKey);
+  Promise.all([ref.once('value'),window._db.ref('settings/lakRate').once('value')]).then(function(res){
+    if(!res[0].exists()){showToast('❌ ไม่พบคำขอ');return;}
+    const r=res[0].val();
+    if(r.status!=='pending'){showToast('⚠ คำขอนี้ถูกดำเนินการไปแล้ว');renderAdminWithdraw();return;}
+    const rate=parseFloat(res[1].exists()?res[1].val():0)||DEFAULT_LAK_RATE;
+    let msg='ยืนยันว่าโอนเงินให้ลูกค้าแล้ว?\n\n';
+    if(r.currency==='LAK'){
+      msg+='ชื่อ: '+(r.fullName||'-')+'\nธนาคาร: '+(r.bank||'-')+'\nเลขบัญชี: '+(r.accNo||'-')+'\nจำนวน: ₭ '+fmtLak(wdLakOf(r.amt,rate))+' ($'+(parseFloat(r.amt)||0).toFixed(2)+' USDT)';
+    } else {
+      msg+='ถอน $'+(parseFloat(r.amt)||0).toFixed(2)+' USDT → '+(r.addr||'-');
+    }
+    if(!confirm(msg))return;
+    claimRequest('withdraw_reqs/'+fbKey,'approved',function(ok){
+      if(!ok){showToast('⚠ คำขอนี้ถูกดำเนินการไปแล้ว');renderAdminWithdraw();return;}
+      ref.update({approvedAt:Date.now()});
+      showToast('✅ อนุมัติถอนแล้ว');
+      renderAdminWithdraw();
+    });
+  }).catch(function(){showToast('❌ โหลดคำขอไม่สำเร็จ');});
+}
+
 function showWithdrawPopup(){
   const ud=getUD(); if(!ud) return;
   const usd=ud.usd||0;
@@ -2848,7 +2978,7 @@ function showWithdrawPopup(){
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='withdrawOv';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd">
-      <div class="pop-title">📤 ถอน USDT</div>
+      <div class="pop-title">📤 ถอนเงิน (USDT → กีบ)</div>
       <button class="pop-close" onclick="document.getElementById('withdrawOv').remove()">✕</button>
     </div>
 
@@ -2860,22 +2990,23 @@ function showWithdrawPopup(){
 
     <!-- จำนวนที่ต้องการถอน -->
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">💰 จำนวนที่ต้องการถอน (USDT)</div>
-    <input type="number" id="wdAmt" placeholder="เช่น 100" max="${usd.toFixed(2)}"
+    <input type="number" id="wdAmt" inputmode="decimal" oninput="wdLakPreview()" placeholder="เช่น 100" max="${usd.toFixed(2)}"
       style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.1rem;outline:none;margin-bottom:1rem;">
 
-    <!-- เครือข่าย -->
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">🌐 เครือข่าย</div>
-    <select id="wdNetwork"
-      style="width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(98,126,234,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:1rem;appearance:none;">
-      <option value="TRC20">TRC20 (TRON) — ค่าธรรมเนียมต่ำ</option>
-      <option value="ERC20">ERC20 (Ethereum)</option>
-      <option value="BEP20">BEP20 (BSC)</option>
-    </select>
+    <div id="wdLakPrev" style="min-height:2.4rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.9rem;line-height:1.6;"></div>
 
-    <!-- ที่อยู่ USDT -->
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">📋 ที่อยู่ USDT ปลายทาง</div>
-    <input type="text" id="wdAddr" placeholder="กรอกที่อยู่ wallet USDT..."
-      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.72rem;outline:none;margin-bottom:0.5rem;word-break:break-all;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">👤 ชื่อ-นามสกุลจริง (ตามบัญชีธนาคาร)</div>
+    <input type="text" id="wdName" autocomplete="name" placeholder="เช่น SOMSAK VONGSA"
+      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.9rem;">
+
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">🏦 ธนาคาร</div>
+    <input type="text" id="wdBank" list="wdBankList" placeholder="เช่น BCEL"
+      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.3);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.9rem;">
+    <datalist id="wdBankList"><option value="BCEL"><option value="LDB"><option value="JDB"><option value="APB"><option value="STB"><option value="LVB"></datalist>
+
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">🔢 เลขบัญชีธนาคาร</div>
+    <input type="text" id="wdAccNo" inputmode="numeric" placeholder="เช่น 010-12-00-1234567"
+      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.9rem;letter-spacing:1px;outline:none;margin-bottom:0.9rem;">
 
     <!-- หมายเหตุ -->
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">📝 หมายเหตุ (ไม่บังคับ)</div>
@@ -2891,39 +3022,8 @@ function showWithdrawPopup(){
     </button>
   </div>`;
   document.body.appendChild(ov);
-}
-
-function submitWithdraw(){
-  const ud=getUD(); if(!ud) return;
-  const usdAmt=parseFloat(document.getElementById('wdAmt')?.value)||0;
-  const addr=document.getElementById('wdAddr')?.value.trim()||'';
-  const network=document.getElementById('wdNetwork')?.value||'TRC20';
-  const note=document.getElementById('wdNote')?.value.trim()||'';
-
-  if(usdAmt<=0){showToast('⚠️ กรอกจำนวนที่ต้องการถอน');return;}
-  if(usdAmt>(ud.usd||0)){showToast('⚠️ จำนวนเกินกว่าที่มีในกระเป๋า');return;}
-  if(!addr){showToast('⚠️ กรุณากรอกที่อยู่ USDT');return;}
-
-  const req={
-    id:'wd_'+Date.now(), user:getSess(),
-    amt:usdAmt, unit:'USDT',
-    addr, network, note,
-    time:Date.now(), status:'pending'
-  };
-
-  if(window._db){
-    window._db.ref('withdraw_reqs').push(req);
-  }
-
-  // หัก USDT ออกตามจำนวนที่ขอถอน แล้ว sync Firebase ทันที
-  ud.usd=Math.max(0,(ud.usd||0)-usdAmt);
-  ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:`📤 แจ้งถอน $${usdAmt.toFixed(2)} USDT → ${network} (กำลังตรวจสอบ)`,amount:-usdAmt,unit:'USDT',time:Date.now()});
-  saveUDForce(ud);
-
-  document.getElementById('withdrawOv').remove();
-  showToast(`📤 ส่งคำขอถอน $${usdAmt.toFixed(2)} USDT แล้ว!`);
-  renderWallet();
+  _wdRate=DEFAULT_LAK_RATE;wdLakPreview();
+  loadTopupInfo(function(i){_wdRate=lakRateOf(i);wdLakPreview();});
 }
 
 function doWithdraw(){ showWithdrawPopup(); } // legacy compat
@@ -3223,15 +3323,6 @@ function rejectTopup(fbKey){
     renderAdminTopup(currentFilter);
   });
 }
-function approveWithdraw(fbKey,username,amt){
-  if(!window._db||!fbKey)return;
-  claimRequest('withdraw_reqs/'+fbKey,'approved',function(ok){
-    if(!ok){showToast('⚠ คำขอนี้ถูกดำเนินการไปแล้ว');renderAdminWithdraw();return;}
-    window._db.ref('withdraw_reqs/'+fbKey).update({approvedAt:Date.now()});
-    showToast('✅ อนุมัติถอนแล้ว');
-    renderAdminWithdraw();
-  });
-}
 function rejectWithdraw(fbKey,username,amt){
   if(!window._db||!fbKey)return;
   const ref=window._db.ref('withdraw_reqs/'+fbKey);
@@ -3394,7 +3485,6 @@ function loadAdminQRPreview(){
 // แอดมินตั้งอัตรา (กีบต่อ 1 USDT) และบัญชีรับโอนที่ settings
 // ตอนอนุมัติ ระบบคำนวณ USDT จากอัตราปัจจุบันของแอดมินเสมอ (ไม่เชื่อตัวเลขที่ลูกค้าส่งมา)
 // ═══════════════════════════════════════════════
-const DEFAULT_LAK_RATE=22700;   // ค่าเริ่มต้น ถ้าแอดมินยังไม่ตั้งอัตราในแท็บตั้งค่า
 let _tpInfo={}, _tpPending=null;
 function fmtLak(n){return Math.round(parseFloat(n)||0).toLocaleString('en-US');}
 function lakRateOf(info){const r=parseFloat(info&&info.lakRate);return (isFinite(r)&&r>0)?r:DEFAULT_LAK_RATE;}
@@ -3970,46 +4060,6 @@ function filterReqs(f){
   });
   renderAdminTopup(f);
 }
-function renderAdminWithdraw(){
-  const el=document.getElementById('adminWithdrawList');if(!el)return;
-  if(!window._db){el.innerHTML='<div style="color:red;padding:1rem;">❌ ไม่มี Firebase</div>';return;}
-  el.innerHTML='<div style="text-align:center;padding:1rem;font-family:monospace;color:#A890CC;font-size:0.7rem;">⏳ กำลังโหลด...</div>';
-  window._db.ref('withdraw_reqs').once('value').then(snap=>{
-    if(!snap.exists()){
-      el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:2rem;">ยังไม่มีคำขอถอน</div>';
-      return;
-    }
-    const reqs=Object.entries(snap.val()).map(([k,v])=>({...v,fbKey:k})).sort((a,b)=>b.time-a.time);
-    el.innerHTML=reqs.map(r=>{
-      const d=new Date(r.time);
-      const t2=`${d.getDate()}/${d.getMonth()+1} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-      const statusCol=r.status==='pending'?'var(--gold)':r.status==='approved'?'var(--green)':'var(--red-bright)';
-      const statusTxt=r.status==='pending'?'⏳ รอดำเนินการ':r.status==='approved'?'✅ อนุมัติแล้ว':'❌ ปฏิเสธ';
-      return `<div class="req-card ${r.status}" style="margin-bottom:0.8rem;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
-          <div>
-            <div style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--gold);">$${(r.amt||0).toFixed(2)} USDT</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);">👤 ${r.user||'-'} · ${t2}</div>
-          </div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:${statusCol};border:1px solid ${statusCol};border-radius:15px;padding:0.2rem 0.5rem;">${statusTxt}</div>
-        </div>
-        <!-- ข้อมูลปลายทาง -->
-        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(74,222,128,0.15);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#A890CC;margin-bottom:0.3rem;">🌐 เครือข่าย: <span style="color:#627eea;">${r.network||'TRC20'}</span></div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--green);word-break:break-all;">${r.addr||'-'}</div>
-          ${r.note?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.3rem;">📝 ${r.note}</div>`:''}
-        </div>
-        ${r.status==='pending'?`<div style="display:flex;gap:0.5rem;">
-          <button onclick="approveWithdraw('${r.fbKey}','${r.user}',${r.amt||0})" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;cursor:pointer;">✅ อนุมัติ</button>
-          <button onclick="rejectWithdraw('${r.fbKey}','${r.user}',${r.amt||0})" style="flex:1;padding:0.6rem;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:var(--red-bright);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;">❌ ปฏิเสธ</button>
-        </div>`:''}
-      </div>`;
-    }).join('');
-  }).catch(()=>{
-    el.innerHTML='<div style="color:red;padding:1rem;">❌ โหลดไม่สำเร็จ</div>';
-  });
-}
-
 // ── Admin User Search ──
 let _allAdminUsers = {};
 
