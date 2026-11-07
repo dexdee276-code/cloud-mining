@@ -1165,8 +1165,12 @@ body:has(#adminScreen.active) #contactFab{display:none}
   </div>
 
   <!-- Stats -->
-  <div class="promo-stats" style="justify-content:center;">
-    <div class="pstat"><div class="pstat-icon">👥</div><div class="pstat-num" id="pstMembers" style="color:#ffd700;">-</div><div class="pstat-lbl">สมาชิกทั้งหมด</div></div>
+  <div class="promo-stats" style="grid-template-columns:1fr;">
+    <div class="pstat" style="display:flex;align-items:center;justify-content:center;gap:0.9rem;padding:0.9rem 1rem;"><div class="pstat-icon" style="margin:0;font-size:1.6rem;">👥</div><div style="text-align:left;"><div class="pstat-num" id="pstMembers" style="color:#ffd700;font-size:1.3rem;margin:0;">-</div><div class="pstat-lbl">สมาชิกทั้งหมด</div></div></div>
+  </div>
+  <div style="margin:0 1rem 1rem;background:linear-gradient(145deg,rgba(10,5,25,0.9),rgba(18,8,40,0.8));border:1px solid rgba(157,78,221,0.12);border-radius:14px;padding:0.9rem 1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.66rem;color:var(--gold);margin-bottom:0.6rem;">🏆 อันดับลงทุนสูงสุด 15 อันดับ</div>
+    <div id="rankList" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;">รอข้อมูลอันดับ</div>
   </div>
 
   <!-- Features -->
@@ -4171,7 +4175,7 @@ function showHistoryPopup(){
 // ═══════════════════════════════════════════════
 // ─── ความน่าเชื่อถือ: สถิติจริง / ศูนย์ช่วยเหลือ / สถานะคำขอของฉัน ───
 // ═══════════════════════════════════════════════
-let _pub={members:0,wdTotal:0,wdCount:0,recent:[],rate:DEFAULT_LAK_RATE};
+let _pub={rank:[],members:0,wdTotal:0,wdCount:0,recent:[],rate:DEFAULT_LAK_RATE};
 function maskName(n){
   n=String(n||'');
   if(n.length<=2)return (n[0]||'*')+'*';
@@ -4201,7 +4205,8 @@ function loadPublicStats(){
   const db=window._db;if(!db)return;
   const val=function(p,d){return db.ref(p).once('value').then(function(s){return s.exists()?s.val():d;});};
   Promise.all([val('stats/members',0),val('stats/wdTotal',0),val('stats/wdCount',0),val('settings/lakRate',0),
-    db.ref('stats/recent').orderByKey().limitToLast(5).once('value')]).then(function(r){
+    db.ref('stats/recent').orderByKey().limitToLast(5).once('value'),db.ref('stats/rank').once('value')]).then(function(r){
+    _pub.rank=r[5]&&r[5].exists()?Object.values(r[5].val()).sort(function(a,b){return (b.v||0)-(a.v||0);}).slice(0,15):[];
     _pub.members=parseFloat(r[0])||0;_pub.wdTotal=parseFloat(r[1])||0;_pub.wdCount=parseFloat(r[2])||0;
     _pub.rate=(parseFloat(r[3])>0)?parseFloat(r[3]):DEFAULT_LAK_RATE;
     const rec=r[4].exists()?Object.values(r[4].val()):[];
@@ -4216,6 +4221,8 @@ function paintPublicStats(){
   set('lsMembers',fmtN(_pub.members));set('lsWd',wd);set('lsWdCount',fmtN(_pub.wdCount));
   set('pstMembers',fmtN(_pub.members));set('pstWd',wd);set('pstWdCount',fmtN(_pub.wdCount));
   renderTicker();
+  const rl=document.getElementById('rankList');
+  if(rl&&_pub.rank.length){const md=['🥇','🥈','🥉'];rl.innerHTML=_pub.rank.map(function(x,i){return '<div style="display:flex;justify-content:space-between;padding:0.18rem 0;"><span style="color:#fff;">'+(md[i]||('<span style=\"display:inline-block;min-width:1.5em;text-align:center;color:#A890CC;\">'+(i+1)+'</span>'))+' '+escHtml(x.u||'-')+'</span><span style="color:var(--green);font-weight:700;">$'+fmtUsd(x.v)+'</span></div>';}).join('');}
   const box=document.getElementById('recentWdBox'),list=document.getElementById('recentWdList');
   if(box&&list){
     box.style.display=_pub.recent.length?'block':'none';
@@ -4258,8 +4265,10 @@ function recountStats(){
     const ok=reqs.filter(function(x){return x.status==='approved';});
     const total=ok.reduce(function(s,x){return s+(parseFloat(x.amt)||0);},0);
     const last=ok.sort(function(a,b){return (b.approvedAt||b.time||0)-(a.approvedAt||a.time||0);}).slice(0,5);
+    const tot=Object.entries(r[0].exists()?r[0].val():{}).map(function(e){const ps=Array.isArray(e[1].packages)?e[1].packages:Object.values(e[1].packages||{});return {n:e[0],v:ps.reduce(function(a,p){return a+(parseFloat(p&&p.price)||0);},0)};}).filter(function(x){return x.v>0;}).sort(function(a,b){return b.v-a.v;}).slice(0,15);
+    const rank={};tot.forEach(function(x,i){rank['k'+String(i).padStart(2,'0')]={u:maskName(x.n),v:Math.round(x.v*100)/100};});
     const rec={};last.forEach(function(x,i){rec['r'+String(i).padStart(2,'0')]={u:maskName(x.user),amt:parseFloat(x.amt)||0,time:x.approvedAt||x.time||0};});
-    return window._db.ref('stats').update({members:members,wdTotal:Math.round(total*100)/100,wdCount:ok.length,recent:rec}).then(function(){
+    return window._db.ref('stats').update({members:members,wdTotal:Math.round(total*100)/100,wdCount:ok.length,recent:rec,rank:rank}).then(function(){
       showToast('✅ นับสถิติจริงแล้ว: สมาชิก '+members+' · ถอน '+ok.length+' ครั้ง $'+fmtUsd(total));
       loadPublicStats();
     });
