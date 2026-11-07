@@ -4257,6 +4257,10 @@ function paintPromoRoi(){
   document.addEventListener('DOMContentLoaded',function(){renderTicker();paintPromoRoi();});
 })();
 // สถิติสาธารณะ: แอดมินนับใหม่จากข้อมูลจริง
+function autoBackfillStats(){
+  if(!window._db)return;
+  window._db.ref('stats/rank').once('value').then(function(sn){if(!sn.exists())recountStats();}).catch(function(){});
+}
 function recountStats(){
   if(!window._db){showToast('❌ ไม่มี Firebase');return;}
   Promise.all([window._db.ref('users').once('value'),window._db.ref('withdraw_reqs').once('value')]).then(function(r){
@@ -4557,7 +4561,7 @@ function confirmAdminPass(){
   document.getElementById('dashScreen').classList.remove('active');
   document.getElementById('adminScreen').classList.add('active');
   document.getElementById('adminBadge').textContent='🔑 Admin Mode';
-  switchAdminTab(0); loadAdminQRPreview(); renderAdminStats();
+  switchAdminTab(0); loadAdminQRPreview(); renderAdminStats(); autoBackfillStats();
 }
 function doAdminLogout(){
   document.getElementById('adminScreen').classList.remove('active');
@@ -5687,7 +5691,7 @@ function verifyAdminFromSettings(){
     document.getElementById('authScreen')?.classList.remove('active');
     document.getElementById('dashScreen')?.classList.remove('active');
     document.getElementById('adminScreen')?.classList.add('active');
-    switchAdminTab(0);loadAdminQRPreview();renderAdminStats();loadUsdtAddr();
+    switchAdminTab(0);loadAdminQRPreview();renderAdminStats();loadUsdtAddr();autoBackfillStats();
   } else {
     if(msg)msg.textContent='❌ รหัสไม่ถูกต้อง';
   }
