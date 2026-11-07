@@ -1011,6 +1011,19 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;">ใส่เฉพาะ QR ก็ได้ ถ้าไม่ใส่บัญชี ลูกค้าจะเห็นแค่ QR</div>
   </div>
 
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);margin-bottom:0.8rem;">💎 เติมด้วย USDT (โอนตรง)</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">เครือข่าย</div>
+    <select id="usdtNetwork" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;"><option value="TRC20">TRC20 · TRON (แนะนำ)</option><option value="BEP20">BEP20 · BSC</option><option value="ERC20">ERC20 · Ethereum</option></select>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">ที่อยู่กระเป๋า USDT (เว้นว่างแล้วบันทึกไม่ได้)</div>
+    <input type="text" id="usdtAddrInput" autocomplete="off" spellcheck="false" style="width:100%;box-sizing:border-box;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.3);color:var(--green);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;">
+    <div id="usdtAddrPreview" style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);word-break:break-all;margin-bottom:0.6rem;"></div>
+    <button onclick="saveUsdtAddr()" class="btn btn-gold" style="width:100%;padding:0.7rem;margin-bottom:0.6rem;">💾 บันทึกที่อยู่ USDT</button>
+    <div id="usdtQrPreview" style="text-align:center;margin-bottom:0.5rem;"></div>
+    <label style="display:block;width:100%;box-sizing:border-box;padding:0.6rem;text-align:center;background:rgba(74,222,128,0.08);border:1px dashed rgba(74,222,128,0.4);border-radius:8px;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">📷 อัปโหลด QR กระเป๋า USDT (ไม่บังคับ)<input type="file" accept="image/*" style="display:none" onchange="uploadUsdtQR(event)"></label>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;line-height:1.6;">ถ้าไม่ได้ตั้งที่อยู่ ลูกค้าจะไม่เห็นตัวเลือกเติม USDT ระบบไม่ตรวจบล็อกเชนอัตโนมัติ แอดมินต้องเช็ก TXID เองก่อนอนุมัติ</div>
+  </div>
+
   <!-- โบนัสเติมครั้งแรก -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">🎁 โบนัสเติมครั้งแรก</div>
@@ -2910,11 +2923,27 @@ function renderWallet(){
 // ─── ถอนเงิน: กรอก USDT → คิดเป็นกีบ → โอนเข้าบัญชีธนาคารลูกค้า ───
 // ═══════════════════════════════════════════════
 const DEFAULT_LAK_RATE=22700;   // ค่าเริ่มต้น ถ้าแอดมินยังไม่ตั้งอัตราในแท็บตั้งค่า
-let _wdRate=DEFAULT_LAK_RATE, _wdSubmitting=false;
+let _wdRate=DEFAULT_LAK_RATE, _wdSubmitting=false, _wdMode='lak';
 function wdLakOf(usdt,rate){return Math.floor((parseFloat(usdt)||0)*rate);}
+function wdMethod(m){
+  _wdMode=m==='usdt'?'usdt':'lak';const u=_wdMode==='usdt';
+  const set=function(id,d){const e=document.getElementById(id);if(e)e.style.display=d;};
+  set('wdUsdtFields',u?'block':'none');set('wdLakFields',u?'none':'block');
+  const t=document.getElementById('wdTitle');if(t)t.textContent=u?'📤 ถอนเงิน (USDT → กระเป๋า)':'📤 ถอนเงิน (USDT → กีบ)';
+  const on='1px solid rgba(255,215,0,0.5)',off='1px solid rgba(255,255,255,0.15)';
+  const a=document.getElementById('wdTabLak'),b=document.getElementById('wdTabUsdt');
+  if(a){a.style.border=u?off:on;a.style.background=u?'transparent':'rgba(255,215,0,0.15)';a.style.color=u?'#A890CC':'var(--gold)';}
+  if(b){b.style.border=u?on:off;b.style.background=u?'rgba(255,215,0,0.15)':'transparent';b.style.color=u?'var(--gold)':'#A890CC';}
+  wdLakPreview();
+}
 function wdLakPreview(){
   const el=document.getElementById('wdLakPrev');
   if(!el)return;
+  if(_wdMode==='usdt'){
+    const u2=Math.round((parseFloat(document.getElementById('wdAmt')?document.getElementById('wdAmt').value:0)||0)*100)/100;
+    el.innerHTML=u2>0?'จะได้รับ <b style="color:var(--green);font-size:1.05rem;">'+u2.toFixed(2)+' USDT</b> <span style="color:var(--text-dim);">(ไม่มีการแปลงเป็นกีบ)</span>':'<span style="color:var(--text-dim);">ถอนเป็น USDT ตามจำนวนที่กรอก</span>';
+    return;
+  }
   const u=Math.round((parseFloat(document.getElementById('wdAmt')?document.getElementById('wdAmt').value:0)||0)*100)/100;
   const rl='อัตรา 1 USDT = ₭ '+fmtLak(_wdRate);
   el.innerHTML=u>0
@@ -2931,12 +2960,20 @@ function submitWithdraw(){
   if(!(usdAmt>0)){showToast('⚠️ กรอกจำนวน USDT ที่ต้องการถอน');return;}
   if(usdAmt>(ud.usd||0)+1e-9){showToast('⚠️ จำนวนเกินกว่าที่มีในกระเป๋า');return;}
   if(usdAmt>withdrawableOf(ud)+1e-9){showToast('🔒 ถอนได้สูงสุด $'+withdrawableOf(ud)+' (โบนัสที่ล็อกถอนได้เมื่อลงทุนครบเงื่อนไข)');return;}
-  if(fullName.length<2){showToast('⚠️ กรุณากรอกชื่อจริง-นามสกุล ตามบัญชีธนาคาร');return;}
-  if(bank.length<2){showToast('⚠️ กรุณากรอกชื่อธนาคาร');return;}
-  if(!/^[0-9][0-9\- ]{5,24}$/.test(accNo)){showToast('⚠️ เลขบัญชีไม่ถูกต้อง (ตัวเลข 6–25 หลัก)');return;}
+  const isU=(_wdMode==='usdt');
+  const net=g('wdNet')||'TRC20', addr=g('wdAddr'), addr2=g('wdAddr2');
+  if(isU){
+    if(!validUsdtAddr(addr,net)){showToast(net==='TRC20'?'⚠️ ที่อยู่ TRC20 ต้องขึ้นต้นด้วย T และยาว 34 ตัว':'⚠️ ที่อยู่ '+net+' ต้องขึ้นต้นด้วย 0x และยาว 42 ตัว');return;}
+    if(addr!==addr2){showToast('⚠️ ที่อยู่ทั้งสองช่องไม่ตรงกัน');return;}
+  } else {
+    if(fullName.length<2){showToast('⚠️ กรุณากรอกชื่อจริง-นามสกุล ตามบัญชีธนาคาร');return;}
+    if(bank.length<2){showToast('⚠️ กรุณากรอกชื่อธนาคาร');return;}
+    if(!/^[0-9][0-9\- ]{5,24}$/.test(accNo)){showToast('⚠️ เลขบัญชีไม่ถูกต้อง (ตัวเลข 6–25 หลัก)');return;}
+  }
   if(!window._db){showToast('❌ ไม่มี Firebase กรุณาลองใหม่');return;}
-  const lak=wdLakOf(usdAmt,_wdRate);
-  if(!(lak>0)){showToast('⚠️ จำนวนน้อยเกินไป');return;}
+  const lak=isU?0:wdLakOf(usdAmt,_wdRate);
+  if(!isU&&!(lak>0)){showToast('⚠️ จำนวนน้อยเกินไป');return;}
+  if(isU&&!_wdMinChecked&&!confirm('ยืนยันถอน '+usdAmt.toFixed(2)+' USDT\nเครือข่าย: '+net+'\nที่อยู่: '+addr+'\n\nตรวจสอบให้แน่ใจว่าถูกต้อง ถ้าผิดจะกู้คืนไม่ได้'))return;
   // ถอนครั้งแรก: ไม่มีขั้นต่ำ · ครั้งต่อๆไป: ขั้นต่ำ $WD_MIN_NEXT
   if(usdAmt<WD_MIN_NEXT&&!_wdMinChecked){
     _wdSubmitting=true;
@@ -2949,7 +2986,11 @@ function submitWithdraw(){
     return;
   }
   _wdSubmitting=true;
-  const req={
+  const req=isU?{
+    id:'wd_'+Date.now(), user:getSess(),
+    amt:usdAmt, unit:'USDT', currency:'USDT', network:net, addr:addr, note:note,
+    time:Date.now(), status:'pending'
+  }:{
     id:'wd_'+Date.now(), user:getSess(),
     amt:usdAmt, unit:'USDT', currency:'LAK', lak:lak, rate:_wdRate,
     fullName:fullName, bank:bank, accNo:accNo, note:note,
@@ -2961,10 +3002,10 @@ function submitWithdraw(){
     _wdSubmitting=false;
     ud.usd=Math.max(0,Math.round(((ud.usd||0)-usdAmt)*100)/100);
     ud.txs=ud.txs||[];
-    ud.txs.unshift({desc:'📤 แจ้งถอน $'+usdAmt.toFixed(2)+' USDT ≈ ₭'+fmtLak(lak)+' → '+bank+' (กำลังตรวจสอบ)',amount:-usdAmt,unit:'USDT',time:Date.now()});
+    ud.txs.unshift({desc:isU?('📤 แจ้งถอน $'+usdAmt.toFixed(2)+' USDT → กระเป๋า '+net+' (กำลังตรวจสอบ)'):('📤 แจ้งถอน $'+usdAmt.toFixed(2)+' USDT ≈ ₭'+fmtLak(lak)+' → '+bank+' (กำลังตรวจสอบ)'),amount:-usdAmt,unit:'USDT',time:Date.now()});
     saveUDForce(ud);
     const ov=document.getElementById('withdrawOv'); if(ov)ov.remove();
-    showToast('📤 ส่งคำขอถอน $'+usdAmt.toFixed(2)+' ≈ ₭'+fmtLak(lak)+' แล้ว!');
+    showToast(isU?('📤 ส่งคำขอถอน $'+usdAmt.toFixed(2)+' USDT แล้ว!'):('📤 ส่งคำขอถอน $'+usdAmt.toFixed(2)+' ≈ ₭'+fmtLak(lak)+' แล้ว!'));
     renderWallet();
   }).catch(function(){
     _wdSubmitting=false;
@@ -2983,7 +3024,7 @@ function withdrawDestHtml(r){
       +(r.note?'<div style="'+f+'font-size:0.58rem;color:var(--text-dim);margin-top:0.4rem;">📝 '+escHtml(r.note)+'</div>':'');
   }
   return '<div style="'+f+'font-size:0.58rem;color:#A890CC;margin-bottom:0.3rem;">🌐 เครือข่าย: <span style="color:#627eea;">'+escHtml(r.network||'TRC20')+'</span></div>'
-    +'<div style="'+f+'font-size:0.65rem;color:var(--green);word-break:break-all;">'+escHtml(r.addr||'-')+'</div>'
+    +'<div style="'+f+'font-size:0.65rem;color:var(--green);word-break:break-all;user-select:all;">'+escHtml(r.addr||'-')+'</div>'
     +(r.note?'<div style="'+f+'font-size:0.58rem;color:var(--text-dim);margin-top:0.3rem;">📝 '+escHtml(r.note)+'</div>':'');
 }
 function renderAdminWithdraw(){
@@ -3012,7 +3053,7 @@ function renderAdminWithdraw(){
       return '<div class="req-card '+escHtml(r.status)+'" style="margin-bottom:0.8rem;">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">'
         +'<div><div style="font-family:\'Orbitron\',monospace;font-size:0.9rem;color:var(--gold);">$'+amt.toFixed(2)+' USDT</div>'
-        +'<div style="font-family:\'Orbitron\',monospace;font-size:0.8rem;color:var(--green);margin-top:0.15rem;">โอน ₭ '+fmtLak(lakNow)+'</div>'
+        +'<div style="font-family:\'Orbitron\',monospace;font-size:0.8rem;color:var(--green);margin-top:0.15rem;">'+(r.currency==='USDT'?'💎 โอน '+amt.toFixed(2)+' USDT ('+escHtml(r.network||'TRC20')+')':'โอน ₭ '+fmtLak(lakNow))+'</div>'
         +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:0.15rem;">👤 '+escHtml(r.user||'-')+' · '+t2+'</div>'+diff+'</div>'
         +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.55rem;color:'+col+';border:1px solid '+col+';border-radius:15px;padding:0.2rem 0.5rem;">'+escHtml(st[r.status]||r.status)+'</div></div>'
         +'<div style="background:rgba(0,0,0,0.3);border:1px solid rgba(74,222,128,0.15);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;">'+withdrawDestHtml(r)+'</div>'
@@ -3039,7 +3080,7 @@ function approveWithdraw(fbKey){
     if(r.currency==='LAK'){
       msg+='ชื่อ: '+(r.fullName||'-')+'\nธนาคาร: '+(r.bank||'-')+'\nเลขบัญชี: '+(r.accNo||'-')+'\nจำนวน: ₭ '+fmtLak(wdLakOf(r.amt,rate))+' ($'+(parseFloat(r.amt)||0).toFixed(2)+' USDT)';
     } else {
-      msg+='ถอน $'+(parseFloat(r.amt)||0).toFixed(2)+' USDT → '+(r.addr||'-');
+      msg+='โอน '+(parseFloat(r.amt)||0).toFixed(2)+' USDT\nเครือข่าย: '+(r.network||'TRC20')+'\nที่อยู่: '+(r.addr||'-')+'\n\n(ตรวจที่อยู่และเครือข่ายให้ตรงก่อนโอน)';
     }
     if(!confirm(msg))return;
     claimRequest('withdraw_reqs/'+fbKey,'approved',function(ok){
@@ -3075,7 +3116,7 @@ function showWithdrawPopup(){
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='withdrawOv';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd">
-      <div class="pop-title">📤 ถอนเงิน (USDT → กีบ)</div>
+      <div class="pop-title" id="wdTitle">📤 ถอนเงิน (USDT → กีบ)</div>
       <button class="pop-close" onclick="document.getElementById('withdrawOv').remove()">✕</button>
     </div>
 
@@ -3087,6 +3128,11 @@ function showWithdrawPopup(){
 
     <div id="wdLockNote" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--gold);margin:-0.5rem 0 0.8rem;line-height:1.5;"></div>
 
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.9rem;">
+      <button id="wdTabLak" onclick="wdMethod('lak')" style="flex:1;padding:0.6rem;border-radius:10px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.72rem;border:1px solid rgba(255,215,0,0.5);background:rgba(255,215,0,0.15);color:var(--gold);">₭ ถอนเป็นกีบ</button>
+      <button id="wdTabUsdt" onclick="wdMethod('usdt')" style="flex:1;padding:0.6rem;border-radius:10px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.72rem;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#A890CC;">💎 ถอนเป็น USDT</button>
+    </div>
+
     <!-- จำนวนที่ต้องการถอน -->
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">💰 จำนวนที่ต้องการถอน (USDT)</div>
     <input type="number" id="wdAmt" inputmode="decimal" oninput="wdLakPreview()" placeholder="เช่น 100" max="${usd.toFixed(2)}"
@@ -3094,6 +3140,18 @@ function showWithdrawPopup(){
 
     <div id="wdLakPrev" style="min-height:2.4rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.9rem;line-height:1.6;"></div>
 
+    <div id="wdUsdtFields" style="display:none;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">🌐 เครือข่าย</div>
+      <select id="wdNet" style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.9rem;"><option value="TRC20">TRC20 · TRON (แนะนำ)</option><option value="BEP20">BEP20 · BSC</option><option value="ERC20">ERC20 · Ethereum</option></select>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">💎 ที่อยู่กระเป๋า USDT ของคุณ</div>
+      <input type="text" id="wdAddr" autocomplete="off" spellcheck="false" placeholder="วางที่อยู่กระเป๋า"
+        style="width:100%;box-sizing:border-box;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.9rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">💎 กรอกที่อยู่อีกครั้งเพื่อยืนยัน</div>
+      <input type="text" id="wdAddr2" autocomplete="off" spellcheck="false" placeholder="วางที่อยู่ซ้ำ"
+        style="width:100%;box-sizing:border-box;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.7rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#fca5a5;line-height:1.7;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:0.6rem;margin-bottom:0.9rem;">⚠ ตรวจที่อยู่และเครือข่ายให้ตรงกับกระเป๋าปลายทาง ถ้าผิด เงินจะสูญหายและกู้คืนไม่ได้</div>
+    </div>
+    <div id="wdLakFields">
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">👤 ชื่อ-นามสกุลจริง (ตามบัญชีธนาคาร)</div>
     <input type="text" id="wdName" autocomplete="name" placeholder="เช่น SOMSAK VONGSA"
       style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.9rem;">
@@ -3107,6 +3165,7 @@ function showWithdrawPopup(){
     <input type="text" id="wdAccNo" inputmode="numeric" placeholder="เช่น 010-12-00-1234567"
       style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.9rem;letter-spacing:1px;outline:none;margin-bottom:0.9rem;">
 
+    </div>
     <!-- หมายเหตุ -->
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">📝 หมายเหตุ (ไม่บังคับ)</div>
     <input type="text" id="wdNote" placeholder="หมายเหตุเพิ่มเติม..."
@@ -3121,7 +3180,7 @@ function showWithdrawPopup(){
     </button>
   </div>`;
   document.body.appendChild(ov);
-  _wdRate=DEFAULT_LAK_RATE;wdLakPreview();wdLockNote();
+  _wdMode='lak';_wdRate=DEFAULT_LAK_RATE;wdLakPreview();wdLockNote();
   loadTopupInfo(function(i){_wdRate=lakRateOf(i);wdLakPreview();});
 }
 
@@ -3482,6 +3541,7 @@ function renderAdminTopup(filter){
         +'<div><div style="font-family:\'Orbitron\',monospace;font-size:0.9rem;font-weight:900;color:var(--gold);">'+escHtml(topupAmtLabel(r))+'</div>'
         +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:var(--text-dim);margin-top:0.15rem;">👤 '+escHtml(r.user||'-')+' · '+timeStr+'</div></div>'
         +'<div style="background:rgba(0,0,0,0.2);border:1px solid '+st+';border-radius:20px;padding:0.2rem 0.55rem;font-family:\'Orbitron\',monospace;font-size:0.48rem;color:'+st+';">'+escHtml(statusText[r.status]||r.status)+'</div></div>'
+        +((r.currency==='USDT'&&r.txid)?'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;color:#c9b8e8;word-break:break-all;background:rgba(74,222,128,0.07);border-radius:8px;padding:0.5rem;margin:0.3rem 0;">💎 '+escHtml(r.network||'TRC20')+' · TXID: <span style="color:#fff;user-select:all;">'+escHtml(r.txid)+'</span></div>':'')
         +(r.hasSlip?'<button data-k="'+k+'" onclick="viewTopupSlip(this.dataset.k)" style="width:100%;margin-top:0.3rem;padding:0.5rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:8px;color:var(--gold);font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;cursor:pointer;">🧾 ดูสลิปโอนเงิน</button>':'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:var(--red-bright);margin-top:0.3rem;">⚠ ไม่มีสลิปแนบ</div>')
         +(r.status==='pending'
           ?'<div style="display:flex;gap:0.5rem;margin-top:0.4rem;">'
@@ -3562,7 +3622,7 @@ function uploadAdminQR(e){
 function loadAdminQRPreview(){
   const wrap=document.getElementById('adminQRPreview');
   if(!wrap||!window._db)return;
-  loadLakSettings();loadRefSettings();loadFirstSettings();loadSiteInfo();
+  loadLakSettings();loadRefSettings();loadFirstSettings();loadSiteInfo();loadUsdtAddr();
   const btn=document.getElementById('delQRBtn');
   const show=function(src){
     wrap.innerHTML='<img src="'+src+'" style="width:160px;height:160px;border-radius:10px;border:2px solid rgba(255,215,0,0.3);object-fit:contain;background:#fff;">';
@@ -3678,6 +3738,59 @@ function submitTopupRequest(amt,onOk,onFail,extra){
     if(onFail)onFail();
   });
 }
+
+// ── เติมด้วย USDT โดยตรง ──
+function tpInitMethods(){
+  loadTopupInfo(function(info){
+    _tpInfo=info||{};
+    const ok=!!(_tpInfo.usdtAddr&&validUsdtAddr(_tpInfo.usdtAddr,_tpInfo.usdtNetwork||'TRC20'));
+    const t=document.getElementById('tpTabs');
+    if(t)t.style.display=ok?'flex':'none';
+    const net=_tpInfo.usdtNetwork||'TRC20';
+    const nl=document.getElementById('tpuNet');if(nl)nl.textContent='เครือข่าย: '+(NET_LABEL[net]||net);
+    const ad=document.getElementById('tpuAddr');if(ad){ad.textContent=_tpInfo.usdtAddr||'';ad.setAttribute('data-addr',_tpInfo.usdtAddr||'');}
+    const q=document.getElementById('tpuQR');
+    if(q){q.innerHTML='';if(_tpInfo.usdtQr&&String(_tpInfo.usdtQr).indexOf('data:image/')===0){const im=document.createElement('img');im.src=_tpInfo.usdtQr;im.style.cssText='width:170px;height:170px;object-fit:contain;background:#fff;padding:6px;border-radius:10px;';q.appendChild(im);}}
+    const w=document.getElementById('tpuWarn');
+    if(w)w.textContent='⚠ โอนเฉพาะ USDT บนเครือข่าย '+net+' เท่านั้น ถ้าโอนผิดเครือข่ายหรือผิดเหรียญ เงินจะสูญหายและกู้คืนไม่ได้ · ยอดจะเข้าหลังแอดมินตรวจสอบ TXID';
+  });
+}
+function tpMethod(m){
+  const u=m==='usdt';
+  const set=function(id,d){const e=document.getElementById(id);if(e)e.style.display=d;};
+  set('tpUsdt',u?'block':'none');set('tpStep1',u?'none':'block');
+  const title=document.getElementById('tpTitle');if(title)title.textContent=u?'💎 เติมด้วย USDT':'₭ เติมเงินด้วยกีบลาว';
+  const on='1px solid rgba(255,215,0,0.5)',off='1px solid rgba(255,255,255,0.15)';
+  const a=document.getElementById('tpTabLak'),b=document.getElementById('tpTabUsdt');
+  if(a){a.style.border=u?off:on;a.style.background=u?'transparent':'rgba(255,215,0,0.15)';a.style.color=u?'#A890CC':'var(--gold)';}
+  if(b){b.style.border=u?on:off;b.style.background=u?'rgba(255,215,0,0.15)':'transparent';b.style.color=u?'var(--gold)':'#A890CC';}
+}
+function tpuSlipChange(e){
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  const pv=document.getElementById('tpuSlipPrev');if(pv)pv.textContent='กำลังประมวลผลรูป...';
+  compressImage(f,900,0.7,function(d){
+    if(!d){_tpSlip=null;if(pv)pv.textContent='';showToast('❌ อ่านรูปไม่ได้ ลองรูปอื่น');return;}
+    _tpSlip=d;
+    if(pv){pv.innerHTML='';const im=document.createElement('img');im.src=d;im.style.cssText='max-width:100%;max-height:140px;border-radius:8px;display:block;margin:0 auto;';pv.appendChild(im);}
+  });
+}
+function tpuSubmit(){
+  const amt=Math.round((parseFloat((document.getElementById('tpuAmt')||{}).value)||0)*100)/100;
+  const tx=((document.getElementById('tpuTx')||{}).value||'').trim();
+  if(!(amt>0)){showToast('⚠ กรอกจำนวน USDT ที่โอน');return;}
+  if(amt<TOPUP_MIN){showToast('⚠ เติมขั้นต่ำ $'+TOPUP_MIN);return;}
+  if(amt>TOPUP_MAX){showToast('⚠ เติมสูงสุด $'+TOPUP_MAX.toLocaleString()+' ต่อครั้ง');return;}
+  if(!/^(0x)?[A-Za-z0-9]{16,100}$/.test(tx)){showToast('⚠ กรอก TXID ให้ถูกต้อง (วางรหัสธุรกรรมจากแอปกระเป๋า)');return;}
+  const btn=document.getElementById('tpuBtn');if(btn){btn.disabled=true;btn.style.opacity='0.6';}
+  const net=_tpInfo.usdtNetwork||'TRC20';
+  submitTopupRequest(amt,function(){
+    const ov=document.getElementById('topupPopupOv');
+    const box=ov&&ov.querySelector('#tpUsdt');
+    if(box)box.innerHTML='<div style="text-align:center;padding:1.5rem 0.5rem;font-family:\'Share Tech Mono\',monospace;"><div style="font-size:2rem;">✅</div><div style="color:var(--green);font-size:0.9rem;margin:0.5rem 0;">ส่งคำขอแล้ว</div><div style="color:#A890CC;font-size:0.7rem;line-height:1.7;">แอดมินกำลังตรวจสอบ TXID<br>USDT จะเข้ากระเป๋าเมื่อยืนยันแล้ว<br>ดูสถานะได้ที่ประวัติคำขอ</div></div>';
+    const tabs=document.getElementById('tpTabs');if(tabs)tabs.style.display='none';
+    _tpSlip=null;
+  },function(){if(btn){btn.disabled=false;btn.style.opacity='1';}},{currency:'USDT',txid:tx,network:net,_slip:_tpSlip});
+}
 // ── สลิปโอนเงิน ──
 let _tpSlip=null;
 function compressImage(file,maxSide,quality,cb){
@@ -3738,7 +3851,7 @@ function topupAmtLabel(r){
     const u=(r.creditedUsdt!=null)?parseFloat(r.creditedUsdt):lakToUsdt(Math.round(parseFloat(r.lak)||0),parseFloat(r.rate)||0);
     return '₭ '+fmtLak(r.lak)+' ≈ $'+(u||0).toLocaleString();
   }
-  return '$'+(parseFloat(r.amt)||0).toLocaleString()+' USDT';
+  return '$'+(parseFloat(r.amt)||0).toLocaleString()+' USDT'+(r.txid?' · โอนตรง':'');
 }
 function renderTopupBanner(){
   const el=document.getElementById('tpLastReq');
@@ -3757,7 +3870,7 @@ function renderTopupBanner(){
 function approveTopup(fbKey){
   if(!window._db||!fbKey)return;
   const reqRef=window._db.ref('topup_reqs/'+fbKey);
-  Promise.all([reqRef.once('value'),window._db.ref('settings/lakRate').once('value')]).then(function(res){
+  Promise.all([reqRef.once('value'),window._db.ref('settings/lakRate').once('value'),window._db.ref('topup_reqs').once('value')]).then(function(res){
     const snap=res[0];
     if(!snap.exists()){showToast('❌ ไม่พบคำขอ');return;}
     const r=snap.val();
@@ -3778,6 +3891,12 @@ function approveTopup(fbKey){
     } else {
       amt=parseFloat(r.amt)||0;
       desc='✅ เติม USDT $'+amt.toLocaleString()+' (อนุมัติแล้ว)';
+      if(r.txid){
+        const all=res[2].exists()?res[2].val():{};
+        const dups=Object.keys(all).filter(function(k){return k!==fbKey&&all[k]&&String(all[k].txid||'').toLowerCase()===String(r.txid).toLowerCase();});
+        if(dups.some(function(k){return all[k].status==='approved';})){showToast('🚫 TXID นี้เคยอนุมัติไปแล้ว ห้ามอนุมัติซ้ำ');return;}
+        if(!confirm('อนุมัติ '+user+'\nเติม USDT $'+amt.toLocaleString()+' ('+(r.network||'TRC20')+')\nTXID: '+r.txid+(dups.length?'\n\n⚠ มีคำขออื่นใช้ TXID เดียวกัน '+dups.length+' รายการ':'')+'\n\nยืนยันว่าตรวจ TXID บนบล็อกเชนแล้ว ยอดและกระเป๋าปลายทางถูกต้อง?'))return;
+      }
     }
     if(!user||!(amt>0)){showToast('❌ ข้อมูลคำขอไม่ถูกต้อง');return;}
     claimRequest('topup_reqs/'+fbKey,'approved',function(ok){
@@ -3983,11 +4102,34 @@ function loadFirstSettings(){
 }
 
 function showTopupPopup(){
+  showTopupPopupBase();
+  setTimeout(tpInitMethods,0);
+}
+function showTopupPopupBase(){
   const ov=document.createElement('div');ov.className='overlay';ov.id='topupPopupOv';
   ov.innerHTML=`<div class="popup">
     <div class="pop-hd">
-      <div class="pop-title">₭ เติมเงินด้วยกีบลาว</div>
+      <div class="pop-title" id="tpTitle">₭ เติมเงินด้วยกีบลาว</div>
       <button class="pop-close" onclick="document.getElementById('topupPopupOv').remove()">✕</button>
+    </div>
+
+    <div id="tpTabs" style="display:none;gap:0.5rem;margin-bottom:0.9rem;">
+      <button id="tpTabLak" onclick="tpMethod('lak')" style="flex:1;padding:0.6rem;border-radius:10px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.72rem;border:1px solid rgba(255,215,0,0.5);background:rgba(255,215,0,0.15);color:var(--gold);">₭ เติมเป็นกีบ</button>
+      <button id="tpTabUsdt" onclick="tpMethod('usdt')" style="flex:1;padding:0.6rem;border-radius:10px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.72rem;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#A890CC;">💎 เติมเป็น USDT</button>
+    </div>
+    <div id="tpUsdt" style="display:none;">
+      <div id="tpuNet" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--gold);margin-bottom:0.5rem;"></div>
+      <div id="tpuQR" style="text-align:center;margin-bottom:0.6rem;"></div>
+      <div id="tpuAddr" data-addr="" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--green);word-break:break-all;background:rgba(0,0,0,0.3);border:1px solid rgba(74,222,128,0.25);border-radius:10px;padding:0.7rem;margin-bottom:0.5rem;"></div>
+      <button onclick="copyTopupAddr('tpuAddr')" style="width:100%;padding:0.55rem;margin-bottom:0.7rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:8px;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.68rem;cursor:pointer;">📋 คัดลอกที่อยู่</button>
+      <div id="tpuWarn" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#fca5a5;line-height:1.7;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:0.6rem;margin-bottom:0.8rem;"></div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">จำนวน USDT ที่โอน (ขั้นต่ำ $10)</div>
+      <input type="number" id="tpuAmt" inputmode="decimal" placeholder="เช่น 50" style="width:100%;box-sizing:border-box;padding:0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.1rem;outline:none;margin-bottom:0.7rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">TXID (รหัสธุรกรรม) หลังโอนเสร็จ</div>
+      <input type="text" id="tpuTx" autocomplete="off" spellcheck="false" placeholder="วางรหัสธุรกรรม" style="width:100%;box-sizing:border-box;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.72rem;outline:none;margin-bottom:0.7rem;">
+      <label style="display:block;padding:0.6rem;text-align:center;background:rgba(255,215,0,0.06);border:1px dashed rgba(255,215,0,0.35);border-radius:10px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.68rem;cursor:pointer;">📎 แนบภาพหลักฐาน (ไม่บังคับ)<input type="file" accept="image/*" style="display:none" onchange="tpuSlipChange(event)"></label>
+      <div id="tpuSlipPrev" style="margin:0.5rem 0;"></div>
+      <button id="tpuBtn" onclick="tpuSubmit()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;background:linear-gradient(135deg,#065f46,#10b981);color:#fff;margin-top:0.4rem;">✅ ส่งคำขอเติม USDT</button>
     </div>
 
     <!-- Step 1: ใส่จำนวน -->
@@ -5560,6 +5702,15 @@ function rejectPkgReq(fbKey,username){
   showToast(`❌ ปฏิเสธ ${username}`);
 }
 
+
+function uploadUsdtQR(e){
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  compressImage(f,500,0.8,function(d){
+    if(!d){showToast('❌ อ่านรูปไม่ได้');return;}
+    window._db.ref('settings/usdtQr').set(d).then(function(){showToast('✅ บันทึก QR USDT แล้ว');loadUsdtAddr();}).catch(function(){showToast('❌ บันทึก QR ไม่สำเร็จ');});
+  });
+}
 // ─── USDT ADDRESS ───
 function loadUsdtAddr(){
   if(!window._db)return;
@@ -5574,6 +5725,8 @@ function loadUsdtAddr(){
       if(prev)prev.textContent='📋 '+data.usdtAddr;
     }
     if(data.usdtNetwork&&net){net.value=data.usdtNetwork;}
+    const qp=document.getElementById('usdtQrPreview');
+    if(qp){qp.innerHTML='';if(data.usdtQr&&String(data.usdtQr).indexOf('data:image/')===0){const im=document.createElement('img');im.src=data.usdtQr;im.style.cssText='width:140px;height:140px;object-fit:contain;background:#fff;border-radius:8px;';qp.appendChild(im);}}
   });
 }
 
