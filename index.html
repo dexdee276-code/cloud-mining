@@ -866,12 +866,13 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
     </div>
   </div>
   <div class="auth-footer">
-    <div class="auth-stat"><div class="auth-stat-val" id="aMiners">2,847</div><div class="auth-stat-lbl" data-i18n="auth.stat.miners">Active Miners</div></div>
+    <div class="auth-stat"><div class="auth-stat-val" id="lsMembers">-</div><div class="auth-stat-lbl">สมาชิก</div></div>
     <div class="auth-footer-div"></div>
-    <div class="auth-stat"><div class="auth-stat-val">142.38</div><div class="auth-stat-lbl" data-i18n="auth.stat.eth">ETH Today</div></div>
+    <div class="auth-stat"><div class="auth-stat-val" id="lsWd">-</div><div class="auth-stat-lbl">ถอนสำเร็จรวม</div></div>
     <div class="auth-footer-div"></div>
-    <div class="auth-stat"><div class="auth-stat-val">99.9%</div><div class="auth-stat-lbl" data-i18n="auth.stat.up">Uptime</div></div>
+    <div class="auth-stat"><div class="auth-stat-val" id="lsWdCount">-</div><div class="auth-stat-lbl">ครั้งที่ถอน</div></div>
   </div>
+  <div style="text-align:center;margin-top:1rem;"><button onclick="showHelpCenter('contact')" style="background:none;border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:0.5rem 1.1rem;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.68rem;cursor:pointer;">🛟 ติดต่อ · FAQ · เงื่อนไข · ข้อมูลผู้ให้บริการ</button></div>
 </div>
 
 <!-- ADMIN SCREEN -->
@@ -977,6 +978,29 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;">มีผลกับการอนุมัติเติมเงินครั้งต่อไป ผู้ที่ได้โบนัสไปแล้วไม่ถูกเปลี่ยนย้อนหลัง</div>
   </div>
 
+  <!-- ข้อมูลติดต่อ/ผู้ให้บริการ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.4rem;">🛟 ข้อมูลติดต่อ & ผู้ให้บริการ</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.8rem;line-height:1.6;">กรอกเฉพาะข้อมูลจริง ช่องที่ว่างจะไม่แสดงให้ลูกค้า</div>
+    <input type="text" id="site_line" maxlength="200" placeholder="ลิงก์ LINE (https://line.me/ti/p/...)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <input type="text" id="site_wa" maxlength="200" placeholder="WhatsApp (เช่น +8562012345678)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <input type="text" id="site_phone" maxlength="200" placeholder="เบอร์โทร" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <input type="text" id="site_email" maxlength="200" placeholder="อีเมลติดต่อ" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <input type="text" id="site_hours" maxlength="200" placeholder="เวลาทำการ (เช่น 09:00-18:00 ทุกวัน)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <input type="text" id="site_proc" maxlength="200" placeholder="เวลาดำเนินการถอน (เช่น ภายใน 24 ชั่วโมงทำการ)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <input type="text" id="site_name" maxlength="200" placeholder="ชื่อบริษัท/เจ้าของ" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <input type="text" id="site_addr" maxlength="200" placeholder="ที่อยู่" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <input type="text" id="site_reg" maxlength="200" placeholder="เลขทะเบียนธุรกิจ/ใบอนุญาต (ถ้ามี)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
+    <button onclick="saveSiteInfo()" class="btn btn-gold" style="width:100%;padding:0.7rem;">💾 บันทึกข้อมูลติดต่อ</button>
+  </div>
+
+  <!-- สถิติสาธารณะ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.4rem;">📈 สถิติที่แสดงหน้าแรก</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.8rem;line-height:1.6;">นับจากข้อมูลจริง (สมาชิก + ถอนที่อนุมัติแล้ว) กดนับใหม่ครั้งแรกหลังอัปเดต เพื่อให้ตัวเลขตรงกับของจริง</div>
+    <button onclick="recountStats()" class="btn btn-primary" style="width:100%;">🔄 นับสถิติจริงใหม่</button>
+  </div>
+
   <!-- QR Code -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📱 QR Code รับโอนเงินกีบ (BCEL OnePay ฯลฯ)</div>
@@ -1075,18 +1099,7 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
 
   <!-- Ticker -->
   <div class="ticker-wrap">
-    <div class="ticker-inner2">
-      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>ETH $2,672.47 ▲2.3%</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#f87171;box-shadow:0 0 5px #f87171;"></div>BTC $67,420 ▲1.1%</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#fbbf24;box-shadow:0 0 5px #fbbf24;"></div>กำลังขุดอยู่ <span id="aMiners" style="color:#fbbf24;">2,847</span> เครื่อง</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>กำไรเฉลี่ย 1.30%/วัน</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#c084fc;box-shadow:0 0 5px #c084fc;"></div>ETH ขุดวันนี้ 142.8 ETH</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>ETH $2,672.47 ▲2.3%</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#f87171;box-shadow:0 0 5px #f87171;"></div>BTC $67,420 ▲1.1%</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#fbbf24;box-shadow:0 0 5px #fbbf24;"></div>กำลังขุดอยู่ 2,847 เครื่อง</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#4ade80;box-shadow:0 0 5px #4ade80;"></div>กำไรเฉลี่ย 1.30%/วัน</div>
-      <div class="ticker-item2"><div class="tdot" style="background:#c084fc;box-shadow:0 0 5px #c084fc;"></div>ETH ขุดวันนี้ 142.8 ETH</div>
-    </div>
+    <div class="ticker-inner2" id="tickerInner"></div>
   </div>
 
   <!-- Hero -->
@@ -1096,19 +1109,23 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
     <div class="promo-eth-bg">Ξ</div>
     <div class="promo-tag"><div class="promo-tag-dot"></div>CLOUD MINING PLATFORM</div>
     <div class="promo-title"><span class="promo-title-g">ขุด ETH</span><br><span class="promo-title-g">รับกำไรทุกวัน</span></div>
-    <div class="promo-sub">ระบบขุด Ethereum อัตโนมัติ 24/7<br>ลงทุนครั้งเดียว รับกำไรทุกวัน ไม่ต้องดูแล</div>
+    <div class="promo-sub">ระบบ Cloud Mining ลงทุนขั้นต่ำ $10<br>กำไรคำนวณรายวันตามสูตรของระบบ (ประมาณการ ไม่รับประกันผลตอบแทน)</div>
     <div class="promo-pills">
-      <div class="ppill ppg">✅ ปลอดภัย 100%</div>
-      <div class="ppill ppp">⚡ Auto 24/7</div>
-      <div class="ppill ppb">💎 ETH จริง</div>
+      <div class="ppill ppg">📄 ตรวจสอบสถานะคำขอได้</div>
+      <div class="ppill ppp">💵 เติม/ถอนเป็นกีบ</div>
+      <div class="ppill ppb">🛟 มีศูนย์ช่วยเหลือ</div>
     </div>
   </div>
 
   <!-- Stats -->
   <div class="promo-stats">
-    <div class="pstat"><div class="pstat-icon">⛏️</div><div class="pstat-num" style="color:#c084fc;">2,847</div><div class="pstat-lbl">เครื่องขุด ACTIVE</div></div>
-    <div class="pstat"><div class="pstat-icon">💰</div><div class="pstat-num" style="color:#4ade80;">1.30%</div><div class="pstat-lbl">กำไร/วัน</div></div>
-    <div class="pstat"><div class="pstat-icon">👥</div><div class="pstat-num" style="color:#ffd700;">12K+</div><div class="pstat-lbl">สมาชิก</div></div>
+    <div class="pstat"><div class="pstat-icon">👥</div><div class="pstat-num" id="pstMembers" style="color:#ffd700;">-</div><div class="pstat-lbl">สมาชิก</div></div>
+    <div class="pstat"><div class="pstat-icon">💸</div><div class="pstat-num" id="pstWd" style="color:#4ade80;">-</div><div class="pstat-lbl">ถอนสำเร็จรวม</div></div>
+    <div class="pstat"><div class="pstat-icon">🧾</div><div class="pstat-num" id="pstWdCount" style="color:#c084fc;">-</div><div class="pstat-lbl">ครั้งที่ถอน</div></div>
+  </div>
+  <div id="recentWdBox" style="display:none;margin:0 1rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--gold);margin-bottom:0.4rem;">💸 ถอนล่าสุด (ข้อมูลจริง ปกปิดชื่อ)</div>
+    <div id="recentWdList"></div>
   </div>
 
   <!-- Features -->
@@ -1116,38 +1133,39 @@ padding:0.28rem 0.6rem;color:var(--text-dim);font-family:'Share Tech Mono',monos
     <div class="pfeat-hd">⬥ ทำไมต้องเลือกเรา ⬥</div>
     <div class="pfeat">
       <div class="pfeat-icon pfi-p">⛏️</div>
-      <div><div class="pfeat-name">เครื่องขุดประสิทธิภาพสูง</div><div class="pfeat-desc">GPU ระดับ Enterprise ขุด ETH ได้สูงสุด รับรองผลตอบแทนทุกวัน</div></div>
+      <div><div class="pfeat-name">แพ็กเกจที่เริ่มได้ตั้งแต่ $10</div><div class="pfeat-desc">ลงทุนผ่านแพ็กเกจของระบบ กำไรคำนวณรายวันตามสูตรที่แสดงในแอป</div></div>
       <div class="pfeat-badge pfb-hot">🔥 HOT</div>
     </div>
     <div class="pfeat">
       <div class="pfeat-icon pfi-g">📈</div>
-      <div><div class="pfeat-name">กำไรสม่ำเสมอทุกวัน</div><div class="pfeat-desc">รับ ETH ทุก 24 ชม. แปลงเป็น USDT ได้ทันที ถอนได้ตลอด</div></div>
+      <div><div class="pfeat-name">กำไรสะสมรายวัน</div><div class="pfeat-desc">กำไรสะสมรายวัน แปลงเป็น USDT ได้ในแอป</div></div>
     </div>
     <div class="pfeat">
       <div class="pfeat-icon pfi-y">🔒</div>
-      <div><div class="pfeat-name">ระบบความปลอดภัยสูงสุด</div><div class="pfeat-desc">เงินทุนได้รับการคุ้มครอง SSL + 2FA ข้อมูลเข้ารหัสทั้งหมด</div></div>
+      <div><div class="pfeat-name">ความปลอดภัยบัญชี</div><div class="pfeat-desc">เชื่อมต่อแบบ HTTPS และเปิด 2FA ให้บัญชีของคุณได้ที่ตั้งค่า</div></div>
       <div class="pfeat-badge pfb-new">✨ NEW</div>
     </div>
     <div class="pfeat">
       <div class="pfeat-icon pfi-b">⚡</div>
-      <div><div class="pfeat-name">ถอนเงินได้ทันที</div><div class="pfeat-desc">แปลง ETH → USDT แล้วถอนได้เลย ไม่มีขั้นต่ำ ไม่มีล็อค</div></div>
+      <div><div class="pfeat-name">ถอนเป็นเงินกีบ มีสถานะให้ติดตาม</div><div class="pfeat-desc">ถอนเป็นเงินกีบเข้าบัญชีธนาคาร แอดมินตรวจสอบก่อนโอน ดูสถานะได้ในแอป</div></div>
     </div>
   </div>
 
   <!-- ROI -->
   <div class="promo-roi">
-    <div class="proi-title">💰 ตัวอย่างกำไร (ลงทุน $1,000)</div>
-    <div class="proi-row"><span class="proi-lbl">กำไร/วัน</span><span class="proi-val" style="color:#4ade80;">+$13.00 USDT</span></div>
-    <div class="proi-row"><span class="proi-lbl">กำไร/เดือน</span><span class="proi-val" style="color:#4ade80;">+$390.00 USDT</span></div>
-    <div class="proi-row"><span class="proi-lbl">ระยะเวลา</span><span class="proi-val" style="color:#c084fc;">270 วัน</span></div>
+    <div class="proi-title">💰 ตัวอย่างประมาณการ (ลงทุน $1,000)</div>
+    <div class="proi-row"><span class="proi-lbl">กำไร/วัน</span><span class="proi-val" id="roiDaily" style="color:#4ade80;">-</span></div>
+    <div class="proi-row"><span class="proi-lbl">กำไร/30 วัน</span><span class="proi-val" id="roiMonth" style="color:#4ade80;">-</span></div>
+    <div class="proi-row"><span class="proi-lbl">ระยะเวลา</span><span class="proi-val" id="roiDays" style="color:#c084fc;">-</span></div>
     <div class="proi-div"></div>
-    <div class="proi-total"><span class="proi-total-lbl">🏆 ได้คืนรวม</span><span class="proi-total-val">$3,510</span></div>
+    <div class="proi-total"><span class="proi-total-lbl">รวมเงินต้น+กำไร (ประมาณการ)</span><span class="proi-total-val" id="roiTotal">-</span></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.56rem;color:#A890CC;margin-top:0.6rem;line-height:1.6;">⚠ ตัวเลขนี้เป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยงที่จะเสียเงินลงทุน</div>
   </div>
 
   <!-- CTA -->
   <div class="promo-cta">
     <button class="promo-cta-btn" onclick="switchTab(1)">⚡ เริ่มขุด ETH เลย</button>
-    <div class="promo-cta-sub">ลงทุนขั้นต่ำเพียง $10 · ถอนได้ทุกเวลา</div>
+    <div class="promo-cta-sub">ลงทุนขั้นต่ำ $10 · ถอนผ่านการตรวจสอบของแอดมิน · <a href="#" onclick="showHelpCenter('terms');return false;" style="color:var(--gold);">อ่านเงื่อนไข/ความเสี่ยง</a></div>
   </div>
 
   <!-- Mining widget -->
@@ -2395,7 +2413,6 @@ function enterDash(user){
       window._db.ref('users/'+getSess()).set(_ud).catch(()=>{});
     }
   },60000);
-  setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
 }
 
 // ─── NAVIGATION ───
@@ -2890,7 +2907,9 @@ function submitWithdraw(){
     fullName:fullName, bank:bank, accNo:accNo, note:note,
     time:Date.now(), status:'pending'
   };
-  window._db.ref('withdraw_reqs').push(req).then(function(){
+  const _wp=window._db.ref('withdraw_reqs').push(req);
+  _wp.then(function(){
+    try{window._db.ref('userreqs/'+req.user+'/'+_wp.key).set({t:'withdraw'});}catch(e){}
     _wdSubmitting=false;
     ud.usd=Math.max(0,Math.round(((ud.usd||0)-usdAmt)*100)/100);
     ud.txs=ud.txs||[];
@@ -2978,6 +2997,7 @@ function approveWithdraw(fbKey){
     claimRequest('withdraw_reqs/'+fbKey,'approved',function(ok){
       if(!ok){showToast('⚠ คำขอนี้ถูกดำเนินการไปแล้ว');renderAdminWithdraw();return;}
       ref.update({approvedAt:Date.now()});
+      recordWithdrawStat(r);
       showToast('✅ อนุมัติถอนแล้ว');
       renderAdminWithdraw();
     });
@@ -3494,7 +3514,7 @@ function uploadAdminQR(e){
 function loadAdminQRPreview(){
   const wrap=document.getElementById('adminQRPreview');
   if(!wrap||!window._db)return;
-  loadLakSettings();loadRefSettings();loadFirstSettings();
+  loadLakSettings();loadRefSettings();loadFirstSettings();loadSiteInfo();
   const btn=document.getElementById('delQRBtn');
   const show=function(src){
     wrap.innerHTML='<img src="'+src+'" style="width:160px;height:160px;border-radius:10px;border:2px solid rgba(255,215,0,0.3);object-fit:contain;background:#fff;">';
@@ -3600,6 +3620,7 @@ function submitTopupRequest(amt,onOk,onFail,extra){
     return ref.set(Object.assign({id:ref.key,user:user,amt:amt,time:Date.now(),status:'pending',hasSlip:!!slip},ex));
   }).then(function(){
     _tpSubmitting=false;
+    try{window._db.ref('userreqs/'+user+'/'+ref.key).set({t:'topup'});}catch(e){}
     if(_ud)_ud.lastTopupKey=ref.key;
     try{window._db.ref('users/'+user+'/lastTopupKey').set(ref.key);}catch(e){}
     if(onOk)onOk(ref.key);
@@ -4082,6 +4103,7 @@ function showHistoryPopup(){
       <div class="pop-title">📋 ประวัติการทำรายการ</div>
       <button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button>
     </div>
+    <button onclick="this.closest('.overlay').remove();showMyRequests()" style="width:100%;padding:0.7rem;margin-bottom:0.8rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">📄 สถานะคำขอเติม/ถอนของฉัน</button>
     <div style="max-height:65vh;overflow-y:auto;">
       ${txs.length?txs.slice(0,50).map(tx=>{
         const d=new Date(tx.time||0);
@@ -4102,6 +4124,257 @@ function showHistoryPopup(){
     </div>
   </div>`;
   document.body.appendChild(ov);
+}
+
+// ═══════════════════════════════════════════════
+// ─── ความน่าเชื่อถือ: สถิติจริง / ศูนย์ช่วยเหลือ / สถานะคำขอของฉัน ───
+// ═══════════════════════════════════════════════
+let _pub={members:0,wdTotal:0,wdCount:0,recent:[],rate:DEFAULT_LAK_RATE};
+function maskName(n){
+  n=String(n||'');
+  if(n.length<=2)return (n[0]||'*')+'*';
+  return n.slice(0,2)+'***'+n.slice(-1);
+}
+function fmtN(n){return Math.round(parseFloat(n)||0).toLocaleString('en-US');}
+function fmtUsd(n){return (Math.round((parseFloat(n)||0)*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});}
+function agoText(t){
+  const m=Math.floor((Date.now()-(t||0))/60000);
+  if(m<1)return 'เมื่อสักครู่';
+  if(m<60)return m+' นาทีที่แล้ว';
+  const h=Math.floor(m/60);
+  if(h<24)return h+' ชั่วโมงที่แล้ว';
+  return Math.floor(h/24)+' วันที่แล้ว';
+}
+function bumpStat(key,delta){
+  if(!window._db)return;
+  window._db.ref('stats/'+key).transaction(function(n){return (parseFloat(n)||0)+delta;},function(){},false);
+}
+function recordWithdrawStat(r){
+  if(!window._db||!r)return;
+  const a=parseFloat(r.amt)||0;
+  bumpStat('wdTotal',a);bumpStat('wdCount',1);
+  window._db.ref('stats/recent').push({u:maskName(r.user),amt:a,time:Date.now()});
+}
+function loadPublicStats(){
+  const db=window._db;if(!db)return;
+  const val=function(p,d){return db.ref(p).once('value').then(function(s){return s.exists()?s.val():d;});};
+  Promise.all([val('stats/members',0),val('stats/wdTotal',0),val('stats/wdCount',0),val('settings/lakRate',0),
+    db.ref('stats/recent').orderByKey().limitToLast(5).once('value')]).then(function(r){
+    _pub.members=parseFloat(r[0])||0;_pub.wdTotal=parseFloat(r[1])||0;_pub.wdCount=parseFloat(r[2])||0;
+    _pub.rate=(parseFloat(r[3])>0)?parseFloat(r[3]):DEFAULT_LAK_RATE;
+    const rec=r[4].exists()?Object.values(r[4].val()):[];
+    _pub.recent=rec.sort(function(a,b){return (b.time||0)-(a.time||0);}).slice(0,5);
+    paintPublicStats();
+  }).catch(function(){});
+}
+function paintPublicStats(){
+  const set=function(id,v){const e=document.getElementById(id);if(e)e.textContent=v;};
+  const wd='$'+fmtUsd(_pub.wdTotal);
+  set('lsMembers',fmtN(_pub.members));set('lsWd',wd);set('lsWdCount',fmtN(_pub.wdCount));
+  set('pstMembers',fmtN(_pub.members));set('pstWd',wd);set('pstWdCount',fmtN(_pub.wdCount));
+  renderTicker();
+  const box=document.getElementById('recentWdBox'),list=document.getElementById('recentWdList');
+  if(box&&list){
+    box.style.display=_pub.recent.length?'block':'none';
+    list.innerHTML=_pub.recent.map(function(r){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.45rem 0;border-bottom:1px solid rgba(157,78,221,0.1);font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;">'
+        +'<span style="color:#fff;">👤 '+escHtml(r.u||'-')+'</span>'
+        +'<span style="color:var(--green);font-weight:700;">$'+(parseFloat(r.amt)||0).toFixed(2)+'</span>'
+        +'<span style="color:#A890CC;font-size:0.58rem;">'+agoText(r.time)+'</span></div>';
+    }).join('');
+  }
+}
+function renderTicker(){
+  const el=document.getElementById('tickerInner');if(!el)return;
+  const items=[
+    ['#4ade80','สมาชิก '+fmtN(_pub.members)+' คน'],
+    ['#fbbf24','ถอนสำเร็จแล้ว $'+fmtUsd(_pub.wdTotal)],
+    ['#c084fc','1 USDT = ₭ '+fmtN(_pub.rate)],
+    ['#4ade80','เติมและลงทุนขั้นต่ำ $'+TOPUP_MIN]
+  ];
+  const one=items.map(function(i){return '<div class="ticker-item2"><div class="tdot" style="background:'+i[0]+';box-shadow:0 0 5px '+i[0]+';"></div>'+escHtml(i[1])+'</div>';}).join('');
+  el.innerHTML=one+one;
+}
+function paintPromoRoi(){
+  const amt=1000,pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt),total=amt+daily*days;
+  const set=function(id,v){const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('roiDaily','+$'+daily.toFixed(2)+' USDT');set('roiMonth','+$'+(daily*30).toFixed(2)+' USDT');
+  set('roiDays',days+' วัน');set('roiTotal','$'+total.toLocaleString('en-US',{maximumFractionDigits:0}));
+}
+(function(){
+  let n=0;
+  const t=setInterval(function(){n++;if(window._db){clearInterval(t);loadPublicStats();}else if(n>40)clearInterval(t);},1000);
+  setInterval(function(){if(window._db)loadPublicStats();},120000);
+  document.addEventListener('DOMContentLoaded',function(){renderTicker();paintPromoRoi();});
+})();
+// สถิติสาธารณะ: แอดมินนับใหม่จากข้อมูลจริง
+function recountStats(){
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  Promise.all([window._db.ref('users').once('value'),window._db.ref('withdraw_reqs').once('value')]).then(function(r){
+    const members=r[0].exists()?Object.keys(r[0].val()).length:0;
+    const reqs=r[1].exists()?Object.values(r[1].val()):[];
+    const ok=reqs.filter(function(x){return x.status==='approved';});
+    const total=ok.reduce(function(s,x){return s+(parseFloat(x.amt)||0);},0);
+    const last=ok.sort(function(a,b){return (b.approvedAt||b.time||0)-(a.approvedAt||a.time||0);}).slice(0,5);
+    const rec={};last.forEach(function(x,i){rec['r'+String(i).padStart(2,'0')]={u:maskName(x.user),amt:parseFloat(x.amt)||0,time:x.approvedAt||x.time||0};});
+    return window._db.ref('stats').update({members:members,wdTotal:Math.round(total*100)/100,wdCount:ok.length,recent:rec}).then(function(){
+      showToast('✅ นับสถิติจริงแล้ว: สมาชิก '+members+' · ถอน '+ok.length+' ครั้ง $'+fmtUsd(total));
+      loadPublicStats();
+    });
+  }).catch(function(){showToast('❌ นับสถิติไม่สำเร็จ');});
+}
+
+// ── ข้อมูลติดต่อ/ผู้ให้บริการ (แอดมินตั้ง เก็บที่ site/) ──
+const SITE_FIELDS=['line','wa','phone','email','hours','name','addr','reg','proc'];
+function saveSiteInfo(){
+  const o={};
+  for(const f of SITE_FIELDS){
+    const e=document.getElementById('site_'+f);
+    const v=e?e.value.trim():'';
+    if(v.length>200){showToast('⚠ ข้อความยาวเกินไป (สูงสุด 200 ตัวอักษร)');return;}
+    o[f]=v;
+  }
+  if(o.line&&/^[a-z]+:/i.test(o.line)&&!/^https?:\/\//i.test(o.line)){showToast('⚠ ลิงก์ LINE ต้องขึ้นต้นด้วย http:// หรือ https://');return;}
+  if(o.wa&&!/^[+0-9 \-]{6,20}$/.test(o.wa)){showToast('⚠ เบอร์ WhatsApp ใส่ได้เฉพาะตัวเลข + และ -');return;}
+  if(o.phone&&!/^[+0-9 \-]{6,20}$/.test(o.phone)){showToast('⚠ เบอร์โทรใส่ได้เฉพาะตัวเลข + และ -');return;}
+  if(o.email&&!/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(o.email)){showToast('⚠ อีเมลไม่ถูกต้อง');return;}
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  window._db.ref('site').set(o).then(function(){showToast('✅ บันทึกข้อมูลติดต่อและผู้ให้บริการแล้ว');}).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
+}
+function loadSiteInfo(){
+  if(!window._db)return;
+  window._db.ref('site').once('value').then(function(s){
+    const d=s.exists()?s.val():{};
+    SITE_FIELDS.forEach(function(f){const e=document.getElementById('site_'+f);if(e)e.value=d[f]||'';});
+  }).catch(function(){});
+}
+
+// ── ศูนย์ช่วยเหลือ ──
+let _helpTab='contact', _helpData={};
+function loadHelpData(cb){
+  const db=window._db;
+  if(!db){cb({});return;}
+  const keys=['lakRate','fbBonus','fbMin','fbTurn','fbMax','refBonus','refMax'];
+  Promise.all([db.ref('site').once('value')].concat(keys.map(function(k){return db.ref('settings/'+k).once('value');}))).then(function(r){
+    const d={site:r[0].exists()?r[0].val():{},settings:{}};
+    keys.forEach(function(k,i){if(r[i+1].exists())d.settings[k]=r[i+1].val();});
+    cb(d);
+  }).catch(function(){cb({});});
+}
+function helpRow(icon,label,value,href){
+  const f='font-family:\'Share Tech Mono\',monospace;';
+  const v=href?'<a href="'+escHtml(href)+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:underline;word-break:break-all;">'+escHtml(value)+'</a>':'<span style="color:#fff;word-break:break-all;">'+escHtml(value)+'</span>';
+  return '<div style="padding:0.7rem 0;border-bottom:1px solid rgba(157,78,221,0.12);'+f+'font-size:0.74rem;"><div style="color:#A890CC;font-size:0.6rem;margin-bottom:0.2rem;">'+icon+' '+escHtml(label)+'</div>'+v+'</div>';
+}
+function helpTabHtml(tab,d){
+  const site=d.site||{},st=d.settings||{};
+  const f='font-family:\'Share Tech Mono\',monospace;';
+  const note=function(t){return '<div style="'+f+'font-size:0.68rem;color:#A890CC;line-height:1.7;margin-bottom:0.6rem;">'+t+'</div>';};
+  if(tab==='contact'){
+    let h='';
+    if(site.line)h+=helpRow('💬','LINE',site.line,/^https?:\/\//i.test(site.line)?site.line:'');
+    if(site.wa)h+=helpRow('🟢','WhatsApp',site.wa,'https://wa.me/'+site.wa.replace(/[^0-9]/g,''));
+    if(site.phone)h+=helpRow('📞','โทรศัพท์',site.phone,'tel:'+site.phone.replace(/[^0-9+]/g,''));
+    if(site.email)h+=helpRow('✉️','อีเมล',site.email,'mailto:'+site.email);
+    if(site.hours)h+=helpRow('🕐','เวลาทำการ',site.hours,'');
+    if(!h)h=note('ผู้ให้บริการยังไม่ได้ระบุช่องทางติดต่อ');
+    return note('มีปัญหาเรื่องเติมเงิน ถอนเงิน หรือบัญชี ติดต่อเราได้ที่ช่องทางด้านล่าง')+h
+      +note('<br>⚠ ผู้ให้บริการจะไม่ขอรหัสผ่านหรือรหัส OTP ของคุณทางแชทหรือโทรศัพท์ทุกกรณี')
+  }
+  if(tab==='faq'){
+    const rate=parseFloat(st.lakRate)>0?parseFloat(st.lakRate):DEFAULT_LAK_RATE;
+    const ex=[10,100,1000,10000].map(function(a){const dp=calcDailyPct(a),dy=calcDays(a);return '$'+a.toLocaleString()+': '+dp.toFixed(2)+'%/วัน · '+dy+' วัน · กำไรรวมประมาณ $'+(calcDailyEarn(a)*dy).toFixed(2);}).join('<br>');
+    const q=function(a,b){return '<details style="border-bottom:1px solid rgba(157,78,221,0.12);padding:0.6rem 0;"><summary style="'+f+'font-size:0.75rem;color:#fff;cursor:pointer;">'+a+'</summary><div style="'+f+'font-size:0.68rem;color:#A890CC;line-height:1.7;margin-top:0.4rem;">'+b+'</div></details>';};
+    let bonus='';
+    const fb=parseFloat(st.fbBonus);
+    if(isFinite(fb)?fb>0:true){
+      const b=isFinite(fb)?fb:FB_DEFAULT.bonus,mn=isFinite(parseFloat(st.fbMin))?parseFloat(st.fbMin):FB_DEFAULT.min,tn=isFinite(parseFloat(st.fbTurn))?parseFloat(st.fbTurn):FB_DEFAULT.turn,mx=isFinite(parseInt(st.fbMax,10))?parseInt(st.fbMax,10):FB_DEFAULT.max;
+      bonus='โบนัสเติมครั้งแรก $'+b+': เติมครั้งแรกขั้นต่ำ $'+mn+' ได้ครั้งเดียวต่อบัญชี จำกัด '+mx+' คนแรก โบนัสถอนไม่ได้จนกว่าจะลงทุนครบ $'+(Math.round(b*tn*100)/100)+'<br>';
+    }
+    const rb=isFinite(parseFloat(st.refBonus))?parseFloat(st.refBonus):REF_BONUS;
+    if(rb>0)bonus+='โบนัสแนะนำเพื่อน $'+rb+': เพื่อนสมัครผ่านลิงก์ของคุณและเติมเงินครั้งแรกสำเร็จ ได้ทั้งสองฝ่าย';
+    if(!bonus)bonus='ขณะนี้ไม่มีโปรโมชันโบนัส';
+    return q('เติมเงินยังไง?','1) กด เติม USDT ในกระเป๋า แล้วกรอกจำนวนเงินกีบ<br>2) โอนตามบัญชีหรือสแกน QR ที่แสดง<br>3) แนบสลิปโอนเงิน แล้วกด "โอนสำเร็จแล้ว"<br>4) แอดมินตรวจสอบยอดและสลิป เมื่ออนุมัติ USDT จะเข้ากระเป๋า')
+      +q('อัตราแลกเปลี่ยนเท่าไหร่?','ปัจจุบัน 1 USDT = ₭'+fmtN(rate)+' อัตรานี้ผู้ให้บริการกำหนดและเปลี่ยนได้ ระบบคำนวณ USDT ตอนแอดมินอนุมัติจากอัตราปัจจุบัน และปัดเศษลง')
+      +q('ถอนใช้เวลากี่ชั่วโมง?',escHtml(site.proc||'ตามที่ผู้ให้บริการแจ้ง สอบถามสถานะได้ที่แท็บติดต่อ')+'<br>คุณดูสถานะคำขอได้ที่ ประวัติ → สถานะคำขอเติม/ถอนของฉัน')
+      +q('มีค่าธรรมเนียมไหม?','ระบบไม่หักค่าธรรมเนียมการเติมและการถอน ค่าธรรมเนียมของธนาคาร (ถ้ามี) เป็นไปตามที่ธนาคารกำหนด')
+      +q('ขั้นต่ำและสูงสุด?','เติมเงินขั้นต่ำ $'+TOPUP_MIN+' (≈ ₭'+fmtN(TOPUP_MIN*rate)+') · ลงทุน $10 – $100,000 ต่อครั้ง · ถอนต้องมากกว่า $0')
+      +q('กำไรคิดยังไง?','คำนวณจากยอดลงทุนตามสูตรของระบบ ตัวอย่าง:<br>'+ex+'<br><b>เป็นประมาณการ ไม่ใช่การรับประกันผลตอบแทน</b>')
+      +q('มีโบนัสอะไรบ้าง?',bonus)
+      +q('บัญชีถูกระงับ?','อาจเกิดจากการฝ่าฝืนเงื่อนไข เช่น สร้างหลายบัญชีเพื่อรับโบนัส ติดต่อผู้ให้บริการที่แท็บติดต่อ');
+  }
+  if(tab==='terms'){
+    const li=function(t){return '<li style="margin-bottom:0.5rem;">'+t+'</li>';};
+    return '<ul style="'+f+'font-size:0.68rem;color:#c9b8e8;line-height:1.7;padding-left:1.1rem;margin:0;">'
+      +li('<b>ความเสี่ยง:</b> การลงทุนมีความเสี่ยง คุณอาจสูญเสียเงินลงทุนบางส่วนหรือทั้งหมด ลงทุนเฉพาะเงินที่พร้อมจะเสียได้')
+      +li('<b>กำไรเป็นประมาณการ:</b> ตัวเลขกำไรที่แสดงคำนวณตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน และอาจเปลี่ยนแปลงได้')
+      +li('<b>ราคา ETH และอัตราแลกเปลี่ยน:</b> ราคา ETH ผันผวน และอัตรากีบ/USDT ผู้ให้บริการเป็นผู้กำหนดและเปลี่ยนได้โดยไม่ต้องแจ้งล่วงหน้า')
+      +li('<b>การเติมเงิน:</b> ต้องแนบสลิปที่ตรงกับยอดโอนจริง รายการที่ตรวจสอบไม่ได้อาจถูกปฏิเสธ')
+      +li('<b>การถอนเงิน:</b> ต้องกรอกชื่อ-นามสกุลจริงและบัญชีธนาคารที่ถูกต้อง ผู้ให้บริการตรวจสอบและโอนตามเวลาที่ระบุ หากกรอกข้อมูลผิดหรือบัญชีไม่ใช่ของคุณ ผู้ให้บริการไม่รับผิดชอบความเสียหาย')
+      +li('<b>โบนัส:</b> โบนัสถอนไม่ได้จนกว่าจะลงทุนครบตามเงื่อนไข ผู้ให้บริการแก้ไขหรือยกเลิกโปรโมชันได้ การสร้างหลายบัญชีเพื่อรับโบนัสทำให้บัญชีถูกระงับ')
+      +li('<b>ความปลอดภัยบัญชี:</b> เก็บรหัสผ่านเป็นความลับ เปิด 2FA ได้ที่ ตั้งค่า ผู้ให้บริการไม่ขอรหัสผ่านหรือ OTP จากคุณ')
+      +li('<b>การระงับบัญชี:</b> ผู้ให้บริการระงับบัญชีที่ฝ่าฝืนเงื่อนไขหรือมีพฤติกรรมน่าสงสัยได้')
+      +'</ul>';
+  }
+  let h='';
+  if(site.name)h+=helpRow('🏢','ชื่อผู้ให้บริการ',site.name,'');
+  if(site.addr)h+=helpRow('📍','ที่อยู่',site.addr,'');
+  if(site.reg)h+=helpRow('📄','เลขทะเบียน/ใบอนุญาต',site.reg,'');
+  if(!h)h=note('ผู้ให้บริการยังไม่ได้ระบุข้อมูลนิติบุคคล/ผู้ให้บริการ');
+  return h;
+}
+function helpSwitch(tab){
+  _helpTab=tab;
+  document.querySelectorAll('#helpOv .help-tab').forEach(function(b){
+    const on=b.getAttribute('data-t')===tab;
+    b.style.background=on?'rgba(255,215,0,0.15)':'rgba(255,255,255,0.04)';
+    b.style.color=on?'var(--gold)':'#A890CC';
+  });
+  const c=document.getElementById('helpBody');
+  if(c)c.innerHTML=helpTabHtml(tab,_helpData);
+}
+function showHelpCenter(tab){
+  const old=document.getElementById('helpOv');if(old)old.remove();
+  const ov=document.createElement('div');ov.className='overlay';ov.id='helpOv';
+  const tabs=[['contact','📞 ติดต่อ'],['faq','❓ FAQ'],['terms','⚖️ เงื่อนไข'],['about','🏢 ผู้ให้บริการ']];
+  ov.innerHTML='<div class="popup"><div class="pop-hd"><div class="pop-title">🛟 ศูนย์ช่วยเหลือ</div><button class="pop-close" onclick="document.getElementById(\'helpOv\').remove()">✕</button></div>'
+    +'<div style="display:flex;gap:0.35rem;margin-bottom:0.8rem;flex-wrap:wrap;">'+tabs.map(function(t){return '<button class="help-tab" data-t="'+t[0]+'" onclick="helpSwitch(this.dataset.t)" style="flex:1;min-width:70px;padding:0.5rem 0.3rem;border:1px solid rgba(255,215,0,0.2);border-radius:8px;cursor:pointer;font-family:\'Share Tech Mono\',monospace;font-size:0.62rem;">'+t[1]+'</button>';}).join('')+'</div>'
+    +'<div id="helpBody" style="max-height:58vh;overflow-y:auto;font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;color:#A890CC;">กำลังโหลด...</div></div>';
+  document.body.appendChild(ov);
+  helpSwitch(tab||'contact');
+  loadHelpData(function(d){_helpData=d;helpSwitch(_helpTab);});
+}
+
+// ── สถานะคำขอเติม/ถอนของฉัน ──
+function showMyRequests(){
+  const u=getSess();if(!u)return;
+  const ov=document.createElement('div');ov.className='overlay';
+  ov.innerHTML='<div class="popup"><div class="pop-hd"><div class="pop-title">📄 คำขอเติม/ถอนของฉัน</div><button class="pop-close" onclick="this.closest(\'.overlay\').remove()">✕</button></div><div id="myReqBody" style="max-height:65vh;overflow-y:auto;font-family:\'Share Tech Mono\',monospace;font-size:0.72rem;color:#A890CC;">กำลังโหลด...</div></div>';
+  document.body.appendChild(ov);
+  const body=ov.querySelector('#myReqBody');
+  if(!window._db){body.textContent='ไม่มี Firebase';return;}
+  window._db.ref('userreqs/'+u).orderByKey().limitToLast(20).once('value').then(function(s){
+    const idx=s.exists()?s.val():{};
+    const keys=Object.keys(idx).sort().reverse();
+    if(!keys.length){body.textContent='ยังไม่มีคำขอ';return;}
+    return Promise.all(keys.map(function(k){
+      const t=idx[k].t==='withdraw'?'withdraw':'topup';
+      return window._db.ref(t+'_reqs/'+k).once('value').then(function(r){return r.exists()?{k:k,t:t,r:r.val()}:null;});
+    })).then(function(list){
+      list=list.filter(Boolean).sort(function(a,b){return (b.r.time||0)-(a.r.time||0);});
+      const sc={pending:['⏳ รอตรวจสอบ','var(--gold)'],approved:['✅ สำเร็จ','var(--green)'],rejected:['❌ ถูกปฏิเสธ','var(--red-bright)']};
+      body.innerHTML=list.map(function(x){
+        const r=x.r,m=sc[r.status]||[escHtml(r.status),'#A890CC'];
+        const d=new Date(r.time||0);
+        const ts=d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+        const main=x.t==='topup'
+          ?'💵 เติม '+escHtml(topupAmtLabel(r))
+          :'📤 ถอน $'+(parseFloat(r.amt)||0).toFixed(2)+(r.currency==='LAK'?' ≈ ₭'+fmtN(r.lak)+' → '+escHtml(r.bank||''):'');
+        return '<div style="padding:0.7rem 0;border-bottom:1px solid rgba(157,78,221,0.12);"><div style="color:#fff;font-size:0.74rem;">'+main+'</div>'
+          +'<div style="display:flex;justify-content:space-between;margin-top:0.25rem;font-size:0.6rem;"><span>'+ts+'</span><span style="color:'+m[1]+';">'+m[0]+'</span></div></div>';
+      }).join('')||'ยังไม่มีคำขอ';
+    });
+  }).catch(function(){body.textContent='โหลดไม่สำเร็จ';});
 }
 
 function stopDrip(){
@@ -4859,7 +5132,6 @@ window.addEventListener('load',()=>{
   if(s&&getU()[s])enterDash(s);
   else{
     typePrompt('auth --mode=login');
-    setInterval(()=>{const el=document.getElementById('aMiners');if(el)el.textContent=(2847+Math.floor((Math.random()-0.5)*6)).toLocaleString()},2500);
   }
 });
 
@@ -4968,6 +5240,7 @@ function verifyOTP(){
   if(window._db){
     window._db.ref('users/'+u).set(nd).then(()=>{
       reserveRefCode(refCode,u);
+      bumpStat('members',1);
       document.querySelectorAll('.overlay').forEach(o=>o.remove());
       _ud=nd;setTimeout(()=>{setSess(u);enterDash(u);},300);
     });
@@ -5262,6 +5535,7 @@ function showSettingsMenu(){
       <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showChangePassPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>🔐</span><span style="font-family:'Share Tech Mono',monospace;">เปลี่ยนรหัสผ่าน</span></button>
       <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showLangPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>🌐</span><span style="font-family:'Share Tech Mono',monospace;">เปลี่ยนภาษา</span></button>
       <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showAboutPopup()" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>ℹ️</span><span style="font-family:'Share Tech Mono',monospace;">เกี่ยวกับแอป</span></button>
+      <button onclick="document.querySelectorAll('.overlay').forEach(o=>o.remove());showHelpCenter('contact')" style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.25);border-radius:12px;color:#fff;cursor:pointer;text-align:left;width:100%;"><span>🛟</span><span style="font-family:'Share Tech Mono',monospace;">ศูนย์ช่วยเหลือ · FAQ · เงื่อนไข</span></button>
       
     <!-- 2FA -->
     <div style="background:rgba(192,132,252,0.05);border:1px solid rgba(192,132,252,0.15);border-radius:12px;padding:1rem;margin-bottom:1rem;">
