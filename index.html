@@ -1010,6 +1010,23 @@ body:has(#authScreen.active) #contactFab{display:none}
 .acx-out{height:54px;border-radius:16px;border:1px solid rgba(248,113,113,.5);background:rgba(239,68,68,.1);color:#fca5a5;font-size:16px;font-weight:800;cursor:pointer}
 .acx-mini{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
 .acx-mini button{height:44px;padding:0 12px;border:none;background:none;color:#a99bc7;font-size:13px;cursor:pointer}
+.apw{display:none;flex-direction:column;gap:10px;margin:0.6rem 0.8rem 0;padding:0.9rem;border-radius:14px;background:rgba(239,68,68,.12);border:2px solid rgba(248,113,113,.6);max-height:45vh;overflow-y:auto;flex:none}
+.apw.on{display:flex}
+.apw-hd{display:flex;gap:10px;align-items:flex-start}
+.apw-t{font-size:0.95rem;font-weight:800;color:#fecaca}
+.apw-b{font-size:0.8rem;line-height:1.6;color:#fde2e2;margin-top:3px}
+.apw-go{height:44px;border:none;border-radius:12px;background:linear-gradient(135deg,#dc2626,#f87171);color:#fff;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit}
+.apw-form{display:none;flex-direction:column;gap:6px}
+.apw-form.on{display:flex}
+.apw-form label{font-size:0.75rem;color:#fecaca;margin-top:2px}
+.apw-in{height:44px;box-sizing:border-box;padding:0 12px;border-radius:10px;border:1px solid rgba(248,113,113,.5);background:rgba(0,0,0,.4);color:#fff;font-size:1rem;outline:none;width:100%;font-family:'Share Tech Mono',monospace}
+.apw-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.apw-bar div{height:100%;width:0;transition:width .2s}
+.apw-hint{font-size:0.75rem;color:#fde2e2;min-height:1em}
+.apw-row{display:flex;gap:8px}
+.apw-cancel{height:46px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:none;color:#fde2e2;font-size:0.85rem;cursor:pointer;font-family:inherit}
+.apw-save{flex:1;height:46px;border:none;border-radius:12px;font-size:0.9rem;font-weight:800;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16}
+.apw-save:disabled{cursor:not-allowed;background:rgba(255,255,255,.12);color:#a99bc7}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1142,6 +1159,26 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);" id="adminBadge"></div>
     <button class="btn-out" style="background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.3);color:var(--gold);" onclick="doAdminLogout()">ออก</button>
   </nav>
+
+<!-- เตือนรหัส Admin เริ่มต้น -->
+  <div id="admPwWarn" class="apw" role="alert">
+    <div class="apw-hd"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"/></svg>
+      <div><div class="apw-t">ยังไม่ได้ตั้งรหัส Admin ที่ปลอดภัย</div><div class="apw-b">ตอนนี้ระบบยังใช้รหัสเริ่มต้น ใครก็เดารหัสนี้ได้ และเข้ามาอนุมัติเงินแทนคุณได้ ควรเปลี่ยนทันทีก่อนเปิดให้ลูกค้าใช้</div></div>
+    </div>
+    <div id="apwOpen"><button type="button" class="apw-go" style="width:100%" onclick="admPwToggle(true)">เปลี่ยนรหัสตอนนี้</button></div>
+    <div id="apwForm" class="apw-form">
+      <label for="apwNew">รหัสใหม่ (อย่างน้อย 8 ตัว)</label>
+      <input id="apwNew" class="apw-in" type="password" autocomplete="new-password" oninput="admPwInput()">
+      <div class="apw-bar"><div id="apwMeter"></div></div>
+      <div id="apwHint" class="apw-hint"></div>
+      <label for="apwConf">ยืนยันรหัสใหม่</label>
+      <input id="apwConf" class="apw-in" type="password" autocomplete="new-password" oninput="admPwInput()">
+      <div class="apw-row">
+        <button type="button" class="apw-cancel" onclick="admPwToggle(false)">ยกเลิก</button>
+        <button type="button" id="apwSave" class="apw-save" onclick="admPwSave()" disabled>บันทึกรหัสใหม่</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Admin tabs -->
 
@@ -1340,7 +1377,7 @@ body:has(#adminScreen.active) #contactFab{display:none}
   <!-- เปลี่ยนรหัส Admin -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);margin-bottom:0.8rem;">🔐 เปลี่ยนรหัส Admin</div>
-    <input type="password" id="newAdminPass" placeholder="รหัสใหม่ (อย่างน้อย 6 ตัว)"
+    <input type="password" id="newAdminPass" placeholder="รหัสใหม่ (อย่างน้อย 8 ตัว)"
       style="width:100%;padding:0.7rem 1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.25);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.85rem;outline:none;margin-bottom:0.7rem;">
     <button onclick="changeAdminPass()" class="btn btn-primary" style="width:100%;">🔐 บันทึกรหัสใหม่</button>
   </div>
@@ -5472,7 +5509,7 @@ function confirmAdminPass(){
   document.getElementById('dashScreen').classList.remove('active');
   document.getElementById('adminScreen').classList.add('active');
   document.getElementById('adminBadge').textContent='🔑 Admin Mode';
-  switchAdminTab(0); loadAdminQRPreview(); renderAdminStats(); autoBackfillStats();
+  admPwCheck(); switchAdminTab(0); loadAdminQRPreview(); renderAdminStats(); autoBackfillStats();
   });
 }
 function doAdminLogout(){
@@ -5573,14 +5610,56 @@ function renderAdminUsers(){
 }
 function changeAdminPass(){
   const p=document.getElementById('newAdminPass').value;
-  if(!p||p.length<6){showToast('⚠️ รหัสต้องมีอย่างน้อย 6 ตัว');return;}
+  if(!p||p.length<8){showToast('⚠️ รหัสต้องมีอย่างน้อย 8 ตัว');return;}
   _adminHash(p).then(function(h){
     return window._db.ref('admin/pwHash').set(h);
   }).then(function(){
     try{localStorage.removeItem(ADMIN_PASS_KEY);}catch(e){}
     document.getElementById('newAdminPass').value='';
-    showToast('✅ เปลี่ยนรหัส Admin สำเร็จ (ใช้ได้ทุกเครื่อง)');
+    showToast('✅ เปลี่ยนรหัส Admin สำเร็จ (ใช้ได้ทุกเครื่อง)');admPwCheck();
   }).catch(function(e){showToast('❌ บันทึกไม่สำเร็จ: '+(e&&e.message||e));});
+}
+
+// ─── เตือนรหัส Admin เริ่มต้น ───
+function admPwCheck(){
+  var w=document.getElementById('admPwWarn');if(!w)return;
+  var show=function(v){w.classList.toggle('on',!!v);};
+  if(!window._db){show(true);return;}
+  window._db.ref('admin/pwHash').once('value').then(function(sn){show(!sn.exists());}).catch(function(){show(true);});
+}
+function admPwToggle(open){
+  var o=document.getElementById('apwOpen'),f=document.getElementById('apwForm');
+  if(o)o.style.display=open?'none':'';
+  if(f)f.classList.toggle('on',!!open);
+  if(open){var i=document.getElementById('apwNew');if(i)i.focus();}
+  else{['apwNew','apwConf'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});admPwInput();}
+}
+function admPwInput(){
+  var a=(document.getElementById('apwNew')||{}).value||'',b=(document.getElementById('apwConf')||{}).value||'';
+  var lvl=!a?0:a.length<8?1:(/[0-9]/.test(a)&&/[A-Za-z]/.test(a)?3:2);
+  var cols=['transparent','#f87171','#fbbf24','#4ade80'];
+  var hints=['พิมพ์รหัสใหม่','สั้นเกินไป ต้องมีอย่างน้อย 8 ตัว','พอใช้ ผสมตัวเลขกับตัวอักษรจะแข็งแรงขึ้น','แข็งแรงดี'];
+  var m=document.getElementById('apwMeter');
+  if(m){m.style.width=(lvl*33.4)+'%';m.style.background=cols[lvl];}
+  var h=document.getElementById('apwHint');
+  if(h)h.textContent=hints[lvl]+(a.length>=8&&b&&a!==b?' · รหัสยืนยันไม่ตรงกัน':'');
+  var s=document.getElementById('apwSave');
+  if(s)s.disabled=!(a.length>=8&&a===b);
+}
+function admPwSave(){
+  var a=(document.getElementById('apwNew')||{}).value||'',b=(document.getElementById('apwConf')||{}).value||'';
+  if(a.length<8||a!==b){showToast('⚠️ รหัสต้องมีอย่างน้อย 8 ตัว และตรงกับช่องยืนยัน');return;}
+  var btn=document.getElementById('apwSave');if(btn)btn.disabled=true;
+  _adminHash(a).then(function(h){return window._db.ref('admin/pwHash').set(h);}).then(function(){
+    try{localStorage.removeItem(ADMIN_PASS_KEY);}catch(e){}
+    ['apwNew','apwConf'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+    admPwToggle(false);
+    showToast('✅ ตั้งรหัส Admin ใหม่แล้ว (ใช้ได้ทุกเครื่อง)');
+    admPwCheck();
+  }).catch(function(e){
+    if(btn)btn.disabled=false;
+    showToast('❌ บันทึกไม่สำเร็จ: '+(e&&e.message||e));
+  });
 }
 function renderAdminPanel(){ showAdmin(); } // legacy compat
 function updateNav(){
@@ -6676,7 +6755,7 @@ function verifyAdminFromSettings(){
     document.getElementById('authScreen')?.classList.remove('active');
     document.getElementById('dashScreen')?.classList.remove('active');
     document.getElementById('adminScreen')?.classList.add('active');
-    switchAdminTab(0);loadAdminQRPreview();renderAdminStats();loadUsdtAddr();autoBackfillStats();
+    admPwCheck();switchAdminTab(0);loadAdminQRPreview();renderAdminStats();loadUsdtAddr();autoBackfillStats();
   } else {
     if(msg)msg.textContent='❌ รหัสไม่ถูกต้อง';
   }
