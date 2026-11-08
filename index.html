@@ -1074,6 +1074,14 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <button onclick="saveSiteInfo()" class="btn btn-gold" style="width:100%;padding:0.7rem;">💾 บันทึกข้อมูลติดต่อ</button>
   </div>
 
+  <!-- ตรวจ ETH ผิดปกติ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.4rem;">🔎 ตรวจบัญชีที่ ETH ผิดปกติ</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.8rem;line-height:1.6;">เทียบ ETH ที่มีอยู่ กับ ETH สูงสุดที่ควรได้จากแพ็กเกจ (หัก ETH ที่แปลงแล้ว) เพื่อหาบัญชีที่ได้ ETH ซ้ำจากบั๊กแปลง ETH เดิม — ผลเป็นการประมาณ ตรวจรายคนก่อนปรับ</div>
+    <button onclick="auditEth()" class="btn btn-primary" style="width:100%;">🔎 ตรวจ ETH ผิดปกติ</button>
+    <div id="ethAuditOut" style="margin-top:.8rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;"></div>
+  </div>
+
   <!-- สถิติสาธารณะ -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.4rem;">📈 สถิติที่แสดงหน้าแรก</div>
@@ -6018,6 +6026,46 @@ function adminResetPw(username){
   window._db.ref('users/'+username+'/pw').set(p).then(function(){showToast('✅ ตั้งรหัสผ่านใหม่ให้ '+username+' แล้ว แจ้งลูกค้าให้เปลี่ยนรหัสเอง');}).catch(function(){showToast('❌ ไม่สำเร็จ');});
 }
 function adminViewTx(username){adminCustomer(username);}
+// ─── ตรวจ ETH ผิดปกติ ───
+var _ethAuditRows=[];
+function escA(x){return String(x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function ethExpectedOf(u,now){
+  var m=0;(u.packages||[]).forEach(function(p){
+    if(!p||!p.bought)return;
+    m+=((p.daily||0)/ETH_RATE)*Math.min(Math.max((now-p.bought)/86400000,0),p.days||0);
+  });
+  return Math.max(0,m-(u.ethConverted||0));
+}
+function auditEth(){
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  var out=document.getElementById('ethAuditOut');out.textContent='กำลังตรวจ…';
+  window._db.ref('users').once('value').then(function(sn){
+    var all=sn.exists()?sn.val():{},now=Date.now(),rows=[],n=0;
+    Object.keys(all).forEach(function(k){
+      var u=all[k]||{};n++;
+      var have=Math.max(u.ethReward||0,u.ethRewardSaved||0);
+      var exp=ethExpectedOf(u,now),ex=have-exp;
+      if(ex>0.0005)rows.push({u:k,have:have,exp:exp,ex:ex,conv:u.ethConverted||0});
+    });
+    rows.sort(function(a,b){return b.ex-a.ex;});_ethAuditRows=rows;
+    if(!rows.length){out.innerHTML='<div style="color:#4ade80">✅ ตรวจ '+n+' บัญชี ไม่พบ ETH เกินค่าที่ควรได้</div>';return;}
+    out.innerHTML='<div style="color:#fbbf24;margin-bottom:.5rem">⚠️ พบ '+rows.length+' จาก '+n+' บัญชี</div>'+rows.map(function(r,i){
+      return '<div style="border:1px solid var(--border);border-radius:8px;padding:.6rem;margin-bottom:.5rem;line-height:1.7">'
+      +'<b style="color:var(--gold)">'+escA(r.u)+'</b><br>มีอยู่ '+r.have.toFixed(6)+' ETH · ควรไม่เกิน '+r.exp.toFixed(6)+'<br>'
+      +'เกิน <b style="color:#f87171">'+r.ex.toFixed(6)+' ETH</b> ≈ $'+(r.ex*ETH_RATE).toFixed(2)+' · แปลงแล้ว '+r.conv.toFixed(6)
+      +'<br><button onclick="fixEthUser('+i+')" class="btn" style="margin-top:.4rem;width:100%">ปรับลดเป็นค่าที่ควรเป็น</button></div>';
+    }).join('');
+  }).catch(function(e){out.textContent='❌ '+(e&&e.message||e);});
+}
+function fixEthUser(i){
+  var r=_ethAuditRows[i];if(!r)return;
+  if(!confirm('ปรับ ETH ของ '+r.u+' จาก '+r.have.toFixed(6)+' เป็น '+r.exp.toFixed(6)+' ?\n(ถ้าลูกค้าออนไลน์อยู่ อาจถูกซิงค์ทับ ควรทำตอนออฟไลน์)'))return;
+  var v=parseFloat(r.exp.toFixed(6));
+  window._db.ref('users/'+r.u).update({ethReward:v,ethRewardSaved:v}).then(function(){
+    showToast('✅ ปรับ '+r.u+' แล้ว');_ethAuditRows[i]=null;auditEth();
+  }).catch(function(e){showToast('❌ '+(e&&e.message||e));});
+}
+
 
 
 // ─── MINING SCENE ───
