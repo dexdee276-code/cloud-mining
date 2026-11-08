@@ -274,6 +274,45 @@ animation:bnGlow 2.2s infinite;
 @media (max-width:380px){.na-word{letter-spacing:.5px;font-size:13px}}
 @media (prefers-reduced-motion:reduce){.bnav-mine-circle,.na-live i{animation:none}}
 
+
+/* ── WITHDRAW STEPPER ── */
+.wdx{padding:18px 16px!important;max-width:440px!important;width:100%;max-height:94vh!important;overflow-y:auto!important;border-radius:24px!important;background:#0b0618!important;border:1px solid rgba(168,85,247,.35)!important;font-family:'Noto Sans Lao','Noto Sans Thai',system-ui,sans-serif;color:#f3ecff;display:flex;flex-direction:column;gap:14px}
+.wdx-hd{display:flex;align-items:center;gap:8px}
+.wdx-ttl{font-family:'Orbitron','Noto Sans Thai','Noto Sans Lao',monospace;font-size:17px;font-weight:900;flex-grow:1}
+.wdx-ib{width:44px;height:44px;flex-shrink:0;border-radius:14px;border:1px solid rgba(200,100,255,.4);background:rgba(157,78,221,.12);color:#C8B0FF;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.wdx-ib svg{width:20px;height:20px}
+.wdx-wa{height:44px;padding:0 12px;border-radius:14px;border:1px solid rgba(74,222,128,.5);background:rgba(74,222,128,.12);color:#86efac;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.wdx-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.wdx-seg i{height:5px;border-radius:3px;background:rgba(255,255,255,.12)}
+.wdx-seg i.on{background:linear-gradient(90deg,#d97706,#fbbf24)}
+.wdx-bal{border-radius:16px;padding:12px 14px;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.25);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#C8B0FF}
+.wdx-bal b{font-family:'Orbitron',monospace;font-size:16px;color:#FFD700}
+.wdx-lock{font-size:12px;line-height:1.6;color:#FFD700}
+.wdx-lock:empty{display:none}
+.wdx-lbl{font-size:12px;color:#A890CC;margin-bottom:6px;display:block}
+.wdx-amtbox{border-radius:20px;padding:18px;background:linear-gradient(160deg,#1d0f3a,#120826);border:2px solid rgba(255,215,0,.35)}
+.wdx-amtrow{display:flex;align-items:center;gap:10px}
+.wdx-amtrow span{font-family:'Orbitron',monospace;font-size:30px;font-weight:900;color:#FFD700}
+.wdx-amtrow input{flex-grow:1;min-width:0;width:100%;box-sizing:border-box;height:56px;padding:0 4px;border:none;border-bottom:2px solid rgba(255,215,0,.6);background:transparent;color:#FFD700;font-family:'Orbitron',monospace;font-size:28px;font-weight:900;outline:none}
+.wdx-max{flex-shrink:0;height:48px;padding:0 16px;border-radius:14px;border:2px solid #FFD700;background:rgba(255,215,0,.15);color:#FFD700;font-family:'Orbitron',monospace;font-size:14px;font-weight:900;cursor:pointer}
+.wdx-err{font-size:13px;color:#fca5a5;margin-top:8px;min-height:0}
+.wdx-prev{font-size:14px;line-height:1.7;color:#86efac;margin-top:12px;min-height:2.4em}
+.wdx-chips{display:grid;gap:8px}
+.wdx-chip{height:48px;border-radius:14px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;border:1px solid rgba(180,80,255,.35);background:rgba(60,0,100,.5);color:#C8B0FF}
+.wdx-chip.on{border:2px solid #FFD700;background:rgba(255,215,0,.12);color:#FFD700}
+.wdx-m{height:52px;border-radius:14px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;border:1px solid rgba(255,255,255,.15);background:transparent;color:#A890CC}
+.wdx-in{width:100%;box-sizing:border-box;height:50px;padding:0 14px;border-radius:14px;border:1px solid rgba(200,100,255,.4);background:rgba(0,0,0,.35);color:#F5EEFF;font-family:inherit;font-size:15px;outline:none}
+.wdx-in.g{border-color:rgba(74,222,128,.4);color:#86efac;font-family:'Share Tech Mono',monospace}
+.wdx-warn{font-size:12px;line-height:1.6;color:#fca5a5;border-radius:12px;padding:10px 12px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3)}
+.wdx-info{font-size:12px;line-height:1.6;color:#A890CC;border-radius:12px;padding:10px 12px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2)}
+.wdx-sum{border-radius:20px;padding:18px;background:rgba(40,5,70,.98);border:2px solid rgba(200,100,255,.45);display:flex;flex-direction:column;gap:12px}
+.wdx-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:#A890CC}
+.wdx-row b{font-family:'Orbitron',monospace;font-size:16px;color:#FFD700;text-align:right}
+.wdx-row b.g{color:#4ade80}
+.wdx-row em{font-style:normal;font-family:'Share Tech Mono',monospace;font-size:13px;color:#E9D5FF;text-align:right;word-break:break-all}
+.wdx-go{height:56px;border:none;border-radius:16px;background:linear-gradient(135deg,#d97706,#fbbf24);color:#1a0a00;font-family:inherit;font-size:17px;font-weight:800;cursor:pointer;flex-shrink:0}
+.wdx-go:disabled{opacity:.4;cursor:not-allowed}
+
 /* ── SHARED ── */
 .sec-title{font-family:'Orbitron',monospace;font-size:0.78rem;letter-spacing:2px;color:#C8B0FF;font-weight:700;
 text-transform:uppercase;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.7rem}
@@ -3106,8 +3145,7 @@ function wdLakOf(usdt,rate){return Math.floor((parseFloat(usdt)||0)*rate);}
 function wdMethod(m){
   _wdMode=m==='usdt'?'usdt':'lak';const u=_wdMode==='usdt';
   const set=function(id,d){const e=document.getElementById(id);if(e)e.style.display=d;};
-  set('wdUsdtFields',u?'block':'none');set('wdLakFields',u?'none':'block');
-  const t=document.getElementById('wdTitle');if(t)t.textContent=u?'📤 ถอนเงิน (USDT → กระเป๋า)':'📤 ถอนเงิน (USDT → กีบ)';
+  set('wdUsdtFields',u?'flex':'none');set('wdLakFields',u?'none':'flex');
   const on='1px solid rgba(255,215,0,0.5)',off='1px solid rgba(255,255,255,0.15)';
   const a=document.getElementById('wdTabLak'),b=document.getElementById('wdTabUsdt');
   if(a){a.style.border=u?off:on;a.style.background=u?'transparent':'rgba(255,215,0,0.15)';a.style.color=u?'#A890CC':'var(--gold)';}
@@ -3151,7 +3189,7 @@ function submitWithdraw(){
   if(!window._db){showToast('❌ ไม่มี Firebase กรุณาลองใหม่');return;}
   const lak=isU?0:wdLakOf(usdAmt,_wdRate);
   if(!isU&&!(lak>0)){showToast('⚠️ จำนวนน้อยเกินไป');return;}
-  if(isU&&!_wdMinChecked&&!confirm('ยืนยันถอน '+usdAmt.toFixed(2)+' USDT\nเครือข่าย: '+net+'\nที่อยู่: '+addr+'\n\nตรวจสอบให้แน่ใจว่าถูกต้อง ถ้าผิดจะกู้คืนไม่ได้'))return;
+  if(isU&&!_wdMinChecked&&!window._wdNoConfirm&&!confirm('ยืนยันถอน '+usdAmt.toFixed(2)+' USDT\nเครือข่าย: '+net+'\nที่อยู่: '+addr+'\n\nตรวจสอบให้แน่ใจว่าถูกต้อง ถ้าผิดจะกู้คืนไม่ได้'))return;
   // ถอนครั้งแรก: ไม่มีขั้นต่ำ · ครั้งต่อๆไป: ขั้นต่ำ $WD_MIN_NEXT
   if(usdAmt<WD_MIN_NEXT&&!_wdMinChecked){
     _wdSubmitting=true;
@@ -3272,6 +3310,82 @@ function approveWithdraw(fbKey){
   }).catch(function(){showToast('❌ โหลดคำขอไม่สำเร็จ');});
 }
 
+var _wdStep=1;
+function wdMaxOf(ud){
+  var m=Math.min(ud.usd||0,withdrawableOf(ud));
+  return Math.max(0,Math.floor(m*100+1e-6)/100);
+}
+function wdShow(n){
+  _wdStep=n;
+  [1,2,3].forEach(function(i){
+    var e=document.getElementById('wdS'+i);if(e)e.style.display=(i===n)?'flex':'none';
+    var g=document.getElementById('wdSg'+i);if(g)g.classList.toggle('on',i<=n);
+  });
+  var b=document.getElementById('wdBack');if(b)b.style.display=n>1?'flex':'none';
+  var t=document.getElementById('wdStepTxt');if(t)t.textContent=n+'/3';
+  var x=document.getElementById('wdNext');if(x)x.textContent=n===1?'ต่อไป':n===2?'ตรวจสอบ':'ยืนยันแจ้งถอน';
+  var ov=document.getElementById('withdrawOv');if(ov){var p=ov.querySelector('.wdx');if(p)p.scrollTop=0;}
+}
+function wdAmtIn(el){
+  var r=String(el.value).replace(/[^0-9.]/g,'');
+  var d=r.indexOf('.');if(d>=0)r=r.slice(0,d+1)+r.slice(d+1).replace(/\./g,'').slice(0,2);
+  if(r!==el.value)el.value=r;
+  wdAmtCheck();wdLakPreview();
+  document.querySelectorAll('#wdS1 .wdx-chip').forEach(function(c){c.classList.remove('on');});
+}
+function wdAmtCheck(quiet){
+  var e=document.getElementById('wdAmt'),er=document.getElementById('wdErr');if(!e)return 0;
+  var v=Math.round((parseFloat(e.value)||0)*100)/100,m=window._wdMaxV||0,msg='';
+  if(e.value!==''&&v>m+1e-9)msg='เกินยอดที่ถอนได้ $'+m.toFixed(2);
+  else if(!(v>0)&&!quiet)msg='กรุณาใส่จำนวน';
+  if(er)er.textContent=msg;
+  return msg?0:v;
+}
+function wdMaxFill(){var e=document.getElementById('wdAmt');if(!e)return;e.value=(window._wdMaxV||0).toFixed(2);wdAmtCheck();wdLakPreview();}
+function wdChip(v){var e=document.getElementById('wdAmt');if(!e)return;e.value=String(v);wdAmtCheck();wdLakPreview();
+  document.querySelectorAll('#wdS1 .wdx-chip').forEach(function(c){c.classList.toggle('on',c.textContent==='$'+v);});}
+function wdPickNet(n){
+  var s=document.getElementById('wdNet');if(s)s.value=n;
+  document.querySelectorAll('#wdNetChips .wdx-chip').forEach(function(c){c.classList.toggle('on',c.getAttribute('data-n')===n);});
+}
+function wdPickBank(b){
+  var i=document.getElementById('wdBank');if(i)i.value=b;wdBankIn();
+}
+function wdBankIn(){
+  var v=((document.getElementById('wdBank')||{}).value||'').trim().toUpperCase();
+  document.querySelectorAll('#wdBankChips .wdx-chip').forEach(function(c){c.classList.toggle('on',c.textContent===v);});
+}
+function wdBackStep(){if(_wdStep>1)wdShow(_wdStep-1);}
+function wdNext(){
+  var ud=getUD();if(!ud)return;
+  var g=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
+  if(_wdStep===1){
+    var v=wdAmtCheck();
+    if(!(v>0)){showToast('⚠️ กรอกจำนวน USDT ที่ต้องการถอน');return;}
+    if(v>(ud.usd||0)+1e-9){showToast('⚠️ จำนวนเกินกว่าที่มีในกระเป๋า');return;}
+    if(v>withdrawableOf(ud)+1e-9){showToast('🔒 ถอนได้สูงสุด $'+withdrawableOf(ud)+' (โบนัสที่ล็อกถอนได้เมื่อลงทุนครบเงื่อนไข)');return;}
+    wdShow(2);return;
+  }
+  if(_wdStep===2){
+    var isU=(_wdMode==='usdt');
+    if(isU){
+      var net=g('wdNet')||'TRC20',addr=g('wdAddr'),addr2=g('wdAddr2');
+      if(!validUsdtAddr(addr,net)){showToast(net==='TRC20'?'⚠️ ที่อยู่ TRC20 ต้องขึ้นต้นด้วย T และยาว 34 ตัว':'⚠️ ที่อยู่ '+net+' ต้องขึ้นต้นด้วย 0x และยาว 42 ตัว');return;}
+      if(addr!==addr2){showToast('⚠️ ที่อยู่ทั้งสองช่องไม่ตรงกัน');return;}
+    } else {
+      if(g('wdName').length<2){showToast('⚠️ กรุณากรอกชื่อจริง-นามสกุล ตามบัญชีธนาคาร');return;}
+      if(g('wdBank').length<2){showToast('⚠️ กรุณากรอกชื่อธนาคาร');return;}
+      if(!/^[0-9][0-9\- ]{5,24}$/.test(g('wdAccNo'))){showToast('⚠️ เลขบัญชีไม่ถูกต้อง (ตัวเลข 6–25 หลัก)');return;}
+    }
+    var amt=Math.round((parseFloat(g('wdAmt'))||0)*100)/100;
+    var set=function(id,t){var e=document.getElementById(id);if(e)e.textContent=t;};
+    set('wdSumAmt','$'+amt.toFixed(2));
+    if(isU){set('wdSumRecvL','ได้รับเป็น USDT');set('wdSumRecv',amt.toFixed(2)+' USDT');set('wdSumDest',g('wdNet')+' · '+g('wdAddr'));}
+    else{set('wdSumRecvL','ได้รับเป็นกีบ');set('wdSumRecv','₭ '+fmtLak(wdLakOf(amt,_wdRate)));set('wdSumDest',g('wdBank')+' · '+g('wdAccNo')+' · '+g('wdName'));}
+    wdShow(3);return;
+  }
+  submitWithdraw();
+}
 function showWithdrawPopup(){
   const ud=getUD(); if(!ud) return;
   const usd=ud.usd||0;
@@ -3293,74 +3407,84 @@ function showWithdrawPopup(){
     return;
   }
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='withdrawOv';
-  ov.innerHTML=`<div class="popup">
-    <div class="pop-hd">
-      <div class="pop-title" id="wdTitle">📤 ถอนเงิน (USDT → กีบ)</div>
-      <button type="button" onclick="contactWA('withdraw')" style="margin-left:auto;margin-right:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(74,222,128,.5);background:rgba(74,222,128,.12);color:#86efac;font-size:12px;font-weight:700;cursor:pointer">💬 WhatsApp</button>
-      <button class="pop-close" onclick="document.getElementById('withdrawOv').remove()">✕</button>
+  const wdMax=wdMaxOf(ud);
+  ov.innerHTML=`<div class="popup wdx">
+    <div class="wdx-hd">
+      <button type="button" id="wdBack" class="wdx-ib" aria-label="กลับ" onclick="wdBackStep()" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+      <div class="wdx-ttl" id="wdTitle">ถอนเงิน</div>
+      <span id="wdStepTxt" style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#C8B0FF">1/3</span>
+      <button type="button" class="wdx-wa" onclick="contactWA('withdraw')">WhatsApp</button>
+      <button type="button" class="wdx-ib" aria-label="ปิด" onclick="document.getElementById('withdrawOv').remove()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="wdx-seg"><i id="wdSg1" class="on"></i><i id="wdSg2"></i><i id="wdSg3"></i></div>
+    <div class="wdx-bal"><span>คงเหลือในกระเป๋า</span><b>$${usd.toFixed(2)}</b></div>
+    <div id="wdLockNote" class="wdx-lock"></div>
+
+    <div id="wdS1" style="display:flex;flex-direction:column;gap:14px">
+      <div class="wdx-amtbox">
+        <label for="wdAmt" class="wdx-lbl">จำนวนที่ต้องการถอน (USDT)</label>
+        <div class="wdx-amtrow"><span>$</span><input type="text" id="wdAmt" inputmode="decimal" autocomplete="off" placeholder="0" oninput="wdAmtIn(this)"><button type="button" class="wdx-max" onclick="wdMaxFill()">MAX</button></div>
+        <div id="wdErr" class="wdx-err"></div>
+        <div id="wdLakPrev" class="wdx-prev"></div>
+      </div>
+      <div class="wdx-chips" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+        <button type="button" class="wdx-chip" onclick="wdChip(10)">$10</button>
+        <button type="button" class="wdx-chip" onclick="wdChip(50)">$50</button>
+        <button type="button" class="wdx-chip" onclick="wdChip(100)">$100</button>
+      </div>
+      <div style="font-size:12px;line-height:1.6;color:#A890CC">ถอนครั้งแรกไม่มีขั้นต่ำ · ครั้งต่อไปขั้นต่ำ $${WD_MIN_NEXT}</div>
     </div>
 
-    <!-- ยอดคงเหลือ -->
-    <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:0.7rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#A890CC;">💵 คงเหลือในกระเป๋า</div>
-      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--gold);">$${usd.toFixed(2)} USDT</div>
+    <div id="wdS2" style="display:none;flex-direction:column;gap:14px">
+      <div class="wdx-chips" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <button type="button" id="wdTabLak" class="wdx-m" onclick="wdMethod('lak')">กีบ (ธนาคาร)</button>
+        <button type="button" id="wdTabUsdt" class="wdx-m" onclick="wdMethod('usdt')">USDT</button>
+      </div>
+      <div id="wdUsdtFields" style="display:none;flex-direction:column;gap:12px">
+        <div>
+          <span class="wdx-lbl">เครือข่าย</span>
+          <div class="wdx-chips" style="grid-template-columns:repeat(3,minmax(0,1fr))" id="wdNetChips">
+            <button type="button" class="wdx-chip on" data-n="TRC20" onclick="wdPickNet('TRC20')">TRC20</button>
+            <button type="button" class="wdx-chip" data-n="BEP20" onclick="wdPickNet('BEP20')">BEP20</button>
+            <button type="button" class="wdx-chip" data-n="ERC20" onclick="wdPickNet('ERC20')">ERC20</button>
+          </div>
+          <select id="wdNet" style="display:none"><option value="TRC20">TRC20</option><option value="BEP20">BEP20</option><option value="ERC20">ERC20</option></select>
+        </div>
+        <div><label for="wdAddr" class="wdx-lbl">ที่อยู่กระเป๋า USDT</label><input type="text" id="wdAddr" class="wdx-in g" autocomplete="off" spellcheck="false" placeholder="วางที่อยู่กระเป๋า"></div>
+        <div><label for="wdAddr2" class="wdx-lbl">กรอกที่อยู่อีกครั้งเพื่อยืนยัน</label><input type="text" id="wdAddr2" class="wdx-in g" autocomplete="off" spellcheck="false" placeholder="วางที่อยู่ซ้ำ"></div>
+        <div class="wdx-warn">⚠ ตรวจที่อยู่และเครือข่ายให้ตรงกับกระเป๋าปลายทาง ถ้าผิด เงินจะสูญหายและกู้คืนไม่ได้</div>
+      </div>
+      <div id="wdLakFields" style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <span class="wdx-lbl">ธนาคาร</span>
+          <div class="wdx-chips" style="grid-template-columns:repeat(3,minmax(0,1fr))" id="wdBankChips">
+            <button type="button" class="wdx-chip" onclick="wdPickBank('BCEL')">BCEL</button><button type="button" class="wdx-chip" onclick="wdPickBank('LDB')">LDB</button><button type="button" class="wdx-chip" onclick="wdPickBank('JDB')">JDB</button>
+            <button type="button" class="wdx-chip" onclick="wdPickBank('APB')">APB</button><button type="button" class="wdx-chip" onclick="wdPickBank('STB')">STB</button><button type="button" class="wdx-chip" onclick="wdPickBank('LVB')">LVB</button>
+          </div>
+          <input type="text" id="wdBank" class="wdx-in" style="margin-top:8px" placeholder="BCEL" oninput="wdBankIn()">
+        </div>
+        <div><label for="wdName" class="wdx-lbl">ชื่อ-นามสกุลจริง (ตามบัญชีธนาคาร)</label><input type="text" id="wdName" class="wdx-in" autocomplete="name" placeholder="SOMSAK VONGSA"></div>
+        <div><label for="wdAccNo" class="wdx-lbl">เลขบัญชีธนาคาร</label><input type="text" id="wdAccNo" class="wdx-in g" inputmode="numeric" placeholder="010-12-00-1234567"></div>
+      </div>
+      <div><label for="wdNote" class="wdx-lbl">หมายเหตุ (ไม่บังคับ)</label><input type="text" id="wdNote" class="wdx-in" placeholder="หมายเหตุเพิ่มเติม..."></div>
     </div>
 
-    <div id="wdLockNote" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--gold);margin:-0.5rem 0 0.8rem;line-height:1.5;"></div>
-
-    <div style="display:flex;gap:0.5rem;margin-bottom:0.9rem;">
-      <button id="wdTabLak" onclick="wdMethod('lak')" style="flex:1;padding:0.6rem;border-radius:10px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.72rem;border:1px solid rgba(255,215,0,0.5);background:rgba(255,215,0,0.15);color:var(--gold);">₭ ถอนเป็นกีบ</button>
-      <button id="wdTabUsdt" onclick="wdMethod('usdt')" style="flex:1;padding:0.6rem;border-radius:10px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.72rem;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#A890CC;">💎 ถอนเป็น USDT</button>
+    <div id="wdS3" style="display:none;flex-direction:column;gap:14px">
+      <div style="font-size:15px;font-weight:700">ตรวจสอบก่อนส่ง</div>
+      <div class="wdx-sum">
+        <div class="wdx-row"><span>จำนวนถอน</span><b id="wdSumAmt"></b></div>
+        <div class="wdx-row"><span id="wdSumRecvL"></span><b class="g" id="wdSumRecv"></b></div>
+        <div style="height:1px;background:rgba(200,100,255,.25)"></div>
+        <div class="wdx-row"><span>ปลายทาง</span><em id="wdSumDest"></em></div>
+      </div>
+      <div class="wdx-info">ยอดจะถูกหักทันที และแอดมินจะตรวจสอบคำขอก่อนโอน</div>
     </div>
 
-    <!-- จำนวนที่ต้องการถอน -->
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">💰 จำนวนที่ต้องการถอน (USDT)</div>
-    <input type="number" id="wdAmt" inputmode="decimal" oninput="wdLakPreview()" placeholder="เช่น 100" max="${usd.toFixed(2)}"
-      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.1rem;outline:none;margin-bottom:1rem;">
-
-    <div id="wdLakPrev" style="min-height:2.4rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.9rem;line-height:1.6;"></div>
-
-    <div id="wdUsdtFields" style="display:none;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">🌐 เครือข่าย</div>
-      <select id="wdNet" style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.9rem;"><option value="TRC20">TRC20 · TRON (แนะนำ)</option><option value="BEP20">BEP20 · BSC</option><option value="ERC20">ERC20 · Ethereum</option></select>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">💎 ที่อยู่กระเป๋า USDT ของคุณ</div>
-      <input type="text" id="wdAddr" autocomplete="off" spellcheck="false" placeholder="วางที่อยู่กระเป๋า"
-        style="width:100%;box-sizing:border-box;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.9rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">💎 กรอกที่อยู่อีกครั้งเพื่อยืนยัน</div>
-      <input type="text" id="wdAddr2" autocomplete="off" spellcheck="false" placeholder="วางที่อยู่ซ้ำ"
-        style="width:100%;box-sizing:border-box;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.7rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#fca5a5;line-height:1.7;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:0.6rem;margin-bottom:0.9rem;">⚠ ตรวจที่อยู่และเครือข่ายให้ตรงกับกระเป๋าปลายทาง ถ้าผิด เงินจะสูญหายและกู้คืนไม่ได้</div>
-    </div>
-    <div id="wdLakFields">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">👤 ชื่อ-นามสกุลจริง (ตามบัญชีธนาคาร)</div>
-    <input type="text" id="wdName" autocomplete="name" placeholder="เช่น SOMSAK VONGSA"
-      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.9rem;">
-
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">🏦 ธนาคาร</div>
-    <input type="text" id="wdBank" list="wdBankList" placeholder="เช่น BCEL"
-      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.3);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;margin-bottom:0.9rem;">
-    <datalist id="wdBankList"><option value="BCEL"><option value="LDB"><option value="JDB"><option value="APB"><option value="STB"><option value="LVB"></datalist>
-
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">🔢 เลขบัญชีธนาคาร</div>
-    <input type="text" id="wdAccNo" inputmode="numeric" placeholder="เช่น 010-12-00-1234567"
-      style="width:100%;padding:0.75rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.9rem;letter-spacing:1px;outline:none;margin-bottom:0.9rem;">
-
-    </div>
-    <!-- หมายเหตุ -->
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">📝 หมายเหตุ (ไม่บังคับ)</div>
-    <input type="text" id="wdNote" placeholder="หมายเหตุเพิ่มเติม..."
-      style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:1rem;">
-
-    <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:8px;padding:0.6rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--text-dim);line-height:1.7;">
-      ⏳ ระบบกำลังตรวจสอบคำขอ กรุณารอการดำเนินการ
-    </div>
-
-    <button onclick="submitWithdraw()" class="btn btn-primary" style="width:100%;padding:1rem;">
-      📤 ยืนยันแจ้งถอน
-    </button>
+    <button type="button" id="wdNext" class="wdx-go" onclick="wdNext()">ต่อไป</button>
   </div>`;
   document.body.appendChild(ov);
-  _wdMode='lak';_wdRate=DEFAULT_LAK_RATE;wdLakPreview();wdLockNote();
+  window._wdNoConfirm=true;window._wdMaxV=wdMax;_wdStep=1;
+  _wdMode='lak';_wdRate=DEFAULT_LAK_RATE;wdMethod('lak');wdLakPreview();wdLockNote();wdShow(1);
   loadTopupInfo(function(i){_wdRate=lakRateOf(i);wdLakPreview();});
 }
 
@@ -5733,6 +5857,7 @@ Object.assign(TRD,{"ขุดอยู่": ["ຂຸດຢູ່", "Mining"], "�
 Object.assign(TRD,{"เช็กอินรายวัน": ["ເຊັກອິນລາຍວັນ", "Daily check-in"], "เข้าแอปทุกวัน รับโบนัสเพิ่ม": ["ເຂົ້າແອັບທຸກມື້ ຮັບໂບນັດເພີ່ມ", "Open the app daily for extra bonuses"], "วันติดต่อกัน": ["ມື້ຕິດຕໍ່ກັນ", "day streak"], "รับรางวัลวันนี้": ["ຮັບລາງວັນມື້ນີ້", "Claim today's reward"], "ได้รับแล้ว": ["ໄດ້ຮັບແລ້ວ", "Claimed"], "มาใหม่พรุ่งนี้": ["ມາໃໝ່ມື້ອື່ນ", "come back tomorrow"], "รับโบนัสใหญ่ ถ้าขาดวันใดวันหนึ่งจะเริ่มนับใหม่ โบนัสถอนได้ตามเงื่อนไขของระบบ": ["ຮັບໂບນັດໃຫຍ່ ຖ້າຂາດມື້ໃດມື້ໜຶ່ງ ຈະເລີ່ມນັບໃໝ່ ໂບນັດຖອນໄດ້ຕາມເງື່ອນໄຂຂອງລະບົບ", "gives a big bonus. Missing a day restarts the count. Bonuses can be withdrawn per the system conditions"], "ภารกิจวันนี้": ["ພາລະກິດມື້ນີ້", "Today's missions"], "สำเร็จ": ["ສຳເລັດ", "done"], "เข้าแอปวันนี้": ["ເຂົ້າແອັບມື້ນີ້", "Open the app today"], "ดูรายการเครื่องขุด": ["ເບິ່ງລາຍການເຄື່ອງຂຸດ", "View your miners"]});
 Object.assign(TRD,{"แจ้งเตือน":["ແຈ້ງເຕືອນ","Notifications"],"อ่านทั้งหมด":["ອ່ານທັງໝົດ","Mark all read"],"ทั้งหมด":["ທັງໝົດ","All"],"การเงิน":["ການເງິນ","Money"],"ประกาศ":["ປະກາດ","News"],"ยังไม่มีแจ้งเตือน":["ຍັງບໍ່ມີແຈ້ງເຕືອນ","No notifications yet"],"รับโบนัสเช็กอิน":["ໄດ້ຮັບໂບນັດເຊັກອິນ","Check-in bonus received"],"ภารกิจสำเร็จ":["ພາລະກິດສຳເລັດ","Mission completed"],"ได้รับเครดิต":["ໄດ້ຮັບເຄຣດິດ","Credit received"]});
 Object.assign(TRD,{"บันไดรางวัล":["ບັນໄດລາງວັນ","Reward ladder"],"เพื่อนของคุณ":["ໝູ່ຂອງທ່ານ","Your friends"],"เพื่อนคนที่":["ໝູ່ຄົນທີ","Friend no."],"ได้รับแล้ว":["ໄດ້ຮັບແລ້ວ","Received"],"ถัดไป":["ຕໍ່ໄປ","Next"],"โบนัสพิเศษเมื่อครบเป้าหมาย":["ໂບນັດພິເສດເມື່ອຄົບເປົ້າໝາຍ","Special bonus at goal"],"เติมเงินแล้ว":["ເຕີມເງິນແລ້ວ","Topped up"],"รอเติมเงิน":["ລໍຖ້າເຕີມເງິນ","Waiting for top-up"],"ยังไม่มีเพื่อน":["ຍັງບໍ່ມີໝູ່","No friends yet"]});
+Object.assign(TRD,{"ถอนครั้งแรกไม่มีขั้นต่ำ": ["ຖອນຄັ້ງທຳອິດບໍ່ມີຂັ້ນຕ່ຳ", "No minimum for the first withdrawal"], "ครั้งต่อไปขั้นต่ำ": ["ຄັ້ງຕໍ່ໄປຂັ້ນຕ່ຳ", "minimum next time"], "ตรวจสอบก่อนส่ง": ["ກວດສອບກ່ອນສົ່ງ", "Review before sending"], "จำนวนถอน": ["ຈຳນວນຖອນ", "Withdraw amount"], "ได้รับเป็นกีบ": ["ໄດ້ຮັບເປັນກີບ", "You receive in Kip"], "ได้รับเป็น": ["ໄດ້ຮັບເປັນ", "You receive in"], "ปลายทาง": ["ປາຍທາງ", "Destination"], "ยอดจะถูกหักทันที และแอดมินจะตรวจสอบคำขอก่อนโอน": ["ຍອດຈະຖືກຫັກທັນທີ ແລະ ແອດມິນຈະກວດສອບຄຳຂໍກ່ອນໂອນ", "The amount is deducted now and admin reviews the request before transfer"], "ต่อไป": ["ຕໍ່ໄປ", "Next"], "เกินยอดที่ถอนได้": ["ເກີນຍອດທີ່ຖອນໄດ້", "Exceeds the withdrawable amount"], "กรุณาใส่จำนวน": ["ກະລຸນາໃສ່ຈຳນວນ", "Please enter an amount"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
 function trStr(s){
