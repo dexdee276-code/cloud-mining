@@ -4718,6 +4718,21 @@ function showRollNotif(def){
 // ─── ADMIN SCREEN ───
 const ADMIN_PASS_KEY = 'cm_admin_pass';
 function getAdminPass(){ return localStorage.getItem(ADMIN_PASS_KEY)||'admin1234'; }
+// รหัสแอดมินเก็บเป็นแฮช SHA-256 ใน Firebase (admin/pwHash) ใช้ได้ทุกเครื่อง; ถ้ายังไม่เคยตั้ง ใช้รหัสเดิมในเครื่อง/ค่าเริ่มต้น
+function _adminHash(p){
+  var data=new TextEncoder().encode('cm-admin-v1|'+p);
+  return crypto.subtle.digest('SHA-256',data).then(function(b){
+    return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+  });
+}
+function checkAdminPass(input,cb){
+  var legacy=function(){cb(input===getAdminPass(),true);};
+  if(!window._db||!window.crypto||!crypto.subtle){legacy();return;}
+  window._db.ref('admin/pwHash').once('value').then(function(sn){
+    if(!sn.exists()){legacy();return;}
+    _adminHash(input).then(function(h){cb(h===sn.val(),false);});
+  }).catch(function(){legacy();});
+}
 
 let currentFilter = 'pending';
 let adminTabIdx = 0;
@@ -4754,14 +4769,18 @@ function confirmAdminPass(){
   const inp=document.getElementById('adminPassInput');
   const err=document.getElementById('adminPassErr');
   if(!inp) return;
-  if(inp.value !== getAdminPass()){
+  err.textContent='⏳ กำลังตรวจ…';
+  checkAdminPass(inp.value,function(ok,isLegacy){
+  if(!ok){
     err.textContent='❌ รหัสไม่ถูกต้อง'; inp.value=''; inp.focus(); return;
   }
+  if(isLegacy)setTimeout(function(){showToast('⚠️ ยังใช้รหัสเดิมในเครื่อง — ไปตั้งรหัสใหม่ในแท็บตั้งค่า เพื่อใช้ได้ทุกเครื่อง');},1500);
   document.getElementById('adminLoginOv').remove();
   document.getElementById('dashScreen').classList.remove('active');
   document.getElementById('adminScreen').classList.add('active');
   document.getElementById('adminBadge').textContent='🔑 Admin Mode';
   switchAdminTab(0); loadAdminQRPreview(); renderAdminStats(); autoBackfillStats();
+  });
 }
 function doAdminLogout(){
   document.getElementById('adminScreen').classList.remove('active');
@@ -4862,9 +4881,13 @@ function renderAdminUsers(){
 function changeAdminPass(){
   const p=document.getElementById('newAdminPass').value;
   if(!p||p.length<6){showToast('⚠️ รหัสต้องมีอย่างน้อย 6 ตัว');return;}
-  localStorage.setItem(ADMIN_PASS_KEY,p);
-  document.getElementById('newAdminPass').value='';
-  showToast('✅ เปลี่ยนรหัส Admin สำเร็จ');
+  _adminHash(p).then(function(h){
+    return window._db.ref('admin/pwHash').set(h);
+  }).then(function(){
+    try{localStorage.removeItem(ADMIN_PASS_KEY);}catch(e){}
+    document.getElementById('newAdminPass').value='';
+    showToast('✅ เปลี่ยนรหัส Admin สำเร็จ (ใช้ได้ทุกเครื่อง)');
+  }).catch(function(e){showToast('❌ บันทึกไม่สำเร็จ: '+(e&&e.message||e));});
 }
 function renderAdminPanel(){ showAdmin(); } // legacy compat
 function updateNav(){
@@ -5849,7 +5872,8 @@ function showAdminPassPopup(){
 function verifyAdminFromSettings(){
   const input=document.getElementById('adminPassInput')?.value;
   const msg=document.getElementById('adminPassMsg');
-  if(input===getAdminPass()){
+  checkAdminPass(input,function(ok){
+  if(ok){
     document.querySelectorAll('.overlay').forEach(o=>o.remove());
     document.getElementById('authScreen')?.classList.remove('active');
     document.getElementById('dashScreen')?.classList.remove('active');
@@ -5858,6 +5882,7 @@ function verifyAdminFromSettings(){
   } else {
     if(msg)msg.textContent='❌ รหัสไม่ถูกต้อง';
   }
+  });
 }
 function copyRefLink(){
   const ud=getUD();if(!ud)return;
