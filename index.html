@@ -814,6 +814,8 @@ body:has(#authScreen.active) #contactFab{display:none}
 @keyframes rgBlink{0%,100%{opacity:1}50%{opacity:.25}}
 @keyframes rgSweep{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}}
 @media (prefers-reduced-motion:reduce){.rg *{animation:none!important}}
+@keyframes ciRing{0%{box-shadow:0 0 0 0 rgba(255,215,0,.55)}100%{box-shadow:0 0 0 9px rgba(255,215,0,0)}}
+@media (prefers-reduced-motion:reduce){#hmCheckin *{animation:none!important}}
 .rg-num{font-family:'Space Grotesk','Noto Sans Thai',sans-serif}
 
 .pk-chip{height:44px;border-radius:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#d9ccf2;padding:0}
@@ -1105,6 +1107,18 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;">จ่ายเมื่อแอดมินอนุมัติการเติมครั้งแรก ครั้งเดียวต่อคน ผู้ที่ได้ไปแล้วไม่ถูกเปลี่ยนย้อนหลัง</div>
   </div>
 
+  <!-- เช็กอินรายวัน -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📅 เช็กอินรายวัน + ภารกิจ</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">สถานะ</div>
+    <select id="ciOnInput" style="width:100%;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(255,215,0,0.3);color:var(--text);margin-bottom:0.7rem;font-size:0.85rem"><option value="1">เปิดใช้งาน</option><option value="0">ปิด (ซ่อนจากลูกค้า)</option></select>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">รางวัลเช็กอินแต่ละวัน (USDT) · 0 = ไม่แจก</div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0.5rem;margin-bottom:0.7rem"><div><div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.2rem">วันที่ 1</div><input type="number" id="ci1Input" inputmode="decimal" step="0.05" min="0" style="width:100%;box-sizing:border-box;padding:0.55rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem"></div><div><div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.2rem">วันที่ 2</div><input type="number" id="ci2Input" inputmode="decimal" step="0.05" min="0" style="width:100%;box-sizing:border-box;padding:0.55rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem"></div><div><div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.2rem">วันที่ 3</div><input type="number" id="ci3Input" inputmode="decimal" step="0.05" min="0" style="width:100%;box-sizing:border-box;padding:0.55rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem"></div><div><div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.2rem">วันที่ 4</div><input type="number" id="ci4Input" inputmode="decimal" step="0.05" min="0" style="width:100%;box-sizing:border-box;padding:0.55rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem"></div><div><div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.2rem">วันที่ 5</div><input type="number" id="ci5Input" inputmode="decimal" step="0.05" min="0" style="width:100%;box-sizing:border-box;padding:0.55rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem"></div><div><div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.2rem">วันที่ 6</div><input type="number" id="ci6Input" inputmode="decimal" step="0.05" min="0" style="width:100%;box-sizing:border-box;padding:0.55rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem"></div><div><div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.2rem">วันที่ 7</div><input type="number" id="ci7Input" inputmode="decimal" step="0.05" min="0" style="width:100%;box-sizing:border-box;padding:0.55rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem"></div></div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.5rem;margin-bottom:0.7rem"><div><div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.2rem">ภารกิจ: เข้าแอป (USDT)</div><input type="number" id="ciM1Input" inputmode="decimal" step="0.05" min="0" style="width:100%;box-sizing:border-box;padding:0.55rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem"></div><div><div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:0.2rem">ภารกิจ: ดูเครื่องขุด (USDT)</div><input type="number" id="ciM2Input" inputmode="decimal" step="0.05" min="0" style="width:100%;box-sizing:border-box;padding:0.55rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem"></div></div>
+    <button onclick="saveCiSettings()" class="btn btn-gold" style="width:100%;padding:0.7rem;">💾 บันทึกเช็กอินรายวัน</button>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;line-height:1.6;">รางวัลเป็นโบนัสล็อก ใช้เงื่อนไข "ลงทุนกี่เท่าของโบนัส" เดียวกับโบนัสเติมครั้งแรก · รับได้วันละครั้ง คิดวันตามเวลาเซิร์ฟเวอร์ (UTC+7) · ขาดวันแล้วเริ่มนับใหม่</div>
+  </div>
+
   <!-- โบนัสแนะนำเพื่อน -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);margin-bottom:0.8rem;">🎁 โบนัสแนะนำเพื่อน</div>
@@ -1289,6 +1303,8 @@ body:has(#adminScreen.active) #contactFab{display:none}
       <button type="button" onclick="showWithdrawPopup()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:72px;border-radius:16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.45);color:#86efac"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>ถอนเงิน</button>
     </div>
   </div>
+
+  <div id="hmCheckin" style="display:none"></div>
 
   <div style="border-radius:20px;padding:18px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(255,215,0,.25);display:flex;flex-direction:column;gap:10px">
     <div style="font-size:15px;font-weight:700">ลองคำนวณกำไร</div>
@@ -2730,6 +2746,7 @@ function renderHome(){
   set('hmEnd',acs.length?'ครบสัญญาเร็วสุด '+Math.max(0,Math.round(Math.min.apply(null,acs.map(p=>p.remaining))))+' วัน':'ยังไม่มีสัญญา');
   renderActs();
   renderHomeBonus();
+  renderCheckin();
   renderReferral();
 }
 function renderHomeBonus(){
@@ -2849,6 +2866,7 @@ function renderPkgs(){
 // ─── MACHINES ───
 function renderMachines(){
   const ud=getUD();if(!ud)return;
+  ciMission('m2');
   const acs=(ud.packages||[]).filter(p=>p.remaining>0);
   const sec=document.getElementById('machSec');
   const list=document.getElementById('machList');
@@ -3745,7 +3763,7 @@ function uploadAdminQR(e){
 function loadAdminQRPreview(){
   const wrap=document.getElementById('adminQRPreview');
   if(!wrap||!window._db)return;
-  loadLakSettings();loadRefSettings();loadFirstSettings();loadSiteInfo();loadUsdtAddr();
+  loadLakSettings();loadRefSettings();loadFirstSettings();loadCiSettings();loadSiteInfo();loadUsdtAddr();
   const btn=document.getElementById('delQRBtn');
   const show=function(src){
     wrap.innerHTML='<img src="'+src+'" style="width:160px;height:160px;border-radius:10px;border:2px solid rgba(255,215,0,0.3);object-fit:contain;background:#fff;">';
@@ -4285,6 +4303,142 @@ function loadFirstSettings(){
     set('fbBonusInput',c.bonus);set('fbMinInput',c.min);set('fbMaxInput',c.max);set('fbTurnInput',c.turn);
     const h=document.getElementById('fbCountHint');
     if(h)h.textContent='จ่ายโบนัสไปแล้ว '+(r[1].exists()?r[1].val():0)+' / '+c.max+' คน';
+  }).catch(function(){});
+}
+
+// ─── DAILY CHECK-IN ───
+var CI_DEF={r:[0.10,0.10,0.15,0.20,0.25,0.30,1.00],m1:0.05,m2:0.05};
+var _ciOff=null,_ciBusy=false;
+function ciCfg(st){
+  st=st||{};var r=[];
+  var ok=function(v){return isFinite(v)&&v>=0&&v<=1000;};
+  for(var i=0;i<7;i++){var v=parseFloat(st['ci'+(i+1)]);r.push(ok(v)?Math.round(v*100)/100:CI_DEF.r[i]);}
+  var m1=parseFloat(st.ciM1),m2=parseFloat(st.ciM2);
+  return {on:(st.ciOn===0||st.ciOn==='0')?0:1,r:r,m1:ok(m1)?Math.round(m1*100)/100:CI_DEF.m1,m2:ok(m2)?Math.round(m2*100)/100:CI_DEF.m2,turn:firstSettingsOf(st).turn};
+}
+// วันที่ตามเวลาเซิร์ฟเวอร์ Firebase (UTC+7) — แก้นาฬิกาเครื่องก็โกงไม่ได้
+function ciDay(cb){
+  var go=function(off){var n=Date.now()+off+25200000;cb(new Date(n).toISOString().slice(0,10),new Date(n-86400000).toISOString().slice(0,10));};
+  if(_ciOff!==null){go(_ciOff);return;}
+  window._db.ref('.info/serverTimeOffset').once('value').then(function(s){_ciOff=parseFloat(s.val())||0;go(_ciOff);}).catch(function(){_ciOff=0;go(0);});
+}
+function ciGrant(u,key,amt,desc,turn){
+  if(!(amt>0))return Promise.resolve();
+  return adminCredit(u,key,amt,desc,turn>0?{lock:amt,need:Math.round(amt*turn*100)/100}:null);
+}
+function ciClaim(){
+  var u=getSess();if(!u||!window._db||_ciBusy)return;
+  _ciBusy=true;
+  var fail=function(){_ciBusy=false;showToast('❌ รับรางวัลไม่สำเร็จ ลองใหม่อีกครั้ง');renderCheckin();};
+  window._db.ref('settings').once('value').then(function(st){
+    var cfg=ciCfg(st.exists()?st.val():{});
+    ciDay(function(today,yest){
+      window._db.ref('checkin/'+u).transaction(function(cur){
+        cur=cur||{};
+        if(cur.day===today)return;
+        var prev=(cur.day===yest)?(parseInt(cur.streak,10)||0):0;
+        var ns=prev>=7?1:prev+1;
+        return Object.assign({},cur,{day:today,streak:ns});
+      },function(err,ok,snap){
+        if(err||!ok||!snap){_ciBusy=false;renderCheckin();return;}
+        var ns=parseInt(snap.val().streak,10)||1,amt=cfg.r[ns-1];
+        ciGrant(u,'ci_'+today,amt,'📅 เช็กอินรายวัน วันที่ '+ns+' +$'+amt,cfg.turn).then(function(){_ciBusy=false;renderCheckin();}).catch(fail);
+      },false);
+    });
+  }).catch(fail);
+}
+function ciMission(id){
+  var u=getSess();if(!u||!window._db)return;
+  window._db.ref('settings').once('value').then(function(st){
+    var cfg=ciCfg(st.exists()?st.val():{}),amt=cfg[id];
+    if(!cfg.on||!(amt>0))return;
+    ciDay(function(today){
+      window._db.ref('checkin/'+u+'/'+id).transaction(function(cur){return cur===today?undefined:today;},function(err,ok){
+        if(err||!ok)return;
+        ciGrant(u,'ms_'+id+'_'+today,amt,(id==='m1'?'✅ ภารกิจ เข้าแอปวันนี้':'✅ ภารกิจ ดูรายการเครื่องขุด')+' +$'+amt,cfg.turn).then(function(){renderCheckin();}).catch(function(){});
+      },false);
+    });
+  }).catch(function(){});
+}
+function renderCheckin(){
+  var el=document.getElementById('hmCheckin'),u=getSess();
+  if(!el)return;
+  if(!u||!window._db){el.style.display='none';return;}
+  Promise.all([window._db.ref('settings').once('value'),window._db.ref('checkin/'+u).once('value')]).then(function(r){
+    var cfg=ciCfg(r[0].exists()?r[0].val():{});
+    if(!cfg.on){el.style.display='none';return;}
+    ciDay(function(today,yest){
+      var rec=r[1].exists()?(r[1].val()||{}):{};
+      var claimed=rec.day===today,valid=(rec.day===today||rec.day===yest);
+      var s=valid?(parseInt(rec.streak,10)||0):0;
+      var todayIdx=claimed?s:(s>=7?1:s+1),doneUpTo=claimed?s:(s>=7?0:s);
+      if(claimed&&cfg.r[s-1]>0){ // เผื่อบันทึกเช็กอินแล้วแต่เครดิตเขียนไม่สำเร็จ
+        window._db.ref('credits/'+u+'/ci_'+today).once('value').then(function(c){
+          if(!c.exists())ciGrant(u,'ci_'+today,cfg.r[s-1],'📅 เช็กอินรายวัน วันที่ '+s+' +$'+cfg.r[s-1],cfg.turn).catch(function(){});
+        }).catch(function(){});
+      }
+      if(cfg.m1>0&&rec.m1!==today)ciMission('m1');
+      var money=function(n){return '$'+(Math.round(n*100)/100).toFixed(2);};
+      var ORB="font-family:'Orbitron','Noto Sans Thai','Noto Sans Lao',monospace;",MONO="font-family:'Share Tech Mono','Noto Sans Thai','Noto Sans Lao',monospace;";
+      var tiles='';
+      for(var n=1;n<=7;n++){
+        var done=n<=doneUpTo,isT=(!claimed&&n===todayIdx),gift=(n===7);
+        var st='border-radius:10px;padding:8px 0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;box-sizing:border-box;',lbl='#A890CC',amtc='#C8B0FF',ic='#A890CC';
+        if(done){st+='background:rgba(74,222,128,.1);border:2px solid rgba(74,222,128,.4);';lbl='#86efac';amtc='#86efac';}
+        else if(isT){st+='background:rgba(255,215,0,.14);border:2px solid #FFD700;animation:ciRing 1.4s infinite;';lbl='#FDE68A';amtc='#FFD700';ic='#FFD700';}
+        else if(gift){st+='background:rgba(255,215,0,.06);border:2px dashed rgba(255,215,0,.5);';amtc='#FFD700';ic='#FFD700';}
+        else{st+='background:rgba(60,0,100,.5);border:2px solid rgba(180,80,255,.35);';}
+        var icon=done?'<svg viewBox="0 0 24 24" fill="none" stroke="#052e16" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="background:#4ade80;border-radius:50%;padding:3px;box-sizing:content-box;width:14px;height:14px"><path d="M5 12l5 5 9-10"/></svg>'
+          :'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 13h18M12 8c-2-4-6-4-6-1s4 1 6 1zM12 8c2-4 6-4 6-1s-4 1-6 1z"/></svg>';
+        tiles+='<div style="'+st+'"><div style="'+MONO+'font-size:11px;color:'+lbl+'">D'+n+'</div><div style="height:22px;display:flex;align-items:center;justify-content:center">'+icon+'</div><div style="'+ORB+'font-size:10px;font-weight:700;color:'+amtc+'">'+money(cfg.r[n-1])+'</div></div>';
+      }
+      var todayAmt=cfg.r[todayIdx-1]||0;
+      var btn=claimed
+        ?'<div style="height:54px;border-radius:14px;background:rgba(74,222,128,.12);border:2px solid rgba(74,222,128,.45);color:#86efac;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px"><span>ได้รับแล้ว · มาใหม่พรุ่งนี้</span></div>'
+        :'<button type="button" onclick="ciClaim()" style="height:54px;border:none;border-radius:14px;background:linear-gradient(135deg,#d97706,#fbbf24);color:#1a0a00;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;animation:ciRing 1.4s infinite"><span>รับรางวัลวันนี้</span>'+(todayAmt>0?'<span>· +'+money(todayAmt)+'</span>':'')+'</button>';
+      var ms=[];
+      if(cfg.m1>0)ms.push({t:'เข้าแอปวันนี้',a:cfg.m1,ok:rec.m1===today});
+      if(cfg.m2>0)ms.push({t:'ดูรายการเครื่องขุด',a:cfg.m2,ok:rec.m2===today});
+      var mdone=ms.filter(function(m){return m.ok;}).length;
+      var mhtml='';
+      if(ms.length){
+        mhtml='<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px"><div style="'+ORB+'font-size:14px;letter-spacing:2px;font-weight:700;color:#C8B0FF">ภารกิจวันนี้</div><div style="'+MONO+'font-size:13px;color:#A890CC"><span>'+mdone+'/'+ms.length+'</span> <span>สำเร็จ</span></div></div>';
+        ms.forEach(function(m,i){
+          mhtml+='<div style="display:flex;align-items:center;gap:12px;border-radius:14px;padding:12px 14px;background:rgba(60,0,100,.5);border:2px solid rgba(180,80,255,.4)">'
+            +'<div style="width:32px;height:32px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;'+ORB+'font-size:13px;font-weight:900;'+(m.ok?'background:#4ade80;color:#052e16;':'background:rgba(157,78,221,.25);color:#e9d5ff;')+'">'+(m.ok?'✓':(i+1))+'</div>'
+            +'<div style="flex-grow:1;min-width:0"><div style="font-size:14px;font-weight:700">'+m.t+'</div><div style="height:5px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:8px;overflow:hidden"><div style="height:100%;border-radius:3px;width:'+(m.ok?100:0)+'%;background:'+(m.ok?'#4ade80':'linear-gradient(90deg,#4A0E8F,#9D4EDD)')+'"></div></div></div>'
+            +'<div style="flex-shrink:0;'+ORB+'font-size:12px;font-weight:700;border-radius:10px;padding:4px 10px;'+(m.ok?'color:#86efac;background:rgba(74,222,128,.12);':'color:#FFD700;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);')+'">+'+money(m.a)+'</div></div>';
+        });
+      }
+      el.innerHTML='<div style="display:flex;flex-direction:column;gap:14px"><div style="position:relative;border-radius:16px;padding:18px;background:rgba(40,5,70,.98);border:2px solid rgba(200,100,255,.45);box-shadow:0 6px 30px rgba(120,0,200,.3),inset 0 1px 0 rgba(255,255,255,.05);display:flex;flex-direction:column;gap:14px;overflow:hidden">'
+        +'<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#78350f,#FFD700,#78350f)"></div>'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="min-width:0"><div style="'+ORB+'font-size:16px;font-weight:900">เช็กอินรายวัน</div><div style="'+MONO+'font-size:13px;color:#C8B0FF;margin-top:2px">เข้าแอปทุกวัน รับโบนัสเพิ่ม</div></div>'
+        +'<div style="text-align:right;flex-shrink:0;border-radius:12px;padding:6px 12px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.35)"><div style="'+ORB+'font-size:20px;font-weight:900;color:#FFD700;line-height:1.1">'+s+'</div><div style="'+MONO+'font-size:12px;color:#FDE68A">วันติดต่อกัน</div></div></div>'
+        +'<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px">'+tiles+'</div>'+btn
+        +'<div style="font-size:12px;line-height:1.6;color:#A890CC">วันที่ 7 รับโบนัสใหญ่ ถ้าขาดวันใดวันหนึ่งจะเริ่มนับใหม่ โบนัสถอนได้ตามเงื่อนไขของระบบ</div></div>'+mhtml+'</div>';
+      el.style.display='block';
+    });
+  }).catch(function(){});
+}
+function saveCiSettings(){
+  var g=function(id){var e=document.getElementById(id);return e?parseFloat(e.value):NaN;};
+  var upd={},bad=false;
+  for(var i=1;i<=7;i++){var v=g('ci'+i+'Input');if(!isFinite(v)||v<0||v>1000)bad=true;upd['ci'+i]=Math.round(v*100)/100;}
+  var m1=g('ciM1Input'),m2=g('ciM2Input');
+  if(!isFinite(m1)||m1<0||m1>1000||!isFinite(m2)||m2<0||m2>1000)bad=true;
+  if(bad){showToast('⚠ รางวัลต้องอยู่ระหว่าง 0–1,000 ดอลลาร์');return;}
+  upd.ciM1=Math.round(m1*100)/100;upd.ciM2=Math.round(m2*100)/100;
+  var on=document.getElementById('ciOnInput');upd.ciOn=(on&&on.value==='0')?0:1;
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  window._db.ref('settings').update(upd).then(function(){showToast('✅ บันทึกเช็กอินรายวันแล้ว');}).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
+}
+function loadCiSettings(){
+  if(!window._db)return;
+  window._db.ref('settings').once('value').then(function(s){
+    var c=ciCfg(s.exists()?s.val():{});
+    var set=function(id,v){var e=document.getElementById(id);if(e)e.value=v;};
+    for(var i=1;i<=7;i++)set('ci'+i+'Input',c.r[i-1]);
+    set('ciM1Input',c.m1);set('ciM2Input',c.m2);set('ciOnInput',c.on?'1':'0');
   }).catch(function(){});
 }
 
@@ -5427,6 +5581,7 @@ Object.assign(TRD,{"กำไรมาจากไหน": ["ກຳໄລມາ�
 Object.assign(TRD,{"ลองคำนวณกำไร": ["ລອງຄຳນວນກຳໄລ", "Try the profit calculator"], "เลื่อนเพื่อเลือกยอดลงทุน": ["ເລື່ອນເພື່ອເລືອກຍອດລົງທຶນ", "Slide to choose an amount"], "เริ่มลงทุนจำนวนนี้": ["ເລີ່ມລົງທຶນຈຳນວນນີ້", "Invest this amount"]});
 Object.assign(TRD,{"กดเพื่อเลือกรูปสลิป": ["ກົດເພື່ອເລືອກຮູບສະລິບ", "Tap to choose the slip image"], "คัดลอก": ["ຄັດລອກ", "Copy"], "คัดลอกเลขบัญชี": ["ຄັດລອກເລກບັນຊີ", "Copy account number"], "คุณจะได้รับประมาณ": ["ທ່ານຈະໄດ້ຮັບປະມານ", "You will receive about"], "ยอดที่โอน": ["ຍອດທີ່ໂອນ", "Amount transferred"], "ยอดเข้ากระเป๋า": ["ຍອດເຂົ້າກະເປົາ", "Balance credited to wallet"], "รอแอดมินตรวจสอบ": ["ລໍແອດມິນກວດສອບ", "Waiting for admin review"], "รูปจากแอปธนาคาร เห็นจำนวนและเวลาชัดเจน": ["ຮູບຈາກແອັບທະນາຄານ ເຫັນຈຳນວນ ແລະ ເວລາຊັດເຈນ", "Image from your banking app with amount and time clearly visible"], "สลิป": ["ສະລິບ", "Slip"], "สลิปต้องตรงกับยอดที่โอนจริง": ["ສະລິບຕ້ອງກົງກັບຍອດທີ່ໂອນຈິງ", "The slip must match the amount actually transferred"], "ส่งคำขอเติมเงิน": ["ສົ່ງຄຳຂໍເຕີມເງິນ", "Submit top-up request"], "เมื่ออนุมัติ ยอดจะเข้ากระเป๋า ดูสถานะได้ในประวัติ": ["ເມື່ອອະນຸມັດ ຍອດຈະເຂົ້າກະເປົາ ເບິ່ງສະຖານະໄດ້ໃນປະຫວັດ", "Once approved the balance enters your wallet. Check the status in History"], "แนบสลิป": ["ແນບສະລິບ", "Attach slip"], "แอดมินกำลังตรวจสอบการโอน ยอดจะเข้ากระเป๋าเมื่อยืนยันแล้ว": ["ແອດມິນກຳລັງກວດສອບການໂອນ ຍອດຈະເຂົ້າກະເປົາເມື່ອຢືນຢັນແລ້ວ", "The admin is verifying your transfer. The balance enters your wallet once confirmed"], "แอดมินตรวจสอบยอดและสลิป": ["ແອດມິນກວດສອບຍອດ ແລະ ສະລິບ", "The admin checks the amount and slip"], "โอนตามจำนวนนี้ให้ตรง": ["ໂອນຕາມຈຳນວນນີ້ໃຫ້ຕົງ", "Transfer exactly this amount"], "โอนเงิน": ["ໂອນເງິນ", "Transfer"], "โอนแล้ว": ["ໂອນແລ້ວ", "Transferred"]});
 Object.assign(TRD,{"ขุดอยู่": ["ຂຸດຢູ່", "Mining"], "สัญญา (วัน)": ["ສັນຍາ (ມື້)", "Contract (days)"], "เหลือ (วัน)": ["ເຫຼືອ (ມື້)", "Left (days)"]});
+Object.assign(TRD,{"เช็กอินรายวัน": ["ເຊັກອິນລາຍວັນ", "Daily check-in"], "เข้าแอปทุกวัน รับโบนัสเพิ่ม": ["ເຂົ້າແອັບທຸກມື້ ຮັບໂບນັດເພີ່ມ", "Open the app daily for extra bonuses"], "วันติดต่อกัน": ["ມື້ຕິດຕໍ່ກັນ", "day streak"], "รับรางวัลวันนี้": ["ຮັບລາງວັນມື້ນີ້", "Claim today's reward"], "ได้รับแล้ว": ["ໄດ້ຮັບແລ້ວ", "Claimed"], "มาใหม่พรุ่งนี้": ["ມາໃໝ່ມື້ອື່ນ", "come back tomorrow"], "รับโบนัสใหญ่ ถ้าขาดวันใดวันหนึ่งจะเริ่มนับใหม่ โบนัสถอนได้ตามเงื่อนไขของระบบ": ["ຮັບໂບນັດໃຫຍ່ ຖ້າຂາດມື້ໃດມື້ໜຶ່ງ ຈະເລີ່ມນັບໃໝ່ ໂບນັດຖອນໄດ້ຕາມເງື່ອນໄຂຂອງລະບົບ", "gives a big bonus. Missing a day restarts the count. Bonuses can be withdrawn per the system conditions"], "ภารกิจวันนี้": ["ພາລະກິດມື້ນີ້", "Today's missions"], "สำเร็จ": ["ສຳເລັດ", "done"], "เข้าแอปวันนี้": ["ເຂົ້າແອັບມື້ນີ້", "Open the app today"], "ดูรายการเครื่องขุด": ["ເບິ່ງລາຍການເຄື່ອງຂຸດ", "View your miners"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
 function trStr(s){
