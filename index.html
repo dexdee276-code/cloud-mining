@@ -245,11 +245,33 @@ animation:bnGlow 2.2s infinite;
 .na-word{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;letter-spacing:1.5px;line-height:1.1;color:#fff}
 .na-live{display:flex;align-items:center;gap:5px;margin-top:3px;font-family:'Share Tech Mono','Noto Sans Thai','Noto Sans Lao',monospace;font-size:11px;color:#86efac}
 .na-live i{width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80;animation:naLive 1.4s infinite}
-.na-act{display:flex;gap:8px}
-.na-btn{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.na-act{display:flex;gap:6px}
+.na-btn{width:42px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .na-lang{border:1px solid rgba(157,78,221,.4);background:rgba(157,78,221,.12);color:#C8B0FF}
 .na-set{border:1px solid rgba(255,215,0,.35);background:rgba(255,215,0,.08);color:#FFD700}
 .na-out{border:1px solid rgba(248,113,113,.45);background:rgba(239,68,68,.1);color:#fca5a5}
+.na-bell{position:relative;border:1px solid rgba(200,100,255,.4);background:rgba(157,78,221,.12);color:#E9D5FF}
+.na-badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:#FFD700;color:#1a0a00;font-family:'Orbitron',monospace;font-size:10px;font-weight:900;display:none;align-items:center;justify-content:center}
+.nf-pop{width:100%;max-width:380px;max-height:86vh;display:flex;flex-direction:column;gap:12px;border-radius:20px;padding:18px 16px;background:rgba(40,5,70,.99);border:2px solid rgba(200,100,255,.5);box-shadow:0 20px 60px rgba(0,0,0,.6);position:relative;overflow:hidden}
+.nf-hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.nf-ttl{font-family:'Orbitron','Noto Sans Thai','Noto Sans Lao',monospace;font-size:17px;font-weight:900;color:#F5EEFF}
+.nf-btn{height:44px;padding:0 14px;border-radius:14px;border:1px solid rgba(200,100,255,.4);background:rgba(157,78,221,.12);color:#C8B0FF;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.nf-tabs{display:flex;gap:8px}
+.nf-tab{height:44px;padding:0 16px;border-radius:14px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;border:1px solid rgba(180,80,255,.35);background:rgba(60,0,100,.5);color:#C8B0FF}
+.nf-tab.on{border:2px solid #FFD700;background:rgba(255,215,0,.12);color:#FFD700}
+.nf-list{overflow-y:auto;display:flex;flex-direction:column;gap:10px;min-height:120px}
+.nf-it{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:rgba(30,5,50,.6);border:1px solid rgba(180,80,255,.25)}
+.nf-it.un{background:rgba(40,5,70,.98);border:2px solid rgba(200,100,255,.5)}
+.nf-ic{width:44px;height:44px;flex-shrink:0;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.nf-ic.m{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.4);color:#4ade80}
+.nf-ic.n{background:rgba(157,78,221,.18);border:1px solid rgba(200,100,255,.4);color:#C8B0FF}
+.nf-tx{flex-grow:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.nf-t1{font-size:14px;font-weight:700;color:#F5EEFF}
+.nf-t2{font-size:13px;line-height:1.5;color:#C8B0FF;word-break:break-word}
+.nf-t3{font-family:'Share Tech Mono',monospace;font-size:12px;color:#A890CC}
+.nf-dot{width:10px;height:10px;flex-shrink:0;border-radius:50%;background:#FFD700;box-shadow:0 0 8px #FFD700}
+.nf-empty{text-align:center;color:#A890CC;font-size:14px;padding:28px 0}
+@media (max-width:380px){.na-word{letter-spacing:.5px;font-size:13px}}
 @media (prefers-reduced-motion:reduce){.bnav-mine-circle,.na-live i{animation:none}}
 
 /* ── SHARED ── */
@@ -1124,6 +1146,16 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;line-height:1.6;">รางวัลเป็นโบนัสล็อก ใช้เงื่อนไข "ลงทุนกี่เท่าของโบนัส" เดียวกับโบนัสเติมครั้งแรก · รับได้วันละครั้ง คิดวันตามเวลาเซิร์ฟเวอร์ (UTC+7) · ขาดวันแล้วเริ่มนับใหม่</div>
   </div>
 
+  <!-- ประกาศ -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.8rem;">📢 ประกาศถึงลูกค้า</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">หัวข้อ (เว้นว่าง = ลบประกาศ)</div>
+    <input type="text" id="annTitleInput" maxlength="80" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);margin-bottom:0.7rem;font-size:0.85rem">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">เนื้อหา</div>
+    <textarea id="annBodyInput" maxlength="400" rows="3" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:1px solid rgba(255,215,0,0.3);color:var(--text);margin-bottom:0.7rem;font-size:0.85rem;font-family:inherit"></textarea>
+    <button onclick="saveAnnSettings()" class="btn btn-gold" style="width:100%;padding:0.7rem;">💾 ส่งประกาศ</button>
+  </div>
+
   <!-- โบนัสแนะนำเพื่อน -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;">
     <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);margin-bottom:0.8rem;">🎁 โบนัสแนะนำเพื่อน</div>
@@ -1275,6 +1307,7 @@ body:has(#adminScreen.active) #contactFab{display:none}
   <nav class="nav nav-app">
     <div class="na-brand"><div class="na-mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4a8 8 0 0 1 6 6M10 8l6 6M4 20l8.5-8.5"/><path d="M13 3.5L20.5 11"/></svg></div><div style="min-width:0"><div class="na-word">CRYPTOMINE</div><div class="na-live"><i></i><span>ออนไลน์</span></div></div></div>
     <div class="na-act">
+      <button type="button" class="na-btn na-bell" onclick="showNotifBox()" aria-label="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="na-badge" id="nfBadge"></span></button>
       <button type="button" class="na-btn na-lang" onclick="showLangPopup()" aria-label="Language"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></button>
       <button type="button" class="na-btn na-set" onclick="showSettingsMenu()" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button>
       <button type="button" class="na-btn na-out" onclick="doLogout()" aria-label="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v9"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
@@ -3575,6 +3608,7 @@ function startCreditListener(){
   _creditRef.on('value',function(snap){
     _credits=snap.exists()?snap.val():{};
     reconcileCredits();
+    try{nfBadge();}catch(e){}
   },function(){});
 }
 function stopCreditListener(){
@@ -3768,7 +3802,7 @@ function uploadAdminQR(e){
 function loadAdminQRPreview(){
   const wrap=document.getElementById('adminQRPreview');
   if(!wrap||!window._db)return;
-  loadLakSettings();loadRefSettings();loadFirstSettings();loadCiSettings();loadSiteInfo();loadUsdtAddr();
+  loadLakSettings();loadRefSettings();loadFirstSettings();loadCiSettings();loadAnnSettings();loadSiteInfo();loadUsdtAddr();
   const btn=document.getElementById('delQRBtn');
   const show=function(src){
     wrap.innerHTML='<img src="'+src+'" style="width:160px;height:160px;border-radius:10px;border:2px solid rgba(255,215,0,0.3);object-fit:contain;background:#fff;">';
@@ -4446,6 +4480,78 @@ function loadCiSettings(){
     set('ciM1Input',c.m1);set('ciM2Input',c.m2);set('ciOnInput',c.on?'1':'0');
   }).catch(function(){});
 }
+
+var _ann=null,_nfTab='all';
+function nfEsc(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function nfSeenKey(){return 'nf_seen_'+getSess();}
+function nfSeen(){try{return parseInt(localStorage.getItem(nfSeenKey())||'0',10)||0;}catch(e){return 0;}}
+function nfItems(){
+  var out=[];
+  var cr=(typeof _credits==='object'&&_credits)?_credits:{};
+  Object.keys(cr).forEach(function(k){
+    var c=cr[k];if(!c||!c.time)return;
+    var title=k.indexOf('ci_')===0?'รับโบนัสเช็กอิน':(k.indexOf('ms_')===0?'ภารกิจสำเร็จ':'ได้รับเครดิต');
+    var amt=Number(c.amt);
+    var body=(c.desc?String(c.desc)+' · ':'')+(isFinite(amt)?'+'+amt.toFixed(2)+' USDT':'');
+    out.push({kind:'m',title:title,body:body,time:c.time});
+  });
+  if(_ann&&_ann.title)out.push({kind:'n',title:_ann.title,body:_ann.body||'',time:_ann.time||0});
+  out.sort(function(a,b){return b.time-a.time;});
+  return out.slice(0,40);
+}
+function nfUnread(){var seen=nfSeen();return nfItems().filter(function(n){return n.time>seen;}).length;}
+function nfBadge(){
+  var b=document.getElementById('nfBadge');if(!b)return;
+  var n=0;try{n=nfUnread();}catch(e){}
+  b.textContent=n>9?'9+':String(n);b.style.display=n>0?'flex':'none';
+}
+function loadAnnSettings(){
+  if(!window._db)return;
+  window._db.ref('settings').once('value').then(function(s){
+    var v=s.exists()?s.val():{};
+    _ann=v.annTitle?{title:v.annTitle,body:v.annBody||'',time:v.annTime||0}:null;
+    var a=document.getElementById('annTitleInput'),b=document.getElementById('annBodyInput');
+    if(a)a.value=v.annTitle||'';if(b)b.value=v.annBody||'';
+    nfBadge();
+  }).catch(function(){});
+}
+function saveAnnSettings(){
+  if(!window._db){showToast('❌ ไม่มี Firebase');return;}
+  var t=(document.getElementById('annTitleInput').value||'').trim().slice(0,80);
+  var b=(document.getElementById('annBodyInput').value||'').trim().slice(0,400);
+  var upd=t?{annTitle:t,annBody:b,annTime:Date.now()}:{annTitle:null,annBody:null,annTime:null};
+  window._db.ref('settings').update(upd).then(function(){showToast(t?'✅ ส่งประกาศแล้ว':'✅ ลบประกาศแล้ว');loadAnnSettings();}).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
+}
+function nfFmt(ts){var d=new Date(ts),p=function(n){return (n<10?'0':'')+n;};return p(d.getHours())+':'+p(d.getMinutes())+' · '+p(d.getDate())+'/'+p(d.getMonth()+1);}
+function nfRender(){
+  var box=document.getElementById('nfList');if(!box)return;
+  var seen=window._nfSeenAtOpen||0;
+  var items=nfItems().filter(function(n){return _nfTab==='all'||n.kind===(_nfTab==='money'?'m':'n');});
+  var ic={m:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',n:'<path d="M4 4h16v12H8l-4 4z"/>'};
+  box.innerHTML=items.length?items.map(function(n){
+    var un=n.time>seen;
+    return '<div class="nf-it'+(un?' un':'')+'"><div class="nf-ic '+n.kind+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic[n.kind]+'</svg></div><div class="nf-tx"><div class="nf-t1">'+nfEsc(n.title)+'</div>'+(n.body?'<div class="nf-t2">'+nfEsc(n.body)+'</div>':'')+'<div class="nf-t3">'+nfEsc(n.time?nfFmt(n.time):'')+'</div></div>'+(un?'<i class="nf-dot"></i>':'')+'</div>';
+  }).join(''):'<div class="nf-empty">ยังไม่มีแจ้งเตือน</div>';
+  ['all','money','news'].forEach(function(k){var e=document.getElementById('nfTab_'+k);if(e)e.classList.toggle('on',k===_nfTab);});
+}
+function nfTabSet(k){_nfTab=k;nfRender();}
+function nfMarkAll(){
+  try{localStorage.setItem(nfSeenKey(),String(Date.now()));}catch(e){}
+  window._nfSeenAtOpen=Date.now();nfBadge();nfRender();
+}
+function showNotifBox(){
+  var old=document.getElementById('nfOv');if(old)old.remove();
+  window._nfSeenAtOpen=nfSeen();_nfTab='all';
+  var ov=document.createElement('div');ov.className='overlay';ov.id='nfOv';
+  ov.addEventListener('click',function(e){if(e.target===ov)nfClose();});
+  ov.innerHTML='<div class="nf-pop"><div class="nf-hd"><div class="nf-ttl">แจ้งเตือน</div><button type="button" class="nf-btn" onclick="nfMarkAll()">อ่านทั้งหมด</button></div>'
+   +'<div class="nf-tabs"><button type="button" class="nf-tab on" id="nfTab_all" onclick="nfTabSet(\'all\')">ทั้งหมด</button><button type="button" class="nf-tab" id="nfTab_money" onclick="nfTabSet(\'money\')">การเงิน</button><button type="button" class="nf-tab" id="nfTab_news" onclick="nfTabSet(\'news\')">ประกาศ</button></div>'
+   +'<div class="nf-list" id="nfList"></div><button type="button" class="nf-btn" onclick="nfClose()">ปิด</button></div>';
+  document.body.appendChild(ov);
+  nfRender();
+  try{if(typeof applyLang==='function')applyLang();}catch(e){}
+}
+function nfClose(){var o=document.getElementById('nfOv');if(o)o.remove();nfBadge();}
 
 function showTopupPopup(){
   _tpInfoReady=false;
@@ -5587,6 +5693,7 @@ Object.assign(TRD,{"ลองคำนวณกำไร": ["ລອງຄຳນ�
 Object.assign(TRD,{"กดเพื่อเลือกรูปสลิป": ["ກົດເພື່ອເລືອກຮູບສະລິບ", "Tap to choose the slip image"], "คัดลอก": ["ຄັດລອກ", "Copy"], "คัดลอกเลขบัญชี": ["ຄັດລອກເລກບັນຊີ", "Copy account number"], "คุณจะได้รับประมาณ": ["ທ່ານຈະໄດ້ຮັບປະມານ", "You will receive about"], "ยอดที่โอน": ["ຍອດທີ່ໂອນ", "Amount transferred"], "ยอดเข้ากระเป๋า": ["ຍອດເຂົ້າກະເປົາ", "Balance credited to wallet"], "รอแอดมินตรวจสอบ": ["ລໍແອດມິນກວດສອບ", "Waiting for admin review"], "รูปจากแอปธนาคาร เห็นจำนวนและเวลาชัดเจน": ["ຮູບຈາກແອັບທະນາຄານ ເຫັນຈຳນວນ ແລະ ເວລາຊັດເຈນ", "Image from your banking app with amount and time clearly visible"], "สลิป": ["ສະລິບ", "Slip"], "สลิปต้องตรงกับยอดที่โอนจริง": ["ສະລິບຕ້ອງກົງກັບຍອດທີ່ໂອນຈິງ", "The slip must match the amount actually transferred"], "ส่งคำขอเติมเงิน": ["ສົ່ງຄຳຂໍເຕີມເງິນ", "Submit top-up request"], "เมื่ออนุมัติ ยอดจะเข้ากระเป๋า ดูสถานะได้ในประวัติ": ["ເມື່ອອະນຸມັດ ຍອດຈະເຂົ້າກະເປົາ ເບິ່ງສະຖານະໄດ້ໃນປະຫວັດ", "Once approved the balance enters your wallet. Check the status in History"], "แนบสลิป": ["ແນບສະລິບ", "Attach slip"], "แอดมินกำลังตรวจสอบการโอน ยอดจะเข้ากระเป๋าเมื่อยืนยันแล้ว": ["ແອດມິນກຳລັງກວດສອບການໂອນ ຍອດຈະເຂົ້າກະເປົາເມື່ອຢືນຢັນແລ້ວ", "The admin is verifying your transfer. The balance enters your wallet once confirmed"], "แอดมินตรวจสอบยอดและสลิป": ["ແອດມິນກວດສອບຍອດ ແລະ ສະລິບ", "The admin checks the amount and slip"], "โอนตามจำนวนนี้ให้ตรง": ["ໂອນຕາມຈຳນວນນີ້ໃຫ້ຕົງ", "Transfer exactly this amount"], "โอนเงิน": ["ໂອນເງິນ", "Transfer"], "โอนแล้ว": ["ໂອນແລ້ວ", "Transferred"]});
 Object.assign(TRD,{"ขุดอยู่": ["ຂຸດຢູ່", "Mining"], "สัญญา (วัน)": ["ສັນຍາ (ມື້)", "Contract (days)"], "เหลือ (วัน)": ["ເຫຼືອ (ມື້)", "Left (days)"]});
 Object.assign(TRD,{"เช็กอินรายวัน": ["ເຊັກອິນລາຍວັນ", "Daily check-in"], "เข้าแอปทุกวัน รับโบนัสเพิ่ม": ["ເຂົ້າແອັບທຸກມື້ ຮັບໂບນັດເພີ່ມ", "Open the app daily for extra bonuses"], "วันติดต่อกัน": ["ມື້ຕິດຕໍ່ກັນ", "day streak"], "รับรางวัลวันนี้": ["ຮັບລາງວັນມື້ນີ້", "Claim today's reward"], "ได้รับแล้ว": ["ໄດ້ຮັບແລ້ວ", "Claimed"], "มาใหม่พรุ่งนี้": ["ມາໃໝ່ມື້ອື່ນ", "come back tomorrow"], "รับโบนัสใหญ่ ถ้าขาดวันใดวันหนึ่งจะเริ่มนับใหม่ โบนัสถอนได้ตามเงื่อนไขของระบบ": ["ຮັບໂບນັດໃຫຍ່ ຖ້າຂາດມື້ໃດມື້ໜຶ່ງ ຈະເລີ່ມນັບໃໝ່ ໂບນັດຖອນໄດ້ຕາມເງື່ອນໄຂຂອງລະບົບ", "gives a big bonus. Missing a day restarts the count. Bonuses can be withdrawn per the system conditions"], "ภารกิจวันนี้": ["ພາລະກິດມື້ນີ້", "Today's missions"], "สำเร็จ": ["ສຳເລັດ", "done"], "เข้าแอปวันนี้": ["ເຂົ້າແອັບມື້ນີ້", "Open the app today"], "ดูรายการเครื่องขุด": ["ເບິ່ງລາຍການເຄື່ອງຂຸດ", "View your miners"]});
+Object.assign(TRD,{"แจ้งเตือน":["ແຈ້ງເຕືອນ","Notifications"],"อ่านทั้งหมด":["ອ່ານທັງໝົດ","Mark all read"],"ทั้งหมด":["ທັງໝົດ","All"],"การเงิน":["ການເງິນ","Money"],"ประกาศ":["ປະກາດ","News"],"ยังไม่มีแจ้งเตือน":["ຍັງບໍ່ມີແຈ້ງເຕືອນ","No notifications yet"],"รับโบนัสเช็กอิน":["ໄດ້ຮັບໂບນັດເຊັກອິນ","Check-in bonus received"],"ภารกิจสำเร็จ":["ພາລະກິດສຳເລັດ","Mission completed"],"ได้รับเครดิต":["ໄດ້ຮັບເຄຣດິດ","Credit received"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
 function trStr(s){
