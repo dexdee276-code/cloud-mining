@@ -1049,6 +1049,10 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <input type="number" id="refBonusInput" inputmode="decimal" step="0.5" min="0" max="100" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.4);color:var(--green);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;">
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">รับโบนัสได้สูงสุดกี่คนต่อผู้แนะนำ</div>
     <input type="number" id="refMaxInput" inputmode="numeric" min="0" max="10000" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(74,222,128,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.8rem;outline:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--gold);margin:0.4rem 0 0.3rem;">🏆 โบนัสครบเป้าหมาย: ชวนเพื่อนครบกี่คน (0 = ปิด)</div>
+    <input type="number" id="refGoalInput" inputmode="numeric" min="0" max="1000" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.4);color:var(--text);font-family:'Share Tech Mono',monospace;margin-bottom:0.6rem;outline:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-bottom:0.3rem;">โบนัสเมื่อครบเป้า (USDT) · ล็อกจนลงทุนครบ "โบนัส × เท่าที่ตั้งในโบนัสเติมครั้งแรก"</div>
+    <input type="number" id="refGoalBonusInput" inputmode="decimal" step="0.5" min="0" max="1000" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Share Tech Mono',monospace;margin-bottom:0.8rem;outline:none;">
     <button onclick="saveRefSettings()" class="btn btn-gold" style="width:100%;padding:0.7rem;">💾 บันทึกโบนัส</button>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-top:0.5rem;">มีผลกับการอนุมัติเติมเงินครั้งต่อไป ผู้ที่ได้โบนัสไปแล้วไม่ถูกเปลี่ยนย้อนหลัง</div>
   </div>
@@ -3475,7 +3479,7 @@ function reconcileCredits(){
   if(wu)wu.textContent=(ud.usd||0).toFixed(2);
   const pw=document.getElementById('pgWallet');
   if(pw&&pw.classList.contains('active'))renderWallet();
-  showToast(net>=0?'✅ ได้รับเติมเงิน $'+net.toLocaleString()+' USDT':'💸 หักยอด $'+Math.abs(net).toLocaleString()+' USDT');
+  if(net!==0)showToast(net>0?'✅ ได้รับเติมเงิน $'+net.toLocaleString()+' USDT':'💸 หักยอด $'+Math.abs(net).toLocaleString()+' USDT');
 }
 
 // ── ADMIN: อะตอมมิก ──
@@ -3931,7 +3935,7 @@ function approveTopup(fbKey){
         showToast('✅ อนุมัติ $'+amt.toLocaleString()+' USDT ให้ '+user+' แล้ว');
         renderAdminTopup(currentFilter);
         grantFirstDepositBonus(user,amt,function(ok,b){if(ok)showToast('🎁 ให้โบนัสเติมครั้งแรก $'+b+' แก่ '+user+' แล้ว');});
-        grantReferralBonus(user,function(ok,ref,bn){if(ok)showToast('🎁 ให้โบนัสแนะนำเพื่อน $'+bn+' แก่ '+user+' และ '+ref+' แล้ว');});
+        grantReferralBonus(user,function(ok,ref,bn,gb){if(ok)showToast((bn>0?'🎁 ให้โบนัสแนะนำเพื่อน $'+bn+' แก่ '+user+' และ '+ref+' แล้ว':'👥 นับเพื่อนของ '+ref+' แล้ว')+(gb>0?' · 🏆 ครบเป้า +$'+gb:''));});
       }).catch(function(){
         reqRef.child('status').set('pending');
         showToast('❌ เติมยอดไม่สำเร็จ คืนสถานะ "รออนุมัติ" แล้ว ลองใหม่อีกครั้ง');
@@ -3992,14 +3996,18 @@ function ensureRefCode(){
 function refSettingsOf(info){
   info=info||{};
   const b=parseFloat(info.refBonus), m=parseInt(info.refMax,10);
-  return {bonus:(isFinite(b)&&b>=0)?b:REF_BONUS, max:(isFinite(m)&&m>=0)?m:REF_MAX};
+  const g=parseInt(info.refGoal,10), gb=parseFloat(info.refGoalBonus);
+  return {bonus:(isFinite(b)&&b>=0)?b:REF_BONUS, max:(isFinite(m)&&m>=0)?m:REF_MAX,
+          goal:(isFinite(g)&&g>=0)?g:3, goalBonus:(isFinite(gb)&&gb>=0)?gb:5};
 }
 function grantReferralBonus(friend,cb){
   const db=window._db; cb=cb||function(){};
   if(!db||!friend){cb(false);return;}
   db.ref('settings').once('value').then(function(st){
-    const cfg=refSettingsOf(st.exists()?st.val():{});
-    if(!(cfg.bonus>0)){cb(false,'off');return;}
+    const sv=st.exists()?st.val():{};
+    const cfg=refSettingsOf(sv), turn=firstSettingsOf(sv).turn;
+    const milestoneOn=cfg.goal>0&&cfg.goalBonus>0;
+    if(!(cfg.bonus>0)&&!milestoneOn){cb(false,'off');return;}
     return db.ref('users/'+friend+'/refBy').once('value').then(function(s){
       const code=s.exists()?String(s.val()).toUpperCase():'';
       if(!/^[A-Z0-9]{4,12}$/.test(code)){cb(false);return;}
@@ -4008,12 +4016,22 @@ function grantReferralBonus(friend,cb){
         if(!ref||ref===friend){cb(false);return;}
         return db.ref('credits/'+ref).once('value').then(function(cs){
           const keys=Object.keys(cs.exists()?cs.val():{});
+          const refbs=keys.filter(function(k){return k.indexOf('refb_')===0;});
           if(keys.indexOf('refb_'+friend)>=0){cb(false);return;}
-          if(keys.filter(function(k){return k.indexOf('refb_')===0;}).length>=cfg.max){cb(false,'max');return;}
-          return Promise.all([
-            adminCredit(ref,'refb_'+friend,cfg.bonus,'🎁 โบนัสแนะนำเพื่อน +$'+cfg.bonus+' ('+friend+')'),
-            adminCredit(friend,'refw_'+friend,cfg.bonus,'🎁 โบนัสสมาชิกใหม่ เติมครั้งแรก +$'+cfg.bonus)
-          ]).then(function(){cb(true,ref,cfg.bonus);});
+          const payPer=cfg.bonus>0&&refbs.length<cfg.max;
+          if(!payPer&&!(milestoneOn&&refbs.length<cfg.goal)){cb(false,'max');return;}
+          const count=refbs.length+1;
+          const jobs=[];
+          // บันทึกว่าเพื่อนคนนี้นับแล้ว (ถ้าไม่จ่ายรายคน จะเป็น $0 แต่ยังนับจำนวนเพื่อน)
+          jobs.push(adminCredit(ref,'refb_'+friend,payPer?cfg.bonus:0,(payPer?'🎁 โบนัสแนะนำเพื่อน +$'+cfg.bonus:'👥 เพื่อนเติมเงินครั้งแรก')+' ('+friend+')'));
+          if(payPer)jobs.push(adminCredit(friend,'refw_'+friend,cfg.bonus,'🎁 โบนัสสมาชิกใหม่ เติมครั้งแรก +$'+cfg.bonus));
+          // โบนัสครบเป้าหมาย: จ่ายครั้งเดียว ล็อกจนลงทุนครบตามเงื่อนไข
+          let hit=false;
+          if(milestoneOn&&count===cfg.goal&&keys.indexOf('refm_'+cfg.goal)<0){
+            hit=true;
+            jobs.push(adminCredit(ref,'refm_'+cfg.goal,cfg.goalBonus,'🏆 ชวนเพื่อนครบ '+cfg.goal+' คน +$'+cfg.goalBonus,{lock:cfg.goalBonus,need:Math.round(cfg.goalBonus*turn*100)/100}));
+          }
+          return Promise.all(jobs).then(function(){cb(true,ref,payPer?cfg.bonus:0,hit?cfg.goalBonus:0);});
         });
       });
     });
@@ -4024,9 +4042,13 @@ function saveRefSettings(){
   const max=parseInt(document.getElementById('refMaxInput')?document.getElementById('refMaxInput').value:'',10);
   if(!isFinite(bonus)||bonus<0||bonus>100){showToast('⚠ โบนัสต้องอยู่ระหว่าง 0–100 ดอลลาร์ (0 = ปิดโบนัส)');return;}
   if(!isFinite(max)||max<0||max>10000){showToast('⚠ จำนวนคนสูงสุดต้องเป็นตัวเลข 0–10,000');return;}
+  const goal=parseInt(document.getElementById('refGoalInput')?document.getElementById('refGoalInput').value:'',10);
+  const gb=parseFloat(document.getElementById('refGoalBonusInput')?document.getElementById('refGoalBonusInput').value:'');
+  if(!isFinite(goal)||goal<0||goal>1000){showToast('⚠ เป้าหมายจำนวนเพื่อนต้องเป็น 0–1,000 (0 = ปิด)');return;}
+  if(!isFinite(gb)||gb<0||gb>1000){showToast('⚠ โบนัสครบเป้าหมายต้องอยู่ระหว่าง 0–1,000 ดอลลาร์');return;}
   if(!window._db){showToast('❌ ไม่มี Firebase');return;}
-  window._db.ref('settings').update({refBonus:Math.round(bonus*100)/100,refMax:max}).then(function(){
-    showToast(bonus>0?'✅ บันทึกโบนัสแนะนำเพื่อนแล้ว':'✅ ปิดโบนัสแนะนำเพื่อนแล้ว');
+  window._db.ref('settings').update({refBonus:Math.round(bonus*100)/100,refMax:max,refGoal:goal,refGoalBonus:Math.round(gb*100)/100}).then(function(){
+    showToast('✅ บันทึกโบนัสแนะนำเพื่อนแล้ว');
   }).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
 }
 function loadRefSettings(){
@@ -4035,6 +4057,8 @@ function loadRefSettings(){
     const c=refSettingsOf(s.exists()?s.val():{});
     const b=document.getElementById('refBonusInput'),m=document.getElementById('refMaxInput');
     if(b)b.value=c.bonus; if(m)m.value=c.max;
+    const g1=document.getElementById('refGoalInput'),g2=document.getElementById('refGoalBonusInput');
+    if(g1)g1.value=c.goal; if(g2)g2.value=c.goalBonus;
   }).catch(function(){});
 }
 function adminCredit(username,key,amt,desc,extra){
@@ -5850,11 +5874,22 @@ function renderReferral(){
     +'<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">'
     +'<button type="button" onclick="copyRefLink()" style="height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">คัดลอกลิงก์</button>'
     +'<button type="button" onclick="shareRefLink()" style="height:46px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">แชร์ให้เพื่อน</button></div>'
+    +'<div id="refGoalBox" style="display:none;border-radius:12px;padding:12px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3)"></div>'
     +'<div style="display:flex;justify-content:space-between;font-size:13px;color:#b6a7d6"><span>แนะนำแล้ว <b class="rg-num" style="color:#fff">'+(ud.refCount||0)+'</b> คน</span><span>ได้รับ <b class="rg-num" style="color:#4ade80">$'+(ud.refEarned||0).toFixed(2)+'</b></span></div>'
     +'</div>';
   const paint=function(c){
     const t=document.getElementById('refRuleText');
-    if(t)t.textContent=c.bonus>0?('เพื่อนสมัครผ่านลิงก์และเติมเงินครั้งแรก ได้ $'+c.bonus+' ทั้งคุณและเพื่อน (สูงสุด '+c.max+' คน)'):'ยังไม่เปิดโบนัสแนะนำเพื่อน';
+    if(t)t.textContent=c.bonus>0?('เพื่อนสมัครผ่านลิงก์และเติมเงินครั้งแรก ได้ $'+c.bonus+' ทั้งคุณและเพื่อน (สูงสุด '+c.max+' คน)'):(c.goal>0&&c.goalBonus>0?'ชวนเพื่อนที่เติมเงินครั้งแรกให้ครบเป้า รับ USDT':'ยังไม่เปิดโบนัสแนะนำเพื่อน');
+    const gbx=document.getElementById('refGoalBox');
+    if(gbx){
+      if(c.goal>0&&c.goalBonus>0){
+        const n=Math.min(ud.refCount||0,c.goal),done=(ud.refCount||0)>=c.goal;
+        gbx.style.display='block';
+        gbx.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;margin-bottom:8px"><span>🏆 ชวนครบ '+c.goal+' คน รับ <span class="rg-num" style="color:#ffd700">$'+c.goalBonus+'</span></span><span class="rg-num" style="color:#ffd700">'+n+'/'+c.goal+'</span></div>'
+          +'<div style="height:8px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden"><div style="width:'+Math.round(n/c.goal*100)+'%;height:100%;background:linear-gradient(90deg,#d97706,#fbbf24)"></div></div>'
+          +'<div style="font-size:11px;color:#b6a7d6;line-height:1.6;margin-top:8px">'+(done?'✅ ครบเป้าแล้ว โบนัสเข้ากระเป๋าแล้ว':'นับเฉพาะเพื่อนที่เติมเงินครั้งแรกและแอดมินอนุมัติแล้ว')+' · โบนัสถอนได้เมื่อลงทุนครบเงื่อนไข</div>';
+      } else gbx.style.display='none';
+    }
   };
   paint(refSettingsOf({}));
   if(window._db)window._db.ref('settings').once('value').then(function(sn){paint(refSettingsOf(sn.exists()?sn.val():{}));}).catch(function(){});
