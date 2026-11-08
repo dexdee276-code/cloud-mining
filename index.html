@@ -5604,9 +5604,11 @@ function saveUDForce(ud){
 
 // ─── ETH MINING CALC ───
 const ETH_RATE=2672.47;
+var DAILY_PCT_TIERS=[[100,0.75],[500,0.8],[1000,1.0],[5000,1.2],[10000,1.5],[30000,1.8],[50000,2.3],[100000,2.8]];
 function calcDailyPct(amt){
-  if(amt<100)return 1.0;   // ยอดต่ำกว่า $100: 1%/วัน ($10 = $0.10/วัน)
-  return 0.75+(amt/100000)*2.75;
+  // ขั้นบันได: ยิ่งลงทุนต่อเครื่องมาก % ต่อวันยิ่งสูง (ไม่ลดลงเมื่อยอดเพิ่ม)
+  for(var i=0;i<DAILY_PCT_TIERS.length;i++){if(amt<DAILY_PCT_TIERS[i][0])return DAILY_PCT_TIERS[i][1];}
+  return 3.5;
 }
 function calcDays(amt){
   if(amt<100)return 30;
