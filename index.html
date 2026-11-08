@@ -1070,7 +1070,6 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <input type="text" id="site_proc" maxlength="200" placeholder="เวลาดำเนินการถอน (เช่น ภายใน 24 ชั่วโมงทำการ)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
     <input type="text" id="site_name" maxlength="200" placeholder="ชื่อบริษัท/เจ้าของ" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
     <input type="text" id="site_addr" maxlength="200" placeholder="ที่อยู่" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
-    <textarea id="site_src" maxlength="800" rows="4" placeholder="ที่มาของกำไร — อธิบายตามความจริงว่ากำไรที่จ่ายให้ลูกค้ามาจากรายได้ส่วนใด (แสดงในหน้า 'กำไรมาจากไหน' เขียนเป็นภาษาลาว)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(157,78,221,0.2);color:var(--text);font-family:inherit;font-size:0.78rem;margin-bottom:0.5rem;"></textarea>
     <input type="text" id="site_reg" maxlength="200" placeholder="เลขทะเบียนธุรกิจ/ใบอนุญาต (ถ้ามี)" style="width:100%;padding:0.65rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.78rem;outline:none;margin-bottom:0.6rem;">
     <button onclick="saveSiteInfo()" class="btn btn-gold" style="width:100%;padding:0.7rem;">💾 บันทึกข้อมูลติดต่อ</button>
   </div>
@@ -1228,6 +1227,20 @@ body:has(#adminScreen.active) #contactFab{display:none}
     </div>
   </div>
 
+  <div style="border-radius:20px;padding:18px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(255,215,0,.25);display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:15px;font-weight:700">ลองคำนวณกำไร</div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-size:12px;color:#b6a7d6">เลื่อนเพื่อเลือกยอดลงทุน</span><span id="roiAmt" class="rg-num" style="font-size:26px;font-weight:700;color:#fff">$1,000</span></div>
+    <input type="range" id="roiSlider" min="0" max="13" step="1" value="8" oninput="paintPromoRoi()" style="width:100%;height:36px;accent-color:#a855f7;cursor:pointer" aria-label="ยอดลงทุน">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#8f80b3"><span>$10</span><span>$10,000</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#b6a7d6">กำไรต่อวัน</span><span id="roiDaily" class="rg-num" style="font-weight:700;color:#4ade80">-</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#b6a7d6">กำไรรวมเมื่อครบสัญญา</span><span id="roiMonth" class="rg-num" style="font-weight:700;color:#4ade80">-</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#b6a7d6">ระยะสัญญา</span><span id="roiDays" class="rg-num" style="font-weight:700">-</span></div>
+    <div style="height:1px;background:rgba(255,255,255,.08)"></div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;color:#c9b8e8">เงินต้น + กำไร</span><span id="roiTotal" class="rg-num" style="font-size:22px;font-weight:700;color:#ffd700">-</span></div>
+    <button type="button" onclick="roiInvest()" style="min-height:48px;border:none;border-radius:14px;background:linear-gradient(135deg,#d97706,#fbbf24);color:#1a0a00;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer">เริ่มลงทุนจำนวนนี้</button>
+    <div style="font-size:11px;color:#a99bc7;line-height:1.6">ประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง</div>
+  </div>
+
   <div style="border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="font-size:15px;font-weight:700">กำไรของคุณวันนี้</div>
@@ -1280,22 +1293,6 @@ body:has(#adminScreen.active) #contactFab{display:none}
   <div style="display:flex;flex-direction:column;gap:10px">
     <div style="display:flex;gap:14px;align-items:flex-start;border-radius:18px;padding:14px 16px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div class="rg-num" style="width:34px;height:34px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">1</div><div><div style="font-size:15px;font-weight:700">เติมเงินเป็นกีบ</div><div style="font-size:13px;color:#c9b8e8;line-height:1.6;margin-top:2px">โอนตาม QR แนบสลิป แอดมินตรวจสอบแล้ว USDT เข้ากระเป๋า</div></div></div><div style="display:flex;gap:14px;align-items:flex-start;border-radius:18px;padding:14px 16px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div class="rg-num" style="width:34px;height:34px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">2</div><div><div style="font-size:15px;font-weight:700">เลือกจำนวนที่จะลงทุน</div><div style="font-size:13px;color:#c9b8e8;line-height:1.6;margin-top:2px">ขั้นต่ำ $10 เห็นประมาณการกำไรก่อนยืนยัน</div></div></div><div style="display:flex;gap:14px;align-items:flex-start;border-radius:18px;padding:14px 16px;background:#150b28;border:1px solid rgba(255,255,255,.08)"><div class="rg-num" style="width:34px;height:34px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0">3</div><div><div style="font-size:15px;font-weight:700">รับกำไรและถอน</div><div style="font-size:13px;color:#c9b8e8;line-height:1.6;margin-top:2px">กำไรสะสมรายวัน ถอนเป็นเงินกีบเข้าบัญชีธนาคาร ดูสถานะได้ในแอป</div></div></div>
   </div>
-
-  <div style="border-radius:20px;padding:18px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(255,215,0,.25);display:flex;flex-direction:column;gap:10px">
-    <div style="font-size:15px;font-weight:700">ลองคำนวณกำไร</div>
-    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-size:12px;color:#b6a7d6">เลื่อนเพื่อเลือกยอดลงทุน</span><span id="roiAmt" class="rg-num" style="font-size:26px;font-weight:700;color:#fff">$1,000</span></div>
-    <input type="range" id="roiSlider" min="0" max="13" step="1" value="8" oninput="paintPromoRoi()" style="width:100%;height:36px;accent-color:#a855f7;cursor:pointer" aria-label="ยอดลงทุน">
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:#8f80b3"><span>$10</span><span>$10,000</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#b6a7d6">กำไรต่อวัน</span><span id="roiDaily" class="rg-num" style="font-weight:700;color:#4ade80">-</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#b6a7d6">กำไรรวมเมื่อครบสัญญา</span><span id="roiMonth" class="rg-num" style="font-weight:700;color:#4ade80">-</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#b6a7d6">ระยะสัญญา</span><span id="roiDays" class="rg-num" style="font-weight:700">-</span></div>
-    <div style="height:1px;background:rgba(255,255,255,.08)"></div>
-    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;color:#c9b8e8">เงินต้น + กำไร</span><span id="roiTotal" class="rg-num" style="font-size:22px;font-weight:700;color:#ffd700">-</span></div>
-    <button type="button" onclick="roiInvest()" style="min-height:48px;border:none;border-radius:14px;background:linear-gradient(135deg,#d97706,#fbbf24);color:#1a0a00;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer">เริ่มลงทุนจำนวนนี้</button>
-    <div style="font-size:11px;color:#a99bc7;line-height:1.6">ประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง</div>
-  </div>
-
-  <button type="button" onclick="showProfitExplain()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 14px;border-radius:14px;border:1px solid rgba(255,215,0,.4);background:rgba(255,215,0,.08);color:#ffd700;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">❓ กำไรมาจากไหน · อ่านก่อนลงทุน</button>
 
   <div style="margin-top:6px;font-size:17px;font-weight:700">กิจกรรมล่าสุด</div>
   <div id="actList" style="border-radius:20px;background:#150b28;border:1px solid rgba(255,255,255,.08);padding:4px 16px"></div>
@@ -1353,7 +1350,6 @@ body:has(#adminScreen.active) #contactFab{display:none}
       </div>
     </div>
 
-    <button type="button" onclick="showProfitExplain()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 14px;border-radius:14px;border:1px solid rgba(255,215,0,.4);background:rgba(255,215,0,.08);color:#ffd700;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">❓ กำไรมาจากไหน · อ่านก่อนลงทุน</button>
     <div style="font-size:12px;color:#a99bc7;line-height:1.7;text-align:center;padding:0 8px">ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน<br>การลงทุนมีความเสี่ยง · <a href="#" onclick="showHelpCenter('terms');return false;" style="color:#ffd700;text-decoration:none">อ่านเงื่อนไข</a></div>
 
     <button type="button" id="pvCta" onclick="startMiningInvestment()" style="display:flex;align-items:center;justify-content:center;width:100%;height:54px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 22px rgba(124,58,237,.45);opacity:.45">กรอกจำนวนเพื่อเริ่มลงทุน</button>
@@ -4414,59 +4410,6 @@ function maskName(n){
 function fmtN(n){return Math.round(parseFloat(n)||0).toLocaleString('en-US');}
 function fmtUsd(n){return (parseFloat(n)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
 
-// ─── หน้า "กำไรมาจากไหน" ───
-function px(th,lo,en){return LANG==='lo'?lo:LANG==='en'?en:th;}
-function showProfitExplain(){
-  var old=document.getElementById('profitOv');if(old)old.remove();
-  var ov=document.createElement('div');ov.className='overlay';ov.id='profitOv';
-  var rows=[10,100,1000].map(function(a){
-    var d=calcDailyEarn(a),n=calcDays(a);
-    return '<tr><td>$'+a.toLocaleString('en-US')+'</td><td>$'+d.toFixed(2)+'</td><td>'+n+'</td><td>$'+(d*n).toFixed(2)+'</td></tr>';
-  }).join('');
-  var H=function(t){return '<div style="font-size:15px;font-weight:700;color:#ffd700;margin:16px 0 6px">'+t+'</div>';};
-  var P=function(t){return '<div style="font-size:13px;line-height:1.75;color:#d9ccf2">'+t+'</div>';};
-  var L=function(items){return '<ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:#d9ccf2">'+items.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ul>';};
-  var risks=L([
-    px('คุณอาจสูญเสียเงินที่ลงทุนบางส่วนหรือทั้งหมด','ທ່ານອາດສູນເສຍເງິນທີ່ລົງທຶນບາງສ່ວນ ຫຼື ທັງໝົດ','You may lose part or all of the money you invest'),
-    px('กำไรที่เห็นเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกัน และอาจเปลี่ยนแปลงหรือหยุดจ่ายได้','ກຳໄລທີ່ເຫັນເປັນປະມານການຕາມສູດຂອງລະບົບ ບໍ່ແມ່ນການຮັບປະກັນ ແລະ ອາດປ່ຽນແປງ ຫຼື ຢຸດຈ່າຍໄດ້','Profit shown is an estimate from the system formula, not a guarantee, and may change or stop'),
-    px('ผู้ให้บริการแก้ไขเงื่อนไข อัตรากำไร หรือโปรโมชันได้','ຜູ້ໃຫ້ບໍລິການແກ້ໄຂເງື່ອນໄຂ ອັດຕາກຳໄລ ຫຼື ໂປຣໂມຊັນໄດ້','The provider may change terms, profit rates or promotions'),
-    px('ราคา ETH และ USDT รวมถึงอัตราแลกเปลี่ยนกีบ ผันผวนได้','ລາຄາ ETH ແລະ USDT ລວມທັງອັດຕາແລກປ່ຽນກີບ ຜັນຜວນໄດ້','ETH and USDT prices and the LAK exchange rate can fluctuate'),
-    px('การถอนต้องผ่านการตรวจสอบของแอดมินและใช้เวลาตามที่ผู้ให้บริการแจ้ง','ການຖອນຕ້ອງຜ່ານການກວດສອບຂອງແອດມິນ ແລະ ໃຊ້ເວລາຕາມທີ່ຜູ້ໃຫ້ບໍລິການແຈ້ງ','Withdrawals need admin verification and take the time the provider states'),
-    px('โอนผิดเครือข่ายหรือกรอกบัญชีผิด เงินอาจกู้คืนไม่ได้','ໂອນຜິດເຄືອຂ່າຍ ຫຼື ກອກບັນຊີຜິດ ເງິນອາດກູ້ຄືນບໍ່ໄດ້','Sending on the wrong network or entering a wrong account may be unrecoverable'),
-    px('ผลตอบแทนที่สูงมาก มักมาพร้อมความเสี่ยงที่สูงมากเช่นกัน','ຜົນຕອບແທນທີ່ສູງຫຼາຍ ມັກມາພ້ອມຄວາມສ່ຽງທີ່ສູງຫຼາຍເຊັ່ນກັນ','Very high returns usually come with very high risk')
-  ]);
-  var check=L([
-    px('นี่เป็นเงินเย็นที่ผมเสียได้โดยไม่เดือดร้อนหรือไม่','ນີ້ເປັນເງິນເຢັນທີ່ຂ້ອຍເສຍໄດ້ໂດຍບໍ່ເດືອດຮ້ອນຫຼືບໍ່','Is this money I can afford to lose?'),
-    px('ผมเข้าใจแล้วหรือยังว่ากำไรมาจากไหน ถ้ายังไม่ชัด ให้ถามแอดมินก่อน','ຂ້ອຍເຂົ້າໃຈແລ້ວບໍວ່າກຳໄລມາຈາກໃສ ຖ້າຍັງບໍ່ຊັດ ໃຫ້ຖາມແອດມິນກ່ອນ','Do I understand where the profit comes from? If not, ask the admin first'),
-    px('เริ่มจากจำนวนน้อย (เช่น $10) แล้วลองถอนดูก่อนเพิ่มยอด','ເລີ່ມຈາກຈຳນວນນ້ອຍ (ເຊັ່ນ $10) ແລ້ວລອງຖອນເບິ່ງກ່ອນເພີ່ມຍອດ','Start small (e.g. $10) and try a withdrawal before adding more'),
-    px('อย่าชวนคนอื่นด้วยคำสัญญาว่าได้กำไรแน่นอน เพราะไม่มีใครรับประกันได้','ຢ່າຊວນຄົນອື່ນດ້ວຍຄຳສັນຍາວ່າໄດ້ກຳໄລແນ່ນອນ ເພາະບໍ່ມີໃຜຮັບປະກັນໄດ້','Do not invite others with promises of certain profit; nobody can guarantee it')
-  ]);
-  var th_='style="padding:6px 4px;text-align:right;color:#b6a7d6;font-weight:600;font-size:12px"';
-  ov.innerHTML='<div class="popup" style="max-width:440px"><div class="pop-hd"><div class="pop-title">❓ '+px('กำไรมาจากไหน','ກຳໄລມາຈາກໃສ','Where does the profit come from')+'</div><button class="pop-close" onclick="document.getElementById(\'profitOv\').remove()">✕</button></div>'
-  +'<div style="max-height:68vh;overflow-y:auto;padding-right:4px">'
-  +H(px('สรุปสั้นๆ','ສະຫຼຸບສັ້ນໆ','In short'))
-  +P(px('แอปคำนวณกำไรให้ตามสูตรของระบบ ตัวเลขที่เห็นเป็น "ประมาณการ" ไม่ใช่เงินที่รับประกัน และการลงทุนมีความเสี่ยงที่จะสูญเงินบางส่วนหรือทั้งหมด','ແອັບຄຳນວນກຳໄລໃຫ້ຕາມສູດຂອງລະບົບ ຕົວເລກທີ່ເຫັນເປັນ "ປະມານການ" ບໍ່ແມ່ນເງິນທີ່ຮັບປະກັນ ແລະ ການລົງທຶນມີຄວາມສ່ຽງທີ່ຈະສູນເສຍເງິນບາງສ່ວນ ຫຼື ທັງໝົດ','The app calculates profit using the system formula. The figures are "estimates", not guaranteed money, and investing carries a risk of losing part or all of it.'))
-  +H(px('กำไรคำนวณยังไง','ກຳໄລຄຳນວນແນວໃດ','How profit is calculated'))
-  +P(px('กำไรต่อวัน = ยอดลงทุน × อัตราต่อวัน โดยอัตราและระยะสัญญาขึ้นกับช่วงยอดลงทุน ตัวอย่างจากสูตรปัจจุบัน:','ກຳໄລຕໍ່ມື້ = ຍອດລົງທຶນ × ອັດຕາຕໍ່ມື້ ໂດຍອັດຕາ ແລະ ໄລຍະສັນຍາຂຶ້ນກັບຊ່ວງຍອດລົງທຶນ ຕົວຢ່າງຈາກສູດປັດຈຸບັນ:','Daily profit = amount invested × daily rate. The rate and contract length depend on the amount. Examples from the current formula:'))
-  +'<table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:13px;color:#fff"><tr><th '+th_.replace('right','left')+'>'+px('ลงทุน','ລົງທຶນ','Invest')+'</th><th '+th_+'>'+px('ต่อวัน','ຕໍ່ມື້','Per day')+'</th><th '+th_+'>'+px('วัน','ມື້','Days')+'</th><th '+th_+'>'+px('กำไรรวม','ກຳໄລລວມ','Total profit')+'</th></tr>'+rows.replace(/<td>/g,'<td style="padding:6px 4px;text-align:right;border-top:1px solid rgba(255,255,255,.08)">')+'</table>'
-  +P(px('ตัวเลขเหล่านี้เป็นผลจากสูตรของระบบ ไม่ใช่ผลที่รับประกันว่าจะได้รับจริง','ຕົວເລກເຫຼົ່ານີ້ເປັນຜົນຈາກສູດຂອງລະບົບ ບໍ່ແມ່ນຜົນທີ່ຮັບປະກັນວ່າຈະໄດ້ຮັບຈິງ','These figures come from the system formula and are not guaranteed outcomes.'))
-  +H(px('ที่มาของกำไร','ທີ່ມາຂອງກຳໄລ','Source of the profit'))
-  +'<div id="profitSrc">'+P(px('กำลังโหลด…','ກຳລັງໂຫຼດ…','Loading…'))+'</div>'
-  +H(px('ความเสี่ยงที่ควรรู้','ຄວາມສ່ຽງທີ່ຄວນຮູ້','Risks you should know'))+risks
-  +H(px('ถามตัวเองก่อนลงทุน','ຖາມຕົວເອງກ່ອນລົງທຶນ','Ask yourself before investing'))+check
-  +'</div>'
-  +'<div style="display:flex;gap:8px;margin-top:12px"><button type="button" onclick="contactWA(\'ask\')" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(74,222,128,.5);background:rgba(74,222,128,.12);color:#86efac;font-weight:700;cursor:pointer">💬 '+px('ถามแอดมิน','ຖາມແອດມິນ','Ask the admin')+'</button>'
-  +'<button type="button" onclick="document.getElementById(\'profitOv\').remove();showHelpCenter(\'terms\')" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,215,0,.4);background:rgba(255,215,0,.08);color:#ffd700;font-weight:700;cursor:pointer">⚖️ '+px('เงื่อนไข','ເງື່ອນໄຂ','Terms')+'</button></div></div>';
-  document.body.appendChild(ov);
-  var fill=function(txt){
-    var box=document.getElementById('profitSrc');if(!box)return;
-    box.innerHTML=txt?'<div style="font-size:13px;line-height:1.75;color:#d9ccf2;white-space:pre-wrap">'+escHtml(txt)+'</div>'
-      :P(px('ผู้ให้บริการยังไม่ได้อธิบายที่มาของกำไรในหน้านี้ ก่อนลงทุน ให้ถามแอดมินและขอคำอธิบายที่ชัดเจนว่ากำไรที่จ่ายมาจากรายได้ส่วนใด และอย่าลงทุนถ้ายังไม่เข้าใจ','ຜູ້ໃຫ້ບໍລິການຍັງບໍ່ໄດ້ອະທິບາຍທີ່ມາຂອງກຳໄລໃນໜ້ານີ້ ກ່ອນລົງທຶນ ໃຫ້ຖາມແອດມິນ ແລະ ຂໍຄຳອະທິບາຍທີ່ຊັດເຈນວ່າກຳໄລທີ່ຈ່າຍມາຈາກລາຍໄດ້ສ່ວນໃດ ແລະ ຢ່າລົງທຶນຖ້າຍັງບໍ່ເຂົ້າໃຈ','The provider has not explained the source of profit on this page. Before investing, ask the admin for a clear explanation of which income the profit is paid from, and do not invest if you do not understand it.'));
-  };
-  if(!window._db){fill('');return;}
-  window._db.ref('site/src').once('value').then(function(sn){fill(sn.exists()?String(sn.val()):'');}).catch(function(){fill('');});
-}
-
 var _waNum=null;
 function contactWA(kind){
   var go=function(num){
@@ -4593,13 +4536,13 @@ function recountStats(){
 }
 
 // ── ข้อมูลติดต่อ/ผู้ให้บริการ (แอดมินตั้ง เก็บที่ site/) ──
-const SITE_FIELDS=['line','fb','wa','phone','email','hours','name','addr','reg','proc','src'];
+const SITE_FIELDS=['line','fb','wa','phone','email','hours','name','addr','reg','proc'];
 function saveSiteInfo(){
   const o={};
   for(const f of SITE_FIELDS){
     const e=document.getElementById('site_'+f);
     const v=e?e.value.trim():'';
-    if(v.length>(f==='src'?800:200)){showToast('⚠ ข้อความยาวเกินไป');return;}
+    if(v.length>200){showToast('⚠ ข้อความยาวเกินไป (สูงสุด 200 ตัวอักษร)');return;}
     o[f]=v;
   }
   ['wa','phone'].forEach(function(k){if(o[k])o[k]=o[k].replace(/[^0-9+\- ]/g,'').trim();});
