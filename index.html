@@ -845,6 +845,10 @@ body:has(#authScreen.active) #contactFab{display:none}
 </head>
 <body>
 
+<style>
+.toast{position:fixed;left:50%;top:max(16px,env(safe-area-inset-top));transform:translate(-50%,-140%);z-index:100000;max-width:min(92vw,420px);box-sizing:border-box;padding:12px 18px;border-radius:14px;background:#1d0f3a;border:1px solid rgba(255,215,0,.55);color:#fff;font-family:'Noto Sans Thai','Share Tech Mono',sans-serif;font-size:14px;font-weight:600;line-height:1.5;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:transform .25s ease,opacity .25s ease}
+.toast.show{transform:translate(-50%,0);opacity:1}
+</style>
 <div class="toast" id="toast"></div>
 <button id="contactFab" onclick="showHelpCenter('contact')" aria-label="ติดต่อแอดมิน">💬<span>ติดต่อแอดมิน</span></button>
 <style>
@@ -3683,9 +3687,13 @@ function parseLakAmt(v,rate){
   if(usdt>TOPUP_MAX){showToast('⚠ เติมสูงสุด $'+TOPUP_MAX.toLocaleString()+' ต่อครั้ง');return null;}
   return {lak:lak,rate:rate,usdt:usdt};
 }
+let _tpInfoReady=false;
 function showTopupQR(){
   const raw=document.getElementById('tpAmt')?document.getElementById('tpAmt').value:0;
-  loadTopupInfo(function(info){
+  const nb=document.getElementById('tpNextBtn');
+  const restore=function(){if(nb){nb.disabled=false;nb.textContent='ถัดไป → ดูบัญชีโอน';}};
+  const run=function(info){
+   try{
     _tpInfo=info||{};
     const q=parseLakAmt(raw,lakRateOf(_tpInfo));
     if(!q)return;
@@ -3709,7 +3717,12 @@ function showTopupQR(){
     const cp=document.querySelector('#tpStep2 .tp4-copy');
     if(cp)cp.style.display=n?'':'none';
     fillTopupInfo({qrImage:_tpInfo.qrImage},{qr:'tpQRWrap',qrSize:180,addr:'__none__'});
-  });
+   }catch(e){showToast('❌ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');}
+   restore();
+  };
+  if(_tpInfoReady){run(_tpInfo);return;}
+  if(nb){nb.disabled=true;nb.textContent='⏳ กำลังโหลดข้อมูลบัญชี...';}
+  loadTopupInfo(function(info){_tpInfoReady=true;run(info);});
 }
 function tpConfirmDone(){
   const q=_tpPending;
@@ -3753,7 +3766,7 @@ function submitTopupRequest(amt,onOk,onFail,extra){
 // ── เติมด้วย USDT โดยตรง ──
 function tpInitMethods(){
   loadTopupInfo(function(info){
-    _tpInfo=info||{};
+    _tpInfo=info||{};_tpInfoReady=true;
     const ok=!!(_tpInfo.usdtAddr&&validUsdtAddr(_tpInfo.usdtAddr,_tpInfo.usdtNetwork||'TRC20'));
     const t=document.getElementById('tpTabs');
     if(t)t.style.display=ok?'flex':'none';
@@ -4114,6 +4127,7 @@ function loadFirstSettings(){
 }
 
 function showTopupPopup(){
+  _tpInfoReady=false;
   showTopupPopupBase();
   setTimeout(tpInitMethods,0);
 }
@@ -4159,7 +4173,7 @@ function showTopupPopupBase(){
         <button onclick="tpQuick(10000000)" style="flex:1;padding:0.4rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);border-radius:8px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">10M</button>
       </div>
       <div id="tpLakPrev" style="min-height:1.3rem;font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#A890CC;margin-bottom:0.8rem;"></div>
-      <button onclick="showTopupQR()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;
+      <button id="tpNextBtn" onclick="showTopupQR()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;
         background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
         box-shadow:0 4px 20px rgba(59,130,246,0.4);">ถัดไป → ดูบัญชีโอน</button>
     </div>
@@ -4758,9 +4772,10 @@ function filterAdminUsers(query){
   const keys = Object.keys(_allAdminUsers).filter(u=>{
     if(!q) return true;
     const ud = _allAdminUsers[u];
-    return u.toLowerCase().includes(q) || (ud.email||'').toLowerCase().includes(q);
+    return u.toLowerCase().includes(q) || String((ud&&ud.email)||'').toLowerCase().includes(q);
   });
-  if(countEl) countEl.textContent = `พบ ${keys.length} คน`;
+  const total=Object.keys(_allAdminUsers).length;
+  if(countEl) countEl.textContent = q ? `พบ ${keys.length} คน จากทั้งหมด ${total} คน` : `สมาชิกทั้งหมด ${total} คน`;
   if(!keys.length){
     el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;text-align:center;padding:2rem;">ไม่พบสมาชิก</div>';
     return;
@@ -4769,11 +4784,14 @@ function filterAdminUsers(query){
 }
 
 function buildUserCard(u, ud){
-  const pkgs=(ud.packages||[]).filter(p=>p.remaining>0).length;
+  ud=ud||{};
+  const pk=Array.isArray(ud.packages)?ud.packages:Object.values(ud.packages||{});
+  const pkgs=pk.filter(p=>p&&p.remaining>0).length;
+  const uh=escHtml(u),eh=escHtml(ud.email||'');
   return `<div class="adm-user-card" style="margin-bottom:0.8rem;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-      <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;">👤 ${u}</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);">${ud.email||''}</div>
+      <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;">👤 ${uh}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);">${eh}</div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:0.5rem;">
       <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
@@ -4790,9 +4808,9 @@ function buildUserCard(u, ud){
       </div>
     </div>
     <div style="display:flex;gap:0.4rem;">
-      <button onclick="adminAddUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">+ เติม</button>
-      <button onclick="adminDeductUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">- หัก</button>
-      <button onclick="adminViewTx('${u}')" style="flex:1;padding:0.45rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:7px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">📋 ประวัติ</button>
+      <button onclick="adminAddUsd('${uh}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">+ เติม</button>
+      <button onclick="adminDeductUsd('${uh}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">- หัก</button>
+      <button onclick="adminViewTx('${uh}')" style="flex:1;padding:0.45rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:7px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.58rem;cursor:pointer;">📋 ประวัติ</button>
     </div>
   </div>`;
 }
@@ -4802,41 +4820,9 @@ function renderAdminUsers(){
   if(!window._db){el.innerHTML='<div style="color:red;padding:1rem;">❌ ไม่มี Firebase</div>';return;}
   el.innerHTML='<div style="text-align:center;padding:1rem;font-family:monospace;color:#A890CC;font-size:0.7rem;">⏳ กำลังโหลด...</div>';
   window._db.ref('users').once('value').then(snap=>{
-    if(!snap.exists()){
-      el.innerHTML='<div style="color:var(--text-dim);font-size:0.75rem;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:2rem;">ยังไม่มีสมาชิก</div>';
-      return;
-    }
-    const users=snap.val();
-    const keys=Object.keys(users);
-    el.innerHTML=keys.map(u=>{
-      const ud=users[u];
-      const pkgs=(ud.packages||[]).filter(p=>p.remaining>0).length;
-      return `<div class="adm-user-card" style="margin-bottom:0.8rem;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#fff;">👤 ${u}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--text-dim);">${ud.email||''}</div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:0.5rem;">
-          <div style="background:rgba(255,215,0,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
-            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);">$${(ud.usd||0).toFixed(2)}</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:var(--text-dim);">USDT</div>
-          </div>
-          <div style="background:rgba(74,222,128,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
-            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--green);">${(ud.ethReward||0).toFixed(4)}</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:var(--text-dim);">ETH</div>
-          </div>
-          <div style="background:rgba(157,78,221,0.07);border-radius:7px;padding:0.45rem;text-align:center;">
-            <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple-light);">${pkgs}</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.48rem;color:var(--text-dim);">แพ็ก Active</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:0.4rem;">
-          <button onclick="adminAddUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:7px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">+ เติม USDT</button>
-          <button onclick="adminDeductUsd('${u}')" style="flex:1;padding:0.45rem;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:7px;color:var(--red-bright);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">- หัก USDT</button>
-          <button onclick="adminViewTx('${u}')" style="flex:1;padding:0.45rem;background:rgba(157,78,221,0.08);border:1px solid rgba(157,78,221,0.2);border-radius:7px;color:var(--purple-light);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">📋 ประวัติ</button>
-        </div>
-      </div>`;
-    }).join('');
+    _allAdminUsers=snap.exists()?snap.val():{};
+    const inp=document.getElementById('userSearchInput');
+    filterAdminUsers(inp?inp.value:'');
   }).catch(()=>{
     el.innerHTML='<div style="color:red;padding:1rem;">❌ โหลดไม่สำเร็จ</div>';
   });
