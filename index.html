@@ -313,6 +313,29 @@ animation:bnGlow 2.2s infinite;
 .wdx-go{height:56px;border:none;border-radius:16px;background:linear-gradient(135deg,#d97706,#fbbf24);color:#1a0a00;font-family:inherit;font-size:17px;font-weight:800;cursor:pointer;flex-shrink:0}
 .wdx-go:disabled{opacity:.4;cursor:not-allowed}
 
+
+/* ── HISTORY EARN CHART ── */
+.hc{border-radius:20px;padding:16px 14px;margin-bottom:12px;background:linear-gradient(160deg,#1d0f3a,#120826);border:2px solid rgba(200,100,255,.45);display:flex;flex-direction:column;gap:14px;font-family:'Noto Sans Lao','Noto Sans Thai',system-ui,sans-serif}
+.hc-hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hc-ttl{font-family:'Orbitron','Noto Sans Thai','Noto Sans Lao',monospace;font-size:15px;font-weight:900;color:#F5EEFF}
+.hc-rg{display:flex;gap:6px}
+.hc-rb{height:44px;padding:0 12px;border-radius:14px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;border:1px solid rgba(180,80,255,.35);background:rgba(60,0,100,.5);color:#C8B0FF}
+.hc-rb.on{border:2px solid #FFD700;background:rgba(255,215,0,.12);color:#FFD700}
+.hc-cur{font-size:13px;color:#C8B0FF}
+.hc-val{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:#4ade80}
+.hc-val small{font-size:13px;color:#86efac;font-weight:700;margin-left:6px;font-family:inherit}
+.hc-bars{display:flex;align-items:flex-end;height:170px;border-bottom:1px solid rgba(200,100,255,.3)}
+.hc-col{flex:1;min-width:0;height:100%;padding:0;border:none;background:none;cursor:pointer;display:flex;align-items:flex-end;justify-content:center}
+.hc-bar{display:block;width:100%;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#C084FC,#7B2FBE)}
+.hc-bar.z{background:rgba(255,255,255,.1)}
+.hc-bar.on{background:linear-gradient(180deg,#FDE68A,#FFD700)}
+.hc-lb{display:flex;margin-top:-8px}
+.hc-lb div{flex:1;min-width:0;text-align:center;font-family:'Share Tech Mono',monospace;font-size:11px;color:#A890CC}
+.hc-st{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hc-st div{border-radius:14px;padding:10px 6px;text-align:center;background:rgba(60,0,100,.5);border:1px solid rgba(180,80,255,.35);font-size:12px;color:#A890CC}
+.hc-st b{display:block;font-family:'Orbitron',monospace;font-size:14px;margin-top:4px;color:#F5EEFF}
+.hc-note{font-size:12px;line-height:1.6;color:#A890CC}
+
 /* ── SHARED ── */
 .sec-title{font-family:'Orbitron',monospace;font-size:0.78rem;letter-spacing:2px;color:#C8B0FF;font-weight:700;
 text-transform:uppercase;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.7rem}
@@ -3927,7 +3950,7 @@ function uploadAdminQR(e){
 function loadAdminQRPreview(){
   const wrap=document.getElementById('adminQRPreview');
   if(!wrap||!window._db)return;
-  loadLakSettings();loadRefSettings();loadFirstSettings();loadCiSettings();loadAnnSettings();loadSiteInfo();loadUsdtAddr();
+  loadLakSettings();loadRefSettings();loadFirstSettings();loadCiSettings();loadAnnSettings();loadNfReqs();loadSiteInfo();loadUsdtAddr();
   const btn=document.getElementById('delQRBtn');
   const show=function(src){
     wrap.innerHTML='<img src="'+src+'" style="width:160px;height:160px;border-radius:10px;border:2px solid rgba(255,215,0,0.3);object-fit:contain;background:#fff;">';
@@ -4643,7 +4666,7 @@ function loadCiSettings(){
   }).catch(function(){});
 }
 
-var _ann=null,_nfTab='all';
+var _ann=null,_nfTab='all',_nfReqs=[];
 function nfEsc(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function nfSeenKey(){return 'nf_seen_'+getSess();}
 function nfSeen(){try{return parseInt(localStorage.getItem(nfSeenKey())||'0',10)||0;}catch(e){return 0;}}
@@ -4657,6 +4680,12 @@ function nfItems(){
     var body=(c.desc?String(c.desc)+' · ':'')+(isFinite(amt)?'+'+amt.toFixed(2)+' USDT':'');
     out.push({kind:'m',title:title,body:body,time:c.time});
   });
+  _nfReqs.forEach(function(x){
+    var r=x.r,st=r.status,tp=x.t==='topup';
+    var title=(tp?(st==='approved'?'เติมเงินสำเร็จ':st==='rejected'?'คำขอเติมเงินถูกปฏิเสธ':'ส่งคำขอเติมเงินแล้ว'):(st==='approved'?'ถอนเงินสำเร็จ':st==='rejected'?'คำขอถอนเงินถูกปฏิเสธ':'ส่งคำขอถอนเงินแล้ว'));
+    var amt=tp?(typeof topupAmtLabel==='function'?topupAmtLabel(r):''):('$'+(parseFloat(r.amt)||0).toFixed(2)+(r.currency==='LAK'?' ≈ ₭'+fmtLak(r.lak):' USDT'));
+    out.push({kind:'m',title:title,body:amt+(st==='pending'||!st?' · รอตรวจสอบ':''),time:(st==='approved'&&r.approvedAt)?r.approvedAt:(r.time||0)});
+  });
   if(_ann&&_ann.title)out.push({kind:'n',title:_ann.title,body:_ann.body||'',time:_ann.time||0});
   out.sort(function(a,b){return b.time-a.time;});
   return out.slice(0,40);
@@ -4666,6 +4695,21 @@ function nfBadge(){
   var b=document.getElementById('nfBadge');if(!b)return;
   var n=0;try{n=nfUnread();}catch(e){}
   b.textContent=n>9?'9+':String(n);b.style.display=n>0?'flex':'none';
+}
+function loadNfReqs(){
+  var u=getSess();if(!u||!window._db)return Promise.resolve();
+  if(!window._nfInt){window._nfInt=setInterval(function(){if(getSess()){loadNfReqs();}},60000);}
+  return window._db.ref('userreqs/'+u).orderByKey().limitToLast(15).once('value').then(function(s){
+    var idx=s.exists()?s.val():{};
+    return Promise.all(Object.keys(idx).map(function(k){
+      var t=idx[k]&&idx[k].t==='withdraw'?'withdraw':'topup';
+      return window._db.ref(t+'_reqs/'+k).once('value').then(function(r){return r.exists()?{k:k,t:t,r:r.val()}:null;});
+    }));
+  }).then(function(list){
+    if(!list)return;
+    _nfReqs=list.filter(Boolean);nfBadge();
+    if(document.getElementById('nfList'))nfRender();
+  }).catch(function(){});
 }
 function loadAnnSettings(){
   if(!window._db)return;
@@ -4710,7 +4754,7 @@ function showNotifBox(){
    +'<div class="nf-tabs"><button type="button" class="nf-tab on" id="nfTab_all" onclick="nfTabSet(\'all\')">ทั้งหมด</button><button type="button" class="nf-tab" id="nfTab_money" onclick="nfTabSet(\'money\')">การเงิน</button><button type="button" class="nf-tab" id="nfTab_news" onclick="nfTabSet(\'news\')">ประกาศ</button></div>'
    +'<div class="nf-list" id="nfList"></div><button type="button" class="nf-btn" onclick="nfClose()">ปิด</button></div>';
   document.body.appendChild(ov);
-  nfRender();
+  nfRender();loadNfReqs();
   try{if(typeof applyLang==='function')applyLang();}catch(e){}
 }
 function nfClose(){var o=document.getElementById('nfOv');if(o)o.remove();nfBadge();}
@@ -4836,6 +4880,50 @@ function showTopupPopupBase(){
 }
 
 let _tpCurrentAmt=0;
+var _hcRange=7,_hcSel=0;
+function hcData(ud,range){
+  var pk=(ud.packages||[]).filter(function(p){return p&&p.bought&&(p.daily||0)>0;});
+  var now=Date.now(),t0=new Date();t0.setHours(0,0,0,0);
+  var out=[];
+  for(var d=range-1;d>=0;d--){
+    var ds=new Date(t0);ds.setDate(ds.getDate()-d);var a=ds.getTime();
+    var nx=new Date(ds);nx.setDate(nx.getDate()+1);var b=nx.getTime();
+    var v=0;
+    pk.forEach(function(p){
+      var st=Math.max(p.bought,a),en=Math.min(p.bought+(p.days||0)*86400000,b,now);
+      if(en>st)v+=(p.daily||0)*(en-st)/(b-a);
+    });
+    out.push({d:d,v:Math.round(v*100)/100,dom:ds.getDate()});
+  }
+  return out;
+}
+function histChartInner(ud){
+  var days=hcData(ud,_hcRange);
+  var max=Math.max.apply(null,days.map(function(x){return x.v;}).concat([1]));
+  var total=days.reduce(function(a,x){return a+x.v;},0);
+  var act=days.filter(function(x){return x.v>0;}).length||1;
+  var best=Math.max.apply(null,days.map(function(x){return x.v;}));
+  var cur=days.filter(function(x){return x.d===_hcSel;})[0]||days[days.length-1];
+  var gap=_hcRange===7?8:3;
+  var bars=days.map(function(x){
+    var h=Math.max(x.v>0?6:2,Math.round(x.v/max*150));
+    return '<button type="button" class="hc-col" style="margin:0 '+(gap/2)+'px" aria-label="'+x.dom+' +$'+x.v.toFixed(2)+'" onclick="hcPick('+x.d+')"><span class="hc-bar'+(x.d===_hcSel?' on':(x.v>0?'':' z'))+'" style="height:'+h+'px"></span></button>';
+  }).join('');
+  var lb=days.map(function(x){return '<div style="margin:0 '+(gap/2)+'px">'+((_hcRange===7||x.d%5===0)?x.dom:'')+'</div>';}).join('');
+  return '<div class="hc-hd"><div class="hc-ttl">รายได้รายวัน</div><div class="hc-rg"><button type="button" class="hc-rb'+(_hcRange===7?' on':'')+'" onclick="hcRange(7)">7 วัน</button><button type="button" class="hc-rb'+(_hcRange===30?' on':'')+'" onclick="hcRange(30)">30 วัน</button></div></div>'
+   +'<div><div class="hc-cur">วันที่ '+cur.dom+(cur.d===0?' · วันนี้':'')+'</div><div class="hc-val">+'+cur.v.toFixed(2)+'<small>USDT</small></div></div>'
+   +'<div class="hc-bars">'+bars+'</div><div class="hc-lb">'+lb+'</div>'
+   +'<div class="hc-st"><div>รวม<b style="color:#FFD700">$'+total.toFixed(2)+'</b></div><div>เฉลี่ยต่อวัน<b>$'+(total/act).toFixed(2)+'</b></div><div>สูงสุด<b style="color:#4ade80">$'+best.toFixed(2)+'</b></div></div>'
+   +'<div class="hc-note">คำนวณจากสัญญาขุดที่ใช้งานอยู่ ตามสูตรของระบบ</div>';
+}
+function histChartCard(ud){
+  if(!(ud.packages||[]).some(function(p){return p&&p.bought&&(p.daily||0)>0;}))return '';
+  _hcRange=7;_hcSel=0;
+  return '<div class="hc" id="histChart">'+histChartInner(ud)+'</div>';
+}
+function hcRefresh(){var e=document.getElementById('histChart'),ud=getUD();if(e&&ud)e.innerHTML=histChartInner(ud);}
+function hcRange(r){_hcRange=r;_hcSel=0;hcRefresh();}
+function hcPick(d){_hcSel=d;hcRefresh();}
 function showHistoryPopup(){
   const ud=getUD();if(!ud)return;
   const txs=ud.txs||[];
@@ -4845,6 +4933,7 @@ function showHistoryPopup(){
       <div class="pop-title">📋 ประวัติการทำรายการ</div>
       <button class="pop-close" onclick="this.closest('.overlay').remove()">✕</button>
     </div>
+    ${histChartCard(ud)}
     <button onclick="this.closest('.overlay').remove();showMyRequests()" style="width:100%;padding:0.7rem;margin-bottom:0.8rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:10px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">📄 สถานะคำขอเติม/ถอนของฉัน</button>
     <div style="max-height:65vh;overflow-y:auto;">
       ${txs.length?txs.slice(0,50).map(tx=>{
@@ -5858,6 +5947,8 @@ Object.assign(TRD,{"เช็กอินรายวัน": ["ເຊັກອ�
 Object.assign(TRD,{"แจ้งเตือน":["ແຈ້ງເຕືອນ","Notifications"],"อ่านทั้งหมด":["ອ່ານທັງໝົດ","Mark all read"],"ทั้งหมด":["ທັງໝົດ","All"],"การเงิน":["ການເງິນ","Money"],"ประกาศ":["ປະກາດ","News"],"ยังไม่มีแจ้งเตือน":["ຍັງບໍ່ມີແຈ້ງເຕືອນ","No notifications yet"],"รับโบนัสเช็กอิน":["ໄດ້ຮັບໂບນັດເຊັກອິນ","Check-in bonus received"],"ภารกิจสำเร็จ":["ພາລະກິດສຳເລັດ","Mission completed"],"ได้รับเครดิต":["ໄດ້ຮັບເຄຣດິດ","Credit received"]});
 Object.assign(TRD,{"บันไดรางวัล":["ບັນໄດລາງວັນ","Reward ladder"],"เพื่อนของคุณ":["ໝູ່ຂອງທ່ານ","Your friends"],"เพื่อนคนที่":["ໝູ່ຄົນທີ","Friend no."],"ได้รับแล้ว":["ໄດ້ຮັບແລ້ວ","Received"],"ถัดไป":["ຕໍ່ໄປ","Next"],"โบนัสพิเศษเมื่อครบเป้าหมาย":["ໂບນັດພິເສດເມື່ອຄົບເປົ້າໝາຍ","Special bonus at goal"],"เติมเงินแล้ว":["ເຕີມເງິນແລ້ວ","Topped up"],"รอเติมเงิน":["ລໍຖ້າເຕີມເງິນ","Waiting for top-up"],"ยังไม่มีเพื่อน":["ຍັງບໍ່ມີໝູ່","No friends yet"]});
 Object.assign(TRD,{"ถอนครั้งแรกไม่มีขั้นต่ำ": ["ຖອນຄັ້ງທຳອິດບໍ່ມີຂັ້ນຕ່ຳ", "No minimum for the first withdrawal"], "ครั้งต่อไปขั้นต่ำ": ["ຄັ້ງຕໍ່ໄປຂັ້ນຕ່ຳ", "minimum next time"], "ตรวจสอบก่อนส่ง": ["ກວດສອບກ່ອນສົ່ງ", "Review before sending"], "จำนวนถอน": ["ຈຳນວນຖອນ", "Withdraw amount"], "ได้รับเป็นกีบ": ["ໄດ້ຮັບເປັນກີບ", "You receive in Kip"], "ได้รับเป็น": ["ໄດ້ຮັບເປັນ", "You receive in"], "ปลายทาง": ["ປາຍທາງ", "Destination"], "ยอดจะถูกหักทันที และแอดมินจะตรวจสอบคำขอก่อนโอน": ["ຍອດຈະຖືກຫັກທັນທີ ແລະ ແອດມິນຈະກວດສອບຄຳຂໍກ່ອນໂອນ", "The amount is deducted now and admin reviews the request before transfer"], "ต่อไป": ["ຕໍ່ໄປ", "Next"], "เกินยอดที่ถอนได้": ["ເກີນຍອດທີ່ຖອນໄດ້", "Exceeds the withdrawable amount"], "กรุณาใส่จำนวน": ["ກະລຸນາໃສ່ຈຳນວນ", "Please enter an amount"]});
+Object.assign(TRD,{"รายได้รายวัน": ["ລາຍໄດ້ລາຍວັນ", "Daily earnings"], "เฉลี่ยต่อวัน": ["ສະເລ່ຍຕໍ່ມື້", "Avg per day"], "คำนวณจากสัญญาขุดที่ใช้งานอยู่ ตามสูตรของระบบ": ["ຄຳນວນຈາກສັນຍາຂຸດທີ່ໃຊ້ງານຢູ່ ຕາມສູດຂອງລະບົບ", "Calculated from your active mining contracts using the system formula"]});
+Object.assign(TRD,{"ส่งคำขอเติมเงินแล้ว": ["ສົ່ງຄຳຂໍເຕີມເງິນແລ້ວ", "Top-up request sent"], "คำขอเติมเงินถูกปฏิเสธ": ["ຄຳຂໍເຕີມເງິນຖືກປະຕິເສດ", "Top-up request rejected"], "เติมเงินสำเร็จ": ["ເຕີມເງິນສຳເລັດ", "Top-up successful"], "ถอนเงินสำเร็จ": ["ຖອນເງິນສຳເລັດ", "Withdrawal successful"], "ส่งคำขอถอนเงินแล้ว": ["ສົ່ງຄຳຂໍຖອນເງິນແລ້ວ", "Withdrawal request sent"], "คำขอถอนเงินถูกปฏิเสธ": ["ຄຳຂໍຖອນເງິນຖືກປະຕິເສດ", "Withdrawal request rejected"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
 function trStr(s){
