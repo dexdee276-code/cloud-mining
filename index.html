@@ -2581,6 +2581,7 @@ function createAccountNow(u,e,p,btn){
   if(window._db){
     window._db.ref('users/'+u).set(nd).then(()=>{
       reserveRefCode(refCode,u);
+      registerRefFriend(refBy,u);
       bumpStat('members',1);
       _ud=nd;setTimeout(()=>{setSess(u);enterDash(u);},300);
     }).catch(()=>{reset();showMsg('regMsg','❌ สมัครไม่สำเร็จ กรุณาลองใหม่','error');});
@@ -4182,6 +4183,43 @@ function reserveRefCode(code,user){
     return;
   },function(){},false);
 }
+function registerRefFriend(code,friend){
+  if(!window._db||!code||!friend)return;
+  window._db.ref('refcodes/'+code).once('value').then(function(rs){
+    var owner=rs.exists()?rs.val():'';
+    if(!owner||owner===friend)return;
+    return window._db.ref('refs/'+owner+'/'+friend).set(Date.now());
+  }).catch(function(){});
+}
+function rfMask(n){n=String(n||'');return n.slice(0,2)+'****';}
+function renderRefFriends(c){
+  var box=document.getElementById('refFriendsBox');if(!box)return;
+  var u=getSess(),ud=getUD()||{};
+  var go=function(regs){
+    var cr=(typeof _credits==='object'&&_credits)?_credits:{};
+    var paid=Object.keys(cr).filter(function(k){return k.indexOf('refb_')===0;}).map(function(k){return k.slice(5);});
+    var paidN=Math.max(paid.length,ud.refCount||0);
+    var rows=c.goal>0?Math.min(c.goal,6):3,h='';
+    for(var i=1;i<=rows;i++){
+      var done=i<=paidN,next=i===paidN+1;
+      var amt=c.bonus>0?'+$'+c.bonus:'';
+      h+='<div style="display:flex;gap:12px;align-items:center;border-radius:12px;padding:10px 12px;background:'+(done?'rgba(74,222,128,.08)':next?'rgba(255,215,0,.07)':'rgba(60,0,100,.4)')+';border:'+(next?'2px solid rgba(255,215,0,.5)':done?'1px solid rgba(74,222,128,.4)':'1px solid rgba(180,80,255,.3)')+'">'
+        +'<div style="width:28px;height:28px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Orbitron,monospace;font-size:12px;font-weight:900;'+(done?'background:#4ade80;color:#052e16':'border:2px solid '+(next?'#FFD700':'rgba(200,100,255,.4)')+';color:'+(next?'#FFD700':'#C8B0FF'))+'">'+(done?'✓':i)+'</div>'
+        +'<div style="flex-grow:1;min-width:0"><div style="font-size:13px;font-weight:700">เพื่อนคนที่ '+i+'</div><div style="font-size:11px;color:'+(done?'#86efac':next?'#FDE68A':'#A890CC')+'">'+(done?'ได้รับแล้ว':next?'ถัดไป':'')+'</div></div>'
+        +'<div class="rg-num" style="font-size:13px;font-weight:900;color:'+(done?'#4ade80':'#FFD700')+'">'+amt+'</div></div>';
+    }
+    if(c.goal>0&&c.goalBonus>0)h+='<div style="display:flex;gap:12px;align-items:center;border-radius:12px;padding:10px 12px;background:rgba(60,0,100,.4);border:1px dashed rgba(255,215,0,.5)"><div style="flex-grow:1;font-size:13px;font-weight:700">โบนัสพิเศษเมื่อครบเป้าหมาย</div><div class="rg-num" style="font-size:13px;font-weight:900;color:#FFD700">+$'+c.goalBonus+'</div></div>';
+    var names=Object.keys(regs||{});paid.forEach(function(n){if(names.indexOf(n)<0)names.push(n);});
+    names.sort(function(a,b){return (paid.indexOf(b)>=0?1:0)-(paid.indexOf(a)>=0?1:0);});
+    var list=names.length?names.slice(0,20).map(function(n){var p=paid.indexOf(n)>=0;
+      return '<div style="display:flex;align-items:center;gap:12px;border-radius:12px;padding:10px 12px;background:rgba(40,5,70,.98);border:1px solid rgba(180,80,255,.3)"><div style="width:36px;height:36px;flex-shrink:0;border-radius:50%;background:rgba(157,78,221,.3);display:flex;align-items:center;justify-content:center;font-family:Orbitron,monospace;font-size:13px;font-weight:900">'+escHtml(String(n).charAt(0).toUpperCase())+'</div><div style="flex-grow:1;font-family:Share Tech Mono,monospace;font-size:13px">'+escHtml(rfMask(n))+'</div><div style="font-size:12px;font-weight:700;border-radius:10px;padding:4px 10px;'+(p?'color:#86efac;background:rgba(74,222,128,.12)':'color:#FDE68A;background:rgba(255,215,0,.1)')+'">'+(p?'เติมเงินแล้ว':'รอเติมเงิน')+'</div></div>';
+    }).join(''):'<div style="text-align:center;color:#A890CC;font-size:13px;padding:10px 0">ยังไม่มีเพื่อน</div>';
+    box.innerHTML='<div style="font-family:Orbitron,monospace;font-size:13px;letter-spacing:2px;font-weight:700;color:#C8B0FF;margin:14px 0 8px">บันไดรางวัล</div><div style="display:flex;flex-direction:column;gap:8px">'+h+'</div>'
+      +'<div style="font-family:Orbitron,monospace;font-size:13px;letter-spacing:2px;font-weight:700;color:#C8B0FF;margin:14px 0 8px">เพื่อนของคุณ</div><div style="display:flex;flex-direction:column;gap:8px">'+list+'</div>';
+  };
+  go({});
+  if(window._db&&u)window._db.ref('refs/'+u).once('value').then(function(sn){go(sn.exists()?sn.val():{});}).catch(function(){});
+}
 function ensureRefCode(){
   const u=getSess();
   if(!u||!_ud||!window._db)return;
@@ -5694,6 +5732,7 @@ Object.assign(TRD,{"กดเพื่อเลือกรูปสลิป": 
 Object.assign(TRD,{"ขุดอยู่": ["ຂຸດຢູ່", "Mining"], "สัญญา (วัน)": ["ສັນຍາ (ມື້)", "Contract (days)"], "เหลือ (วัน)": ["ເຫຼືອ (ມື້)", "Left (days)"]});
 Object.assign(TRD,{"เช็กอินรายวัน": ["ເຊັກອິນລາຍວັນ", "Daily check-in"], "เข้าแอปทุกวัน รับโบนัสเพิ่ม": ["ເຂົ້າແອັບທຸກມື້ ຮັບໂບນັດເພີ່ມ", "Open the app daily for extra bonuses"], "วันติดต่อกัน": ["ມື້ຕິດຕໍ່ກັນ", "day streak"], "รับรางวัลวันนี้": ["ຮັບລາງວັນມື້ນີ້", "Claim today's reward"], "ได้รับแล้ว": ["ໄດ້ຮັບແລ້ວ", "Claimed"], "มาใหม่พรุ่งนี้": ["ມາໃໝ່ມື້ອື່ນ", "come back tomorrow"], "รับโบนัสใหญ่ ถ้าขาดวันใดวันหนึ่งจะเริ่มนับใหม่ โบนัสถอนได้ตามเงื่อนไขของระบบ": ["ຮັບໂບນັດໃຫຍ່ ຖ້າຂາດມື້ໃດມື້ໜຶ່ງ ຈະເລີ່ມນັບໃໝ່ ໂບນັດຖອນໄດ້ຕາມເງື່ອນໄຂຂອງລະບົບ", "gives a big bonus. Missing a day restarts the count. Bonuses can be withdrawn per the system conditions"], "ภารกิจวันนี้": ["ພາລະກິດມື້ນີ້", "Today's missions"], "สำเร็จ": ["ສຳເລັດ", "done"], "เข้าแอปวันนี้": ["ເຂົ້າແອັບມື້ນີ້", "Open the app today"], "ดูรายการเครื่องขุด": ["ເບິ່ງລາຍການເຄື່ອງຂຸດ", "View your miners"]});
 Object.assign(TRD,{"แจ้งเตือน":["ແຈ້ງເຕືອນ","Notifications"],"อ่านทั้งหมด":["ອ່ານທັງໝົດ","Mark all read"],"ทั้งหมด":["ທັງໝົດ","All"],"การเงิน":["ການເງິນ","Money"],"ประกาศ":["ປະກາດ","News"],"ยังไม่มีแจ้งเตือน":["ຍັງບໍ່ມີແຈ້ງເຕືອນ","No notifications yet"],"รับโบนัสเช็กอิน":["ໄດ້ຮັບໂບນັດເຊັກອິນ","Check-in bonus received"],"ภารกิจสำเร็จ":["ພາລະກິດສຳເລັດ","Mission completed"],"ได้รับเครดิต":["ໄດ້ຮັບເຄຣດິດ","Credit received"]});
+Object.assign(TRD,{"บันไดรางวัล":["ບັນໄດລາງວັນ","Reward ladder"],"เพื่อนของคุณ":["ໝູ່ຂອງທ່ານ","Your friends"],"เพื่อนคนที่":["ໝູ່ຄົນທີ","Friend no."],"ได้รับแล้ว":["ໄດ້ຮັບແລ້ວ","Received"],"ถัดไป":["ຕໍ່ໄປ","Next"],"โบนัสพิเศษเมื่อครบเป้าหมาย":["ໂບນັດພິເສດເມື່ອຄົບເປົ້າໝາຍ","Special bonus at goal"],"เติมเงินแล้ว":["ເຕີມເງິນແລ້ວ","Topped up"],"รอเติมเงิน":["ລໍຖ້າເຕີມເງິນ","Waiting for top-up"],"ยังไม่มีเพื่อน":["ຍັງບໍ່ມີໝູ່","No friends yet"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
 function trStr(s){
@@ -6356,7 +6395,7 @@ function renderReferral(){
     +'<button type="button" onclick="shareRefLink()" style="height:46px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">แชร์ให้เพื่อน</button></div>'
     +'<div id="refGoalBox" style="display:none;border-radius:12px;padding:12px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3)"></div>'
     +'<div style="display:flex;justify-content:space-between;font-size:13px;color:#b6a7d6"><span>แนะนำแล้ว <b class="rg-num" style="color:#fff">'+(ud.refCount||0)+'</b> คน</span><span>ได้รับ <b class="rg-num" style="color:#4ade80">$'+(ud.refEarned||0).toFixed(2)+'</b></span></div>'
-    +'</div>';
+    +'</div><div id="refFriendsBox"></div>';
   const paint=function(c){
     const t=document.getElementById('refRuleText');
     if(t)t.textContent=c.bonus>0?('เพื่อนสมัครผ่านลิงก์และเติมเงินครั้งแรก ได้ $'+c.bonus+' ทั้งคุณและเพื่อน (สูงสุด '+c.max+' คน)'):(c.goal>0&&c.goalBonus>0?'ชวนเพื่อนที่เติมเงินครั้งแรกให้ครบเป้า รับ USDT':'ยังไม่เปิดโบนัสแนะนำเพื่อน');
@@ -6371,8 +6410,8 @@ function renderReferral(){
       } else gbx.style.display='none';
     }
   };
-  paint(refSettingsOf({}));
-  if(window._db)window._db.ref('settings').once('value').then(function(sn){paint(refSettingsOf(sn.exists()?sn.val():{}));}).catch(function(){});
+  paint(refSettingsOf({}));renderRefFriends(refSettingsOf({}));
+  if(window._db)window._db.ref('settings').once('value').then(function(sn){var cc=refSettingsOf(sn.exists()?sn.val():{});paint(cc);renderRefFriends(cc);}).catch(function(){});
 }
 function calcOfflineEarnings(){
   const ud=getUD();if(!ud)return;
