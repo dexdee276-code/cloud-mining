@@ -840,9 +840,7 @@ body:has(#authScreen.active) #contactFab{display:none}
   });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
-<script>emailjs.init('ifiD1WB6OHpQjy78Q');</script>
 
 </head>
 <body>
@@ -2422,31 +2420,41 @@ function doLogin(){
   }
 }
 
+function createAccountNow(u,e,p,btn){
+  const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+  const refBy=getPendingRef();
+  const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
+  const reset=function(){if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}};
+  if(window._db){
+    window._db.ref('users/'+u).set(nd).then(()=>{
+      reserveRefCode(refCode,u);
+      bumpStat('members',1);
+      _ud=nd;setTimeout(()=>{setSess(u);enterDash(u);},300);
+    }).catch(()=>{reset();showMsg('regMsg','❌ สมัครไม่สำเร็จ กรุณาลองใหม่','error');});
+  } else {
+    try{localStorage.setItem('cm_ud_'+u,JSON.stringify(nd));}catch(e2){}
+    _ud=nd;setSess(u);enterDash(u);
+  }
+}
 function doRegister(){
   const u=(document.getElementById('regUser')?.value||'').trim();
   const e=(document.getElementById('regEmail')?.value||'').trim();
   const p=document.getElementById('regPass')?.value||'';
   if(!u||!e||!p){showMsg('regMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return;}
   if(p.length<6){showMsg('regMsg','⚠ รหัสผ่านต้องมีอย่างน้อย 6 ตัว','error');return;}
-  if(!canSendOTP(e)){showMsg('regMsg','❌ ส่ง OTP ครบ 5 ครั้ง กรุณารอ '+getOTPWaitTime(e),'error');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){showMsg('regMsg','⚠ รูปแบบอีเมลไม่ถูกต้อง','error');return;}
   const btn=document.querySelector('#regForm .btn-auth');
-  if(btn){btn.disabled=true;btn.textContent='⏳ กำลังส่ง OTP...';}
+  if(btn){btn.disabled=true;btn.textContent='⏳ กำลังสมัคร...';}
   const checkUser=window._db?fbGetUser(u):Promise.resolve(null);
   checkUser.then(existing=>{
     if(existing){
       if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}
       showMsg('regMsg','❌ ชื่อผู้ใช้นี้ถูกใช้แล้ว','error');return;
     }
-    const otp=Math.floor(100000+Math.random()*900000).toString();
-    _pendingOTP=otp;_pendingUser=u;_pendingEmail=e;_pendingPass=p;_otpExpiry=Date.now()+600000;
-    emailjs.send('service_6j83xlj','template_riz4m4w',{to_name:u,to_email:e,otp}).then(()=>{
-      incrementOTPCount(e);
-      if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}
-      showOTPModal(u,e);
-    }).catch(err=>{
-      if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}
-      showMsg('regMsg','❌ ส่ง Email ไม่ได้: '+(err?.text||'error'),'error');
-    });
+    if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}
+    _pendingOTP=Math.floor(100000+Math.random()*900000).toString();
+    _pendingUser=u;_pendingEmail=e;_pendingPass=p;_otpExpiry=Date.now()+600000;
+    showOTPModal(u,e);
   }).catch(()=>{
     if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}
     showMsg('regMsg','❌ เชื่อมต่อไม่ได้','error');
@@ -5416,62 +5424,39 @@ function getOTPWaitTime(e){
   return Math.ceil((3600000-(Date.now()-d.firstTime))/60000)+' นาที';
 }
 function showOTPModal(username,email){
+  const old=document.getElementById('otpOverlay');if(old)old.remove();
   const ov=document.createElement('div');ov.className='overlay';ov.id='otpOverlay';
   ov.innerHTML=`<div class="popup" style="text-align:center;">
-    <div style="font-size:2.5rem;margin-bottom:0.5rem;">📧</div>
-    <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.5rem;">ยืนยัน Email</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.8rem;line-height:1.8;">
-      ส่งรหัส OTP ไปที่<br><span style="color:var(--green);">${email}</span>
-    </div>
-    <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:0.6rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--gold);">
-      ⚠️ ถ้าไม่พบ OTP กรุณาเช็ค Spam ด้วยครับ
-    </div>
-    <input type="number" id="otpInput" placeholder="000000"
-      style="width:100%;padding:1rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;outline:none;text-align:center;letter-spacing:8px;margin-bottom:1rem;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:900;color:var(--gold);margin-bottom:0.6rem;">ยืนยันว่าไม่ใช่บอท</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#A890CC;margin-bottom:0.6rem;">พิมพ์รหัส 6 หลักด้านล่างให้ตรงกัน</div>
+    <div id="otpShow" style="font-family:'Orbitron',monospace;font-size:2.2rem;font-weight:900;letter-spacing:0.4rem;color:var(--green);background:rgba(0,0,0,0.35);border:1px dashed rgba(74,222,128,0.4);border-radius:12px;padding:0.8rem 0.4rem 0.8rem 0.8rem;margin-bottom:1rem;user-select:none;-webkit-user-select:none;">${_pendingOTP}</div>
+    <input type="text" inputmode="numeric" maxlength="6" id="otpInput" placeholder="พิมพ์รหัสที่เห็น" autocomplete="off"
+      style="width:100%;box-sizing:border-box;padding:0.9rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;outline:none;text-align:center;margin-bottom:0.6rem;">
     <div id="otpMsg" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;margin-bottom:0.8rem;min-height:1.2rem;"></div>
-    <button onclick="verifyOTP()" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">✅ ยืนยัน OTP</button>
-    <button onclick="resendOTPBrevo()" style="width:100%;padding:0.5rem;background:none;border:none;color:rgba(157,78,221,0.7);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">📨 ส่งรหัสใหม่</button>
+    <button onclick="verifyOTP()" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;">✅ ยืนยันและสมัคร</button>
+    <button onclick="resendOTPBrevo()" style="width:100%;padding:0.5rem;background:none;border:none;color:rgba(157,78,221,0.7);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">🔄 เปลี่ยนรหัสใหม่</button>
+    <button onclick="document.getElementById('otpOverlay').remove()" style="width:100%;padding:0.4rem;background:none;border:none;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;">ยกเลิก</button>
   </div>`;
   document.body.appendChild(ov);
 }
 function verifyOTP(){
   const input=document.getElementById('otpInput')?.value.trim();
   const msg=document.getElementById('otpMsg');
-  if(!input){if(msg){msg.style.color='var(--red-bright)';msg.textContent='⚠ กรอกรหัส OTP';}return;}
-  if(Date.now()>_otpExpiry){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสหมดอายุ';}return;}
-  if(input!==_pendingOTP){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสไม่ถูกต้อง';}return;}
+  const err=function(t){if(msg){msg.style.color='var(--red-bright)';msg.textContent=t;}};
+  if(!input){err('⚠ กรอกรหัสที่เห็นด้านบน');return;}
+  if(Date.now()>_otpExpiry){err('❌ รหัสหมดอายุ กดเปลี่ยนรหัสใหม่');return;}
+  if(input!==_pendingOTP){err('❌ รหัสไม่ตรง ลองใหม่');return;}
   if(msg){msg.style.color='var(--green)';msg.textContent='✅ กำลังสร้างบัญชี...';}
-  const u=_pendingUser,e=_pendingEmail,p=_pendingPass;
-  const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
-  const refBy=getPendingRef();
-  const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
-  if(window._db){
-    window._db.ref('users/'+u).set(nd).then(()=>{
-      reserveRefCode(refCode,u);
-      bumpStat('members',1);
-      document.querySelectorAll('.overlay').forEach(o=>o.remove());
-      _ud=nd;setTimeout(()=>{setSess(u);enterDash(u);},300);
-    });
-  } else {
-    try{localStorage.setItem('cm_ud_'+u,JSON.stringify(nd));}catch(e2){}
-    document.querySelectorAll('.overlay').forEach(o=>o.remove());
-    _ud=nd;setSess(u);enterDash(u);
-  }
+  const ov=document.getElementById('otpOverlay');if(ov)ov.remove();
+  const btn=document.querySelector('#regForm .btn-auth');
+  if(btn){btn.disabled=true;btn.textContent='⏳ กำลังสมัคร...';}
+  createAccountNow(_pendingUser,_pendingEmail,_pendingPass,btn);
 }
 function resendOTPBrevo(){
-  const msg=document.getElementById('otpMsg');
-  if(!canSendOTP(_pendingEmail)){
-    if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งครบ 5 ครั้ง รอ '+getOTPWaitTime(_pendingEmail);}
-    return;
-  }
-  const otp=Math.floor(100000+Math.random()*900000).toString();
-  _pendingOTP=otp;_otpExpiry=Date.now()+600000;
-  emailjs.send('service_6j83xlj','template_riz4m4w',{
-    to_name:_pendingUser,to_email:_pendingEmail,otp
-  }).then(()=>{
-    incrementOTPCount(_pendingEmail);
-    if(msg){msg.style.color='var(--green)';msg.textContent='✅ ส่งรหัสใหม่แล้ว';}
-  }).catch(()=>{if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ ส่งไม่ได้';}});
+  _pendingOTP=Math.floor(100000+Math.random()*900000).toString();_otpExpiry=Date.now()+600000;
+  const sh=document.getElementById('otpShow');if(sh)sh.textContent=_pendingOTP;
+  const i=document.getElementById('otpInput');if(i)i.value='';
+  const msg=document.getElementById('otpMsg');if(msg){msg.style.color='var(--green)';msg.textContent='✅ เปลี่ยนรหัสแล้ว';}
 }
 
 // ─── MINING INVESTMENT ───
