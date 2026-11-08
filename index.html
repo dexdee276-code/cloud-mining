@@ -966,14 +966,19 @@ body:has(#authScreen.active) #contactFab{display:none}
 .tpx-done .ck{width:84px;height:84px;border-radius:50%;background:rgba(74,222,128,.15);border:2px solid #4ade80;color:#4ade80;display:flex;align-items:center;justify-content:center}
 .tpx-done h3{margin:0;font-size:22px}.tpx-done p{margin:0;font-size:14px;line-height:1.7;color:#d9ccf2}
 .tpx-uin{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14);color:#fff;font-family:'Space Grotesk',sans-serif;font-size:16px;outline:none}
-.ob-pop{width:100%;max-width:380px;min-height:min(560px,84vh);display:flex;flex-direction:column;border-radius:24px;padding:14px 20px 22px;background:linear-gradient(160deg,#1d0f3a,#120826);border:2px solid rgba(200,100,255,.5);box-shadow:0 20px 60px rgba(0,0,0,.6);position:relative;overflow:hidden}
+.ob-pop{width:100%;max-width:380px;max-height:94vh;overflow-y:auto;min-height:min(640px,90vh);display:flex;flex-direction:column;border-radius:24px;padding:14px 20px 22px;background:linear-gradient(160deg,#1d0f3a,#120826);border:2px solid rgba(200,100,255,.5);box-shadow:0 20px 60px rgba(0,0,0,.6);position:relative;overflow:hidden}
 .ob-top{display:flex;align-items:center;justify-content:space-between}
-.ob-no{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:#FFD700}
+.ob-no{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:#C8B0FF;margin-top:2px}
+.ob-hd{font-size:17px;font-weight:800;color:#FFD700}
+.ob-pts{width:100%;display:flex;flex-direction:column;gap:8px;text-align:left}
+.ob-pt{display:flex;gap:12px;align-items:flex-start;border-radius:14px;padding:12px;background:rgba(60,0,100,.5);border:1px solid rgba(180,80,255,.35);font-size:15px;line-height:1.55;color:#F5EEFF}
+.ob-pt i{flex:none;width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(255,215,0,.14);color:#FFD700;font-family:'Orbitron',monospace;font-size:13px;font-weight:900;font-style:normal}
+.ob-pop>*{flex:none}
 .ob-skip{height:44px;padding:0 12px;border:none;background:none;color:#C8B0FF;font-size:15px;font-weight:700;cursor:pointer}
-.ob-mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:10px 0}
-.ob-ic{width:130px;height:130px;border-radius:40px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#2a1253,#160a30);border:2px solid rgba(200,100,255,.45);box-shadow:0 0 44px rgba(157,78,221,.35);color:#FFD700}
+.ob-mid{flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:6px 0 12px}
+.ob-ic{width:100px;height:100px;border-radius:30px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#2a1253,#160a30);border:2px solid rgba(200,100,255,.45);box-shadow:0 0 44px rgba(157,78,221,.35);color:#FFD700}
 .ob-t{font-size:24px;font-weight:800;line-height:1.35;color:#F5EEFF}
-.ob-b{font-size:15px;line-height:1.7;color:#C8B0FF;max-width:290px}
+.ob-b{font-size:15px;line-height:1.6;color:#C8B0FF}
 .ob-dots{display:flex;gap:8px}
 .ob-dots span{display:block;height:8px;width:8px;border-radius:4px;background:rgba(200,176,255,.35);transition:all .2s}
 .ob-dots span.on{width:26px;background:#FFD700}
@@ -4789,9 +4794,12 @@ function nfMarkAll(){
 
 var _obI=0;
 var _obSteps=[
- {t:'เติมเงิน',b:'โอนผ่านธนาคาร แล้วส่งสลิป ทีมงานจะตรวจสอบให้เร็ว',p:'M3 7h18v12H3zM3 11h18M7 15h3'},
- {t:'เลือกแพ็กเกจขุด',b:'เลือกแพ็กเกจที่เหมาะกับคุณ ระบบจะเริ่มขุดให้ทันที',p:'M12 3l8 4v10l-8 4-8-4V7zM12 12l8-4M12 12v9M12 12L4 8'},
- {t:'รับรายได้และถอนเงิน',b:'รายได้เข้าทุกวัน ถอนเป็นกีบหรือ USDT ได้ตามต้องการ',p:'M4 18l5-6 4 3 7-9M15 6h5v5'}
+ {t:'เติมเงิน',b:'เริ่มจากเติมเงินเข้าบัญชีของคุณ',p:'M3 7h18v12H3zM3 11h18M7 15h3',l:['กดปุ่มเติมเงิน แล้วใส่จำนวนที่ต้องการ','โอนเงินตามบัญชีที่ระบบแสดง','แนบสลิปแล้วส่งคำขอ รอทีมงานอนุมัติ']},
+ {t:'เลือกแพ็กเกจขุด',b:'นำเงินไปซื้อแพ็กเกจขุดที่เหมาะกับคุณ',p:'M12 3l8 4v10l-8 4-8-4V7zM12 12l8-4M12 12v9M12 12L4 8',l:['ดูรายได้ต่อวัน และจำนวนวันของแต่ละแพ็กเกจ','เลือกแพ็กเกจแล้วกดซื้อ ระบบหักเงินจากยอดคงเหลือ','เครื่องขุดจะเริ่มทำงานทันที']},
+ {t:'ติดตามรายได้',b:'รายได้เข้าทุกวันโดยอัตโนมัติ',p:'M4 18l5-6 4 3 7-9M15 6h5v5',l:['ดูเครื่องขุดและรายได้ที่หน้าหลัก','กดประวัติเพื่อดูกราฟรายได้รายวัน','กระดิ่งแจ้งเตือนสถานะเติมเงินและถอนเงิน']},
+ {t:'แนะนำเพื่อน',b:'ชวนเพื่อนมาร่วมขุด รับโบนัสทันที',p:'M16 11a4 4 0 1 0-8 0M4 20c0-3.5 3.5-6 8-6s8 2.5 8 6M19 8v6M16 11h6',l:['คัดลอกรหัสหรือลิงก์แนะนำของคุณ','เพื่อนสมัครและเติมเงิน คุณได้โบนัส','ดูรายชื่อเพื่อนและโบนัสที่หน้าแนะนำเพื่อน']},
+ {t:'ถอนเงิน',b:'ถอนรายได้เข้าบัญชีของคุณได้ทุกเวลา',p:'M12 21V9M7 14l5-5 5 5M4 4h16',l:['เลือกรับเป็นเงินกีบ หรือเหรียญดิจิทัล','ใส่จำนวนเอง หรือกดปุ่มสูงสุดเพื่อถอนทั้งหมด','โบนัสที่ยังล็อกอยู่ยังถอนไม่ได้ ทีมงานโอนให้หลังตรวจสอบ']},
+ {t:'มีปัญหา ติดต่อเรา',b:'ทีมงานพร้อมช่วยเหลือ',p:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01',l:['กดไอคอนตั้งค่า แล้วเลือกศูนย์ช่วยเหลือ','ติดต่อทีมงานได้ทางวอทส์แอป','ตั้งรหัสสองชั้นเพื่อความปลอดภัยของบัญชี']}
 ];
 function obClose(){var o=document.getElementById('obOv');if(o)o.remove();}
 function obGo(d){
@@ -4803,9 +4811,10 @@ function obRender(){
   var o=document.getElementById('obOv');if(!o)return;
   var c=_obSteps[_obI],last=_obI===_obSteps.length-1;
   var dots='';for(var k=0;k<_obSteps.length;k++)dots+='<span'+(k===_obI?' class="on"':'')+'></span>';
-  o.innerHTML='<div class="ob-pop"><div class="ob-top"><div class="ob-no">'+(_obI+1)+' / '+_obSteps.length+'</div><button type="button" class="ob-skip" onclick="obClose()">ข้าม</button></div>'
-   +'<div class="ob-mid"><div class="ob-ic"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+c.p+'"/></svg></div>'
-   +'<div class="ob-t">'+c.t+'</div><div class="ob-b">'+c.b+'</div><div class="ob-dots">'+dots+'</div></div>'
+  var pts=c.l.map(function(x,k){return '<div class="ob-pt"><i>'+(k+1)+'</i><span>'+x+'</span></div>';}).join('');
+  o.innerHTML='<div class="ob-pop"><div class="ob-top"><div><div class="ob-hd">วิธีเล่น และ ลงทุน</div><div class="ob-no">'+(_obI+1)+' / '+_obSteps.length+'</div></div><button type="button" class="ob-skip" onclick="obClose()">ข้าม</button></div>'
+   +'<div class="ob-mid"><div class="ob-ic"><svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+c.p+'"/></svg></div>'
+   +'<div class="ob-t">'+c.t+'</div><div class="ob-b">'+c.b+'</div><div class="ob-pts">'+pts+'</div><div class="ob-dots">'+dots+'</div></div>'
    +'<div class="ob-bt">'+(_obI>0?'<button type="button" class="ob-back" onclick="obGo(-1)">ย้อนกลับ</button>':'')+'<button type="button" class="ob-next" onclick="obGo(1)">'+(last?'เริ่มต้นเลย':'ต่อไป')+'</button></div></div>';
   try{if(typeof applyLang==='function')applyLang();}catch(e){}
 }
@@ -6020,6 +6029,7 @@ Object.assign(TRD,{"รายได้รายวัน": ["ລາຍໄດ້�
 Object.assign(TRD,{"ส่งคำขอเติมเงินแล้ว": ["ສົ່ງຄຳຂໍເຕີມເງິນແລ້ວ", "Top-up request sent"], "คำขอเติมเงินถูกปฏิเสธ": ["ຄຳຂໍເຕີມເງິນຖືກປະຕິເສດ", "Top-up request rejected"], "เติมเงินสำเร็จ": ["ເຕີມເງິນສຳເລັດ", "Top-up successful"], "ถอนเงินสำเร็จ": ["ຖອນເງິນສຳເລັດ", "Withdrawal successful"], "ส่งคำขอถอนเงินแล้ว": ["ສົ່ງຄຳຂໍຖອນເງິນແລ້ວ", "Withdrawal request sent"], "คำขอถอนเงินถูกปฏิเสธ": ["ຄຳຂໍຖອນເງິນຖືກປະຕິເສດ", "Withdrawal request rejected"]});
 Object.assign(TRD,{"เลือกแพ็กเกจขุด": ["ເລືອກແພັກເກດຂຸດ", "Choose a mining package"], "รับรายได้และถอนเงิน": ["ຮັບລາຍໄດ້ ແລະ ຖອນເງິນ", "Earn and withdraw"], "โอนผ่านธนาคาร แล้วส่งสลิป ทีมงานจะตรวจสอบให้เร็ว": ["ໂອນຜ່ານທະນາຄານ ແລ້ວສົ່ງສະລິບ ທີມງານຈະກວດສອບໃຫ້ໄວ", "Transfer via bank, then send the slip. Our team verifies it quickly"], "เลือกแพ็กเกจที่เหมาะกับคุณ ระบบจะเริ่มขุดให้ทันที": ["ເລືອກແພັກເກດທີ່ເໝາະກັບທ່ານ ລະບົບຈະເລີ່ມຂຸດໃຫ້ທັນທີ", "Pick the package that suits you and mining starts right away"], "รายได้เข้าทุกวัน ถอนเป็นกีบหรือ": ["ລາຍໄດ້ເຂົ້າທຸກມື້ ຖອນເປັນກີບ ຫຼື", "Earnings arrive daily. Withdraw in kip or"], "ได้ตามต้องการ": ["ໄດ້ຕາມຕ້ອງການ", "as you like"], "ข้าม": ["ຂ້າມ", "Skip"], "ย้อนกลับ": ["ກັບຄືນ", "Back"], "เริ่มต้นเลย": ["ເລີ່ມຕົ້ນເລີຍ", "Get started"]});
 Object.assign(TRD,{"บัญชีรับเงินถอน": ["ບັນຊີຮັບເງິນຖອນ", "Payout account"], "บันทึกไว้ ครั้งต่อไปถอนเงินไม่ต้องพิมพ์ใหม่": ["ບັນທຶກໄວ້ ຄັ້ງຕໍ່ໄປຖອນເງິນບໍ່ຕ້ອງພິມໃໝ່", "Saved, so next time you won't need to retype it"], "แก้ไข": ["ແກ້ໄຂ", "Edit"], "ออกจากระบบ": ["ອອກຈາກລະບົບ", "Log out"], "บันทึกบัญชีแล้ว": ["ບັນທຶກບັນຊີແລ້ວ", "Account saved"]});
+Object.assign(TRD,{"วิธีเล่น และ ลงทุน": ["ວິທີຫຼິ້ນ ແລະ ລົງທຶນ", "How to play and invest"], "ติดตามรายได้": ["ຕິດຕາມລາຍໄດ້", "Track earnings"], "มีปัญหา ติดต่อเรา": ["ມີບັນຫາ ຕິດຕໍ່ເຮົາ", "Need help? Contact us"], "เริ่มจากเติมเงินเข้าบัญชีของคุณ": ["ເລີ່ມຈາກເຕີມເງິນເຂົ້າບັນຊີຂອງທ່ານ", "Start by topping up your account"], "กดปุ่มเติมเงิน แล้วใส่จำนวนที่ต้องการ": ["ກົດປຸ່ມເຕີມເງິນ ແລ້ວໃສ່ຈຳນວນທີ່ຕ້ອງການ", "Tap Top up and enter the amount you want"], "โอนเงินตามบัญชีที่ระบบแสดง": ["ໂອນເງິນຕາມບັນຊີທີ່ລະບົບສະແດງ", "Transfer to the account shown"], "แนบสลิปแล้วส่งคำขอ รอทีมงานอนุมัติ": ["ແນບສະລິບແລ້ວສົ່ງຄຳຂໍ ລໍຖ້າທີມງານອະນຸມັດ", "Attach the slip, send the request and wait for approval"], "นำเงินไปซื้อแพ็กเกจขุดที่เหมาะกับคุณ": ["ນຳເງິນໄປຊື້ແພັກເກດຂຸດທີ່ເໝາະກັບທ່ານ", "Use your balance to buy a mining package"], "ดูรายได้ต่อวัน และจำนวนวันของแต่ละแพ็กเกจ": ["ເບິ່ງລາຍໄດ້ຕໍ່ມື້ ແລະ ຈຳນວນມື້ຂອງແຕ່ລະແພັກເກດ", "Check the daily income and duration of each package"], "เลือกแพ็กเกจแล้วกดซื้อ ระบบหักเงินจากยอดคงเหลือ": ["ເລືອກແພັກເກດແລ້ວກົດຊື້ ລະບົບຫັກເງິນຈາກຍອດຄົງເຫຼືອ", "Pick a package and buy it; the cost is taken from your balance"], "เครื่องขุดจะเริ่มทำงานทันที": ["ເຄື່ອງຂຸດຈະເລີ່ມເຮັດວຽກທັນທີ", "Your miner starts working right away"], "รายได้เข้าทุกวันโดยอัตโนมัติ": ["ລາຍໄດ້ເຂົ້າທຸກມື້ໂດຍອັດຕະໂນມັດ", "Earnings arrive automatically every day"], "ดูเครื่องขุดและรายได้ที่หน้าหลัก": ["ເບິ່ງເຄື່ອງຂຸດ ແລະ ລາຍໄດ້ທີ່ໜ້າຫຼັກ", "See your miners and earnings on the home page"], "กดประวัติเพื่อดูกราฟรายได้รายวัน": ["ກົດປະຫວັດເພື່ອເບິ່ງກາຟລາຍໄດ້ລາຍວັນ", "Open History to see the daily earnings chart"], "กระดิ่งแจ้งเตือนสถานะเติมเงินและถอนเงิน": ["ກະດິ່ງແຈ້ງເຕືອນສະຖານະເຕີມເງິນ ແລະ ຖອນເງິນ", "The bell shows top-up and withdrawal status"], "ชวนเพื่อนมาร่วมขุด รับโบนัสทันที": ["ຊວນໝູ່ມາຮ່ວມຂຸດ ຮັບໂບນັດທັນທີ", "Invite friends to mine and get a bonus"], "คัดลอกรหัสหรือลิงก์แนะนำของคุณ": ["ຄັດລອກລະຫັດ ຫຼື ລິ້ງແນະນຳຂອງທ່ານ", "Copy your referral code or link"], "เพื่อนสมัครและเติมเงิน คุณได้โบนัส": ["ໝູ່ສະໝັກ ແລະ ເຕີມເງິນ ທ່ານໄດ້ໂບນັດ", "When a friend signs up and tops up, you get a bonus"], "ดูรายชื่อเพื่อนและโบนัสที่หน้าแนะนำเพื่อน": ["ເບິ່ງລາຍຊື່ໝູ່ ແລະ ໂບນັດທີ່ໜ້າແນະນຳໝູ່", "See friends and bonuses on the referral page"], "ถอนรายได้เข้าบัญชีของคุณได้ทุกเวลา": ["ຖອນລາຍໄດ້ເຂົ້າບັນຊີຂອງທ່ານໄດ້ທຸກເວລາ", "Withdraw your earnings to your account any time"], "เลือกรับเป็นเงินกีบ หรือเหรียญดิจิทัล": ["ເລືອກຮັບເປັນເງິນກີບ ຫຼື ເຫຼຽນດິຈິຕອນ", "Choose to receive kip or digital coins"], "ใส่จำนวนเอง หรือกดปุ่มสูงสุดเพื่อถอนทั้งหมด": ["ໃສ່ຈຳນວນເອງ ຫຼື ກົດປຸ່ມສູງສຸດເພື່ອຖອນທັງໝົດ", "Enter an amount or tap Max to withdraw everything"], "โบนัสที่ยังล็อกอยู่ยังถอนไม่ได้ ทีมงานโอนให้หลังตรวจสอบ": ["ໂບນັດທີ່ຍັງລັອກຢູ່ຍັງຖອນບໍ່ໄດ້ ທີມງານໂອນໃຫ້ຫຼັງກວດສອບ", "Locked bonuses can't be withdrawn yet; we transfer after verification"], "ทีมงานพร้อมช่วยเหลือ": ["ທີມງານພ້ອມຊ່ວຍເຫຼືອ", "Our team is ready to help"], "กดไอคอนตั้งค่า แล้วเลือกศูนย์ช่วยเหลือ": ["ກົດໄອຄອນຕັ້ງຄ່າ ແລ້ວເລືອກສູນຊ່ວຍເຫຼືອ", "Tap the settings icon and choose Help center"], "ติดต่อทีมงานได้ทางวอทส์แอป": ["ຕິດຕໍ່ທີມງານໄດ້ທາງວອດແອັບ", "Contact the team on WhatsApp"], "ตั้งรหัสสองชั้นเพื่อความปลอดภัยของบัญชี": ["ຕັ້ງລະຫັດສອງຊັ້ນເພື່ອຄວາມປອດໄພຂອງບັນຊີ", "Turn on two-step verification to protect your account"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
 function trStr(s){
