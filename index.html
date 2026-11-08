@@ -5617,6 +5617,7 @@ function submitConvert(){
   if(amt<=0||amt>(ud.ethReward||0)){showToast('❌ จำนวนไม่ถูกต้อง');return;}
   ud.ethReward=parseFloat(((ud.ethReward||0)-amt).toFixed(6));
   ud.ethConverted=(ud.ethConverted||0)+amt;
+  ud.ethRewardSaved=ud.ethReward; // ต้องอัปเดตด้วย ไม่งั้นตอนเข้าใหม่ Math.max จะคืนค่า ETH เก่ากลับมา
   const usdt=parseFloat((amt*ETH_RATE).toFixed(2));
   ud.usd=(ud.usd||0)+usdt;
   ud.txs=ud.txs||[];
