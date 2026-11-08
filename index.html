@@ -1230,6 +1230,8 @@ body:has(#adminScreen.active) #contactFab{display:none}
     <div style="font-size:13px;color:#ffd700;font-weight:700">รับ ›</div>
   </button>
 
+  <div id="refSection"></div>
+
   <div style="display:flex;align-items:center;gap:14px;border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08)">
     <div style="width:46px;height:46px;border-radius:14px;background:rgba(168,85,247,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M17 11a3 3 0 1 0 0-6M22 20c0-2.8-1.8-4.8-4.5-5.6"/></svg></div>
     <div style="flex-grow:1"><div style="font-size:12px;color:#b6a7d6">สมาชิกทั้งหมด</div><div id="pstMembers" class="rg-num" style="font-size:26px;font-weight:700;color:#ffd700;line-height:1.2">-</div></div>
@@ -2620,6 +2622,7 @@ function renderHome(){
   set('hmEnd',acs.length?'ครบสัญญาเร็วสุด '+Math.max(0,Math.round(Math.min.apply(null,acs.map(p=>p.remaining))))+' วัน':'ยังไม่มีสัญญา');
   renderActs();
   renderHomeBonus();
+  renderReferral();
 }
 function renderHomeBonus(){
   const el=document.getElementById('hmBonus'),u=getSess();
@@ -5857,24 +5860,32 @@ function copyRefLink(){
   const link=location.origin+location.pathname+'?ref='+(ud.refCode||'');
   navigator.clipboard?.writeText(link).then(()=>showToast('📋 คัดลอกแล้ว!')).catch(()=>showToast('❌ คัดลอกไม่ได้'));
 }
+function shareRefLink(){
+  const ud=getUD();if(!ud)return;
+  const link=location.origin+location.pathname+'?ref='+(ud.refCode||'');
+  if(navigator.share){navigator.share({title:'CryptoMine',text:'สมัครผ่านลิงก์นี้',url:link}).catch(function(){});}
+  else copyRefLink();
+}
 function renderReferral(){
   const ud=getUD();if(!ud)return;
   const el=document.getElementById('refSection');if(!el)return;
   const code=ud.refCode||'-';
   const link=location.origin+location.pathname+'?ref='+code;
-  el.innerHTML=`<div style="background:rgba(157,78,221,0.07);border:1px solid rgba(157,78,221,0.2);border-radius:12px;padding:1rem;margin-top:1rem;">
-    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.5rem;">🔗 Referral</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.5rem;word-break:break-all;">${link}</div>
-    <button onclick="copyRefLink()" class="btn btn-primary" style="width:100%;padding:0.6rem;font-size:0.65rem;">📋 คัดลอกลิงก์</button>
-    <div id="refRuleText" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--green);margin-top:0.5rem;line-height:1.6;"></div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-top:0.5rem;">แนะนำ: ${ud.refCount||0} คน · ได้: $${(ud.refEarned||0).toFixed(2)}</div>
-  </div>`;
+  el.innerHTML='<div style="border-radius:20px;padding:16px;background:linear-gradient(135deg,rgba(74,222,128,.10),rgba(124,58,237,.12));border:1px solid rgba(74,222,128,.35);display:flex;flex-direction:column;gap:12px">'
+    +'<div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:14px;background:rgba(74,222,128,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M19 8v6M16 11h6"/></svg></div>'
+    +'<div style="min-width:0"><div style="font-size:16px;font-weight:700">แนะนำเพื่อน</div><div id="refRuleText" style="font-size:12px;color:#86efac;line-height:1.5;margin-top:2px"></div></div></div>'
+    +'<div style="border-radius:12px;padding:10px 12px;background:rgba(0,0,0,.3);font-size:12px;color:#c9b8e8;word-break:break-all;line-height:1.5">'+escHtml(link)+'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">'
+    +'<button type="button" onclick="copyRefLink()" style="height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">คัดลอกลิงก์</button>'
+    +'<button type="button" onclick="shareRefLink()" style="height:46px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">แชร์ให้เพื่อน</button></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;color:#b6a7d6"><span>แนะนำแล้ว <b class="rg-num" style="color:#fff">'+(ud.refCount||0)+'</b> คน</span><span>ได้รับ <b class="rg-num" style="color:#4ade80">$'+(ud.refEarned||0).toFixed(2)+'</b></span></div>'
+    +'</div>';
   const paint=function(c){
     const t=document.getElementById('refRuleText');
-    if(t)t.textContent=c.bonus>0?('🎁 เพื่อนสมัครผ่านลิงก์นี้และเติมเงินครั้งแรกสำเร็จ ได้ $'+c.bonus+' ทั้งคุณและเพื่อน (สูงสุด '+c.max+' คน)'):'';
+    if(t)t.textContent=c.bonus>0?('เพื่อนสมัครผ่านลิงก์และเติมเงินครั้งแรก ได้ $'+c.bonus+' ทั้งคุณและเพื่อน (สูงสุด '+c.max+' คน)'):'ยังไม่เปิดโบนัสแนะนำเพื่อน';
   };
   paint(refSettingsOf({}));
-  if(window._db)window._db.ref('settings').once('value').then(function(s){paint(refSettingsOf(s.exists()?s.val():{}));}).catch(function(){});
+  if(window._db)window._db.ref('settings').once('value').then(function(sn){paint(refSettingsOf(sn.exists()?sn.val():{}));}).catch(function(){});
 }
 function calcOfflineEarnings(){
   const ud=getUD();if(!ud)return;
