@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#1A0020">
 <meta name="format-detection" content="telephone=no">
 <title>CryptoMine — Cloud ETH Mining</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Lao:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
 
 :root{
@@ -812,6 +812,62 @@ body:has(#authScreen.active) #contactFab{display:none}
 .pk-chip{height:44px;border-radius:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#d9ccf2;padding:0}
 .pk-chip.on{background:#7c3aed;border-color:#a855f7;color:#fff}
 .pk-amt:focus-within{border-color:#a855f7!important;box-shadow:0 0 0 3px rgba(168,85,247,.22)}
+
+/* ── หน้าเติมเงินใหม่ (tpx) ── */
+.tpx{padding:0!important;max-width:440px!important;width:100%;max-height:94vh!important;display:flex;flex-direction:column;overflow:hidden!important;border-radius:24px!important;background:#0b0618!important;border:1px solid rgba(168,85,247,.35)!important;font-family:'Noto Sans Lao','Noto Sans Thai',system-ui,sans-serif;color:#f3ecff}
+.tpx-hd{display:flex;align-items:center;gap:8px;padding:16px 16px 6px}
+.tpx-ib{width:44px;height:44px;flex-shrink:0;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#f3ecff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit}
+.tpx-ib svg{width:20px;height:20px}
+.tpx-ib.wa{border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.1);color:#86efac}
+.tpx-ttl{flex-grow:1;text-align:center;font-size:17px;font-weight:700;min-width:0}
+.tpx-body{flex-grow:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 16px 8px;display:flex;flex-direction:column;gap:12px}
+.tpx-steps{display:flex;align-items:flex-start;padding:8px 22px 2px}
+.tpx-st{display:flex;flex-direction:column;align-items:center;gap:6px;width:60px;font-size:12px;color:#b6a7d6}
+.tpx-st i{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);font-style:normal;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#b6a7d6}
+.tpx-st.on{color:#fff;font-weight:700}.tpx-st.on i{background:#a855f7;border-color:#a855f7;color:#fff}
+.tpx-st.done{color:#86efac}.tpx-st.done i{background:#4ade80;border-color:#4ade80;color:#052e16}
+.tpx-ln{flex-grow:1;height:2px;background:rgba(255,255,255,.14);margin-top:14px}.tpx-ln.done{background:#4ade80}
+.tpx-seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:5px;border-radius:16px;background:rgba(255,255,255,.05)}
+.tpx-seg button{height:44px;border:none;border-radius:12px;background:transparent;color:#b6a7d6;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.tpx-seg button.on{background:#7c3aed;color:#fff;font-weight:700}
+.tpx-card{border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(168,85,247,.35);display:flex;flex-direction:column;gap:10px}
+.tpx-lbl{font-size:14px;font-weight:600}
+.tpx-in{display:flex;align-items:center;height:64px;padding:0 16px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,215,0,.45)}
+.tpx-in span{font-size:24px;font-weight:700;color:#ffd700;margin-right:8px}
+.tpx-in input{flex-grow:1;min-width:0;width:100%;border:none;background:none;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;outline:none}
+.tpx-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tpx-chips button{height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#e9dffb;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.tpx-get{border-radius:20px;padding:14px 16px;background:linear-gradient(160deg,#10321f,#0f1f19);border:1px solid rgba(74,222,128,.35);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tpx-get .l{font-size:13px;color:#bbf7d0}.tpx-get #tpLakPrev{min-height:0;margin:0;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:#4ade80;line-height:1.3}
+.tpx-get #tpRateLine{margin:0;font-size:12px;color:#bbf7d0;text-align:right;line-height:1.6;max-width:46%}
+.tpx-bonus{display:flex;gap:10px;align-items:flex-start;border-radius:16px;padding:12px 14px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);font-size:13px;line-height:1.6;color:#f0e6ff}
+.tpx-bonus:empty{display:none}
+.tpx-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border:none;border-radius:16px;font-family:inherit;font-size:17px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#d97706,#fbbf24);color:#1a0a00}
+.tpx-cta.ok{background:linear-gradient(135deg,#059669,#10b981);color:#fff}
+.tpx-cta:disabled{opacity:.6;cursor:default}
+.tpx-ft{padding:10px 16px 18px;background:linear-gradient(to top,#0b0618 70%,rgba(11,6,24,0))}
+.tpx-amtc{border-radius:20px;padding:16px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(255,215,0,.4);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tpx-amtc .n{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;color:#ffd700;line-height:1.2;word-break:break-all}
+.tpx-amtc .s{font-size:13px;color:#d9ccf2}.tpx-amtc .g{font-size:13px;color:#86efac}
+.tpx-copy{flex-shrink:0;display:flex;align-items:center;gap:6px;height:44px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,215,0,.5);background:rgba(255,215,0,.1);color:#ffd700;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.tpx-qr{display:flex;justify-content:center;padding:6px 0}
+#tpQRWrap{width:210px;height:210px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:16px;overflow:hidden}
+#tpQRWrap img{width:100%!important;height:100%!important;padding:8px!important;margin:0!important;border-radius:0!important;box-sizing:border-box}
+.tpx-info{border-radius:20px;padding:14px 16px;background:#150b28;border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:10px}
+.tpx-info .k{font-size:12px;color:#b6a7d6}.tpx-info .v{font-size:15px;font-weight:700;word-break:break-word}
+.tpx-info .no{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;letter-spacing:.5px}
+.tpx-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tpx-warn{display:flex;gap:10px;align-items:flex-start;border-radius:16px;padding:12px 14px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);font-size:13px;line-height:1.65;color:#fff3cf}
+.tpx-warn svg{flex-shrink:0;margin-top:2px}
+.tpx-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:170px;border-radius:20px;border:2px dashed rgba(168,85,247,.6);background:rgba(168,85,247,.07);color:#e9dffb;cursor:pointer;text-align:center;padding:14px}
+.tpx-drop .ic{width:52px;height:52px;border-radius:50%;background:rgba(168,85,247,.2);display:flex;align-items:center;justify-content:center;color:#c084fc}
+.tpx-tips{display:flex;flex-direction:column;gap:10px;border-radius:16px;padding:14px;background:#150b28;border:1px solid rgba(255,255,255,.08)}
+.tpx-tip{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.6;color:#e9dffb}
+.tpx-tip i{width:22px;height:22px;flex-shrink:0;border-radius:50%;background:rgba(168,85,247,.25);color:#e9d5ff;font-style:normal;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.tpx-done{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:18px 6px 6px}
+.tpx-done .ck{width:84px;height:84px;border-radius:50%;background:rgba(74,222,128,.15);border:2px solid #4ade80;color:#4ade80;display:flex;align-items:center;justify-content:center}
+.tpx-done h3{margin:0;font-size:22px}.tpx-done p{margin:0;font-size:14px;line-height:1.7;color:#d9ccf2}
+.tpx-uin{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14);color:#fff;font-family:'Space Grotesk',sans-serif;font-size:16px;outline:none}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -3709,9 +3765,9 @@ function tpLakPreview(){
   const p=document.getElementById('tpLakPrev');
   if(!p)return;
   const lak=Math.round(parseFloat(document.getElementById('tpAmt')?document.getElementById('tpAmt').value:0)||0);
-  if(!rate||lak<=0){p.textContent='';return;}
+  if(!rate||lak<=0){p.textContent='—';return;}
   const u=lakToUsdt(lak,rate);
-  p.innerHTML='ได้รับ ≈ <b style="color:var(--green);">$'+u.toLocaleString()+' USDT</b>';
+  p.textContent='≈ $'+u.toLocaleString()+' USDT';
 }
 function parseLakAmt(v,rate){
   if(!rate){showToast('⚠ ยังไม่ได้ตั้งอัตราแลกเปลี่ยน กรุณาติดต่อ Admin');return null;}
@@ -3726,30 +3782,30 @@ let _tpInfoReady=false;
 function showTopupQR(){
   const raw=document.getElementById('tpAmt')?document.getElementById('tpAmt').value:0;
   const nb=document.getElementById('tpNextBtn');
-  const restore=function(){if(nb){nb.disabled=false;nb.textContent='ถัดไป → ดูบัญชีโอน';}};
+  const restore=function(){if(nb){nb.disabled=false;nb.textContent='ถัดไป · ดูบัญชีโอน';}};
   const run=function(info){
    try{
     _tpInfo=info||{};
     const q=parseLakAmt(raw,lakRateOf(_tpInfo));
     if(!q)return;
     _tpPending=q;
-    document.getElementById('tpStep1').style.display='none';
-    document.getElementById('tpStep2').style.display='block';
+    tpxGo(2);
     document.getElementById('tpAmtDisplay').textContent=fmtLak(q.lak);
     const g=document.getElementById('tpUsdtGet');
-    if(g)g.textContent='⬥ ได้รับ $'+q.usdt.toLocaleString()+' USDT ⬥';
+    if(g)g.textContent='ได้รับ ≈ $'+q.usdt.toLocaleString()+' USDT';
     const rn=document.getElementById('tpRateNote');
     if(rn)rn.textContent='อัตรา 1 USDT = ₭ '+fmtLak(q.rate);
     const bank=document.getElementById('tpNetworkDisplay');
     if(bank)bank.textContent=_tpInfo.lakBank||'BANK';
     const nm=document.getElementById('tpAccName');
-    if(nm)nm.textContent=_tpInfo.lakAccName?('ชื่อบัญชี: '+_tpInfo.lakAccName):'';
+    if(nm)nm.textContent=_tpInfo.lakAccName||'-';
+    const ab=document.getElementById('tpAccBox');if(ab)ab.style.display=_tpInfo.lakAccName?'':'none';
     const ac=document.getElementById('tpAddrText');
     const n=_tpInfo.lakAccNo||'';
     if(ac){ac.textContent=n;ac.setAttribute('data-addr',n);}
-    const box=document.querySelector('#tpStep2 .tp4-addr');
+    const box=document.querySelector('#tpStep2 .tpx-addr');
     if(box)box.style.display=(n||_tpInfo.lakAccName||_tpInfo.lakBank)?'':'none';
-    const cp=document.querySelector('#tpStep2 .tp4-copy');
+    const cp=document.querySelector('#tpStep2 .tpx-copy2');
     if(cp)cp.style.display=n?'':'none';
     fillTopupInfo({qrImage:_tpInfo.qrImage},{qr:'tpQRWrap',qrSize:180,addr:'__none__'});
    }catch(e){showToast('❌ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');}
@@ -3766,8 +3822,7 @@ function tpConfirmDone(){
   const btn=document.getElementById('tpCtaBtn');
   if(btn){btn.disabled=true;btn.style.opacity='0.6';}
   submitTopupRequest(q.usdt,function(){
-    document.getElementById('tpStep2').style.display='none';
-    document.getElementById('tpStep3').style.display='block';
+    tpxGo(4);
     _tpPending=null;_tpSlip=null;
   },function(){
     if(btn){btn.disabled=false;btn.style.opacity='1';}
@@ -3804,7 +3859,7 @@ function tpInitMethods(){
     _tpInfo=info||{};_tpInfoReady=true;
     const ok=!!(_tpInfo.usdtAddr&&validUsdtAddr(_tpInfo.usdtAddr,_tpInfo.usdtNetwork||'TRC20'));
     const t=document.getElementById('tpTabs');
-    if(t)t.style.display=ok?'flex':'none';
+    window._tpUsdtOk=ok;if(t)t.style.display=(ok&&_tpxN===1)?'grid':'none';
     const net=_tpInfo.usdtNetwork||'TRC20';
     const nl=document.getElementById('tpuNet');if(nl)nl.textContent='เครือข่าย: '+(NET_LABEL[net]||net);
     const ad=document.getElementById('tpuAddr');if(ad){ad.textContent=_tpInfo.usdtAddr||'';ad.setAttribute('data-addr',_tpInfo.usdtAddr||'');}
@@ -3814,15 +3869,50 @@ function tpInitMethods(){
     if(w)w.textContent='⚠ โอนเฉพาะ USDT บนเครือข่าย '+net+' เท่านั้น ถ้าโอนผิดเครือข่ายหรือผิดเหรียญ เงินจะสูญหายและกู้คืนไม่ได้ · ยอดจะเข้าหลังแอดมินตรวจสอบ TXID';
   });
 }
+var _tpxN=1;
+function tpxGo(n){
+  _tpxN=n;
+  var ids={1:'tpStep1',2:'tpStep2',3:'tpStep2b',4:'tpStep3'};
+  Object.keys(ids).forEach(function(k){var e=document.getElementById(ids[k]);if(e)e.style.display=(+k===n)?'flex':'none';});
+  var u=document.getElementById('tpUsdt');if(u)u.style.display='none';
+  var ck='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>';
+  for(var i=1;i<=3;i++){
+    var st=document.getElementById('tpxS'+i);if(!st)continue;
+    var done=n>i,on=n===i;
+    st.className='tpx-st'+(done?' done':on?' on':'');
+    if(st.firstChild)st.firstChild.innerHTML=done?ck:String(i);
+    var ln=document.getElementById('tpxL'+i);if(ln)ln.className='tpx-ln'+(n>i?' done':'');
+  }
+  var sp=document.getElementById('tpSteps');if(sp)sp.style.display='flex';
+  var tb=document.getElementById('tpTabs');if(tb)tb.style.display=(n===1&&window._tpUsdtOk)?'grid':'none';
+  var b=document.getElementById('tpBack');if(b)b.style.visibility=(n===2||n===3)?'visible':'hidden';
+  var t=document.getElementById('tpTitle');if(t)t.textContent={1:'เติมเงิน',2:'โอนเงิน',3:'แนบสลิป',4:'ส่งคำขอแล้ว'}[n];
+  var bd=document.getElementById('tpxBody');if(bd)bd.scrollTop=0;
+}
+function tpxBack(){if(_tpxN===3)tpxGo(2);else if(_tpxN===2)tpxGo(1);}
+function tpxSlip(){
+  var q=_tpPending;if(!q){showToast('⚠ ไม่พบจำนวน');return;}
+  var a=document.getElementById('tpSumLak'),b=document.getElementById('tpSumUsdt');
+  if(a)a.textContent='₭'+fmtLak(q.lak);if(b)b.textContent='≈ $'+q.usdt.toLocaleString()+' USDT';
+  tpxGo(3);
+}
+function tpCopyAmt(){
+  var q=_tpPending;if(!q)return;var t=String(q.lak);
+  var fb=function(){var x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();try{document.execCommand('copy');showToast('📋 คัดลอกแล้ว!');}catch(e){showToast('❌ คัดลอกไม่ได้');}document.body.removeChild(x);};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){showToast('📋 คัดลอกแล้ว!');}).catch(fb);else fb();
+}
 function tpMethod(m){
-  const u=m==='usdt';
-  const set=function(id,d){const e=document.getElementById(id);if(e)e.style.display=d;};
-  set('tpUsdt',u?'block':'none');set('tpStep1',u?'none':'block');
-  const title=document.getElementById('tpTitle');if(title)title.textContent=u?'💎 เติมด้วย USDT':'₭ เติมเงินด้วยกีบลาว';
-  const on='1px solid rgba(255,215,0,0.5)',off='1px solid rgba(255,255,255,0.15)';
-  const a=document.getElementById('tpTabLak'),b=document.getElementById('tpTabUsdt');
-  if(a){a.style.border=u?off:on;a.style.background=u?'transparent':'rgba(255,215,0,0.15)';a.style.color=u?'#A890CC':'var(--gold)';}
-  if(b){b.style.border=u?on:off;b.style.background=u?'rgba(255,215,0,0.15)':'transparent';b.style.color=u?'var(--gold)':'#A890CC';}
+  var u=m==='usdt';
+  var a=document.getElementById('tpTabLak'),b=document.getElementById('tpTabUsdt');
+  if(a)a.className=u?'':'on';if(b)b.className=u?'on':'';
+  if(u){
+    ['tpStep1','tpStep2','tpStep2b','tpStep3'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
+    var x=document.getElementById('tpUsdt');if(x)x.style.display='flex';
+    var sp=document.getElementById('tpSteps');if(sp)sp.style.display='none';
+    var bk=document.getElementById('tpBack');if(bk)bk.style.visibility='hidden';
+    var t=document.getElementById('tpTitle');if(t)t.textContent='เติมด้วย USDT';
+    var bd=document.getElementById('tpxBody');if(bd)bd.scrollTop=0;
+  } else tpxGo(1);
 }
 function tpuSlipChange(e){
   const f=e.target.files&&e.target.files[0];if(!f)return;
@@ -3846,7 +3936,7 @@ function tpuSubmit(){
   submitTopupRequest(amt,function(){
     const ov=document.getElementById('topupPopupOv');
     const box=ov&&ov.querySelector('#tpUsdt');
-    if(box)box.innerHTML='<div style="text-align:center;padding:1.5rem 0.5rem;font-family:\'Share Tech Mono\',monospace;"><div style="font-size:2rem;">✅</div><div style="color:var(--green);font-size:0.9rem;margin:0.5rem 0;">ส่งคำขอแล้ว</div><div style="color:#A890CC;font-size:0.7rem;line-height:1.7;">แอดมินกำลังตรวจสอบ TXID<br>USDT จะเข้ากระเป๋าเมื่อยืนยันแล้ว<br>ดูสถานะได้ที่ประวัติคำขอ</div></div>';
+    if(box)box.innerHTML='<div class="tpx-done"><div class="ck"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></div><h3>ส่งคำขอแล้ว</h3><p>แอดมินกำลังตรวจสอบ<br>ดูสถานะได้ที่ประวัติคำขอ</p></div>';
     const tabs=document.getElementById('tpTabs');if(tabs)tabs.style.display='none';
     _tpSlip=null;
   },function(){if(btn){btn.disabled=false;btn.style.opacity='1';}},{currency:'USDT',txid:tx,network:net,_slip:_tpSlip});
@@ -4188,178 +4278,114 @@ function showTopupPopup(){
 }
 function showTopupPopupBase(){
   const ov=document.createElement('div');ov.className='overlay';ov.id='topupPopupOv';
-  ov.innerHTML=`<div class="popup">
-    <div class="pop-hd">
-      <div class="pop-title" id="tpTitle">₭ เติมเงินด้วยกีบลาว</div>
-      <button type="button" onclick="contactWA('topup')" style="margin-left:auto;margin-right:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(74,222,128,.5);background:rgba(74,222,128,.12);color:#86efac;font-size:12px;font-weight:700;cursor:pointer">💬 WhatsApp</button>
-      <button class="pop-close" onclick="document.getElementById('topupPopupOv').remove()">✕</button>
+  ov.innerHTML=`<div class="popup tpx">
+    <div class="tpx-hd">
+      <button type="button" id="tpBack" class="tpx-ib" aria-label="กลับ" onclick="tpxBack()" style="visibility:hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+      <div class="tpx-ttl" id="tpTitle">เติมเงิน</div>
+      <button type="button" class="tpx-ib wa" aria-label="WhatsApp" onclick="contactWA('topup')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12z"/></svg></button>
+      <button type="button" class="tpx-ib" aria-label="ปิด" onclick="document.getElementById('topupPopupOv').remove()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
-
-    <div id="tpTabs" style="display:none;gap:0.5rem;margin-bottom:0.9rem;">
-      <button id="tpTabLak" onclick="tpMethod('lak')" style="flex:1;padding:0.6rem;border-radius:10px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.72rem;border:1px solid rgba(255,215,0,0.5);background:rgba(255,215,0,0.15);color:var(--gold);">₭ เติมเป็นกีบ</button>
-      <button id="tpTabUsdt" onclick="tpMethod('usdt')" style="flex:1;padding:0.6rem;border-radius:10px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.72rem;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#A890CC;">💎 เติมเป็น USDT</button>
+    <div class="tpx-steps" id="tpSteps">
+      <div class="tpx-st on" id="tpxS1"><i>1</i>จำนวน</div><div class="tpx-ln" id="tpxL1"></div>
+      <div class="tpx-st" id="tpxS2"><i>2</i>โอนเงิน</div><div class="tpx-ln" id="tpxL2"></div>
+      <div class="tpx-st" id="tpxS3"><i>3</i>สลิป</div>
     </div>
-    <div id="tpUsdt" style="display:none;">
-      <div id="tpuNet" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--gold);margin-bottom:0.5rem;"></div>
-      <div id="tpuQR" style="text-align:center;margin-bottom:0.6rem;"></div>
-      <div id="tpuAddr" data-addr="" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--green);word-break:break-all;background:rgba(0,0,0,0.3);border:1px solid rgba(74,222,128,0.25);border-radius:10px;padding:0.7rem;margin-bottom:0.5rem;"></div>
-      <button onclick="copyTopupAddr('tpuAddr')" style="width:100%;padding:0.55rem;margin-bottom:0.7rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:8px;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:0.68rem;cursor:pointer;">📋 คัดลอกที่อยู่</button>
-      <div id="tpuWarn" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:#fca5a5;line-height:1.7;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:0.6rem;margin-bottom:0.8rem;"></div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">จำนวน USDT ที่โอน (ขั้นต่ำ $10)</div>
-      <input type="number" id="tpuAmt" inputmode="decimal" placeholder="เช่น 50" style="width:100%;box-sizing:border-box;padding:0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.1rem;outline:none;margin-bottom:0.7rem;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.3rem;">TXID (รหัสธุรกรรม) หลังโอนเสร็จ</div>
-      <input type="text" id="tpuTx" autocomplete="off" spellcheck="false" placeholder="วางรหัสธุรกรรม" style="width:100%;box-sizing:border-box;padding:0.7rem;background:rgba(0,0,0,0.3);border:none;border-bottom:1px solid rgba(255,215,0,0.3);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.72rem;outline:none;margin-bottom:0.7rem;">
-      <label style="display:block;padding:0.6rem;text-align:center;background:rgba(255,215,0,0.06);border:1px dashed rgba(255,215,0,0.35);border-radius:10px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.68rem;cursor:pointer;">📎 แนบภาพหลักฐาน (จำเป็น)<input type="file" accept="image/*" style="display:none" onchange="tpuSlipChange(event)"></label>
-      <div id="tpuSlipPrev" style="margin:0.5rem 0;"></div>
-      <button id="tpuBtn" onclick="tpuSubmit()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;background:linear-gradient(135deg,#065f46,#10b981);color:#fff;margin-top:0.4rem;">✅ ส่งคำขอเติม USDT</button>
-    </div>
-
-    <!-- Step 1: ใส่จำนวน -->
-    <div id="tpStep1">
-      <div id="tpLastReq" style="margin-bottom:0.8rem;"></div>
-      <div id="tpBonusNote" style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--green);line-height:1.6;margin-bottom:0.6rem;"></div>
-      <div id="tpRateLine" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--gold);margin-bottom:0.6rem;">กำลังโหลดอัตรา...</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#A890CC;margin-bottom:0.4rem;">จำนวนเงินกีบ (LAK) ที่ต้องการโอน</div>
-      <input type="number" id="tpAmt" inputmode="numeric" placeholder="เช่น 500000" oninput="tpLakPreview()"
-        style="width:100%;padding:0.8rem;background:rgba(0,0,0,0.3);border:none;border-bottom:2px solid rgba(255,215,0,0.4);color:var(--gold);font-family:'Orbitron',monospace;font-size:1.2rem;outline:none;margin-bottom:0.5rem;">
-      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.6rem;">
-        <button onclick="tpQuick(500000)" style="flex:1;padding:0.4rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);border-radius:8px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">500K</button>
-        <button onclick="tpQuick(1000000)" style="flex:1;padding:0.4rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);border-radius:8px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">1M</button>
-        <button onclick="tpQuick(5000000)" style="flex:1;padding:0.4rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);border-radius:8px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">5M</button>
-        <button onclick="tpQuick(10000000)" style="flex:1;padding:0.4rem;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);border-radius:8px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.6rem;cursor:pointer;">10M</button>
+    <div class="tpx-body" id="tpxBody">
+      <div class="tpx-seg" id="tpTabs" style="display:none">
+        <button type="button" id="tpTabLak" class="on" onclick="tpMethod('lak')">เติมเป็นกีบ (LAK)</button>
+        <button type="button" id="tpTabUsdt" onclick="tpMethod('usdt')">เติมเป็น USDT</button>
       </div>
-      <div id="tpLakPrev" style="min-height:1.3rem;font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#A890CC;margin-bottom:0.8rem;"></div>
-      <button id="tpNextBtn" onclick="showTopupQR()" style="width:100%;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;
-        background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;
-        box-shadow:0 4px 20px rgba(59,130,246,0.4);">ถัดไป → ดูบัญชีโอน</button>
-    </div>
 
-    <!-- Step 2: QR + ที่อยู่ -->
-    <div id="tpStep2" style="display:none;margin:-1rem;">
-      <div class="tp4-card">
-        <div class="tp4-hd">
-          <button class="tp4-back" onclick="document.getElementById('tpStep1').style.display='block';document.getElementById('tpStep2').style.display='none';">← กลับ</button>
-          <div class="tp4-title">TRANSFER LAK</div>
-          <button class="tp4-x" onclick="document.getElementById('topupPopupOv').remove()">✕</button>
+      <!-- USDT โดยตรง -->
+      <div id="tpUsdt" style="display:none;flex-direction:column;gap:12px">
+        <div class="tpx-card">
+          <div id="tpuNet" style="font-size:13px;font-weight:700;color:#ffd700"></div>
+          <div id="tpuQR" style="text-align:center"></div>
+          <div id="tpuAddr" data-addr="" style="font-family:'Space Grotesk',sans-serif;font-size:14px;color:#4ade80;word-break:break-all;background:rgba(0,0,0,.35);border:1px solid rgba(74,222,128,.3);border-radius:12px;padding:12px"></div>
+          <button type="button" class="tpx-copy" style="width:100%;justify-content:center" onclick="copyTopupAddr('tpuAddr')">คัดลอกที่อยู่</button>
         </div>
-        <div class="tp4-amt">
-          <div class="tp4-amt-lbl">AMOUNT TO TRANSFER</div>
-          <div class="tp4-amt-row">
-            <span class="tp4-amt-cur">₭</span>
-            <span id="tpAmtDisplay" class="tp4-amt-num">0</span>
-          </div>
-          <div><div class="tp4-amt-tag" id="tpUsdtGet">⬥ USDT ⬥</div></div>
+        <div class="tpx-warn" id="tpuWarn" style="background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.45);color:#fecaca"></div>
+        <div class="tpx-card">
+          <label class="tpx-lbl" for="tpuAmt">จำนวน USDT ที่โอน (ขั้นต่ำ $10)</label>
+          <input type="number" id="tpuAmt" inputmode="decimal" placeholder="50" class="tpx-uin">
+          <label class="tpx-lbl" for="tpuTx">TXID (รหัสธุรกรรม) หลังโอนเสร็จ</label>
+          <input type="text" id="tpuTx" autocomplete="off" spellcheck="false" placeholder="วางรหัสธุรกรรม" class="tpx-uin">
+          <label class="tpx-drop" style="min-height:96px"><div style="font-size:15px;font-weight:700">แนบภาพหลักฐาน <span style="color:#fbbf24;font-size:12px">(จำเป็น)</span></div><input type="file" accept="image/*" style="display:none" onchange="tpuSlipChange(event)"></label>
+          <div id="tpuSlipPrev"></div>
         </div>
-        <div class="tp4-qr-wrap">
-          <div class="tp4-orbit">
-            <div class="tp4-ring tp4-o1"></div>
-            <div class="tp4-ring tp4-o2"></div>
-            <div class="tp4-ring tp4-o3"></div>
-            <div class="tp4-qr-box">
-              <div class="tp4-scan"></div>
-              <div id="tpQRWrap" style="width:170px;height:170px;display:flex;align-items:center;justify-content:center;background:#fff;"></div>
-            </div>
-          </div>
-        </div>
-        <div class="tp4-addr">
-          <div class="tp4-addr-inner">
-            <div class="tp4-addr-bar">
-              <div style="display:flex;align-items:center;gap:0.4rem;">
-                <div class="tp4-addr-dot"></div>
-                <span class="tp4-addr-lbl">BANK ACCOUNT</span>
-              </div>
-              <span class="tp4-addr-badge" id="tpNetworkDisplay">TRC20</span>
-            </div>
-            <div id="tpAccName" style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#fff;padding:0.6rem 0.9rem 0;"></div>
-            <div class="tp4-addr-text" id="tpAddrText">กำลังโหลด...</div>
-            <button class="tp4-copy" onclick="copyTopupAddr('tpAddrText')">
-              📋 &nbsp; COPY ACCOUNT NO.
-            </button>
-          </div>
-        </div>
-        <div class="tp4-net">
-          <span style="font-size:0.65rem;">⚠️</span>
-          <span class="tp4-net-t" id="tpRateNote">โอนตามจำนวนกีบให้ตรง</span>
-          <span class="tp4-net-t">· ยอด USDT คำนวณตอนแอดมินตรวจสอบ</span>
-        </div>
-        <div style="padding:0 1rem 0.8rem;">
-          <label style="display:block;padding:0.7rem;text-align:center;background:rgba(255,215,0,0.08);border:1px dashed rgba(255,215,0,0.45);border-radius:12px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.72rem;cursor:pointer;">
-            📎 แนบสลิปโอนเงิน (จำเป็น)
-            <input type="file" accept="image/*" style="display:none" onchange="tpSlipChange(event)">
-          </label>
-          <div id="tpSlipPrev" style="margin-top:0.5rem;"></div>
-        </div>
-        <div class="tp4-cta-wrap">
-          <button class="tp4-cta" id="tpCtaBtn" onclick="tpConfirmDone()">
-            <span class="tp4-shine"></span>
-            ✅ &nbsp; โอนสำเร็จแล้ว
-          </button>
-        </div>
+        <div class="tpx-ft"><button type="button" id="tpuBtn" class="tpx-cta ok" onclick="tpuSubmit()">ส่งคำขอเติม USDT</button></div>
       </div>
-    </div>
 
-    <!-- Step 3: กำลังตรวจสอบ -->
-    <div id="tpStep3" style="display:none;margin:-1rem;">
-      <div class="s3-card">
-        <div class="s3-hd">
-          <div class="s3-hd-title">PAYMENT SENT</div>
-          <button style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.06);background:none;color:rgba(255,255,255,0.2);cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;" onclick="document.getElementById('topupPopupOv').remove()">✕</button>
-        </div>
-        <div class="s3-check-wrap">
-          <div class="s3-rings">
-            <div class="s3-cr s3-cr1"></div>
-            <div class="s3-cr s3-cr2"></div>
-            <div class="s3-cr s3-cr3"></div>
-            <div class="s3-ping"></div>
-            <div class="s3-ping s3-ping2"></div>
-            <div class="s3-ping s3-ping3"></div>
-            <div class="s3-circle">
-              <div class="s3-icon">✅</div>
-            </div>
-          </div>
-          <div class="s3-title">โอนสำเร็จ!</div>
-          <div class="s3-sub">ระบบกำลังตรวจสอบการโอน<br>USDT จะเข้ากระเป๋าเมื่อยืนยันแล้ว</div>
-        </div>
-        <div class="s3-prog-wrap">
-          <div class="s3-prog-label">
-            <span class="s3-prog-lbl">VERIFYING</span>
-            <span class="s3-prog-pct">65%</span>
-          </div>
-          <div class="s3-prog-bar"><div class="s3-prog-fill"></div></div>
-        </div>
-        <div class="s3-steps">
-          <div class="s3-step s3-done">
-            <div class="s3-si">✓</div>
-            <div class="s3-st">
-              <div class="s3-sname">ส่งคำขอแล้ว</div>
-              <div class="s3-sdesc">ระบบได้รับข้อมูลของคุณ</div>
-            </div>
-            <span class="s3-sbadge">DONE</span>
-          </div>
-          <div class="s3-step s3-active">
-            <div class="s3-si">⟳</div>
-            <div class="s3-st">
-              <div class="s3-sname">ตรวจสอบการโอน<span class="s3-dots"><span class="s3-dot"></span><span class="s3-dot"></span><span class="s3-dot"></span></span></div>
-              <div class="s3-sdesc">กำลังยืนยันธุรกรรม</div>
-            </div>
-            <span class="s3-sbadge">CHECKING</span>
-          </div>
-          <div class="s3-step s3-wait">
-            <div class="s3-si">◷</div>
-            <div class="s3-st">
-              <div class="s3-sname">เติม USDT เข้ากระเป๋า</div>
-              <div class="s3-sdesc">รอการยืนยัน</div>
-            </div>
-            <span class="s3-sbadge">PENDING</span>
+      <!-- ขั้น 1: จำนวน -->
+      <div id="tpStep1" style="display:flex;flex-direction:column;gap:12px">
+        <div id="tpLastReq"></div>
+        <div class="tpx-card">
+          <label class="tpx-lbl" for="tpAmt">จำนวนเงินกีบ (LAK) ที่ต้องการโอน</label>
+          <div class="tpx-in"><span>₭</span><input type="number" id="tpAmt" inputmode="numeric" placeholder="500000" oninput="tpLakPreview()"></div>
+          <div class="tpx-chips">
+            <button type="button" onclick="tpQuick(500000)">500K</button>
+            <button type="button" onclick="tpQuick(1000000)">1M</button>
+            <button type="button" onclick="tpQuick(5000000)">5M</button>
+            <button type="button" onclick="tpQuick(10000000)">10M</button>
           </div>
         </div>
-        <div class="s3-cta-wrap">
-          <button class="s3-cta" onclick="document.getElementById('topupPopupOv').remove()">🏠 &nbsp; กลับหน้าหลัก</button>
+        <div class="tpx-get">
+          <div><div class="l">คุณจะได้รับประมาณ</div><div id="tpLakPrev">—</div></div>
+          <div id="tpRateLine">กำลังโหลดอัตรา...</div>
         </div>
+        <div class="tpx-bonus" id="tpBonusNote"></div>
+        <div class="tpx-ft"><button type="button" id="tpNextBtn" class="tpx-cta" onclick="showTopupQR()">ถัดไป · ดูบัญชีโอน</button></div>
+      </div>
+
+      <!-- ขั้น 2: โอนเงิน -->
+      <div id="tpStep2" style="display:none;flex-direction:column;gap:12px">
+        <div class="tpx-amtc">
+          <div style="min-width:0"><div class="s">โอนตามจำนวนนี้ให้ตรง</div><div class="n">₭<span id="tpAmtDisplay">0</span></div><div class="g" id="tpUsdtGet"></div></div>
+          <button type="button" class="tpx-copy" onclick="tpCopyAmt()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>คัดลอก</button>
+        </div>
+        <div class="tpx-qr"><div id="tpQRWrap"></div></div>
+        <div class="tpx-info tpx-addr">
+          <div><div class="k">ธนาคาร</div><div class="v" id="tpNetworkDisplay">-</div></div>
+          <div id="tpAccBox"><div class="k">ชื่อบัญชี</div><div class="v" id="tpAccName">-</div></div>
+          <div class="tpx-row"><div style="min-width:0"><div class="k">เลขบัญชี</div><div class="v no" id="tpAddrText">กำลังโหลด...</div></div>
+            <button type="button" class="tpx-ib tpx-copy2" aria-label="คัดลอกเลขบัญชี" onclick="copyTopupAddr('tpAddrText')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button></div>
+        </div>
+        <div class="tpx-warn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg><div><span id="tpRateNote">โอนตามจำนวนกีบให้ตรง</span> · ยอด USDT คำนวณตอนแอดมินตรวจสอบ</div></div>
+        <div class="tpx-ft"><button type="button" class="tpx-cta ok" onclick="tpxSlip()">โอนแล้ว · แนบสลิป</button></div>
+      </div>
+
+      <!-- ขั้น 3: แนบสลิป -->
+      <div id="tpStep2b" style="display:none;flex-direction:column;gap:12px">
+        <div class="tpx-info"><div class="tpx-row"><div class="k">ยอดที่โอน</div><div style="text-align:right"><div id="tpSumLak" style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:#ffd700">-</div><div id="tpSumUsdt" style="font-size:12px;color:#86efac"></div></div></div></div>
+        <div class="tpx-lbl">แนบสลิปโอนเงิน <span style="color:#fbbf24;font-size:12px">(จำเป็น)</span></div>
+        <label class="tpx-drop"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></div><div style="font-size:16px;font-weight:700">กดเพื่อเลือกรูปสลิป</div><div style="font-size:12px;color:#b6a7d6">รูปจากแอปธนาคาร เห็นจำนวนและเวลาชัดเจน</div><input type="file" accept="image/*" style="display:none" onchange="tpSlipChange(event)"></label>
+        <div id="tpSlipPrev"></div>
+        <div class="tpx-tips">
+          <div class="tpx-tip"><i>1</i><div>สลิปต้องตรงกับยอดที่โอนจริง</div></div>
+          <div class="tpx-tip"><i>2</i><div>แอดมินตรวจสอบยอดและสลิป</div></div>
+          <div class="tpx-tip"><i>3</i><div>เมื่ออนุมัติ ยอดจะเข้ากระเป๋า ดูสถานะได้ในประวัติ</div></div>
+        </div>
+        <div class="tpx-ft"><button type="button" id="tpCtaBtn" class="tpx-cta" onclick="tpConfirmDone()">ส่งคำขอเติมเงิน</button></div>
+      </div>
+
+      <!-- เสร็จสิ้น -->
+      <div id="tpStep3" style="display:none;flex-direction:column;gap:12px">
+        <div class="tpx-done">
+          <div class="ck"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></div>
+          <h3>ส่งคำขอแล้ว</h3>
+          <p>ระบบได้รับข้อมูลของคุณ<br>แอดมินกำลังตรวจสอบการโอน ยอดจะเข้ากระเป๋าเมื่อยืนยันแล้ว</p>
+        </div>
+        <div class="tpx-tips">
+          <div class="tpx-tip"><i>✓</i><div>ส่งคำขอแล้ว</div></div>
+          <div class="tpx-tip"><i>2</i><div>รอแอดมินตรวจสอบ</div></div>
+          <div class="tpx-tip"><i>3</i><div>ยอดเข้ากระเป๋า</div></div>
+        </div>
+        <div class="tpx-ft"><button type="button" class="tpx-cta" onclick="document.getElementById('topupPopupOv').remove()">กลับหน้าหลัก</button></div>
       </div>
     </div>
   </div>`;
   document.body.appendChild(ov);
+  _tpxN=1;window._tpUsdtOk=false;
   renderTopupBanner();
   _tpSlip=null;
   loadTopupInfo(function(i){_tpInfo=i||{};tpLakPreview();tpFirstBonusNote(_tpInfo);});
@@ -5382,6 +5408,7 @@ var TRD={"เชื่อมต่อแล้ว":["ເຊື່ອມຕໍ່
 Object.assign(TRD,{"ถอนสำเร็จล่าสุด": ["ຖອນສຳເລັດຫຼ້າສຸດ", "Recent successful withdrawals"], "โอนแล้วจริง": ["ໂອນແລ້ວຈິງ", "Actually paid"], "ชื่อปกปิดบางส่วน": ["ຊື່ປົກປິດບາງສ່ວນ", "Names partly hidden"], "ถอนสำเร็จแล้ว": ["ຖອນສຳເລັດແລ້ວ", "Successful withdrawals"], "ครั้ง": ["ຄັ້ງ", "times"], "รวม": ["ລວມ", "Total"], "ยังไม่ได้ตั้งค่า": ["ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ", "Not set up yet"], "กรุณาติดต่อทางอื่น": ["ກະລຸນາຕິດຕໍ່ທາງອື່ນ", "please contact another way"]});
 Object.assign(TRD,{"กำไรมาจากไหน": ["ກຳໄລມາຈາກໃສ", "Where does the profit come from"], "อ่านก่อนลงทุน": ["ອ່ານກ່ອນລົງທຶນ", "read before investing"]});
 Object.assign(TRD,{"ลองคำนวณกำไร": ["ລອງຄຳນວນກຳໄລ", "Try the profit calculator"], "เลื่อนเพื่อเลือกยอดลงทุน": ["ເລື່ອນເພື່ອເລືອກຍອດລົງທຶນ", "Slide to choose an amount"], "เริ่มลงทุนจำนวนนี้": ["ເລີ່ມລົງທຶນຈຳນວນນີ້", "Invest this amount"]});
+Object.assign(TRD,{"กดเพื่อเลือกรูปสลิป": ["ກົດເພື່ອເລືອກຮູບສະລິບ", "Tap to choose the slip image"], "คัดลอก": ["ຄັດລອກ", "Copy"], "คัดลอกเลขบัญชี": ["ຄັດລອກເລກບັນຊີ", "Copy account number"], "คุณจะได้รับประมาณ": ["ທ່ານຈະໄດ້ຮັບປະມານ", "You will receive about"], "ยอดที่โอน": ["ຍອດທີ່ໂອນ", "Amount transferred"], "ยอดเข้ากระเป๋า": ["ຍອດເຂົ້າກະເປົາ", "Balance credited to wallet"], "รอแอดมินตรวจสอบ": ["ລໍແອດມິນກວດສອບ", "Waiting for admin review"], "รูปจากแอปธนาคาร เห็นจำนวนและเวลาชัดเจน": ["ຮູບຈາກແອັບທະນາຄານ ເຫັນຈຳນວນ ແລະ ເວລາຊັດເຈນ", "Image from your banking app with amount and time clearly visible"], "สลิป": ["ສະລິບ", "Slip"], "สลิปต้องตรงกับยอดที่โอนจริง": ["ສະລິບຕ້ອງກົງກັບຍອດທີ່ໂອນຈິງ", "The slip must match the amount actually transferred"], "ส่งคำขอเติมเงิน": ["ສົ່ງຄຳຂໍເຕີມເງິນ", "Submit top-up request"], "เมื่ออนุมัติ ยอดจะเข้ากระเป๋า ดูสถานะได้ในประวัติ": ["ເມື່ອອະນຸມັດ ຍອດຈະເຂົ້າກະເປົາ ເບິ່ງສະຖານະໄດ້ໃນປະຫວັດ", "Once approved the balance enters your wallet. Check the status in History"], "แนบสลิป": ["ແນບສະລິບ", "Attach slip"], "แอดมินกำลังตรวจสอบการโอน ยอดจะเข้ากระเป๋าเมื่อยืนยันแล้ว": ["ແອດມິນກຳລັງກວດສອບການໂອນ ຍອດຈະເຂົ້າກະເປົາເມື່ອຢືນຢັນແລ້ວ", "The admin is verifying your transfer. The balance enters your wallet once confirmed"], "แอดมินตรวจสอบยอดและสลิป": ["ແອດມິນກວດສອບຍອດ ແລະ ສະລິບ", "The admin checks the amount and slip"], "โอนตามจำนวนนี้ให้ตรง": ["ໂອນຕາມຈຳນວນນີ້ໃຫ້ຕົງ", "Transfer exactly this amount"], "โอนเงิน": ["ໂອນເງິນ", "Transfer"], "โอนแล้ว": ["ໂອນແລ້ວ", "Transferred"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
 function trStr(s){
