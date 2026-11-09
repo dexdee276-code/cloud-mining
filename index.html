@@ -1027,6 +1027,29 @@ body:has(#authScreen.active) #contactFab{display:none}
 .apw-cancel{height:46px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:none;color:#fde2e2;font-size:0.85rem;cursor:pointer;font-family:inherit}
 .apw-save{flex:1;height:46px;border:none;border-radius:12px;font-size:0.9rem;font-weight:800;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16}
 .apw-save:disabled{cursor:not-allowed;background:rgba(255,255,255,.12);color:#a99bc7}
+/* ── สัญญาขุด (หน้าใหม่) ── */
+.mp-chip{height:52px;border-radius:14px;cursor:pointer;font-family:inherit;font-size:15px;font-weight:700;border:1px solid rgba(180,80,255,.35);background:rgba(60,0,100,.45);color:#E9D5FF;padding:0}
+.mp-chip.on{border:2px solid #FFD700;background:rgba(255,215,0,.12);color:#FFD700}
+.mp-tier{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:6px;align-items:center;padding:10px;border-radius:12px;font-size:13px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.06)}
+.mp-tier.on{background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.6)}
+.mp-tn{font-weight:500;color:#F5EEFF}
+.mp-tier.on .mp-tn{font-weight:800;color:#FFD700}
+.mp-tag{font-size:11px;color:#FFD700;font-weight:700}
+.mp-tp{text-align:right;font-weight:700;color:#4ade80}
+.mp-tier.on .mp-tp{color:#FFD700}
+.mp-td{text-align:right;color:#C8B0FF}
+input[type=range].mp-range{-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer;margin:0;padding:0}
+input[type=range].mp-range::-webkit-slider-runnable-track{height:28px;background:transparent}
+input[type=range].mp-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;margin-top:3px;border-radius:50%;background:#FFD700;border:3px solid #120826;box-shadow:0 0 0 2px rgba(255,215,0,.35)}
+input[type=range].mp-range::-moz-range-track{height:28px;background:transparent;border:none}
+input[type=range].mp-range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#FFD700;border:3px solid #120826}
+#miningAmtInput::placeholder{color:rgba(185,170,215,.45)}
+
+.mp-foot{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;width:calc(100% - 24px);max-width:520px;box-sizing:border-box;padding:16px 8px 6px;z-index:150;background:linear-gradient(to top,#080010 72%,rgba(8,0,16,0));pointer-events:none}
+.mp-foot button{pointer-events:auto}
+
+/* ปุ่มติดต่อแอดมินลอยอยู่เหนือแถบ CTA เฉพาะตอนเปิดหน้าสัญญาขุด */
+body:has(#pgPkg.active) #contactFab{bottom:178px}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1562,57 +1585,107 @@ body:has(#adminScreen.active) #contactFab{display:none}
 
 <!-- PACKAGES -->
 <div class="tab-page" id="pgPkg" style="flex-direction:column;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem 0.8rem 0;">
-  <div class="rg" style="padding:8px 4px 100px;">
-    <div>
-      <div style="font-size:13px;color:#b6a7d6;margin-bottom:4px">สัญญาขุด ETH</div>
-      <div style="font-size:24px;font-weight:700;line-height:1.25">เลือกจำนวนเงินที่จะลงทุน</div>
-      <div style="font-size:13px;color:#c9b8e8;margin-top:6px">เริ่มต้นเพียง $10 · เห็นประมาณการกำไรก่อนยืนยัน</div>
+  <div class="rg" style="padding:8px 4px 0;gap:14px;">
+
+    <div id="mpDone" style="display:none;align-items:center;gap:12px;padding:12px 12px 12px 14px;border-radius:16px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.5)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#86efac" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M5 12l5 5 9-10"/></svg>
+      <div style="flex-grow:1;min-width:0">
+        <div id="mpDoneTxt" class="rg-num" style="font-size:15px;font-weight:800;color:#bbf7d0"></div>
+        <div style="font-size:12px;color:#dcfce7;margin-top:2px">ยอดในกระเป๋าอัปเดตแล้ว</div>
+      </div>
+      <button type="button" aria-label="ปิด" onclick="mpDoneClose()" style="width:36px;height:36px;flex:none;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:none;color:#dcfce7;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
 
-    <div style="border-radius:24px;padding:22px 20px 18px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(168,85,247,.35);box-shadow:0 16px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:6px">
-      <div style="font-size:13px;color:#c9b8e8">ประมาณการกำไรต่อวัน</div>
-      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
-        <span id="pvDaily" class="rg-num" style="font-size:42px;font-weight:700;color:#4ade80;letter-spacing:-1px;line-height:1.1">--</span>
-        <span style="font-size:16px;font-weight:600;color:#86efac">USDT</span>
+    <div>
+      <div style="font-size:13px;color:#b6a7d6">สัญญาขุด ETH</div>
+      <div style="font-size:23px;font-weight:700;line-height:1.3;margin-top:4px">เลือกจำนวนเงินที่จะลงทุน</div>
+      <div style="font-size:13px;color:#c9b8e8;margin-top:6px">เริ่มเพียง $10 · เห็นกำไรประมาณการก่อนยืนยัน</div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;border-radius:16px;padding:10px 10px 10px 14px;background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.3)">
+      <div style="min-width:0">
+        <div style="font-size:12px;color:#b6a7d6">ยอดในกระเป๋า</div>
+        <div class="rg-num" style="font-size:18px;font-weight:700;color:#4ade80;margin-top:2px">$<span id="mpBal">0.00</span> <span style="font-size:12px;font-weight:600;color:#86efac">USDT</span></div>
       </div>
-      <div style="font-size:13px;color:#b6a7d6">≈ <span id="pvEth">--</span> ETH ต่อวัน</div>
-      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px">
-        <div style="border-radius:14px;padding:12px 8px;background:rgba(0,0,0,.28);text-align:center"><div id="pvPct" class="rg-num" style="font-size:16px;font-weight:700;color:#ffd700">--</div><div style="font-size:11px;color:#b6a7d6;margin-top:2px">ต่อวัน</div></div>
-        <div style="border-radius:14px;padding:12px 8px;background:rgba(0,0,0,.28);text-align:center"><div id="pvDays" class="rg-num" style="font-size:16px;font-weight:700;color:#fff">--</div><div style="font-size:11px;color:#b6a7d6;margin-top:2px">ระยะสัญญา</div></div>
-        <div style="border-radius:14px;padding:12px 8px;background:rgba(0,0,0,.28);text-align:center"><div id="pvProfit" class="rg-num" style="font-size:16px;font-weight:700;color:#c084fc;word-break:break-all">--</div><div style="font-size:11px;color:#b6a7d6;margin-top:2px">กำไรรวม</div></div>
+      <button type="button" onclick="mpTopupGo()" style="height:42px;padding:0 14px;flex:none;border-radius:12px;border:1px solid rgba(255,215,0,.45);background:rgba(255,215,0,.1);color:#FFD700;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">เติมเงิน</button>
+    </div>
+
+    <div style="border-radius:24px;padding:20px 18px 18px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(168,85,247,.35);box-shadow:0 16px 40px rgba(0,0,0,.4)">
+      <div id="mpHeroOn" style="display:none;flex-direction:column;gap:14px">
+        <div>
+          <div style="font-size:13px;color:#c9b8e8">กำไรประมาณการต่อวัน</div>
+          <div class="rg-num" style="font-size:40px;font-weight:700;color:#4ade80;letter-spacing:-1px;line-height:1.1;margin-top:4px">+$<span id="mpDaily">0.00</span></div>
+          <div style="font-size:13px;color:#b6a7d6;margin-top:6px">≈ <span class="rg-num" id="mpEth">0.000000</span> ETH ต่อวัน</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+          <div style="border-radius:14px;padding:12px 6px;text-align:center;background:rgba(0,0,0,.28);min-width:0"><div class="rg-num" id="mpPct" style="font-size:16px;font-weight:700;color:#FFD700">--</div><div style="font-size:11px;color:#b6a7d6;margin-top:3px">ต่อวัน</div></div>
+          <div style="border-radius:14px;padding:12px 6px;text-align:center;background:rgba(0,0,0,.28);min-width:0"><div class="rg-num" id="mpDays" style="font-size:16px;font-weight:700;color:#fff">--</div><div style="font-size:11px;color:#b6a7d6;margin-top:3px">ระยะสัญญา</div></div>
+          <div style="border-radius:14px;padding:12px 6px;text-align:center;background:rgba(0,0,0,.28);min-width:0"><div class="rg-num" id="mpProfit" style="font-size:15px;font-weight:700;color:#c084fc;word-break:break-all">--</div><div style="font-size:11px;color:#b6a7d6;margin-top:3px">กำไรรวม</div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;color:#b6a7d6">
+            <span>กำไรสะสม วันที่ <span class="rg-num" id="mpDayVal" style="color:#fff;font-weight:700">0</span> / <span class="rg-num" id="mpDaysTot">0</span></span>
+            <span class="rg-num" style="font-size:14px;font-weight:700;color:#FFD700">+$<span id="mpAcc">0.00</span></span>
+          </div>
+          <div style="position:relative;height:28px;margin-top:6px">
+            <div style="position:absolute;left:0;right:0;top:10px;height:8px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden"><div id="mpBar" style="height:100%;width:0%;border-radius:4px;background:linear-gradient(90deg,#7B2FBE,#C084FC)"></div></div>
+            <input id="mpRange" type="range" class="mp-range" min="0" max="1" value="0" oninput="mpDay(this.value)" aria-label="เลื่อนดูกำไรสะสมตามวัน" style="position:absolute;left:0;top:0;width:100%;height:28px;margin:0">
+          </div>
+        </div>
+        <div style="height:1px;background:rgba(255,255,255,.08)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+          <div style="font-size:13px;color:#c9b8e8">เงินต้น + กำไร เมื่อครบสัญญา</div>
+          <div class="rg-num" style="font-size:20px;font-weight:700;white-space:nowrap">$<span id="mpTotal">0.00</span></div>
+        </div>
       </div>
-      <div style="height:1px;background:rgba(255,255,255,.08);margin:14px 0 10px"></div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
-        <div style="font-size:13px;color:#c9b8e8">เงินต้น + กำไร เมื่อครบสัญญา</div>
-        <div id="pvTotal" class="rg-num" style="font-size:19px;font-weight:700">--</div>
+      <div id="mpHeroOff" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 6px;text-align:center">
+        <div style="width:58px;height:58px;border-radius:20px;background:rgba(168,85,247,.16);border:1px solid rgba(168,85,247,.35);display:flex;align-items:center;justify-content:center;color:#C084FC"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/></svg></div>
+        <div style="font-size:16px;font-weight:700">เลือกจำนวนเพื่อดูกำไร</div>
+        <div style="font-size:13px;color:#b6a7d6;line-height:1.6">ระบบจะคำนวณกำไรให้ทันที</div>
       </div>
     </div>
 
     <div style="border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:12px">
-      <div style="display:flex;justify-content:space-between;align-items:baseline">
-        <label for="miningAmtInput" style="font-size:14px;font-weight:600">จำนวนที่ต้องการลงทุน</label>
-        <span style="font-size:12px;color:#b6a7d6">$10 – $100,000</span>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+        <label for="miningAmtInput" style="font-size:14px;font-weight:700">จำนวนที่ต้องการลงทุน</label>
+        <span style="font-size:12px;color:#b6a7d6;white-space:nowrap">$10 – $100,000</span>
       </div>
-      <div class="pk-amt" style="display:flex;align-items:center;height:60px;padding:0 16px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14)">
+      <div id="mpAmtBox" style="display:flex;align-items:center;height:60px;box-sizing:border-box;padding:0 16px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14)">
         <span class="rg-num" style="font-size:24px;font-weight:700;color:#b6a7d6;margin-right:6px">$</span>
-        <input type="number" id="miningAmtInput" inputmode="decimal" min="10" max="100000" placeholder="0" oninput="calcMiningPreview()" style="flex-grow:1;min-width:0;border:none;background:none;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;outline:none;padding:0;box-shadow:none;">
+        <input id="miningAmtInput" type="text" inputmode="decimal" autocomplete="off" placeholder="0" oninput="mpTyped()" class="rg-num" style="flex-grow:1;min-width:0;border:none;background:none;color:#fff;font-size:26px;font-weight:700;outline:none;padding:0;box-shadow:none">
         <span style="font-size:14px;color:#b6a7d6;margin-left:8px">USDT</span>
       </div>
-      <div id="pvHint" style="font-size:12px;line-height:1.5;color:#b6a7d6">เลือกจำนวนด้านล่าง หรือพิมพ์เอง</div>
+      <div id="mpHint" style="font-size:12px;line-height:1.5;color:#b6a7d6">เลือกจำนวนด้านล่าง หรือพิมพ์เอง</div>
       <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
-        <button type="button" class="pk-chip" data-v="10" onclick="setMiningAmt(10)">$10</button>
-        <button type="button" class="pk-chip" data-v="100" onclick="setMiningAmt(100)">$100</button>
-        <button type="button" class="pk-chip" data-v="500" onclick="setMiningAmt(500)">$500</button>
-        <button type="button" class="pk-chip" data-v="1000" onclick="setMiningAmt(1000)">$1K</button>
-        <button type="button" class="pk-chip" data-v="5000" onclick="setMiningAmt(5000)">$5K</button>
-        <button type="button" class="pk-chip" data-v="10000" onclick="setMiningAmt(10000)">$10K</button>
+        <button type="button" class="mp-chip" data-v="10" onclick="setMiningAmt(10)">$10</button>
+        <button type="button" class="mp-chip" data-v="100" onclick="setMiningAmt(100)">$100</button>
+        <button type="button" class="mp-chip" data-v="500" onclick="setMiningAmt(500)">$500</button>
+        <button type="button" class="mp-chip" data-v="1000" onclick="setMiningAmt(1000)">$1K</button>
+        <button type="button" class="mp-chip" data-v="5000" onclick="setMiningAmt(5000)">$5K</button>
+        <button type="button" class="mp-chip" data-v="10000" onclick="setMiningAmt(10000)">$10K</button>
       </div>
     </div>
 
-    <div style="font-size:12px;color:#a99bc7;line-height:1.7;text-align:center;padding:0 8px">ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน<br>การลงทุนมีความเสี่ยง · <a href="#" onclick="showHelpCenter('terms');return false;" style="color:#ffd700;text-decoration:none">อ่านเงื่อนไข</a></div>
+    <div style="border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:10px">
+      <div>
+        <div style="font-size:15px;font-weight:700">อัตราตามจำนวนเงิน</div>
+        <div style="font-size:12px;color:#b6a7d6;line-height:1.5;margin-top:3px">ลงมาก อัตราต่อวันยิ่งสูง · ระดับปัจจุบันมีกรอบสีทอง</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:6px;padding:0 10px;font-size:11px;color:#8f80b3">
+        <span>จำนวน</span><span style="text-align:right">ต่อวัน</span><span style="text-align:right">สัญญา</span>
+      </div>
+      <div id="mpTiers" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div id="mpNext" style="display:none;font-size:13px;line-height:1.5;color:#E9D5FF;text-align:center;padding:10px;border-radius:12px;background:rgba(255,215,0,.06);border:1px dashed rgba(255,215,0,.35)"></div>
+    </div>
 
-    <button type="button" id="pvCta" onclick="startMiningInvestment()" style="display:flex;align-items:center;justify-content:center;width:100%;height:54px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 22px rgba(124,58,237,.45);opacity:.45">กรอกจำนวนเพื่อเริ่มลงทุน</button>
+    <div style="font-size:11px;color:#a99bc7;line-height:1.6;text-align:center;padding:0 8px">ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง · <a href="#" onclick="showHelpCenter('terms');return false;" style="color:#ffd700;text-decoration:none">อ่านเงื่อนไข</a></div>
+
   </div>
+
+  <div id="mpFoot" class="mp-foot">
+    <button type="button" id="pvCta" onclick="startMiningInvestment()" disabled style="width:100%;height:56px;border:none;border-radius:16px;font-family:inherit;font-size:16px;font-weight:800;background:rgba(255,255,255,.1);color:#a99bc7;cursor:not-allowed">ใส่จำนวนเพื่อเริ่มลงทุน</button>
+  </div>
+  <div style="height:88px;flex:none"></div>
 </div>
 
 <div class="tab-page" id="pgWallet">
@@ -6109,6 +6182,7 @@ Object.assign(TRD,{"ส่งคำขอเติมเงินแล้ว": 
 Object.assign(TRD,{"เลือกแพ็กเกจขุด": ["ເລືອກແພັກເກດຂຸດ", "Choose a mining package"], "รับรายได้และถอนเงิน": ["ຮັບລາຍໄດ້ ແລະ ຖອນເງິນ", "Earn and withdraw"], "โอนผ่านธนาคาร แล้วส่งสลิป ทีมงานจะตรวจสอบให้เร็ว": ["ໂອນຜ່ານທະນາຄານ ແລ້ວສົ່ງສະລິບ ທີມງານຈະກວດສອບໃຫ້ໄວ", "Transfer via bank, then send the slip. Our team verifies it quickly"], "เลือกแพ็กเกจที่เหมาะกับคุณ ระบบจะเริ่มขุดให้ทันที": ["ເລືອກແພັກເກດທີ່ເໝາະກັບທ່ານ ລະບົບຈະເລີ່ມຂຸດໃຫ້ທັນທີ", "Pick the package that suits you and mining starts right away"], "รายได้เข้าทุกวัน ถอนเป็นกีบหรือ": ["ລາຍໄດ້ເຂົ້າທຸກມື້ ຖອນເປັນກີບ ຫຼື", "Earnings arrive daily. Withdraw in kip or"], "ได้ตามต้องการ": ["ໄດ້ຕາມຕ້ອງການ", "as you like"], "ข้าม": ["ຂ້າມ", "Skip"], "ย้อนกลับ": ["ກັບຄືນ", "Back"], "เริ่มต้นเลย": ["ເລີ່ມຕົ້ນເລີຍ", "Get started"]});
 Object.assign(TRD,{"บัญชีรับเงินถอน": ["ບັນຊີຮັບເງິນຖອນ", "Payout account"], "บันทึกไว้ ครั้งต่อไปถอนเงินไม่ต้องพิมพ์ใหม่": ["ບັນທຶກໄວ້ ຄັ້ງຕໍ່ໄປຖອນເງິນບໍ່ຕ້ອງພິມໃໝ່", "Saved, so next time you won't need to retype it"], "แก้ไข": ["ແກ້ໄຂ", "Edit"], "ออกจากระบบ": ["ອອກຈາກລະບົບ", "Log out"], "บันทึกบัญชีแล้ว": ["ບັນທຶກບັນຊີແລ້ວ", "Account saved"]});
 Object.assign(TRD,{"วิธีเล่น และ ลงทุน": ["ວິທີຫຼິ້ນ ແລະ ລົງທຶນ", "How to play and invest"], "ติดตามรายได้": ["ຕິດຕາມລາຍໄດ້", "Track earnings"], "มีปัญหา ติดต่อเรา": ["ມີບັນຫາ ຕິດຕໍ່ເຮົາ", "Need help? Contact us"], "เริ่มจากเติมเงินเข้าบัญชีของคุณ": ["ເລີ່ມຈາກເຕີມເງິນເຂົ້າບັນຊີຂອງທ່ານ", "Start by topping up your account"], "กดปุ่มเติมเงิน แล้วใส่จำนวนที่ต้องการ": ["ກົດປຸ່ມເຕີມເງິນ ແລ້ວໃສ່ຈຳນວນທີ່ຕ້ອງການ", "Tap Top up and enter the amount you want"], "โอนเงินตามบัญชีที่ระบบแสดง": ["ໂອນເງິນຕາມບັນຊີທີ່ລະບົບສະແດງ", "Transfer to the account shown"], "แนบสลิปแล้วส่งคำขอ รอทีมงานอนุมัติ": ["ແນບສະລິບແລ້ວສົ່ງຄຳຂໍ ລໍຖ້າທີມງານອະນຸມັດ", "Attach the slip, send the request and wait for approval"], "นำเงินไปซื้อแพ็กเกจขุดที่เหมาะกับคุณ": ["ນຳເງິນໄປຊື້ແພັກເກດຂຸດທີ່ເໝາະກັບທ່ານ", "Use your balance to buy a mining package"], "ดูรายได้ต่อวัน และจำนวนวันของแต่ละแพ็กเกจ": ["ເບິ່ງລາຍໄດ້ຕໍ່ມື້ ແລະ ຈຳນວນມື້ຂອງແຕ່ລະແພັກເກດ", "Check the daily income and duration of each package"], "เลือกแพ็กเกจแล้วกดซื้อ ระบบหักเงินจากยอดคงเหลือ": ["ເລືອກແພັກເກດແລ້ວກົດຊື້ ລະບົບຫັກເງິນຈາກຍອດຄົງເຫຼືອ", "Pick a package and buy it; the cost is taken from your balance"], "เครื่องขุดจะเริ่มทำงานทันที": ["ເຄື່ອງຂຸດຈະເລີ່ມເຮັດວຽກທັນທີ", "Your miner starts working right away"], "รายได้เข้าทุกวันโดยอัตโนมัติ": ["ລາຍໄດ້ເຂົ້າທຸກມື້ໂດຍອັດຕະໂນມັດ", "Earnings arrive automatically every day"], "ดูเครื่องขุดและรายได้ที่หน้าหลัก": ["ເບິ່ງເຄື່ອງຂຸດ ແລະ ລາຍໄດ້ທີ່ໜ້າຫຼັກ", "See your miners and earnings on the home page"], "กดประวัติเพื่อดูกราฟรายได้รายวัน": ["ກົດປະຫວັດເພື່ອເບິ່ງກາຟລາຍໄດ້ລາຍວັນ", "Open History to see the daily earnings chart"], "กระดิ่งแจ้งเตือนสถานะเติมเงินและถอนเงิน": ["ກະດິ່ງແຈ້ງເຕືອນສະຖານະເຕີມເງິນ ແລະ ຖອນເງິນ", "The bell shows top-up and withdrawal status"], "ชวนเพื่อนมาร่วมขุด รับโบนัสทันที": ["ຊວນໝູ່ມາຮ່ວມຂຸດ ຮັບໂບນັດທັນທີ", "Invite friends to mine and get a bonus"], "คัดลอกรหัสหรือลิงก์แนะนำของคุณ": ["ຄັດລອກລະຫັດ ຫຼື ລິ້ງແນະນຳຂອງທ່ານ", "Copy your referral code or link"], "เพื่อนสมัครและเติมเงิน คุณได้โบนัส": ["ໝູ່ສະໝັກ ແລະ ເຕີມເງິນ ທ່ານໄດ້ໂບນັດ", "When a friend signs up and tops up, you get a bonus"], "ดูรายชื่อเพื่อนและโบนัสที่หน้าแนะนำเพื่อน": ["ເບິ່ງລາຍຊື່ໝູ່ ແລະ ໂບນັດທີ່ໜ້າແນະນຳໝູ່", "See friends and bonuses on the referral page"], "ถอนรายได้เข้าบัญชีของคุณได้ทุกเวลา": ["ຖອນລາຍໄດ້ເຂົ້າບັນຊີຂອງທ່ານໄດ້ທຸກເວລາ", "Withdraw your earnings to your account any time"], "เลือกรับเป็นเงินกีบ หรือเหรียญดิจิทัล": ["ເລືອກຮັບເປັນເງິນກີບ ຫຼື ເຫຼຽນດິຈິຕອນ", "Choose to receive kip or digital coins"], "ใส่จำนวนเอง หรือกดปุ่มสูงสุดเพื่อถอนทั้งหมด": ["ໃສ່ຈຳນວນເອງ ຫຼື ກົດປຸ່ມສູງສຸດເພື່ອຖອນທັງໝົດ", "Enter an amount or tap Max to withdraw everything"], "โบนัสที่ยังล็อกอยู่ยังถอนไม่ได้ ทีมงานโอนให้หลังตรวจสอบ": ["ໂບນັດທີ່ຍັງລັອກຢູ່ຍັງຖອນບໍ່ໄດ້ ທີມງານໂອນໃຫ້ຫຼັງກວດສອບ", "Locked bonuses can't be withdrawn yet; we transfer after verification"], "ทีมงานพร้อมช่วยเหลือ": ["ທີມງານພ້ອມຊ່ວຍເຫຼືອ", "Our team is ready to help"], "กดไอคอนตั้งค่า แล้วเลือกศูนย์ช่วยเหลือ": ["ກົດໄອຄອນຕັ້ງຄ່າ ແລ້ວເລືອກສູນຊ່ວຍເຫຼືອ", "Tap the settings icon and choose Help center"], "ติดต่อทีมงานได้ทางวอทส์แอป": ["ຕິດຕໍ່ທີມງານໄດ້ທາງວອດແອັບ", "Contact the team on WhatsApp"], "ตั้งรหัสสองชั้นเพื่อความปลอดภัยของบัญชี": ["ຕັ້ງລະຫັດສອງຊັ້ນເພື່ອຄວາມປອດໄພຂອງບັນຊີ", "Turn on two-step verification to protect your account"]});
+Object.assign(TRD,{"กำไรประมาณการต่อวัน": ["ກຳໄລປະມານຕໍ່ມື້", "Estimated daily profit"], "กำไรสะสม วันที่": ["ກຳໄລສະສົມ ວັນທີ", "Accumulated profit · day"], "ขาดอีก": ["ຂາດອີກ", "short by"], "ตอนนี้": ["ຕອນນີ້", "current"], "ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง": ["ຕົວເລກເປັນການປະມານຕາມສູດຂອງລະບົບ ບໍ່ແມ່ນການຮັບປະກັນຜົນຕອບແທນ ການລົງທຶນມີຄວາມສ່ຽງ", "Figures are estimates from the system formula, not a guaranteed return. Investing carries risk."], "ท่านอยู่ระดับสูงสุดแล้ว": ["ທ່ານຢູ່ລະດັບສູງສຸດແລ້ວ", "You are at the top tier"], "ยอดคงเหลือหลังลงทุน": ["ຍອດຄົງເຫຼືອຫຼັງລົງທຶນ", "Balance after investing"], "ยอดในกระเป๋า": ["ຍອດໃນກະເປົາ", "Wallet balance"], "ยอดในกระเป๋าอัปเดตแล้ว": ["ຍອດໃນກະເປົາອັບເດດແລ້ວ", "Your wallet balance is updated"], "ยอดในกระเป๋าไม่พอ": ["ຍອດໃນກະເປົາບໍ່ພໍ", "Not enough balance"], "ระดับปัจจุบันมีกรอบสีทอง": ["ລະດັບປັດຈຸບັນມີກອບສີທອງ", "the current tier has a gold frame"], "ระบบจะคำนวณกำไรให้ทันที": ["ລະບົບຈະຄຳນວນກຳໄລໃຫ້ທັນທີ", "The system calculates your profit instantly"], "รับคืนเมื่อครบสัญญา": ["ຮັບຄືນເມື່ອຄົບສັນຍາ", "Returned at contract end"], "ลงมาก อัตราต่อวันยิ่งสูง": ["ລົງຫຼາຍ ອັດຕາຕໍ່ມື້ຍິ່ງສູງ", "Invest more, higher daily rate"], "ลงเพิ่มอีก": ["ລົງເພີ່ມອີກ", "Add"], "อัตราตามจำนวนเงิน": ["ອັດຕາຕາມຈຳນວນເງິນ", "Rate by amount"], "เติมเงินก่อน": ["ເຕີມເງິນກ່ອນ", "Top up first"], "เพื่อขึ้นเป็น": ["ເພື່ອຂຶ້ນເປັນ", "to reach"], "เริ่มเพียง": ["ເລີ່ມພຽງ", "Start from"], "เลือกจำนวนเพื่อดูกำไร": ["ເລືອກຈຳນວນເພື່ອເບິ່ງກຳໄລ", "Choose an amount to see profit"], "เลื่อนดูกำไรสะสมตามวัน": ["ເລື່ອນເບິ່ງກຳໄລສະສົມຕາມວັນ", "Slide to see accumulated profit by day"], "เห็นกำไรประมาณการก่อนยืนยัน": ["ເຫັນກຳໄລປະມານກ່ອນຢືນຢັນ", "see the estimated profit before you confirm"], "ใส่จำนวนเพื่อเริ่มลงทุน": ["ໃສ່ຈຳນວນເພື່ອເລີ່ມລົງທຶນ", "Enter an amount to start"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
 function trStr(s){
@@ -6364,33 +6438,108 @@ function resendOTPBrevo(){
 
 // ─── MINING INVESTMENT ───
 
-function calcMiningPreview(){
-  const raw=document.getElementById('miningAmtInput')?document.getElementById('miningAmtInput').value:'';
-  const amt=parseFloat(raw)||0;
-  const ok=amt>=10&&amt<=100000;
-  const set=function(id,v){const e=document.getElementById(id);if(e)e.textContent=v;};
-  const fm=function(n,d){return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});};
-  let hint='เลือกจำนวนด้านล่าง หรือพิมพ์เอง',hc='#b6a7d6';
-  if(raw!==''&&amt>0&&amt<10){hint='ขั้นต่ำ $10';hc='#fda4af';}
-  if(amt>100000){hint='สูงสุด $100,000 ต่อครั้ง';hc='#fda4af';}
-  if(ok){
-    const pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt),profit=daily*days;
-    set('pvDaily','+'+fm(daily,2));set('pvEth',(daily/ETH_RATE).toFixed(6));
-    set('pvPct',pct.toFixed(2)+'%');set('pvDays',days+' วัน');
-    set('pvProfit','+$'+fm(profit,2));set('pvTotal','$'+fm(amt+profit,2));
-    hint='สัญญา '+days+' วัน · อัตรา '+pct.toFixed(2)+'% ต่อวัน';hc='#86efac';
-  } else {
-    ['pvDaily','pvEth','pvPct','pvDays','pvProfit','pvTotal'].forEach(function(id){set(id,'--');});
-  }
-  const h=document.getElementById('pvHint');if(h){h.textContent=hint;h.style.color=hc;}
-  const cta=document.getElementById('pvCta');
-  if(cta){cta.textContent=ok?'เริ่มลงทุน $'+fm(amt,amt%1?2:0):'กรอกจำนวนเพื่อเริ่มลงทุน';cta.style.opacity=ok?'1':'.45';}
-  document.querySelectorAll('.pk-chip').forEach(function(b){b.classList.toggle('on',ok&&parseFloat(b.getAttribute('data-v'))===amt);});
+// ─── สัญญาขุด (หน้าใหม่ตามดีไซน์ที่อนุมัติ ใช้สูตรเดิมของระบบ) ───
+var _mpDay=null,_mpDone=false,_mpLastAmt=0;
+var MP_LO=[10,100,500,1000,5000,10000,30000,50000,100000];
+var MP_LBL=['$10–99','$100–499','$500–999','$1,000–4,999','$5,000–9,999','$10,000–29,999','$30,000–49,999','$50,000–99,999','$100,000'];
+var MP_NX=[100,500,1000,5000,10000,30000,50000,100000];
+var MP_CTA_OFF='width:100%;height:56px;border:none;border-radius:16px;font-family:inherit;font-size:16px;font-weight:800;background:rgba(255,255,255,.1);color:#a99bc7;cursor:not-allowed;';
+var MP_CTA_ON='width:100%;height:56px;border:none;border-radius:16px;font-family:inherit;font-size:16px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 10px 26px rgba(124,58,237,.45);cursor:pointer;';
+var MP_CTA_TOPUP='width:100%;height:56px;border:none;border-radius:16px;font-family:inherit;font-size:16px;font-weight:800;background:linear-gradient(135deg,#b45309,#fbbf24);color:#1a0a00;box-shadow:0 10px 26px rgba(180,83,9,.35);cursor:pointer;';
+function mpFm(n,d){return Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function mpSet(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt;}
+function mpShow(id,on,disp){var e=document.getElementById(id);if(e)e.style.display=on?(disp||'block'):'none';}
+function mpClean(v){
+  v=String(v).replace(/[^0-9.]/g,'');
+  var p=v.indexOf('.');
+  if(p>=0)v=v.slice(0,p+1)+v.slice(p+1).replace(/\./g,'').slice(0,2);
+  return v.slice(0,9);
 }
+function mpTopupGo(){
+  mpCloseSheet();
+  switchTab(2);
+  setTimeout(function(){try{showTopupPopup();}catch(e){}},300);
+}
+function mpTyped(){_mpDay=null;calcMiningPreview();}
+function mpDay(v){_mpDay=parseInt(v,10)||0;calcMiningPreview();}
+function mpDoneClose(){_mpDone=false;calcMiningPreview();}
 function setMiningAmt(v){
-  const inp=document.getElementById('miningAmtInput');
-  if(inp){inp.value=v;calcMiningPreview();}
+  var inp=document.getElementById('miningAmtInput');
+  if(inp)inp.value=String(v);
+  _mpDay=null;
+  calcMiningPreview();
 }
+function calcMiningPreview(){
+  var inp=document.getElementById('miningAmtInput');
+  if(!inp)return;
+  var raw=mpClean(inp.value);
+  if(raw!==inp.value)inp.value=raw;
+  var amt=parseFloat(raw)||0;
+  var valid=amt>=10&&amt<=100000;
+  var tooLow=raw!==''&&amt>0&&amt<10;
+  var tooHigh=amt>100000;
+  var ud=getUD();
+  var bal=ud?(parseFloat(ud.usd)||0):0;
+  var enough=valid&&amt<=bal;
+  var pct=valid?calcDailyPct(amt):0;
+  var days=valid?calcDays(amt):0;
+  var daily=valid?calcDailyEarn(amt):0;
+  var profit=daily*days;
+  var dayVal=valid?(_mpDay==null?days:Math.min(days,_mpDay)):0;
+
+  mpSet('mpBal',mpFm(bal,2));
+  mpShow('mpDone',_mpDone,'flex');
+  if(_mpDone)mpSet('mpDoneTxt','เริ่มขุดแล้ว · $'+mpFm(_mpLastAmt,_mpLastAmt%1?2:0));
+
+  mpShow('mpHeroOn',valid,'flex');
+  mpShow('mpHeroOff',!valid,'flex');
+  if(valid){
+    mpSet('mpDaily',mpFm(daily,2));
+    mpSet('mpEth',(daily/ETH_RATE).toFixed(6));
+    mpSet('mpPct',pct.toFixed(2)+'%');
+    mpSet('mpDays',days+' วัน');
+    mpSet('mpProfit','+$'+mpFm(profit,2));
+    mpSet('mpTotal',mpFm(amt+profit,2));
+    mpSet('mpDayVal',String(dayVal));
+    mpSet('mpDaysTot',String(days));
+    mpSet('mpAcc',mpFm(daily*dayVal,2));
+    var bar=document.getElementById('mpBar');if(bar)bar.style.width=(days?(dayVal/days)*100:0)+'%';
+    var rg=document.getElementById('mpRange');if(rg){rg.max=String(days);rg.value=String(dayVal);}
+  }
+
+  var hint='เลือกจำนวนด้านล่าง หรือพิมพ์เอง',hc='#b6a7d6',bd='rgba(255,255,255,.14)';
+  if(tooLow){hint='ขั้นต่ำ $10';hc='#fda4af';bd='rgba(248,113,113,.6)';}
+  else if(tooHigh){hint='สูงสุด $100,000 ต่อครั้ง';hc='#fda4af';bd='rgba(248,113,113,.6)';}
+  else if(valid&&!enough){hint='ยอดในกระเป๋าไม่พอ · ขาดอีก $'+mpFm(amt-bal,2);hc='#fcd34d';bd='rgba(252,211,77,.55)';}
+  else if(valid){hint='สัญญา '+days+' วัน · อัตรา '+pct.toFixed(2)+'% ต่อวัน';hc='#86efac';bd='rgba(74,222,128,.55)';}
+  mpSet('mpHint',hint);
+  var he=document.getElementById('mpHint');if(he)he.style.color=hc;
+  var box=document.getElementById('mpAmtBox');if(box)box.style.border='1px solid '+bd;
+
+  document.querySelectorAll('.mp-chip').forEach(function(b){
+    b.classList.toggle('on',valid&&parseFloat(b.getAttribute('data-v'))===amt);
+  });
+
+  var rows='';
+  MP_LO.forEach(function(lo,i){
+    var hi=i<MP_LO.length-1?MP_LO[i+1]:Infinity;
+    var cur=valid&&amt>=lo&&amt<hi;
+    rows+='<div class="mp-tier'+(cur?' on':'')+'"><span class="mp-tn">'+MP_LBL[i]+(cur?' <span class="mp-tag">· ตอนนี้</span>':'')+'</span><span class="rg-num mp-tp">'+calcDailyPct(lo).toFixed(2)+'%</span><span class="rg-num mp-td">'+calcDays(lo)+' วัน</span></div>';
+  });
+  var tl=document.getElementById('mpTiers');if(tl)tl.innerHTML=rows;
+
+  var nt=MP_NX.find(function(t){return t>amt;});
+  mpShow('mpNext',valid,'block');
+  mpSet('mpNext',nt?('ลงเพิ่มอีก $'+mpFm(nt-amt,(nt-amt)%1?2:0)+' เพื่อขึ้นเป็น '+calcDailyPct(nt).toFixed(2)+'% ต่อวัน'):'ท่านอยู่ระดับสูงสุดแล้ว');
+
+  var cta=document.getElementById('pvCta');
+  if(cta){
+    if(!valid){cta.disabled=true;cta.textContent='ใส่จำนวนเพื่อเริ่มลงทุน';cta.style.cssText=MP_CTA_OFF;}
+    else if(enough){cta.disabled=false;cta.textContent='เริ่มลงทุน $'+mpFm(amt,amt%1?2:0);cta.style.cssText=MP_CTA_ON;}
+    else{cta.disabled=false;cta.textContent='เติมเงินก่อน';cta.style.cssText=MP_CTA_TOPUP;}
+  }
+}
+
 // ETH Rain in pgPkg
 let _pkgRainInt=null;
 function startPkgRain(){
@@ -6405,98 +6554,57 @@ function startPkgRain(){
   },400);
 }
 
+// ─── ยืนยันการลงทุน (แผ่นล่าง) ───
+function mpCloseSheet(){var o=document.getElementById('mpSheetOv');if(o)o.remove();}
 function startMiningInvestment(){
-  const amt=parseFloat(document.getElementById('miningAmtInput')?.value)||0;
+  var inp=document.getElementById('miningAmtInput');
+  var amt=parseFloat(inp?inp.value:'')||0;
   if(amt<10||amt>100000){showToast('⚠ ใส่จำนวน $10 - $100,000');return;}
-  const ud=getUD();if(!ud)return;
-  if((ud.usd||0)<amt){
-    const ov=document.createElement('div');ov.className='overlay';
-    ov.innerHTML=`<div class="popup" style="text-align:center;max-width:300px;">
-      <div style="font-size:2.5rem;margin-bottom:0.8rem;">💰</div>
-      <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#f87171;margin-bottom:0.5rem;">USDT ไม่เพียงพอ</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.3rem;">ต้องการ <span style="color:#ffd700;font-weight:700;">$${amt.toLocaleString()}</span> USDT</div>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:1.2rem;">มีในกระเป๋า <span style="color:#4ade80;font-weight:700;">$${(ud.usd||0).toFixed(2)}</span> USDT</div>
-      <div style="display:flex;flex-direction:column;gap:0.5rem;">
-        <button onclick="this.closest('.overlay').remove();switchTab(2);setTimeout(()=>showTopupPopup(),300);"
-          style="padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;background:linear-gradient(135deg,#b45309,#d97706,#fbbf24);color:#000;box-shadow:0 4px 20px rgba(251,191,36,0.4);">
-          💵 เติม USDT
-        </button>
-        <button onclick="this.closest('.overlay').remove()"
-          style="padding:0.7rem;border:1px solid rgba(255,255,255,0.1);border-radius:12px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.7rem;background:transparent;color:rgba(255,255,255,0.4);">
-          ปิด
-        </button>
-      </div>
-    </div>`;
-    document.body.appendChild(ov);
-    return;
-  }
-  const pct=calcDailyPct(amt),daily=calcDailyEarn(amt),days=calcDays(amt),total=amt+daily*days;
-  const ov=document.createElement('div');ov.className='overlay';
-  ov.innerHTML=`<div class="ci-card" style="width:calc(100vw - 2rem);max-width:370px;">
-    <div class="ci-hd">
-      <div class="ci-hd-tag">INVESTMENT CONFIRMATION</div>
-      <div class="ci-hd-title">ยืนยันการลงทุน</div>
-    </div>
-    <div class="ci-amt">
-      <div class="ci-orbit">
-        <div class="ci-r1"></div>
-        <div class="ci-r2"></div>
-        <div class="ci-icon">💵</div>
-      </div>
-      <div class="ci-lbl">จำนวนเงินลงทุน</div>
-      <div class="ci-val">$${amt.toLocaleString()}</div>
-      <div class="ci-unit">U · S · D · T</div>
-    </div>
-    <div class="ci-stats">
-      <div class="ci-stat">
-        <span class="ci-stat-icon">📈</span>
-        <div class="ci-stat-lbl">กำไร/วัน</div>
-        <div class="ci-stat-val">$${daily.toFixed(2)}<span class="ci-stat-unit">USDT</span></div>
-      </div>
-      <div class="ci-stat">
-        <span class="ci-stat-icon">⏱</span>
-        <div class="ci-stat-lbl">ระยะเวลา</div>
-        <div class="ci-stat-val">${days}<span class="ci-stat-unit">วัน</span></div>
-      </div>
-    </div>
-    <div class="ci-profit">
-      <div style="display:flex;align-items:center;gap:0.4rem;">
-        <span style="font-size:1.1rem;">🏆</span>
-        <div>
-          <div style="font-size:0.44rem;color:rgba(16,185,129,0.45);font-family:'Orbitron',monospace;letter-spacing:1px;">ได้คืนรวม</div>
-          <div class="ci-profit-val">$${total.toFixed(0)}</div>
-        </div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-family:'Orbitron',monospace;font-size:0.55rem;color:rgba(16,185,129,0.6);">ROI</div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#34d399;">${((total/amt-1)*100).toFixed(0)}%</div>
-      </div>
-    </div>
-    <div class="ci-balance">
-      <div class="ci-bal-l"><div class="ci-bal-dot"></div>USDT คงเหลือหลังลงทุน</div>
-      <div class="ci-bal-val">$${((ud.usd||0)-amt).toFixed(2)}</div>
-    </div>
-    <div class="ci-btns">
-      <button class="ci-cancel" onclick="this.closest('.overlay').remove()">✕ ยกเลิก</button>
-      <button class="ci-confirm" onclick="confirmMiningInvestment(${amt})">⚡ ยืนยันเลย</button>
-    </div>
-  </div>`;
+  var ud=getUD();if(!ud)return;
+  if((ud.usd||0)<amt){mpTopupGo();return;}
+  var daily=calcDailyEarn(amt),days=calcDays(amt),total=amt+daily*days;
+  mpCloseSheet();
+  var ov=document.createElement('div');
+  ov.className='overlay';ov.id='mpSheetOv';
+  ov.style.cssText='align-items:flex-end;padding:0';
+  ov.addEventListener('click',function(e){if(e.target===ov)mpCloseSheet();});
+  ov.innerHTML='<div style="width:100%;box-sizing:border-box;max-height:92vh;overflow-y:auto;border-radius:24px 24px 0 0;padding:14px 18px calc(24px + env(safe-area-inset-bottom,0px));background:#150b28;border-top:1px solid rgba(168,85,247,.5);display:flex;flex-direction:column;gap:12px">'
+    +'<div style="width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.2);margin:0 auto"></div>'
+    +'<div style="font-size:18px;font-weight:700">ยืนยันการลงทุน</div>'
+    +'<div style="border-radius:18px;padding:14px;background:linear-gradient(160deg,#1d0f3a,#120826);border:1px solid rgba(168,85,247,.35);text-align:center">'
+      +'<div style="font-size:12px;color:#b6a7d6">จำนวนเงินลงทุน</div>'
+      +'<div class="rg-num" style="font-size:30px;font-weight:700;color:#FFD700;margin-top:2px">$'+mpFm(amt,amt%1?2:0)+'</div>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:9px;font-size:14px">'
+      +'<div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#b6a7d6">กำไรต่อวัน ('+calcDailyPct(amt).toFixed(2)+'%)</span><span class="rg-num" style="color:#4ade80;font-weight:700">+$'+mpFm(daily,2)+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#b6a7d6">ระยะสัญญา</span><span class="rg-num" style="font-weight:700">'+days+' วัน</span></div>'
+      +'<div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#b6a7d6">รับคืนเมื่อครบสัญญา</span><span class="rg-num" style="font-weight:700;color:#c084fc">$'+mpFm(total,2)+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#b6a7d6">ยอดคงเหลือหลังลงทุน</span><span class="rg-num" style="font-weight:700">$'+mpFm((ud.usd||0)-amt,2)+'</span></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:4px">'
+      +'<button type="button" onclick="mpCloseSheet()" style="height:52px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:none;color:#E9D5FF;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">ยกเลิก</button>'
+      +'<button type="button" onclick="confirmMiningInvestment('+amt+')" style="height:52px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer">ยืนยันเลย</button>'
+    +'</div>'
+  +'</div>';
   document.body.appendChild(ov);
 }
 function confirmMiningInvestment(amt){
-  const ud=getUD();if(!ud)return;
-  if((ud.usd||0)<amt){showToast('❌ USDT ไม่พอ');return;}
+  var ud=getUD();if(!ud)return;
+  if((ud.usd||0)<amt){mpCloseSheet();showToast('❌ USDT ไม่พอ');return;}
   ud.usd=(ud.usd||0)-amt;
   consumeBonusTurnover(ud,amt);
-  const daily=calcDailyEarn(amt),days=calcDays(amt),dailyPct=calcDailyPct(amt);
+  var daily=calcDailyEarn(amt),days=calcDays(amt),dailyPct=calcDailyPct(amt);
   ud.packages=ud.packages||[];
-  ud.packages.push({key:'mining',price:amt,days,daily,dailyPct,profit:daily*days,bought:Date.now(),remaining:days});
+  ud.packages.push({key:'mining',price:amt,days:days,daily:daily,dailyPct:dailyPct,profit:daily*days,bought:Date.now(),remaining:days});
   ud.txs=ud.txs||[];
-  ud.txs.unshift({desc:`⛏ เริ่มขุด $${amt.toLocaleString()} USDT`,amount:-amt,unit:'USDT',time:Date.now()});
+  ud.txs.unshift({desc:'⛏ เริ่มขุด $'+amt.toLocaleString()+' USDT',amount:-amt,unit:'USDT',time:Date.now()});
   saveUD(ud);
-  document.querySelectorAll('.overlay').forEach(o=>o.remove());
-  updateNav();startDrip();renderPkgs();renderMachines();switchTab(0);
-  showToast(`✅ เริ่มขุดแล้ว! $${amt.toLocaleString()} USDT`);
+  document.querySelectorAll('.overlay').forEach(function(o){o.remove();});
+  _mpDone=true;_mpLastAmt=amt;_mpDay=null;
+  var inp=document.getElementById('miningAmtInput');if(inp)inp.value='';
+  updateNav();startDrip();renderPkgs();renderMachines();
+  calcMiningPreview();
+  var pg=document.getElementById('pgPkg');if(pg)pg.scrollTop=0;
 }
 
 // ─── CONVERT ETH→USDT ───
