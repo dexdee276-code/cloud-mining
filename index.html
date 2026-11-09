@@ -2723,8 +2723,37 @@ function typePrompt(txt){
   function tk(){if(i<txt.length){el.textContent+=txt[i++];ptTimer=setTimeout(tk,38+Math.random()*28);}}
   tk();
 }
+// ─── รหัสผ่าน: เก็บแบบแฮช PBKDF2-SHA256 (รูปแบบ h1$salt$hash) บัญชีเก่าที่เป็นข้อความธรรมดาจะถูกแปลงตอนเข้าสู่ระบบ ───
+const PW_ITER=100000,PW_RE=/^h1\$[0-9a-f]{32}\$[0-9a-f]{64}$/;
+function _pwHex(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
+function _pwUnhex(h){const a=new Uint8Array(h.length/2);for(let i=0;i<a.length;i++)a[i]=parseInt(h.substr(i*2,2),16);return a;}
+function _pwCan(){return !!(window.crypto&&window.crypto.subtle);}
+async function _pwDerive(p,salt){
+  const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveBits']);
+  return _pwHex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:salt,iterations:PW_ITER,hash:'SHA-256'},k,256));
+}
+async function hashPw(p){
+  if(!_pwCan())return p;
+  const s=crypto.getRandomValues(new Uint8Array(16));
+  return 'h1$'+_pwHex(s)+'$'+await _pwDerive(p,s);
+}
+async function checkPw(stored,p){
+  if(typeof stored!=='string')return false;
+  if(PW_RE.test(stored)){
+    if(!_pwCan())return false;
+    const a=stored.split('$');
+    return (await _pwDerive(p,_pwUnhex(a[1])))===a[2];
+  }
+  return stored===p;
+}
+// เขียนข้อมูลผู้ใช้ขึ้น Firebase โดยไม่แตะช่องรหัสผ่าน (กันเครื่องที่ข้อมูลเก่าเขียนทับรหัสใหม่)
+function fbPutUser(u,ud){
+  if(!window._db||!u||!ud)return Promise.resolve();
+  const c=Object.assign({},ud);delete c.pw;
+  return window._db.ref('users/'+u).update(c);
+}
 function showMsg(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className='auth-msg '+type}
-function doLogin(){
+async function doLogin(){
   const u=(document.getElementById('loginUser')?.value||'').trim();
   const p=document.getElementById('loginPass')?.value||'';
   if(!u||!p){showMsg('loginMsg','⚠ กรุณากรอกข้อมูลให้ครบ','error');return;}
@@ -2733,7 +2762,7 @@ function doLogin(){
     const cached=localStorage.getItem('cm_ud_'+u);
     if(cached){
       const ud=JSON.parse(cached);
-      if(ud&&ud.pw===p&&!window._db){
+      if(ud&&!window._db&&await checkPw(ud.pw,p)){
         // ออฟไลน์เท่านั้น: ถ้ามี Firebase ต้องตรวจรหัสจากเซิร์ฟเวอร์เสมอ (กันรหัสเก่าที่แอดมินรีเซ็ตแล้ว)
         // เช็คแบน
         checkBanned(u,(banned)=>{
@@ -2768,9 +2797,12 @@ function doLogin(){
   // รอ Firebase พร้อม max 5 วินาที
   const tryLogin=()=>{
     if(!window._db){showMsg('loginMsg','❌ เชื่อมต่อ Firebase ไม่ได้','error');return;}
-    fbGetUser(u).then(ud=>{
+    fbGetUser(u).then(async ud=>{
       if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
-      if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
+      if(!(await checkPw(ud.pw,p))){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
+      if(!PW_RE.test(ud.pw||'')){ // บัญชีเก่า: แปลงเป็นแฮชครั้งเดียว
+        try{const h=await hashPw(p);if(h!==p){await window._db.ref('users/'+u+'/pw').set(h);ud.pw=h;try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e3){}}}catch(e2){}
+      }
       checkBanned(u,(banned)=>{
         if(banned){showMsg('loginMsg','🚫 บัญชีนี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแล','error');return;}
         if(ud.twoFA&&ud.twoFA.enabled){
@@ -2798,11 +2830,12 @@ function doLogin(){
   }
 }
 
-function createAccountNow(u,e,p,btn){
+async function createAccountNow(u,e,p,btn){
   const refCode=(u.toUpperCase().replace(/[^A-Z0-9]/g,'X')+'XXXX').slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
   const refBy=getPendingRef();
   const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
   const reset=function(){if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}};
+  nd.pw=await hashPw(p);
   if(window._db){
     window._db.ref('users/'+u).set(nd).then(()=>{
       reserveRefCode(refCode,u);
@@ -2912,7 +2945,7 @@ function enterDash(user){
   window._fbFullSyncInt=setInterval(()=>{
     if(_ud&&window._db&&getSess()){
       _ud.ethRewardSaved=_ud.ethReward||0;
-      window._db.ref('users/'+getSess()).set(_ud).catch(()=>{});
+      fbPutUser(getSess(),_ud).catch(()=>{});
     }
   },60000);
 }
@@ -6207,7 +6240,7 @@ Object.assign(TRD,{"ส่งคำขอเติมเงินแล้ว": 
 Object.assign(TRD,{"เลือกแพ็กเกจขุด": ["ເລືອກແພັກເກດຂຸດ", "Choose a mining package"], "รับรายได้และถอนเงิน": ["ຮັບລາຍໄດ້ ແລະ ຖອນເງິນ", "Earn and withdraw"], "โอนผ่านธนาคาร แล้วส่งสลิป ทีมงานจะตรวจสอบให้เร็ว": ["ໂອນຜ່ານທະນາຄານ ແລ້ວສົ່ງສະລິບ ທີມງານຈະກວດສອບໃຫ້ໄວ", "Transfer via bank, then send the slip. Our team verifies it quickly"], "เลือกแพ็กเกจที่เหมาะกับคุณ ระบบจะเริ่มขุดให้ทันที": ["ເລືອກແພັກເກດທີ່ເໝາະກັບທ່ານ ລະບົບຈະເລີ່ມຂຸດໃຫ້ທັນທີ", "Pick the package that suits you and mining starts right away"], "รายได้เข้าทุกวัน ถอนเป็นกีบหรือ": ["ລາຍໄດ້ເຂົ້າທຸກມື້ ຖອນເປັນກີບ ຫຼື", "Earnings arrive daily. Withdraw in kip or"], "ได้ตามต้องการ": ["ໄດ້ຕາມຕ້ອງການ", "as you like"], "ข้าม": ["ຂ້າມ", "Skip"], "ย้อนกลับ": ["ກັບຄືນ", "Back"], "เริ่มต้นเลย": ["ເລີ່ມຕົ້ນເລີຍ", "Get started"]});
 Object.assign(TRD,{"บัญชีรับเงินถอน": ["ບັນຊີຮັບເງິນຖອນ", "Payout account"], "บันทึกไว้ ครั้งต่อไปถอนเงินไม่ต้องพิมพ์ใหม่": ["ບັນທຶກໄວ້ ຄັ້ງຕໍ່ໄປຖອນເງິນບໍ່ຕ້ອງພິມໃໝ່", "Saved, so next time you won't need to retype it"], "แก้ไข": ["ແກ້ໄຂ", "Edit"], "ออกจากระบบ": ["ອອກຈາກລະບົບ", "Log out"], "บันทึกบัญชีแล้ว": ["ບັນທຶກບັນຊີແລ້ວ", "Account saved"]});
 Object.assign(TRD,{"วิธีเล่น และ ลงทุน": ["ວິທີຫຼິ້ນ ແລະ ລົງທຶນ", "How to play and invest"], "ติดตามรายได้": ["ຕິດຕາມລາຍໄດ້", "Track earnings"], "มีปัญหา ติดต่อเรา": ["ມີບັນຫາ ຕິດຕໍ່ເຮົາ", "Need help? Contact us"], "เริ่มจากเติมเงินเข้าบัญชีของคุณ": ["ເລີ່ມຈາກເຕີມເງິນເຂົ້າບັນຊີຂອງທ່ານ", "Start by topping up your account"], "กดปุ่มเติมเงิน แล้วใส่จำนวนที่ต้องการ": ["ກົດປຸ່ມເຕີມເງິນ ແລ້ວໃສ່ຈຳນວນທີ່ຕ້ອງການ", "Tap Top up and enter the amount you want"], "โอนเงินตามบัญชีที่ระบบแสดง": ["ໂອນເງິນຕາມບັນຊີທີ່ລະບົບສະແດງ", "Transfer to the account shown"], "แนบสลิปแล้วส่งคำขอ รอทีมงานอนุมัติ": ["ແນບສະລິບແລ້ວສົ່ງຄຳຂໍ ລໍຖ້າທີມງານອະນຸມັດ", "Attach the slip, send the request and wait for approval"], "นำเงินไปซื้อแพ็กเกจขุดที่เหมาะกับคุณ": ["ນຳເງິນໄປຊື້ແພັກເກດຂຸດທີ່ເໝາະກັບທ່ານ", "Use your balance to buy a mining package"], "ดูรายได้ต่อวัน และจำนวนวันของแต่ละแพ็กเกจ": ["ເບິ່ງລາຍໄດ້ຕໍ່ມື້ ແລະ ຈຳນວນມື້ຂອງແຕ່ລະແພັກເກດ", "Check the daily income and duration of each package"], "เลือกแพ็กเกจแล้วกดซื้อ ระบบหักเงินจากยอดคงเหลือ": ["ເລືອກແພັກເກດແລ້ວກົດຊື້ ລະບົບຫັກເງິນຈາກຍອດຄົງເຫຼືອ", "Pick a package and buy it; the cost is taken from your balance"], "เครื่องขุดจะเริ่มทำงานทันที": ["ເຄື່ອງຂຸດຈະເລີ່ມເຮັດວຽກທັນທີ", "Your miner starts working right away"], "รายได้เข้าทุกวันโดยอัตโนมัติ": ["ລາຍໄດ້ເຂົ້າທຸກມື້ໂດຍອັດຕະໂນມັດ", "Earnings arrive automatically every day"], "ดูเครื่องขุดและรายได้ที่หน้าหลัก": ["ເບິ່ງເຄື່ອງຂຸດ ແລະ ລາຍໄດ້ທີ່ໜ້າຫຼັກ", "See your miners and earnings on the home page"], "กดประวัติเพื่อดูกราฟรายได้รายวัน": ["ກົດປະຫວັດເພື່ອເບິ່ງກາຟລາຍໄດ້ລາຍວັນ", "Open History to see the daily earnings chart"], "กระดิ่งแจ้งเตือนสถานะเติมเงินและถอนเงิน": ["ກະດິ່ງແຈ້ງເຕືອນສະຖານະເຕີມເງິນ ແລະ ຖອນເງິນ", "The bell shows top-up and withdrawal status"], "ชวนเพื่อนมาร่วมขุด รับโบนัสทันที": ["ຊວນໝູ່ມາຮ່ວມຂຸດ ຮັບໂບນັດທັນທີ", "Invite friends to mine and get a bonus"], "คัดลอกรหัสหรือลิงก์แนะนำของคุณ": ["ຄັດລອກລະຫັດ ຫຼື ລິ້ງແນະນຳຂອງທ່ານ", "Copy your referral code or link"], "เพื่อนสมัครและเติมเงิน คุณได้โบนัส": ["ໝູ່ສະໝັກ ແລະ ເຕີມເງິນ ທ່ານໄດ້ໂບນັດ", "When a friend signs up and tops up, you get a bonus"], "ดูรายชื่อเพื่อนและโบนัสที่หน้าแนะนำเพื่อน": ["ເບິ່ງລາຍຊື່ໝູ່ ແລະ ໂບນັດທີ່ໜ້າແນະນຳໝູ່", "See friends and bonuses on the referral page"], "ถอนรายได้เข้าบัญชีของคุณได้ทุกเวลา": ["ຖອນລາຍໄດ້ເຂົ້າບັນຊີຂອງທ່ານໄດ້ທຸກເວລາ", "Withdraw your earnings to your account any time"], "เลือกรับเป็นเงินกีบ หรือเหรียญดิจิทัล": ["ເລືອກຮັບເປັນເງິນກີບ ຫຼື ເຫຼຽນດິຈິຕອນ", "Choose to receive kip or digital coins"], "ใส่จำนวนเอง หรือกดปุ่มสูงสุดเพื่อถอนทั้งหมด": ["ໃສ່ຈຳນວນເອງ ຫຼື ກົດປຸ່ມສູງສຸດເພື່ອຖອນທັງໝົດ", "Enter an amount or tap Max to withdraw everything"], "โบนัสที่ยังล็อกอยู่ยังถอนไม่ได้ ทีมงานโอนให้หลังตรวจสอบ": ["ໂບນັດທີ່ຍັງລັອກຢູ່ຍັງຖອນບໍ່ໄດ້ ທີມງານໂອນໃຫ້ຫຼັງກວດສອບ", "Locked bonuses can't be withdrawn yet; we transfer after verification"], "ทีมงานพร้อมช่วยเหลือ": ["ທີມງານພ້ອມຊ່ວຍເຫຼືອ", "Our team is ready to help"], "กดไอคอนตั้งค่า แล้วเลือกศูนย์ช่วยเหลือ": ["ກົດໄອຄອນຕັ້ງຄ່າ ແລ້ວເລືອກສູນຊ່ວຍເຫຼືອ", "Tap the settings icon and choose Help center"], "ติดต่อทีมงานได้ทางวอทส์แอป": ["ຕິດຕໍ່ທີມງານໄດ້ທາງວອດແອັບ", "Contact the team on WhatsApp"], "ตั้งรหัสสองชั้นเพื่อความปลอดภัยของบัญชี": ["ຕັ້ງລະຫັດສອງຊັ້ນເພື່ອຄວາມປອດໄພຂອງບັນຊີ", "Turn on two-step verification to protect your account"]});
-Object.assign(TRD,{"บันทึกไม่สำเร็จ กรุณาลองใหม่":["ບັນທຶກບໍ່ສຳເລັດ ກະລຸນາລອງໃໝ່","Save failed, please try again"]});
+Object.assign(TRD,{"บันทึกไม่สำเร็จ กรุณาลองใหม่":["ບັນທຶກບໍ່ສຳເລັດ ກະລຸນາລອງໃໝ່","Save failed, please try again"],"ส่งทาง":["ສົ່ງທາງ","Send via"],"ชวนมาลองเช่ากำลังขุดคริปโต สมัครผ่านลิงก์นี้":["ຊວນມາລອງເຊົ່າກຳລັງຂຸດຄຣິບໂຕ ສະໝັກຜ່ານລິ້ງນີ້","Come try crypto mining - sign up with this link"]});
 Object.assign(TRD,{"กำไรประมาณการต่อวัน": ["ກຳໄລປະມານຕໍ່ມື້", "Estimated daily profit"], "กำไรสะสม วันที่": ["ກຳໄລສະສົມ ວັນທີ", "Accumulated profit · day"], "ขาดอีก": ["ຂາດອີກ", "short by"], "ตอนนี้": ["ຕອນນີ້", "current"], "ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง": ["ຕົວເລກເປັນການປະມານຕາມສູດຂອງລະບົບ ບໍ່ແມ່ນການຮັບປະກັນຜົນຕອບແທນ ການລົງທຶນມີຄວາມສ່ຽງ", "Figures are estimates from the system formula, not a guaranteed return. Investing carries risk."], "ท่านอยู่ระดับสูงสุดแล้ว": ["ທ່ານຢູ່ລະດັບສູງສຸດແລ້ວ", "You are at the top tier"], "ยอดคงเหลือหลังลงทุน": ["ຍອດຄົງເຫຼືອຫຼັງລົງທຶນ", "Balance after investing"], "ยอดในกระเป๋า": ["ຍອດໃນກະເປົາ", "Wallet balance"], "ยอดในกระเป๋าอัปเดตแล้ว": ["ຍອດໃນກະເປົາອັບເດດແລ້ວ", "Your wallet balance is updated"], "ยอดในกระเป๋าไม่พอ": ["ຍອດໃນກະເປົາບໍ່ພໍ", "Not enough balance"], "ระดับปัจจุบันมีกรอบสีทอง": ["ລະດັບປັດຈຸບັນມີກອບສີທອງ", "the current tier has a gold frame"], "ระบบจะคำนวณกำไรให้ทันที": ["ລະບົບຈະຄຳນວນກຳໄລໃຫ້ທັນທີ", "The system calculates your profit instantly"], "รับคืนเมื่อครบสัญญา": ["ຮັບຄືນເມື່ອຄົບສັນຍາ", "Returned at contract end"], "ลงมาก อัตราต่อวันยิ่งสูง": ["ລົງຫຼາຍ ອັດຕາຕໍ່ມື້ຍິ່ງສູງ", "Invest more, higher daily rate"], "ลงเพิ่มอีก": ["ລົງເພີ່ມອີກ", "Add"], "อัตราตามจำนวนเงิน": ["ອັດຕາຕາມຈຳນວນເງິນ", "Rate by amount"], "เติมเงินก่อน": ["ເຕີມເງິນກ່ອນ", "Top up first"], "เพื่อขึ้นเป็น": ["ເພື່ອຂຶ້ນເປັນ", "to reach"], "เริ่มเพียง": ["ເລີ່ມພຽງ", "Start from"], "เลือกจำนวนเพื่อดูกำไร": ["ເລືອກຈຳນວນເພື່ອເບິ່ງກຳໄລ", "Choose an amount to see profit"], "เลื่อนดูกำไรสะสมตามวัน": ["ເລື່ອນເບິ່ງກຳໄລສະສົມຕາມວັນ", "Slide to see accumulated profit by day"], "เห็นกำไรประมาณการก่อนยืนยัน": ["ເຫັນກຳໄລປະມານກ່ອນຢືນຢັນ", "see the estimated profit before you confirm"], "ใส่จำนวนเพื่อเริ่มลงทุน": ["ໃສ່ຈຳນວນເພື່ອເລີ່ມລົງທຶນ", "Enter an amount to start"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
@@ -6381,7 +6414,7 @@ function saveUDForce(ud){
   _ud=ud;
   try{localStorage.setItem('cm_ud_'+u,JSON.stringify(ud));}catch(e){}
   // sync Firebase เฉพาะตอน force (logout)
-  if(window._db) window._db.ref('users/'+u).set(ud).catch(()=>{});
+  fbPutUser(u,ud).catch(()=>{});
 }
 
 // ─── ETH MINING CALC ───
@@ -6837,18 +6870,19 @@ function showChangePassPopup(){
   </div>`;
   document.body.appendChild(ov);
 }
-function changeUserPass(){
+async function changeUserPass(){
   const ud=getUD();if(!ud)return;
   const o=document.getElementById('cpOld')?.value;
   const n=document.getElementById('cpNew')?.value;
   const msg=document.getElementById('cpMsg');
-  if(ud.pw!==o){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสเดิมไม่ถูก';}return;}
+  if(!(await checkPw(ud.pw,o))){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสเดิมไม่ถูก';}return;}
   if(!n||n.length<6){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ รหัสต้องมี 6 ตัวขึ้นไป';}return;}
   const u=getSess();
   if(!window._db||!u){if(msg){msg.style.color='var(--red-bright)';msg.textContent='❌ เชื่อมต่อไม่ได้ กรุณารีโหลดหน้า';}return;}
   // เขียนรหัสใหม่ลง Firebase ทันที (ไม่รอ sync ทุก 60 วิ) ไม่งั้นถ้าปิดแอปก่อน sync ค่าเดิมจาก Firebase จะทับรหัสใหม่
-  window._db.ref('users/'+u+'/pw').set(n).then(function(){
-    ud.pw=n;saveUD(ud);
+  const hn=await hashPw(n);
+  window._db.ref('users/'+u+'/pw').set(hn).then(function(){
+    ud.pw=hn;saveUD(ud);
     if(msg){msg.style.color='var(--green)';msg.textContent='✅ เปลี่ยนรหัสแล้ว';}
     setTimeout(()=>document.querySelectorAll('.overlay').forEach(o=>o.remove()),1000);
   }).catch(function(){
@@ -6909,6 +6943,12 @@ function copyRefLink(){
   const link=location.origin+location.pathname+'?ref='+(ud.refCode||'');
   navigator.clipboard?.writeText(link).then(()=>showToast('📋 คัดลอกแล้ว!')).catch(()=>showToast('❌ คัดลอกไม่ได้'));
 }
+function waShareRef(){
+  const ud=getUD();if(!ud)return;
+  const link=location.origin+location.pathname+'?ref='+(ud.refCode||'');
+  const msg=trStr('ชวนมาลองเช่ากำลังขุดคริปโต สมัครผ่านลิงก์นี้')+'\n'+link;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
 function shareRefLink(){
   const ud=getUD();if(!ud)return;
   const link=location.origin+location.pathname+'?ref='+(ud.refCode||'');
@@ -6926,7 +6966,7 @@ function renderReferral(){
     +'<div style="border-radius:12px;padding:10px 12px;background:rgba(0,0,0,.3);font-size:12px;color:#c9b8e8;word-break:break-all;line-height:1.5">'+escHtml(link)+'</div>'
     +'<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">'
     +'<button type="button" onclick="copyRefLink()" style="height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">คัดลอกลิงก์</button>'
-    +'<button type="button" onclick="shareRefLink()" style="height:46px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">แชร์ให้เพื่อน</button></div>'
+    +'<button type="button" onclick="waShareRef()" style="height:46px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">ส่งทาง WhatsApp</button></div>'
     +'<div id="refGoalBox" style="display:none;border-radius:12px;padding:12px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3)"></div>'
     +'<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">'
     +'<div style="border-radius:14px;padding:10px 6px;text-align:center;background:rgba(0,0,0,.28);min-width:0"><div style="font-size:11px;color:#b6a7d6">แนะนำแล้ว</div><div style="margin-top:3px;font-size:15px;font-weight:700;color:#fff"><span class="rg-num" id="refJoinedN">'+(ud.refCount||0)+'</span> <span style="font-size:11px;font-weight:600;color:#b6a7d6">คน</span></div></div>'
@@ -7072,7 +7112,7 @@ function adminResetPw(username){
   const p=prompt('ตั้งรหัสผ่านใหม่ให้ '+username+' (อย่างน้อย 6 ตัว):');
   if(p===null)return;
   if(p.length<6){showToast('⚠️ รหัสต้องมีอย่างน้อย 6 ตัว');return;}
-  window._db.ref('users/'+username+'/pw').set(p).then(function(){showToast('✅ ตั้งรหัสผ่านใหม่ให้ '+username+' แล้ว แจ้งลูกค้าให้เปลี่ยนรหัสเอง');}).catch(function(){showToast('❌ ไม่สำเร็จ');});
+  hashPw(p).then(function(h){return window._db.ref('users/'+username+'/pw').set(h);}).then(function(){showToast('✅ ตั้งรหัสผ่านใหม่ให้ '+username+' แล้ว แจ้งลูกค้าให้เปลี่ยนรหัสเอง');}).catch(function(){showToast('❌ ไม่สำเร็จ');});
 }
 function adminViewTx(username){adminCustomer(username);}
 
