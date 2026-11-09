@@ -1028,6 +1028,9 @@ body:has(#authScreen.active) #contactFab{display:none}
 .apw-save{flex:1;height:46px;border:none;border-radius:12px;font-size:0.9rem;font-weight:800;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16}
 .apw-save:disabled{cursor:not-allowed;background:rgba(255,255,255,.12);color:#a99bc7}
 /* ── หุ้นต่างประเทศ ── */
+.st-sym{position:relative}
+.st-sym img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:7px;box-sizing:border-box;background:#fff;border-radius:14px}
+.st-sym.lg{font-size:0!important;color:transparent!important;text-shadow:none!important}
 .st-back{width:38px;height:38px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:24px;line-height:1;cursor:pointer;flex-shrink:0;font-family:inherit;padding:0}
 .st-warn{border-radius:14px;padding:10px 12px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3);font-size:12px;line-height:1.6;color:#f5e6a8}
 .st-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
@@ -1492,7 +1495,19 @@ body:has(#adminScreen.active) #contactFab{display:none}
           <input id="stAdPrice" placeholder="ราคา USD" inputmode="decimal" style="flex:1;min-width:0;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:#fff;">
         </div>
         <input id="stAdName" placeholder="ชื่อบริษัท เช่น Apple Inc." maxlength="40" style="width:100%;box-sizing:border-box;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:#fff;margin-bottom:0.5rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+          <div id="stAdLogoPrev" style="width:44px;height:44px;border-radius:10px;background:#fff;border:1px solid rgba(157,78,221,0.4);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:0.55rem;color:#888;text-align:center;">ไม่มีโลโก้</div>
+          <input type="file" id="stAdLogoFile" accept="image/*" style="display:none" onchange="stAdLogoPick(this)">
+          <button type="button" onclick="document.getElementById('stAdLogoFile').click()" style="flex:1;padding:0.55rem;border-radius:8px;border:1px solid rgba(157,78,221,0.4);background:transparent;color:#fff;cursor:pointer;font-size:0.75rem;">🖼 เลือกรูปโลโก้จากเครื่อง</button>
+          <button type="button" onclick="stAdLogoClear()" style="padding:0.55rem 0.7rem;border-radius:8px;border:1px solid rgba(230,57,70,0.4);background:transparent;color:var(--red-bright);cursor:pointer;font-size:0.75rem;">ลบ</button>
+        </div>
+        <input id="stAdLogoUrl" placeholder="หรือวางลิงก์รูปโลโก้ https://..." oninput="stAdLogoUrlIn(this.value)" style="width:100%;box-sizing:border-box;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:#fff;margin-bottom:0.5rem;font-size:0.75rem;">
         <button onclick="stAdmSave()" style="width:100%;padding:0.7rem;background:linear-gradient(135deg,#065f46,var(--green));border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer;">💾 บันทึกหุ้น</button>
+      </div>
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:10px;padding:0.8rem;margin-bottom:0.8rem;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#A890CC;margin-bottom:0.5rem;">วางหลายตัวพร้อมกัน (1 บรรทัดต่อ 1 หุ้น: สัญลักษณ์,ชื่อ,ราคา)</div>
+        <textarea id="stAdBulk" rows="5" placeholder="AAPL,Apple Inc.,350.86" style="width:100%;box-sizing:border-box;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:#fff;margin-bottom:0.5rem;font-family:monospace;"></textarea>
+        <button onclick="stAdmBulk()" style="width:100%;padding:0.7rem;background:linear-gradient(135deg,#4c1d95,#a855f7);border:none;border-radius:8px;color:#fff;font-weight:700;cursor:pointer;">📥 บันทึกทั้งหมด</button>
       </div>
       <div id="stAdList" style="margin-bottom:1rem;"></div>
       <div class="sec-title">📋 คำสั่งซื้อ/ขายหุ้น</div>
@@ -3029,6 +3044,18 @@ function enterDash(user){
 // แอดมินตั้งราคาเอง ซื้อขายจริงผ่านแอดมิน: ลูกค้าส่งคำสั่ง → แอดมินดำเนินการ+ใส่ราคาจริง → ระบบอัปเดตพอร์ตผ่าน credits
 // ═══════════════════════════════════════════════
 var ST_MIN=10,_stOn=false,_stList={},_stTab=0,_stBusy=false;
+// ป้ายสีประจำหุ้น: ใช้สีแบรนด์โดยประมาณถ้ามี ไม่มีก็สุ่มสีคงที่จากสัญลักษณ์
+var ST_BRAND={AAPL:['#4b5563','#9ca3af'],NVDA:['#3f6212','#76b900'],MSFT:['#0369a1','#38bdf8'],GOOGL:['#1d4ed8','#ea4335'],GOOG:['#1d4ed8','#ea4335'],AMZN:['#b45309','#ff9900'],META:['#1d4ed8','#0ea5e9'],AVGO:['#991b1b','#ef4444'],TSLA:['#991b1b','#e31937'],LLY:['#9f1239','#f43f5e'],WMT:['#1d4ed8','#facc15'],JPM:['#1e3a8a','#3b82f6'],AMD:['#166534','#22c55e'],MU:['#0e7490','#06b6d4'],V:['#1e3a8a','#f59e0b'],JNJ:['#991b1b','#dc2626'],XOM:['#b91c1c','#ef4444']};
+function stBadge(sym){
+  var c=ST_BRAND[sym];
+  if(!c){var h=0;for(var i=0;i<sym.length;i++)h=(h*31+sym.charCodeAt(i))%360;c=['hsl('+h+',55%,32%)','hsl('+((h+40)%360)+',65%,50%)'];}
+  return 'background:linear-gradient(135deg,'+c[0]+','+c[1]+');color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45);font-size:'+(sym.length>3?'11px':'14px');
+}
+// โลโก้หุ้น: ดึงจากบริการโลโก้ภายนอกตามสัญลักษณ์ (แอดมินใส่ช่อง logo ในรายการหุ้นเพื่อกำหนดเองได้) โหลดไม่ได้จะใช้ป้ายสีแทน
+function stIcon(k){
+  var st=_stList[k],u=(st&&st.logo)||('https://financialmodelingprep.com/image-stock/'+encodeURIComponent(k)+'.png');
+  return '<div class="st-sym" style="'+stBadge(k)+'">'+escHtml(k.slice(0,5))+'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+escHtml(u)+'" onload="this.parentNode.classList.add(&quot;lg&quot;)" onerror="this.remove()"></div>';
+}
 function stR2(n){return Math.round((+n||0)*100)/100;}
 function stR6(n){return Math.round((+n||0)*1e6)/1e6;}
 function stFm(n,d){return (+n||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
@@ -3064,7 +3091,7 @@ function stDrawMarket(body){
   if(!ks.length){body.innerHTML='<div class="st-empty">ยังไม่มีหุ้นในรายการ</div>';return;}
   body.innerHTML=ks.map(function(k){
     var s=_stList[k];
-    return '<div class="st-row"><div class="st-sym">'+escHtml(k.slice(0,5))+'</div>'
+    return '<div class="st-row">'+stIcon(k)+''
       +'<div class="st-mid"><div class="st-nm">'+escHtml(s.name||k)+'</div><div class="st-sub">'+escHtml(k)+(s.updated?' · '+stTime(s.updated):'')+'</div></div>'
       +'<div class="st-right"><div class="st-px rg-num">$'+stFm(s.price,2)+'</div>'
       +'<button type="button" class="st-btn" data-s="'+escHtml(k)+'" onclick="stBuySheet(this.dataset.s)">ซื้อ</button></div></div>';
@@ -3080,7 +3107,7 @@ function stDrawPort(body){
     var val=px?stR2(x.shares*px):stR2(x.cost),pl=stR2(val-x.cost);
     tc+=x.cost;tv+=val;
     var cls=pl>0?'st-up':(pl<0?'st-dn':'');
-    return '<div class="st-row"><div class="st-sym">'+escHtml(k.slice(0,5))+'</div>'
+    return '<div class="st-row">'+stIcon(k)+''
       +'<div class="st-mid"><div class="st-nm">'+escHtml(x.name||k)+'</div>'
       +'<div class="st-sub"><span class="rg-num">'+stR6(x.shares)+'</span> หุ้น · ต้นทุนเฉลี่ย $<span class="rg-num">'+stFm(x.cost/x.shares,2)+'</span></div>'
       +'<div class="st-sub">มูลค่า $<span class="rg-num">'+stFm(val,2)+'</span> · <span class="rg-num '+cls+'">'+(pl>0?'+':'')+stFm(pl,2)+'</span></div></div>'
@@ -3242,6 +3269,7 @@ function stAdmList(){
     el.innerHTML=ks.map(function(k){
       var s=v[k]||{},on=(s.on!==false),e=escHtml(k);
       return '<div class="req-card" style="margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem;">'
+        +(s.logo?'<img alt="" src="'+escHtml(s.logo)+'" style="width:30px;height:30px;border-radius:7px;background:#fff;object-fit:contain;flex-shrink:0;">':'')
         +'<div style="flex:1;min-width:0;"><div style="font-weight:700;color:var(--gold);">'+e+' · $'+(+s.price||0).toFixed(2)+'</div>'
         +'<div style="font-size:0.65rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(s.name||'')+(s.updated?' · '+stTime(s.updated):'')+'</div></div>'
         +'<button data-k="'+e+'" onclick="stAdmEdit(this.dataset.k)" style="padding:0.4rem 0.6rem;border-radius:8px;border:1px solid rgba(157,78,221,0.4);background:transparent;color:#fff;cursor:pointer;">✏️</button>'
@@ -3250,12 +3278,57 @@ function stAdmList(){
     }).join('');
   }).catch(function(){});
 }
+var _stAdLogo; // undefined=คงของเดิม, ''=ลบ, string=โลโก้ใหม่
+function stAdLogoShow(u){
+  var el=document.getElementById('stAdLogoPrev');if(!el)return;
+  if(u){el.innerHTML='<img alt="" style="width:100%;height:100%;object-fit:contain;" src="'+escHtml(u)+'">';}
+  else el.textContent='ไม่มีโลโก้';
+}
+function stAdLogoReset(){
+  _stAdLogo=undefined;stAdLogoShow('');
+  var f=document.getElementById('stAdLogoFile');if(f)f.value='';
+  var u=document.getElementById('stAdLogoUrl');if(u)u.value='';
+}
+function stAdLogoClear(){_stAdLogo='';stAdLogoShow('');var u=document.getElementById('stAdLogoUrl');if(u)u.value='';var f=document.getElementById('stAdLogoFile');if(f)f.value='';showToast('จะลบโลโก้เมื่อกดบันทึก');}
+function stAdLogoUrlIn(v){
+  v=(v||'').trim();
+  if(!v){return;}
+  if(/^https:\/\/\S+$/i.test(v)&&v.length<500){_stAdLogo=v;stAdLogoShow(v);}
+}
+function stAdLogoPick(inp){
+  var f=inp.files&&inp.files[0];if(!f)return;
+  if(!/^image\//.test(f.type)){showToast('⚠️ เลือกไฟล์รูปภาพเท่านั้น');return;}
+  var rd=new FileReader();
+  rd.onerror=function(){showToast('❌ อ่านไฟล์ไม่สำเร็จ');};
+  rd.onload=function(){
+    var im=new Image();
+    im.onerror=function(){showToast('❌ เปิดรูปนี้ไม่ได้');};
+    im.onload=function(){
+      var S=128,c=document.createElement('canvas');c.width=c.height=S;
+      var g=c.getContext('2d'),w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;
+      if(!w||!h){showToast('❌ เปิดรูปนี้ไม่ได้');return;}
+      var pad=8,r=Math.min((S-2*pad)/w,(S-2*pad)/h),dw=w*r,dh=h*r;
+      g.drawImage(im,(S-dw)/2,(S-dh)/2,dw,dh);
+      var out=c.toDataURL('image/png');
+      if(out.length>45000){ // รูปซับซ้อน: บีบเป็น JPEG พื้นขาว
+        var c2=document.createElement('canvas');c2.width=c2.height=S;var g2=c2.getContext('2d');
+        g2.fillStyle='#fff';g2.fillRect(0,0,S,S);g2.drawImage(c,0,0);out=c2.toDataURL('image/jpeg',0.85);
+      }
+      if(out.length>60000){showToast('⚠️ รูปใหญ่/ซับซ้อนเกินไป ลองรูปอื่น');return;}
+      _stAdLogo=out;stAdLogoShow(out);
+      var u=document.getElementById('stAdLogoUrl');if(u)u.value='';
+    };
+    im.src=rd.result;
+  };
+  rd.readAsDataURL(f);
+}
 function stAdmEdit(sym){
   window._db.ref('stocks/'+sym).once('value').then(function(sn){
     var s=sn.val()||{};
     document.getElementById('stAdSym').value=sym;
     document.getElementById('stAdName').value=s.name||'';
     document.getElementById('stAdPrice').value=s.price||'';
+    stAdLogoReset();stAdLogoShow(s.logo||'');
   });
 }
 function stAdmSave(){
@@ -3268,11 +3341,35 @@ function stAdmSave(){
   var ref=window._db.ref('stocks/'+sym);
   ref.once('value').then(function(sn){
     var old=sn.val()||{};
-    return ref.set({name:name,price:price,on:(old.on!==false),updated:Date.now()});
+    var o={name:name,price:price,on:(old.on!==false),updated:Date.now()};
+    var lg=(_stAdLogo===undefined)?old.logo:_stAdLogo;
+    if(lg)o.logo=lg;
+    return ref.set(o);
   }).then(function(){
     showToast('✅ บันทึก '+sym+' แล้ว');
     ['stAdSym','stAdName','stAdPrice'].forEach(function(i){document.getElementById(i).value='';});
+    stAdLogoReset();
     stAdmList();
+  }).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
+}
+function stAdmBulk(){
+  var ok=[],bad=0;
+  (document.getElementById('stAdBulk').value||'').split('\n').forEach(function(l){
+    l=l.trim();if(!l)return;
+    var a=l.indexOf(','),z=l.lastIndexOf(',');
+    if(a<1||z<=a){bad++;return;}
+    var sym=l.slice(0,a).trim().toUpperCase(),name=l.slice(a+1,z).trim(),price=Math.round(parseFloat(l.slice(z+1))*10000)/10000;
+    if(!/^[A-Z0-9.\-]{1,10}$/.test(sym)||name.length<2||!(price>0)){bad++;return;}
+    ok.push({sym:sym,name:name,price:price});
+  });
+  if(!ok.length){showToast('⚠️ ไม่พบรายการที่ถูกต้อง');return;}
+  if(!confirm('บันทึก '+ok.length+' รายการ'+(bad?' (ข้าม '+bad+' บรรทัดที่รูปแบบผิด)':'')+'?'))return;
+  Promise.all(ok.map(function(x){
+    var r=window._db.ref('stocks/'+x.sym);
+    return r.once('value').then(function(sn){var old=sn.val()||{};var o={name:x.name,price:x.price,on:(old.on!==false),updated:Date.now()};if(old.logo)o.logo=old.logo;return r.set(o);});
+  })).then(function(){
+    showToast('✅ บันทึก '+ok.length+' รายการแล้ว');
+    document.getElementById('stAdBulk').value='';stAdmList();
   }).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
 }
 function stAdmShow(sym,on){window._db.ref('stocks/'+sym+'/on').set(!!on).then(stAdmList).catch(function(){showToast('❌ ไม่สำเร็จ');});}
