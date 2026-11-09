@@ -2790,7 +2790,7 @@ function doLogin(){
 }
 
 function createAccountNow(u,e,p,btn){
-  const refCode=u.toUpperCase().slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+  const refCode=(u.toUpperCase().replace(/[^A-Z0-9]/g,'X')+'XXXX').slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
   const refBy=getPendingRef();
   const nd={pw:p,email:e,usd:0,ethReward:0,ethMine:0,sessions:0,packages:[],txs:[],refCode,refBy,refCount:0,refEarned:0};
   const reset=function(){if(btn){btn.disabled=false;btn.textContent='🚀 CREATE NODE';}};
@@ -4498,7 +4498,7 @@ function rfMask(n){n=String(n||'');return n.slice(0,2)+'****';}
 function renderRefFriends(c){
   var box=document.getElementById('refFriendsBox');if(!box)return;
   var u=getSess(),ud=getUD()||{};
-  var go=function(regs){
+  var go=function(regs,fromDb){
     var cr=(typeof _credits==='object'&&_credits)?_credits:{};
     var paid=Object.keys(cr).filter(function(k){return k.indexOf('refb_')===0;}).map(function(k){return k.slice(5);});
     var paidN=Math.max(paid.length,ud.refCount||0);
@@ -4513,6 +4513,7 @@ function renderRefFriends(c){
     }
     if(c.goal>0&&c.goalBonus>0)h+='<div style="display:flex;gap:12px;align-items:center;border-radius:12px;padding:10px 12px;background:rgba(60,0,100,.4);border:1px dashed rgba(255,215,0,.5)"><div style="flex-grow:1;font-size:13px;font-weight:700">โบนัสพิเศษเมื่อครบเป้าหมาย</div><div class="rg-num" style="font-size:13px;font-weight:900;color:#FFD700">+$'+c.goalBonus+'</div></div>';
     var names=Object.keys(regs||{});paid.forEach(function(n){if(names.indexOf(n)<0)names.push(n);});
+    if(fromDb){var jn=document.getElementById('refJoinedN'),pn=document.getElementById('refPaidN');if(jn)jn.textContent=String(names.length);if(pn)pn.textContent=String(paidN);}
     names.sort(function(a,b){return (paid.indexOf(b)>=0?1:0)-(paid.indexOf(a)>=0?1:0);});
     var list=names.length?names.slice(0,20).map(function(n){var p=paid.indexOf(n)>=0;
       return '<div style="display:flex;align-items:center;gap:12px;border-radius:12px;padding:10px 12px;background:rgba(40,5,70,.98);border:1px solid rgba(180,80,255,.3)"><div style="width:36px;height:36px;flex-shrink:0;border-radius:50%;background:rgba(157,78,221,.3);display:flex;align-items:center;justify-content:center;font-family:Orbitron,monospace;font-size:13px;font-weight:900">'+escHtml(String(n).charAt(0).toUpperCase())+'</div><div style="flex-grow:1;font-family:Share Tech Mono,monospace;font-size:13px">'+escHtml(rfMask(n))+'</div><div style="font-size:12px;font-weight:700;border-radius:10px;padding:4px 10px;'+(p?'color:#86efac;background:rgba(74,222,128,.12)':'color:#FDE68A;background:rgba(255,215,0,.1)')+'">'+(p?'เติมเงินแล้ว':'รอเติมเงิน')+'</div></div>';
@@ -4521,12 +4522,15 @@ function renderRefFriends(c){
       +'<div style="font-family:Orbitron,monospace;font-size:13px;letter-spacing:2px;font-weight:700;color:#C8B0FF;margin:14px 0 8px">เพื่อนของคุณ</div><div style="display:flex;flex-direction:column;gap:8px">'+list+'</div>';
   };
   go({});
-  if(window._db&&u)window._db.ref('refs/'+u).once('value').then(function(sn){go(sn.exists()?sn.val():{});}).catch(function(){});
+  if(window._db&&u)window._db.ref('refs/'+u).once('value').then(function(sn){go(sn.exists()?sn.val():{},true);}).catch(function(){});
 }
 function ensureRefCode(){
   const u=getSess();
   if(!u||!_ud||!window._db)return;
-  if(!_ud.refCode)_ud.refCode=(u.toUpperCase().replace(/[^A-Z0-9]/g,'X')+'XXXX').slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+  if(!/^[A-Za-z0-9]{4,12}$/.test(_ud.refCode||'')){
+    _ud.refCode=(u.toUpperCase().replace(/[^A-Z0-9]/g,'X')+'XXXX').slice(0,4)+Math.random().toString(36).slice(2,6).toUpperCase();
+    saveUDForce(_ud);
+  }
   reserveRefCode(_ud.refCode,u);
 }
 function refSettingsOf(info){
@@ -6895,7 +6899,11 @@ function renderReferral(){
     +'<button type="button" onclick="copyRefLink()" style="height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">คัดลอกลิงก์</button>'
     +'<button type="button" onclick="shareRefLink()" style="height:46px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">แชร์ให้เพื่อน</button></div>'
     +'<div id="refGoalBox" style="display:none;border-radius:12px;padding:12px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3)"></div>'
-    +'<div style="display:flex;justify-content:space-between;font-size:13px;color:#b6a7d6"><span>แนะนำแล้ว <b class="rg-num" style="color:#fff">'+(ud.refCount||0)+'</b> คน</span><span>ได้รับ <b class="rg-num" style="color:#4ade80">$'+(ud.refEarned||0).toFixed(2)+'</b></span></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">'
+    +'<div style="border-radius:14px;padding:10px 6px;text-align:center;background:rgba(0,0,0,.28);min-width:0"><div style="font-size:11px;color:#b6a7d6">แนะนำแล้ว</div><div style="margin-top:3px;font-size:15px;font-weight:700;color:#fff"><span class="rg-num" id="refJoinedN">'+(ud.refCount||0)+'</span> <span style="font-size:11px;font-weight:600;color:#b6a7d6">คน</span></div></div>'
+    +'<div style="border-radius:14px;padding:10px 6px;text-align:center;background:rgba(0,0,0,.28);min-width:0"><div style="font-size:11px;color:#b6a7d6">เติมเงินแล้ว</div><div style="margin-top:3px;font-size:15px;font-weight:700;color:#FFD700"><span class="rg-num" id="refPaidN">'+(ud.refCount||0)+'</span> <span style="font-size:11px;font-weight:600;color:#b6a7d6">คน</span></div></div>'
+    +'<div style="border-radius:14px;padding:10px 6px;text-align:center;background:rgba(0,0,0,.28);min-width:0"><div style="font-size:11px;color:#b6a7d6">ได้รับ</div><div class="rg-num" style="margin-top:3px;font-size:15px;font-weight:700;color:#4ade80">$'+(ud.refEarned||0).toFixed(2)+'</div></div>'
+    +'</div>'
     +'</div><div id="refFriendsBox"></div>';
   const paint=function(c){
     const t=document.getElementById('refRuleText');
