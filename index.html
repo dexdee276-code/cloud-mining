@@ -1064,6 +1064,14 @@ body:has(#authScreen.active) #contactFab{display:none}
 .st-acts .go{border:none;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16}
 .st-acts .go.sell{background:linear-gradient(135deg,#b91c1c,#f87171);color:#fff}
 .st-acts .go:disabled{opacity:.5}
+.st-dh{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.st-card{border-radius:16px;padding:12px;background:#150b28;border:1px solid rgba(255,255,255,.08);margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.st-big{font-size:32px;font-weight:800;color:#FFD700;line-height:1.15}
+.st-ch{font-size:14px;font-weight:700}
+.st-dacts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.st-dacts.one{grid-template-columns:1fr}
+.st-dacts button{height:50px;border-radius:14px;border:none;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#16a34a,#4ade80);color:#052e16}
+.st-dacts button.sell{background:linear-gradient(135deg,#b91c1c,#f87171);color:#fff}
 body:has(#pgStock.active) #contactFab{bottom:96px}
 /* ── สัญญาขุด (หน้าใหม่) ── */
 .mp-chip{height:52px;border-radius:14px;cursor:pointer;font-family:inherit;font-size:15px;font-weight:700;border:1px solid rgba(180,80,255,.35);background:rgba(60,0,100,.45);color:#E9D5FF;padding:0}
@@ -1494,7 +1502,8 @@ body:has(#adminScreen.active) #contactFab{display:none}
           <input id="stAdSym" placeholder="สัญลักษณ์ เช่น AAPL" maxlength="10" style="flex:1;min-width:0;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:#fff;text-transform:uppercase;">
           <input id="stAdPrice" placeholder="ราคา USD" inputmode="decimal" style="flex:1;min-width:0;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:#fff;">
         </div>
-        <input id="stAdName" placeholder="ชื่อบริษัท เช่น Apple Inc." maxlength="40" style="width:100%;box-sizing:border-box;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:#fff;margin-bottom:0.5rem;">
+        <input id="stAdName" placeholder="ชื่อบริษัท เช่น Apple Inc." maxlength="40" style="width:100%;box-sizing:border-box;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:#fff;margin-bottom:0.4rem;">
+        <input id="stAdCap" placeholder="มูลค่าตลาด (ไม่บังคับ) เช่น 5.22T" maxlength="12" style="width:100%;box-sizing:border-box;padding:0.6rem;background:rgba(0,0,0,0.3);border:1px solid rgba(157,78,221,0.3);border-radius:8px;color:#fff;margin-bottom:0.5rem;">
         <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
           <div id="stAdLogoPrev" style="width:44px;height:44px;border-radius:10px;background:#fff;border:1px solid rgba(157,78,221,0.4);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:0.55rem;color:#888;text-align:center;">ไม่มีโลโก้</div>
           <input type="file" id="stAdLogoFile" accept="image/*" style="display:none" onchange="stAdLogoPick(this)">
@@ -3043,7 +3052,7 @@ function enterDash(user){
 // ─── หุ้นต่างประเทศ (ฝั่งลูกค้า) ───
 // แอดมินตั้งราคาเอง ซื้อขายจริงผ่านแอดมิน: ลูกค้าส่งคำสั่ง → แอดมินดำเนินการ+ใส่ราคาจริง → ระบบอัปเดตพอร์ตผ่าน credits
 // ═══════════════════════════════════════════════
-var ST_MIN=10,_stOn=false,_stList={},_stTab=0,_stBusy=false;
+var ST_MIN=10,_stOn=false,_stList={},_stTab=0,_stBusy=false,_stDet=null;
 // ป้ายสีประจำหุ้น: ใช้สีแบรนด์โดยประมาณถ้ามี ไม่มีก็สุ่มสีคงที่จากสัญลักษณ์
 var ST_BRAND={AAPL:['#4b5563','#9ca3af'],NVDA:['#3f6212','#76b900'],MSFT:['#0369a1','#38bdf8'],GOOGL:['#1d4ed8','#ea4335'],GOOG:['#1d4ed8','#ea4335'],AMZN:['#b45309','#ff9900'],META:['#1d4ed8','#0ea5e9'],AVGO:['#991b1b','#ef4444'],TSLA:['#991b1b','#e31937'],LLY:['#9f1239','#f43f5e'],WMT:['#1d4ed8','#facc15'],JPM:['#1e3a8a','#3b82f6'],AMD:['#166534','#22c55e'],MU:['#0e7490','#06b6d4'],V:['#1e3a8a','#f59e0b'],JNJ:['#991b1b','#dc2626'],XOM:['#b91c1c','#ef4444']};
 function stBadge(sym){
@@ -3054,7 +3063,7 @@ function stBadge(sym){
 // โลโก้หุ้น: ดึงจากบริการโลโก้ภายนอกตามสัญลักษณ์ (แอดมินใส่ช่อง logo ในรายการหุ้นเพื่อกำหนดเองได้) โหลดไม่ได้จะใช้ป้ายสีแทน
 function stIcon(k){
   var st=_stList[k],u=(st&&st.logo)||('https://financialmodelingprep.com/image-stock/'+encodeURIComponent(k)+'.png');
-  return '<div class="st-sym" style="'+stBadge(k)+'">'+escHtml(k.slice(0,5))+'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+escHtml(u)+'" onload="this.parentNode.classList.add(&quot;lg&quot;)" onerror="this.remove()"></div>';
+  return '<div class="st-sym" style="'+stBadge(k)+'">'+escHtml(k.split('.')[0].slice(0,5))+'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+escHtml(u)+'" onload="this.parentNode.classList.add(&quot;lg&quot;)" onerror="this.remove()"></div>';
 }
 function stR2(n){return Math.round((+n||0)*100)/100;}
 function stR6(n){return Math.round((+n||0)*1e6)/1e6;}
@@ -3072,8 +3081,10 @@ function stFlag(){
     _stOn=(sn.val()===true);b.style.display=_stOn?'flex':'none';
   }).catch(function(){});
 }
-function stOpen(){_stTab=0;switchTab(5);}
-function stTab(i){_stTab=i;stRender();}
+function stOpen(){_stTab=0;_stDet=null;switchTab(5);}
+function stTab(i){_stTab=i;_stDet=null;stRender();}
+function stDetail(sym){_stDet=sym;stRender();var r=document.getElementById('pgStock');if(r)r.scrollTop=0;}
+function stBack(){_stDet=null;stRender();}
 function stActive(){
   return Object.keys(_stList).filter(function(k){var s=_stList[k];return s&&s.on!==false&&(+s.price)>0;}).sort();
 }
@@ -3083,7 +3094,8 @@ function stRender(){
   body.innerHTML='<div class="st-note">⏳ กำลังโหลด...</div>';
   stMeta().then(function(){
     if(!_stOn){body.innerHTML='<div class="st-empty">ขณะนี้ยังไม่เปิดให้บริการซื้อหุ้น</div>';return;}
-    if(_stTab===0)stDrawMarket(body);else if(_stTab===1)stDrawPort(body);else stDrawOrders(body);
+    if(_stTab===2)_stDet=null;
+    if(_stDet&&_stTab<2)stDrawDetail(body,_stDet);else if(_stTab===0)stDrawMarket(body);else if(_stTab===1)stDrawPort(body);else stDrawOrders(body);
   }).catch(function(){body.innerHTML='<div class="st-empty">❌ โหลดไม่สำเร็จ กรุณาลองใหม่</div>';});
 }
 function stDrawMarket(body){
@@ -3091,11 +3103,66 @@ function stDrawMarket(body){
   if(!ks.length){body.innerHTML='<div class="st-empty">ยังไม่มีหุ้นในรายการ</div>';return;}
   body.innerHTML=ks.map(function(k){
     var s=_stList[k];
-    return '<div class="st-row">'+stIcon(k)+''
+    var ch=stChg(s);
+    return '<div class="st-row" style="cursor:pointer" data-s="'+escHtml(k)+'" onclick="stDetail(this.dataset.s)">'+stIcon(k)+''
       +'<div class="st-mid"><div class="st-nm">'+escHtml(s.name||k)+'</div><div class="st-sub">'+escHtml(k)+(s.updated?' · '+stTime(s.updated):'')+'</div></div>'
       +'<div class="st-right"><div class="st-px rg-num">$'+stFm(s.price,2)+'</div>'
-      +'<button type="button" class="st-btn" data-s="'+escHtml(k)+'" onclick="stBuySheet(this.dataset.s)">ซื้อ</button></div></div>';
+      +(ch?'<div class="st-ch rg-num '+(ch.pct>=0?'st-up':'st-dn')+'" style="font-size:11px">'+(ch.pct>=0?'+':'')+stFm(ch.pct,2)+'%</div>':'')
+      +'<button type="button" class="st-btn" data-s="'+escHtml(k)+'" onclick="event.stopPropagation();stBuySheet(this.dataset.s)">ซื้อ</button></div></div>';
   }).join('');
+}
+function stHist(s){
+  var a=s&&s.hist;if(!a)return [];
+  if(!Array.isArray(a))a=Object.keys(a).map(function(k){return a[k];});
+  var o=[];a.forEach(function(q){if(q&&(+q[1])>0)o.push([+q[0]||0,+q[1]]);});
+  return o;
+}
+function stChg(s){
+  var h=stHist(s);if(h.length<2)return null;
+  var a=h[h.length-2][1],b=h[h.length-1][1];if(!(a>0))return null;
+  return {pct:(b-a)/a*100,diff:b-a};
+}
+function stChart(h){
+  if(h.length<2)return '<div class="st-note" style="padding:18px 8px">ราคาย้อนหลังจะแสดงเมื่อแอดมินอัปเดตราคาอย่างน้อยสองครั้ง</div>';
+  var W=320,H=130,P=6,n=h.length,mn=Infinity,mx=-Infinity;
+  h.forEach(function(q){if(q[1]<mn)mn=q[1];if(q[1]>mx)mx=q[1];});
+  var lo=mn,hi=mx,sp=(mx-mn)||Math.max(mx*0.02,0.01);mn-=sp*0.12;mx+=sp*0.12;
+  var pts=h.map(function(q,i){return [P+(W-2*P)*i/(n-1),P+(H-2*P)*(1-(q[1]-mn)/(mx-mn))];});
+  var line=pts.map(function(q,i){return (i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1);}).join(' ');
+  var area=line+' L'+pts[n-1][0].toFixed(1)+' '+H+' L'+pts[0][0].toFixed(1)+' '+H+' Z';
+  var up=h[n-1][1]>=h[0][1],col=up?'#4ade80':'#f87171';
+  var d0=new Date(h[0][0]),d1=new Date(h[n-1][0]);
+  var fd=function(d){return d.getDate()+'/'+(d.getMonth()+1);};
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block"><defs><linearGradient id="stGr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".35"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs>'
+    +'<path d="'+area+'" fill="url(#stGr)"/><path d="'+line+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+    +'<circle cx="'+pts[n-1][0].toFixed(1)+'" cy="'+pts[n-1][1].toFixed(1)+'" r="3.5" fill="'+col+'"/></svg>'
+    +'<div class="st-line" style="margin-top:6px"><span>'+fd(d0)+'</span><span>'+fd(d1)+'</span></div>'
+    +'<div class="st-line"><span>ต่ำสุด <b class="rg-num">$'+stFm(lo,2)+'</b></span><span>สูงสุด <b class="rg-num">$'+stFm(hi,2)+'</b></span></div>';
+}
+function stDrawDetail(body,sym){
+  var s=_stList[sym];
+  if(!s||s.on===false||!((+s.price)>0)){_stDet=null;stDrawMarket(body);return;}
+  var ud=getUD()||{},h=(ud.stocks||{})[sym],px=+s.price,ch=stChg(s),e=escHtml(sym);
+  var hist=stHist(s);
+  var o='<div class="st-dh"><button type="button" class="st-back" onclick="stBack()" aria-label="back">‹</button>'+stIcon(sym)
+    +'<div class="st-mid"><div class="st-nm" style="white-space:normal">'+escHtml(s.name||sym)+'</div><div class="st-sub">'+e+'</div></div></div>'
+    +'<div class="st-card"><div class="st-sub">ราคาล่าสุด</div><div class="st-big rg-num">$'+stFm(px,2)+'</div>'
+    +(ch?'<div class="st-ch rg-num '+(ch.diff>=0?'st-up':'st-dn')+'">'+(ch.diff>=0?'+':'')+stFm(ch.diff,2)+' ('+(ch.pct>=0?'+':'')+stFm(ch.pct,2)+'%)</div>':'')+'</div>'
+    +'<div class="st-card"><div class="st-sub" style="margin-bottom:6px">ราคาย้อนหลัง</div>'+stChart(hist)+'</div>'
+    +'<div class="st-card">'
+    +(s.cap?'<div class="st-line"><span>มูลค่าตลาด</span><b class="rg-num">$'+escHtml(String(s.cap))+'</b></div>':'')
+    +'<div class="st-line"><span>อัปเดตล่าสุด</span><b class="rg-num">'+(s.updated?stTime(s.updated):'-')+'</b></div></div>';
+  if(h&&h.shares>1e-9){
+    var val=stR2(h.shares*px),pl=stR2(val-h.cost),cls=pl>0?'st-up':(pl<0?'st-dn':'');
+    o+='<div class="st-card"><div class="st-sub" style="margin-bottom:6px">หุ้นของฉัน</div>'
+      +'<div class="st-line"><span>หุ้นที่ถือ</span><b class="rg-num">'+stR6(h.shares)+'</b></div>'
+      +'<div class="st-line"><span>ต้นทุนเฉลี่ย</span><b class="rg-num">$'+stFm(h.cost/h.shares,2)+'</b></div>'
+      +'<div class="st-line"><span>มูลค่า</span><b class="rg-num">$'+stFm(val,2)+'</b></div>'
+      +'<div class="st-line"><span>ผลกำไรขาดทุน</span><b class="rg-num '+cls+'">'+(pl>0?'+':'')+stFm(pl,2)+'</b></div></div>';
+  }
+  o+='<div class="st-dacts'+(h&&h.shares>1e-9?'':' one')+'"><button type="button" class="go" data-s="'+e+'" onclick="stBuySheet(this.dataset.s)">ซื้อ</button>'
+    +(h&&h.shares>1e-9?'<button type="button" class="go sell" data-s="'+e+'" onclick="stSellSheet(this.dataset.s)">ขาย</button>':'')+'</div>';
+  body.innerHTML=o;
 }
 function stDrawPort(body){
   var ud=getUD()||{},h=ud.stocks||{};
@@ -3107,11 +3174,11 @@ function stDrawPort(body){
     var val=px?stR2(x.shares*px):stR2(x.cost),pl=stR2(val-x.cost);
     tc+=x.cost;tv+=val;
     var cls=pl>0?'st-up':(pl<0?'st-dn':'');
-    return '<div class="st-row">'+stIcon(k)+''
+    return '<div class="st-row" style="cursor:pointer" data-s="'+escHtml(k)+'" onclick="stDetail(this.dataset.s)">'+stIcon(k)+''
       +'<div class="st-mid"><div class="st-nm">'+escHtml(x.name||k)+'</div>'
       +'<div class="st-sub"><span class="rg-num">'+stR6(x.shares)+'</span> หุ้น · ต้นทุนเฉลี่ย $<span class="rg-num">'+stFm(x.cost/x.shares,2)+'</span></div>'
       +'<div class="st-sub">มูลค่า $<span class="rg-num">'+stFm(val,2)+'</span> · <span class="rg-num '+cls+'">'+(pl>0?'+':'')+stFm(pl,2)+'</span></div></div>'
-      +'<div class="st-right"><button type="button" class="st-btn sell" data-s="'+escHtml(k)+'" onclick="stSellSheet(this.dataset.s)">ขาย</button></div></div>';
+      +'<div class="st-right"><button type="button" class="st-btn sell" data-s="'+escHtml(k)+'" onclick="event.stopPropagation();stSellSheet(this.dataset.s)">ขาย</button></div></div>';
   }).join('');
   var tp=stR2(tv-tc),tcls=tp>0?'st-up':(tp<0?'st-dn':'');
   body.innerHTML='<div class="st-sum">'
@@ -3322,12 +3389,18 @@ function stAdLogoPick(inp){
   };
   rd.readAsDataURL(f);
 }
+function stHistAdd(old,price){
+  var h=stHist(old);
+  if(!h.length||h[h.length-1][1]!==price)h.push([Date.now(),price]);
+  return h.slice(-90);
+}
 function stAdmEdit(sym){
   window._db.ref('stocks/'+sym).once('value').then(function(sn){
     var s=sn.val()||{};
     document.getElementById('stAdSym').value=sym;
     document.getElementById('stAdName').value=s.name||'';
     document.getElementById('stAdPrice').value=s.price||'';
+    document.getElementById('stAdCap').value=s.cap||'';
     stAdLogoReset();stAdLogoShow(s.logo||'');
   });
 }
@@ -3341,13 +3414,14 @@ function stAdmSave(){
   var ref=window._db.ref('stocks/'+sym);
   ref.once('value').then(function(sn){
     var old=sn.val()||{};
-    var o={name:name,price:price,on:(old.on!==false),updated:Date.now()};
+    var o={name:name,price:price,on:(old.on!==false),updated:Date.now(),hist:stHistAdd(old,price)};
+    var cap=(document.getElementById('stAdCap').value||'').trim();if(cap)o.cap=cap;
     var lg=(_stAdLogo===undefined)?old.logo:_stAdLogo;
     if(lg)o.logo=lg;
     return ref.set(o);
   }).then(function(){
     showToast('✅ บันทึก '+sym+' แล้ว');
-    ['stAdSym','stAdName','stAdPrice'].forEach(function(i){document.getElementById(i).value='';});
+    ['stAdSym','stAdName','stAdPrice','stAdCap'].forEach(function(i){document.getElementById(i).value='';});
     stAdLogoReset();
     stAdmList();
   }).catch(function(){showToast('❌ บันทึกไม่สำเร็จ');});
@@ -3356,17 +3430,19 @@ function stAdmBulk(){
   var ok=[],bad=0;
   (document.getElementById('stAdBulk').value||'').split('\n').forEach(function(l){
     l=l.trim();if(!l)return;
+    var cap='',bar=l.indexOf('|');
+    if(bar>=0){cap=l.slice(bar+1).trim().slice(0,12);l=l.slice(0,bar).trim();}
     var a=l.indexOf(','),z=l.lastIndexOf(',');
     if(a<1||z<=a){bad++;return;}
     var sym=l.slice(0,a).trim().toUpperCase(),name=l.slice(a+1,z).trim(),price=Math.round(parseFloat(l.slice(z+1))*10000)/10000;
     if(!/^[A-Z0-9.\-]{1,10}$/.test(sym)||name.length<2||!(price>0)){bad++;return;}
-    ok.push({sym:sym,name:name,price:price});
+    ok.push({sym:sym,name:name,price:price,cap:cap});
   });
   if(!ok.length){showToast('⚠️ ไม่พบรายการที่ถูกต้อง');return;}
   if(!confirm('บันทึก '+ok.length+' รายการ'+(bad?' (ข้าม '+bad+' บรรทัดที่รูปแบบผิด)':'')+'?'))return;
   Promise.all(ok.map(function(x){
     var r=window._db.ref('stocks/'+x.sym);
-    return r.once('value').then(function(sn){var old=sn.val()||{};var o={name:x.name,price:x.price,on:(old.on!==false),updated:Date.now()};if(old.logo)o.logo=old.logo;return r.set(o);});
+    return r.once('value').then(function(sn){var old=sn.val()||{};var o={name:x.name,price:x.price,on:(old.on!==false),updated:Date.now(),hist:stHistAdd(old,x.price)};if(old.logo)o.logo=old.logo;var cp=x.cap||old.cap;if(cp)o.cap=cp;return r.set(o);});
   })).then(function(){
     showToast('✅ บันทึก '+ok.length+' รายการแล้ว');
     document.getElementById('stAdBulk').value='';stAdmList();
@@ -6762,6 +6838,7 @@ Object.assign(TRD,{"บัญชีรับเงินถอน": ["ບັນ�
 Object.assign(TRD,{"วิธีเล่น และ ลงทุน": ["ວິທີຫຼິ້ນ ແລະ ລົງທຶນ", "How to play and invest"], "ติดตามรายได้": ["ຕິດຕາມລາຍໄດ້", "Track earnings"], "มีปัญหา ติดต่อเรา": ["ມີບັນຫາ ຕິດຕໍ່ເຮົາ", "Need help? Contact us"], "เริ่มจากเติมเงินเข้าบัญชีของคุณ": ["ເລີ່ມຈາກເຕີມເງິນເຂົ້າບັນຊີຂອງທ່ານ", "Start by topping up your account"], "กดปุ่มเติมเงิน แล้วใส่จำนวนที่ต้องการ": ["ກົດປຸ່ມເຕີມເງິນ ແລ້ວໃສ່ຈຳນວນທີ່ຕ້ອງການ", "Tap Top up and enter the amount you want"], "โอนเงินตามบัญชีที่ระบบแสดง": ["ໂອນເງິນຕາມບັນຊີທີ່ລະບົບສະແດງ", "Transfer to the account shown"], "แนบสลิปแล้วส่งคำขอ รอทีมงานอนุมัติ": ["ແນບສະລິບແລ້ວສົ່ງຄຳຂໍ ລໍຖ້າທີມງານອະນຸມັດ", "Attach the slip, send the request and wait for approval"], "นำเงินไปซื้อแพ็กเกจขุดที่เหมาะกับคุณ": ["ນຳເງິນໄປຊື້ແພັກເກດຂຸດທີ່ເໝາະກັບທ່ານ", "Use your balance to buy a mining package"], "ดูรายได้ต่อวัน และจำนวนวันของแต่ละแพ็กเกจ": ["ເບິ່ງລາຍໄດ້ຕໍ່ມື້ ແລະ ຈຳນວນມື້ຂອງແຕ່ລະແພັກເກດ", "Check the daily income and duration of each package"], "เลือกแพ็กเกจแล้วกดซื้อ ระบบหักเงินจากยอดคงเหลือ": ["ເລືອກແພັກເກດແລ້ວກົດຊື້ ລະບົບຫັກເງິນຈາກຍອດຄົງເຫຼືອ", "Pick a package and buy it; the cost is taken from your balance"], "เครื่องขุดจะเริ่มทำงานทันที": ["ເຄື່ອງຂຸດຈະເລີ່ມເຮັດວຽກທັນທີ", "Your miner starts working right away"], "รายได้เข้าทุกวันโดยอัตโนมัติ": ["ລາຍໄດ້ເຂົ້າທຸກມື້ໂດຍອັດຕະໂນມັດ", "Earnings arrive automatically every day"], "ดูเครื่องขุดและรายได้ที่หน้าหลัก": ["ເບິ່ງເຄື່ອງຂຸດ ແລະ ລາຍໄດ້ທີ່ໜ້າຫຼັກ", "See your miners and earnings on the home page"], "กดประวัติเพื่อดูกราฟรายได้รายวัน": ["ກົດປະຫວັດເພື່ອເບິ່ງກາຟລາຍໄດ້ລາຍວັນ", "Open History to see the daily earnings chart"], "กระดิ่งแจ้งเตือนสถานะเติมเงินและถอนเงิน": ["ກະດິ່ງແຈ້ງເຕືອນສະຖານະເຕີມເງິນ ແລະ ຖອນເງິນ", "The bell shows top-up and withdrawal status"], "ชวนเพื่อนมาร่วมขุด รับโบนัสทันที": ["ຊວນໝູ່ມາຮ່ວມຂຸດ ຮັບໂບນັດທັນທີ", "Invite friends to mine and get a bonus"], "คัดลอกรหัสหรือลิงก์แนะนำของคุณ": ["ຄັດລອກລະຫັດ ຫຼື ລິ້ງແນະນຳຂອງທ່ານ", "Copy your referral code or link"], "เพื่อนสมัครและเติมเงิน คุณได้โบนัส": ["ໝູ່ສະໝັກ ແລະ ເຕີມເງິນ ທ່ານໄດ້ໂບນັດ", "When a friend signs up and tops up, you get a bonus"], "ดูรายชื่อเพื่อนและโบนัสที่หน้าแนะนำเพื่อน": ["ເບິ່ງລາຍຊື່ໝູ່ ແລະ ໂບນັດທີ່ໜ້າແນະນຳໝູ່", "See friends and bonuses on the referral page"], "ถอนรายได้เข้าบัญชีของคุณได้ทุกเวลา": ["ຖອນລາຍໄດ້ເຂົ້າບັນຊີຂອງທ່ານໄດ້ທຸກເວລາ", "Withdraw your earnings to your account any time"], "เลือกรับเป็นเงินกีบ หรือเหรียญดิจิทัล": ["ເລືອກຮັບເປັນເງິນກີບ ຫຼື ເຫຼຽນດິຈິຕອນ", "Choose to receive kip or digital coins"], "ใส่จำนวนเอง หรือกดปุ่มสูงสุดเพื่อถอนทั้งหมด": ["ໃສ່ຈຳນວນເອງ ຫຼື ກົດປຸ່ມສູງສຸດເພື່ອຖອນທັງໝົດ", "Enter an amount or tap Max to withdraw everything"], "โบนัสที่ยังล็อกอยู่ยังถอนไม่ได้ ทีมงานโอนให้หลังตรวจสอบ": ["ໂບນັດທີ່ຍັງລັອກຢູ່ຍັງຖອນບໍ່ໄດ້ ທີມງານໂອນໃຫ້ຫຼັງກວດສອບ", "Locked bonuses can't be withdrawn yet; we transfer after verification"], "ทีมงานพร้อมช่วยเหลือ": ["ທີມງານພ້ອມຊ່ວຍເຫຼືອ", "Our team is ready to help"], "กดไอคอนตั้งค่า แล้วเลือกศูนย์ช่วยเหลือ": ["ກົດໄອຄອນຕັ້ງຄ່າ ແລ້ວເລືອກສູນຊ່ວຍເຫຼືອ", "Tap the settings icon and choose Help center"], "ติดต่อทีมงานได้ทางวอทส์แอป": ["ຕິດຕໍ່ທີມງານໄດ້ທາງວອດແອັບ", "Contact the team on WhatsApp"], "ตั้งรหัสสองชั้นเพื่อความปลอดภัยของบัญชี": ["ຕັ້ງລະຫັດສອງຊັ້ນເພື່ອຄວາມປອດໄພຂອງບັນຊີ", "Turn on two-step verification to protect your account"]});
 Object.assign(TRD,{"บันทึกไม่สำเร็จ กรุณาลองใหม่":["ບັນທຶກບໍ່ສຳເລັດ ກະລຸນາລອງໃໝ່","Save failed, please try again"],"ส่งทาง":["ສົ່ງທາງ","Send via"],"ชวนมาลองเช่ากำลังขุดคริปโต สมัครผ่านลิงก์นี้":["ຊວນມາລອງເຊົ່າກຳລັງຂຸດຄຣິບໂຕ ສະໝັກຜ່ານລິ້ງນີ້","Come try crypto mining - sign up with this link"]});
 Object.assign(TRD,{"ขณะนี้ยังไม่เปิดให้บริการซื้อหุ้น": ["ຕອນນີ້ຍັງບໍ່ເປີດໃຫ້ບໍລິການຊື້ຮຸ້ນ", "Stock trading is not available yet"], "ขาดทุน": ["ຂາດທຶນ", "Loss"], "ขาย": ["ຂາຍ", "Sell"], "ขายทั้งหมด": ["ຂາຍທັງໝົດ", "Sell all"], "คำสั่งของฉัน": ["ຄຳສັ່ງຂອງຂ້ອຍ", "My orders"], "จำนวนเกินกว่าที่ถืออยู่": ["ຈຳນວນເກີນກວ່າທີ່ຖືຢູ່", "More than you hold"], "ซื้อ": ["ຊື້", "Buy"], "ซื้อขายผ่านแอดมิน": ["ຊື້ຂາຍຜ່ານແອັດມິນ", "Trade through admin"], "ซื้อหุ้นต่างประเทศผ่านแอดมิน": ["ຊື້ຮຸ້ນຕ່າງປະເທດຜ່ານແອັດມິນ", "Buy foreign stocks through admin"], "ดู": ["ເບິ່ງ", "View"], "ตลาด": ["ຕະຫຼາດ", "Market"], "ต้นทุนรวม": ["ຕົ້ນທຶນລວມ", "Total cost"], "ต้นทุนเฉลี่ย": ["ຕົ້ນທຶນສະເລ່ຍ", "Avg cost"], "ปฏิเสธแล้ว คืนให้แล้ว": ["ປະຕິເສດແລ້ວ ຄືນໃຫ້ແລ້ວ", "Rejected, refunded"], "ประมาณการหุ้นที่ได้": ["ປະມານການຮຸ້ນທີ່ໄດ້", "Estimated shares"], "ประมาณการเงินที่ได้": ["ປະມານການເງິນທີ່ໄດ້", "Estimated proceeds"], "พอร์ตของฉัน": ["ພອດຂອງຂ້ອຍ", "My portfolio"], "มูลค่า": ["ມູນຄ່າ", "Value"], "มูลค่าปัจจุบัน": ["ມູນຄ່າປັດຈຸບັນ", "Current value"], "ยอดในกระเป๋า": ["ຍອດໃນກະເປົາ", "Wallet balance"], "ยอดในกระเป๋าไม่พอ": ["ຍອດໃນກະເປົາບໍ່ພໍ", "Not enough balance"], "ยังไม่มีคำสั่ง": ["ຍັງບໍ່ມີຄຳສັ່ງ", "No orders yet"], "ยังไม่มีหุ้นในพอร์ต": ["ຍັງບໍ່ມີຮຸ້ນໃນພອດ", "No stocks in your portfolio yet"], "ยังไม่มีหุ้นในรายการ": ["ຍັງບໍ່ມີຮຸ້ນໃນລາຍການ", "No stocks listed yet"], "ยืนยันสั่งขาย": ["ຢືນຢັນສັ່ງຂາຍ", "Confirm sell order"], "ยืนยันสั่งซื้อ": ["ຢືນຢັນສັ່ງຊື້", "Confirm buy order"], "ราคาขายจริงอาจต่างจากที่แสดง ระบบพักหุ้นไว้ทันทีและคืนให้ถ้าคำสั่งถูกปฏิเสธ": ["ລາຄາຂາຍຈິງອາດຕ່າງຈາກທີ່ສະແດງ ລະບົບພັກຮຸ້ນໄວ້ທັນທີ ແລະ ຄືນໃຫ້ຖ້າຄຳສັ່ງຖືກປະຕິເສດ", "The actual sale price may differ from the one shown. Shares are held immediately and returned if the order is rejected."], "ราคาซื้อจริงอาจต่างจากที่แสดง ระบบหักยอดทันทีและคืนให้ถ้าคำสั่งถูกปฏิเสธ": ["ລາຄາຊື້ຈິງອາດຕ່າງຈາກທີ່ສະແດງ ລະບົບຫັກຍອດທັນທີ ແລະ ຄືນໃຫ້ຖ້າຄຳສັ່ງຖືກປະຕິເສດ", "The actual purchase price may differ from the one shown. Your balance is deducted immediately and refunded if the order is rejected."], "ราคาที่แสดง": ["ລາຄາທີ່ສະແດງ", "Listed price"], "ราคาในหน้านี้อัปเดตโดยแอดมิน ไม่ใช่ราคาเรียลไทม์ ราคาซื้อหรือขายจริงอาจต่างจากที่แสดง การลงทุนในหุ้นมีความเสี่ยง อาจขาดทุนได้": ["ລາຄາໃນໜ້ານີ້ອັບເດດໂດຍແອັດມິນ ບໍ່ແມ່ນລາຄາເວລາຈິງ ລາຄາຊື້ ຫຼື ຂາຍຈິງອາດຕ່າງຈາກທີ່ສະແດງ ການລົງທຶນໃນຮຸ້ນມີຄວາມສ່ຽງ ອາດຂາດທຶນໄດ້", "Prices on this page are updated by the admin and are not real-time. Actual buy or sell prices may differ. Investing in stocks carries risk and you may lose money."], "สั่งขายหุ้น": ["ສັ່ງຂາຍຮຸ້ນ", "Sell order"], "สั่งซื้อหุ้น": ["ສັ່ງຊື້ຮຸ້ນ", "Buy order"], "ส่งคำสั่งขายแล้ว รอแอดมินดำเนินการ": ["ສົ່ງຄຳສັ່ງຂາຍແລ້ວ ລໍແອັດມິນດຳເນີນການ", "Sell order sent, waiting for admin"], "ส่งคำสั่งซื้อแล้ว รอแอดมินดำเนินการ": ["ສົ່ງຄຳສັ່ງຊື້ແລ້ວ ລໍແອັດມິນດຳເນີນການ", "Buy order sent, waiting for admin"], "ส่งคำสั่งไม่สำเร็จ ยังไม่ได้หักยอด กรุณาลองใหม่": ["ສົ່ງຄຳສັ່ງບໍ່ສຳເລັດ ຍັງບໍ່ໄດ້ຫັກຍອດ ກະລຸນາລອງໃໝ່", "Could not send the order. Nothing was deducted. Please try again"], "ส่งคำสั่งไม่สำเร็จ ยังไม่ได้หักหุ้น กรุณาลองใหม่": ["ສົ່ງຄຳສັ່ງບໍ່ສຳເລັດ ຍັງບໍ່ໄດ້ຫັກຮຸ້ນ ກະລຸນາລອງໃໝ່", "Could not send the order. No shares were deducted. Please try again"], "หุ้น": ["ຮຸ້ນ", "shares"], "หุ้น ราคา": ["ຮຸ້ນ ລາຄາ", "shares at"], "หุ้นต่างประเทศ": ["ຮຸ້ນຕ່າງປະເທດ", "Foreign stocks"], "หุ้นที่ถือ": ["ຮຸ້ນທີ່ຖື", "Shares held"], "โหลดไม่สำเร็จ กรุณาลองใหม่": ["ໂຫຼດບໍ່ສຳເລັດ ກະລຸນາລອງໃໝ່", "Could not load. Please try again"], "ใส่จำนวนหุ้นที่ต้องการขาย": ["ໃສ່ຈຳນວນຮຸ້ນທີ່ຕ້ອງການຂາຍ", "Enter the number of shares to sell"]});
+Object.assign(TRD,{"ราคาล่าสุด": ["ລາຄາຫຼ້າສຸດ", "Latest price"], "อัปเดตล่าสุด": ["ອັບເດດຫຼ້າສຸດ", "Last updated"], "มูลค่าตลาด": ["ມູນຄ່າຕະຫຼາດ", "Market cap"], "ราคาย้อนหลัง": ["ລາຄາຍ້ອນຫຼັງ", "Price history"], "ราคาย้อนหลังจะแสดงเมื่อแอดมินอัปเดตราคาอย่างน้อยสองครั้ง": ["ລາຄາຍ້ອນຫຼັງຈະສະແດງເມື່ອແອັດມິນອັບເດດລາຄາຢ່າງໜ້ອຍສອງຄັ້ງ", "Price history appears after the admin updates the price at least twice"], "หุ้นของฉัน": ["ຮຸ້ນຂອງຂ້ອຍ", "My holding"], "ผลกำไรขาดทุน": ["ກຳໄລ/ຂາດທຶນ", "Profit/Loss"], "ต่ำสุด": ["ຕ່ຳສຸດ", "Low"], "สูงสุด": ["ສູງສຸດ", "High"]});
 Object.assign(TRD,{"กำไรประมาณการต่อวัน": ["ກຳໄລປະມານຕໍ່ມື້", "Estimated daily profit"], "กำไรสะสม วันที่": ["ກຳໄລສະສົມ ວັນທີ", "Accumulated profit · day"], "ขาดอีก": ["ຂາດອີກ", "short by"], "ตอนนี้": ["ຕອນນີ້", "current"], "ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง": ["ຕົວເລກເປັນການປະມານຕາມສູດຂອງລະບົບ ບໍ່ແມ່ນການຮັບປະກັນຜົນຕອບແທນ ການລົງທຶນມີຄວາມສ່ຽງ", "Figures are estimates from the system formula, not a guaranteed return. Investing carries risk."], "ท่านอยู่ระดับสูงสุดแล้ว": ["ທ່ານຢູ່ລະດັບສູງສຸດແລ້ວ", "You are at the top tier"], "ยอดคงเหลือหลังลงทุน": ["ຍອດຄົງເຫຼືອຫຼັງລົງທຶນ", "Balance after investing"], "ยอดในกระเป๋าอัปเดตแล้ว": ["ຍອດໃນກະເປົາອັບເດດແລ້ວ", "Your wallet balance is updated"], "ระดับปัจจุบันมีกรอบสีทอง": ["ລະດັບປັດຈຸບັນມີກອບສີທອງ", "the current tier has a gold frame"], "ระบบจะคำนวณกำไรให้ทันที": ["ລະບົບຈະຄຳນວນກຳໄລໃຫ້ທັນທີ", "The system calculates your profit instantly"], "รับคืนเมื่อครบสัญญา": ["ຮັບຄືນເມື່ອຄົບສັນຍາ", "Returned at contract end"], "ลงมาก อัตราต่อวันยิ่งสูง": ["ລົງຫຼາຍ ອັດຕາຕໍ່ມື້ຍິ່ງສູງ", "Invest more, higher daily rate"], "ลงเพิ่มอีก": ["ລົງເພີ່ມອີກ", "Add"], "อัตราตามจำนวนเงิน": ["ອັດຕາຕາມຈຳນວນເງິນ", "Rate by amount"], "เติมเงินก่อน": ["ເຕີມເງິນກ່ອນ", "Top up first"], "เพื่อขึ้นเป็น": ["ເພື່ອຂຶ້ນເປັນ", "to reach"], "เริ่มเพียง": ["ເລີ່ມພຽງ", "Start from"], "เลือกจำนวนเพื่อดูกำไร": ["ເລືອກຈຳນວນເພື່ອເບິ່ງກຳໄລ", "Choose an amount to see profit"], "เลื่อนดูกำไรสะสมตามวัน": ["ເລື່ອນເບິ່ງກຳໄລສະສົມຕາມວັນ", "Slide to see accumulated profit by day"], "เห็นกำไรประมาณการก่อนยืนยัน": ["ເຫັນກຳໄລປະມານກ່ອນຢືນຢັນ", "see the estimated profit before you confirm"], "ใส่จำนวนเพื่อเริ่มลงทุน": ["ໃສ່ຈຳນວນເພື່ອເລີ່ມລົງທຶນ", "Enter an amount to start"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
