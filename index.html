@@ -1711,6 +1711,7 @@ body:has(#adminScreen.active) #contactFab{display:none}
         <div id="wLockBox" style="display:none;flex-direction:column;gap:8px">
           <div style="display:flex;justify-content:space-between;font-size:13px;align-items:center"><span style="color:#b6a7d6;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>โบนัสที่ล็อกอยู่</span><span id="wLockAmt" class="rg-num" style="font-weight:700;color:#fda4af">$0</span></div>
           <div id="wLockNote" style="font-size:11px;color:#8f80b3;line-height:1.5"></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden"><div id="wLockBar" style="height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#a855f7,#86efac);transition:width .4s"></div></div><span id="wLockPct" class="rg-num" style="font-size:11px;font-weight:700;color:#c8b0ff;min-width:34px;text-align:right">0%</span></div>
         </div>
       </div>
 
@@ -3293,6 +3294,11 @@ function renderWallet(){
   if(lockBox){
     const lk=Math.min(usd,ud.bonusLocked||0);
     lockBox.style.display=lk>0?'flex':'none';
+    if(lk>0){
+      const need=ud.bonusNeed||0,tot=Math.max(ud.bonusNeedTotal||0,need),pct=tot>0?Math.max(0,Math.min(100,Math.floor((1-need/tot)*100))):0;
+      const bar=document.getElementById('wLockBar');if(bar)bar.style.width=pct+'%';
+      set('wLockPct',pct+'%');
+    }
     if(lk>0){set('wLockAmt','$'+fm(lk,2));set('wLockNote','โบนัสถอนได้เมื่อลงทุนครบเงื่อนไข เหลือลงทุนอีก $'+fm(ud.bonusNeed||0,2));}
   }
   walletLakRate(function(rate){set('wUsdLak','≈ ₭ '+Math.floor(usd*rate).toLocaleString('en-US')+'  ·  1 USDT = ₭ '+Math.round(rate).toLocaleString('en-US'));});
@@ -3402,6 +3408,7 @@ function submitWithdraw(){
   _wp.then(function(){
     window._lastWdKey=_wp.key;
     try{window._db.ref('userreqs/'+req.user+'/'+_wp.key).set({t:'withdraw'});}catch(e){}
+    notifyAdmin('withdraw',_wp.key);
     _wdSubmitting=false;
     ud.usd=Math.max(0,Math.round(((ud.usd||0)-usdAmt)*100)/100);
     ud.txs=ud.txs||[];
@@ -3942,7 +3949,7 @@ function reconcileCredits(){
     if(!ud.txs)ud.txs=[];
     ud.txs.unshift({desc:c.desc||(a>=0?'✅ เติม USDT':'Admin หัก USDT'),amount:a,unit:'USDT',time:c.time||Date.now()});
     ud.appliedCredits[k]=1;
-    if(c.lock>0){ud.bonusLocked=(ud.bonusLocked||0)+(parseFloat(c.lock)||0);ud.bonusNeed=(ud.bonusNeed||0)+(parseFloat(c.need)||0);}
+    if(c.lock>0){ud.bonusLocked=(ud.bonusLocked||0)+(parseFloat(c.lock)||0);ud.bonusNeed=(ud.bonusNeed||0)+(parseFloat(c.need)||0);ud.bonusNeedTotal=(ud.bonusNeedTotal||0)+(parseFloat(c.need)||0);}
     if(k.indexOf('refb_')===0){ud.refCount=(ud.refCount||0)+1;ud.refEarned=(ud.refEarned||0)+a;}
     net+=a;
   });
@@ -4214,6 +4221,10 @@ function tpConfirmDone(){
     if(btn){btn.disabled=false;btn.style.opacity='1';}
   },{currency:'LAK',lak:q.lak,rate:q.rate,_slip:_tpSlip});
 }
+// แจ้งแอดมินทาง Telegram ผ่าน /api/notify (ส่งแค่ชนิด+รหัสคำขอ ข้อมูลจริงเซิร์ฟเวอร์ไปอ่านจาก Firebase เอง) ล้มเหลวเงียบ ไม่กระทบลูกค้า
+function notifyAdmin(type,key){
+  try{fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:type,key:key}),keepalive:true}).catch(function(){});}catch(e){}
+}
 function submitTopupRequest(amt,onOk,onFail,extra){
   if(_tpSubmitting)return;
   if(!window._db){showToast('❌ ไม่มี Firebase');if(onFail)onFail();return;}
@@ -4229,6 +4240,7 @@ function submitTopupRequest(amt,onOk,onFail,extra){
   }).then(function(){
     _tpSubmitting=false;
     try{window._db.ref('userreqs/'+user+'/'+ref.key).set({t:'topup'});}catch(e){}
+    notifyAdmin('topup',ref.key);
     if(_ud)_ud.lastTopupKey=ref.key;
     try{window._db.ref('users/'+user+'/lastTopupKey').set(ref.key);}catch(e){}
     if(onOk)onOk(ref.key);
@@ -4653,8 +4665,9 @@ function grantFirstDepositBonus(user,amt,cb){
 }
 function consumeBonusTurnover(ud,amt){
   if(!ud||!(ud.bonusLocked>0))return;
+  if(!(ud.bonusNeedTotal>0))ud.bonusNeedTotal=ud.bonusNeed||0;
   ud.bonusNeed=Math.max(0,(ud.bonusNeed||0)-amt);
-  if(ud.bonusNeed<=0){ud.bonusLocked=0;ud.bonusNeed=0;}
+  if(ud.bonusNeed<=0){ud.bonusLocked=0;ud.bonusNeed=0;ud.bonusNeedTotal=0;}
 }
 function withdrawableOf(ud){
   const usd=ud.usd||0,locked=Math.min(usd,ud.bonusLocked||0);
