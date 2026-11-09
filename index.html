@@ -2519,7 +2519,7 @@ body:has(#adminScreen.active) #contactFab{display:none}
         </div>
         <div style="border-radius:14px;padding:12px;background:rgba(0,0,0,.28);text-align:left">
           <div style="font-size:11px;color:#b6a7d6;margin-bottom:4px">ตัวอย่าง ลงทุน $100</div>
-          <div class="rg-num" style="font-size:18px;font-weight:700;color:#4ade80">+$0.75/วัน</div>
+          <div class="rg-num" style="font-size:18px;font-weight:700;color:#4ade80">+$0.80/วัน</div>
           <div style="font-size:11px;color:#b6a7d6">สัญญา 90 วัน</div>
         </div>
       </div>
@@ -6360,7 +6360,7 @@ function saveUDForce(ud){
 
 // ─── ETH MINING CALC ───
 const ETH_RATE=2672.47;
-var DAILY_PCT_TIERS=[[100,0.75],[500,0.8],[1000,1.0],[5000,1.2],[10000,1.5],[30000,1.8],[50000,2.3],[100000,2.8]];
+var DAILY_PCT_TIERS=[[100,1.0],[500,0.8],[1000,1.0],[5000,1.2],[10000,1.5],[30000,1.8],[50000,2.3],[100000,2.8]];
 function calcDailyPct(amt){
   // ขั้นบันได: ยิ่งลงทุนต่อเครื่องมาก % ต่อวันยิ่งสูง (ไม่ลดลงเมื่อยอดเพิ่ม)
   for(var i=0;i<DAILY_PCT_TIERS.length;i++){if(amt<DAILY_PCT_TIERS[i][0])return DAILY_PCT_TIERS[i][1];}
@@ -6528,7 +6528,9 @@ function calcMiningPreview(){
   });
   var tl=document.getElementById('mpTiers');if(tl)tl.innerHTML=rows;
 
-  var nt=MP_NX.find(function(t){return t>amt;});
+  // next hint must offer a tier with a HIGHER daily rate, not a lower one
+  var cr=valid?calcDailyPct(amt):0;
+  var nt=MP_NX.find(function(t){return t>amt&&calcDailyPct(t)>cr;});
   mpShow('mpNext',valid,'block');
   mpSet('mpNext',nt?('ลงเพิ่มอีก $'+mpFm(nt-amt,(nt-amt)%1?2:0)+' เพื่อขึ้นเป็น '+calcDailyPct(nt).toFixed(2)+'% ต่อวัน'):'ท่านอยู่ระดับสูงสุดแล้ว');
 
