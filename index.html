@@ -3063,7 +3063,7 @@ function stBadge(sym){
 // โลโก้หุ้น: ดึงจากบริการโลโก้ภายนอกตามสัญลักษณ์ (แอดมินใส่ช่อง logo ในรายการหุ้นเพื่อกำหนดเองได้) โหลดไม่ได้จะใช้ป้ายสีแทน
 function stIcon(k){
   var st=_stList[k],u=(st&&st.logo)||('https://financialmodelingprep.com/image-stock/'+encodeURIComponent(k)+'.png');
-  return '<div class="st-sym" style="'+stBadge(k)+'">'+escHtml(k.split('.')[0].slice(0,5))+'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+escHtml(u)+'" onload="this.parentNode.classList.add(&quot;lg&quot;)" onerror="this.remove()"></div>';
+  return '<div class="st-sym" style="'+stBadge(k)+'">'+escHtml(k.split('-')[0].slice(0,5))+'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+escHtml(u)+'" onload="this.parentNode.classList.add(&quot;lg&quot;)" onerror="this.remove()"></div>';
 }
 function stR2(n){return Math.round((+n||0)*100)/100;}
 function stR6(n){return Math.round((+n||0)*1e6)/1e6;}
@@ -3408,7 +3408,7 @@ function stAdmSave(){
   var sym=(document.getElementById('stAdSym').value||'').trim().toUpperCase();
   var name=(document.getElementById('stAdName').value||'').trim();
   var price=Math.round(parseFloat(document.getElementById('stAdPrice').value)*10000)/10000;
-  if(!/^[A-Z0-9.\-]{1,10}$/.test(sym)){showToast('⚠️ สัญลักษณ์ใช้ได้เฉพาะ A-Z 0-9 . -');return;}
+  if(!/^[A-Z0-9\-]{1,10}$/.test(sym)){showToast('⚠️ สัญลักษณ์ใช้ได้เฉพาะ A-Z 0-9 และ - (ห้ามมีจุด)');return;}
   if(!(price>0)){showToast('⚠️ ใส่ราคาให้ถูกต้อง');return;}
   if(name.length<2){showToast('⚠️ ใส่ชื่อบริษัท');return;}
   var ref=window._db.ref('stocks/'+sym);
@@ -3435,7 +3435,7 @@ function stAdmBulk(){
     var a=l.indexOf(','),z=l.lastIndexOf(',');
     if(a<1||z<=a){bad++;return;}
     var sym=l.slice(0,a).trim().toUpperCase(),name=l.slice(a+1,z).trim(),price=Math.round(parseFloat(l.slice(z+1))*10000)/10000;
-    if(!/^[A-Z0-9.\-]{1,10}$/.test(sym)||name.length<2||!(price>0)){bad++;return;}
+    if(!/^[A-Z0-9\-]{1,10}$/.test(sym)||name.length<2||!(price>0)){bad++;return;}
     ok.push({sym:sym,name:name,price:price,cap:cap});
   });
   if(!ok.length){showToast('⚠️ ไม่พบรายการที่ถูกต้อง');return;}
