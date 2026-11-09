@@ -2732,7 +2732,8 @@ function doLogin(){
     const cached=localStorage.getItem('cm_ud_'+u);
     if(cached){
       const ud=JSON.parse(cached);
-      if(ud&&ud.pw===p){
+      if(ud&&ud.pw===p&&!window._db){
+        // ออฟไลน์เท่านั้น: ถ้ามี Firebase ต้องตรวจรหัสจากเซิร์ฟเวอร์เสมอ (กันรหัสเก่าที่แอดมินรีเซ็ตแล้ว)
         // เช็คแบน
         checkBanned(u,(banned)=>{
           if(banned){
@@ -2769,7 +2770,14 @@ function doLogin(){
     fbGetUser(u).then(ud=>{
       if(!ud){showMsg('loginMsg','❌ ไม่พบชื่อผู้ใช้','error');return;}
       if(ud.pw!==p){showMsg('loginMsg','❌ รหัสผ่านไม่ถูกต้อง','error');return;}
-      _ud=ud;setSess(u);enterDash(u);
+      checkBanned(u,(banned)=>{
+        if(banned){showMsg('loginMsg','🚫 บัญชีนี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแล','error');return;}
+        if(ud.twoFA&&ud.twoFA.enabled){
+          show2FALogin(u,ud,()=>{_ud=ud;setSess(u);enterDash(u);});
+          return;
+        }
+        _ud=ud;setSess(u);enterDash(u);
+      });
     }).catch(err=>{
       showMsg('loginMsg','❌ '+( err&&err.message?err.message:JSON.stringify(err)),'error');
     });
@@ -4569,7 +4577,7 @@ function grantReferralBonus(friend,cb){
           let hit=false;
           if(milestoneOn&&count===cfg.goal&&keys.indexOf('refm_'+cfg.goal)<0){
             hit=true;
-            jobs.push(adminCredit(ref,'refm_'+cfg.goal,cfg.goalBonus,'🏆 ชวนเพื่อนครบ '+cfg.goal+' คน +$'+cfg.goalBonus,{lock:cfg.goalBonus,need:Math.round(cfg.goalBonus*turn*100)/100}));
+            jobs.push(adminCredit(ref,'refm_'+cfg.goal,cfg.goalBonus,'🏆 ชวนเพื่อนครบ '+cfg.goal+' คน +$'+cfg.goalBonus,turn>0?{lock:cfg.goalBonus,need:Math.round(cfg.goalBonus*turn*100)/100}:null));
           }
           return Promise.all(jobs).then(function(){cb(true,ref,payPer?cfg.bonus:0,hit?cfg.goalBonus:0);});
         });
@@ -4637,7 +4645,7 @@ function grantFirstDepositBonus(user,amt,cb){
         return n+1;
       },function(err2,ok2){
         if(err2||!ok2){cb(false,'max');return;}
-        adminCredit(user,'fdb_'+user,cfg.bonus,'🎁 โบนัสเติมครั้งแรก +$'+cfg.bonus,{lock:cfg.bonus,need:Math.round(cfg.bonus*cfg.turn*100)/100})
+        adminCredit(user,'fdb_'+user,cfg.bonus,'🎁 โบนัสเติมครั้งแรก +$'+cfg.bonus,cfg.turn>0?{lock:cfg.bonus,need:Math.round(cfg.bonus*cfg.turn*100)/100}:null)
           .then(function(){cb(true,cfg.bonus);}).catch(function(){cb(false);});
       },false);
     },false);
