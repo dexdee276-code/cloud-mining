@@ -3148,9 +3148,10 @@ function stChart(h,lab){
     +'<div class="st-line" style="margin-top:6px"><span>'+(lab?'ปิดก่อนหน้า':fd(d0))+'</span><span>'+(lab?'ล่าสุด':fd(d1))+'</span></div>'
     +'<div class="st-line"><span>ต่ำสุด <b class="rg-num">$'+stFm(lo,2)+'</b></span><span>สูงสุด <b class="rg-num">$'+stFm(hi,2)+'</b></span></div>';
 }
-var ST_API='/api/chart',_stRange='1mo',_stCache={};
+var ST_API=(/vercel\.app$/.test(location.hostname)?'':'https://cloud-mining-black.vercel.app')+'/api/chart',_stRange='1mo',_stCache={};
 var ST_RG=[['1d','1D'],['5d','5D'],['1mo','1M'],['6mo','6M'],['1y','1Y']];
-function stRangeTabs(){
+function stRangeTabs(f){
+  if(!ST_API||!f)return ''; // แสดงปุ่มช่วงเวลาเมื่อโหลดข้อมูลตลาดสำเร็จแล้วเท่านั้น
   return '<div class="st-rg">'+ST_RG.map(function(r){return '<button type="button" data-r="'+r[0]+'" class="'+(r[0]===_stRange?'on':'')+'" onclick="stSetRange(this.dataset.r)">'+r[1]+'</button>';}).join('')+'</div>';
 }
 function stSetRange(r){
@@ -3160,7 +3161,7 @@ function stSetRange(r){
 }
 function stLoadChart(sym){
   var rg=_stRange,key=sym+'|'+rg,box=document.getElementById('stChBox');
-  if(!box||typeof fetch!=='function')return;
+  if(!ST_API||!box||typeof fetch!=='function')return;
   var show=function(d){
     if(_stDet!==sym||_stRange!==rg)return;
     stShowChart(sym,rg,d);
@@ -3180,6 +3181,7 @@ function stShowChart(sym,rg,d){
   var px=+s.price,last=d.c[d.c.length-1],k=1;
   if(d.cur&&d.cur!=='USD'&&px>0&&last>0)k=px/last; // หุ้นต่างตลาด: ปรับสเกลให้ตรงกับราคา USD ที่แสดง
   var pts=d.t.map(function(t,i){return [t*1000,d.c[i]*k];});
+  if(!document.querySelector('.st-rg'))box.insertAdjacentHTML('beforebegin',stRangeTabs(true));
   box.innerHTML=stChartI(pts,rg)+'<div class="st-sub" style="margin-top:6px">ข้อมูลกราฟจากตลาด ราคาซื้อขายจริงตามที่แอดมินกำหนด</div>';
   stBindChart(pts,rg);
 }
