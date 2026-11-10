@@ -3234,9 +3234,13 @@ function stBadge(sym){
   return 'background:linear-gradient(135deg,'+c[0]+','+c[1]+');color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45);font-size:'+(sym.length>3?'11px':'14px');
 }
 // โลโก้หุ้น: ดึงจากบริการโลโก้ภายนอกตามสัญลักษณ์ (แอดมินใส่ช่อง logo ในรายการหุ้นเพื่อกำหนดเองได้) โหลดไม่ได้จะใช้ป้ายสีแทน
+function stIni(k,st){
+  if(/^\d/.test(k)){var w=String((st&&st.name)||'').replace(/[^A-Za-z]+/g,' ').trim().split(' ')[0]||'';if(w)return w.slice(0,4).toUpperCase();}
+  return k.split('-')[0].slice(0,5);
+}
 function stIcon(k){
   var st=_stList[k],u=(st&&st.logo)||('https://financialmodelingprep.com/image-stock/'+encodeURIComponent(k)+'.png');
-  return '<div class="st-sym" style="'+stBadge(k)+'">'+escHtml(k.split('-')[0].slice(0,5))+'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+escHtml(u)+'" onload="this.parentNode.classList.add(&quot;lg&quot;)" onerror="this.remove()"></div>';
+  return '<div class="st-sym" style="'+stBadge(k)+'">'+escHtml(stIni(k,st))+'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+escHtml(u)+'" onload="this.parentNode.classList.add(&quot;lg&quot;)" onerror="this.remove()"></div>';
 }
 function stPc(pl,c){return (+c>0)?' ('+(pl>0?'+':'')+stFm(pl/c*100,2)+'%)':'';}
 function stR2(n){return Math.round((+n||0)*100)/100;}
