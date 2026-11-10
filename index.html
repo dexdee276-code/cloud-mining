@@ -1171,7 +1171,7 @@ input[type=range].mp-range::-moz-range-track{height:28px;background:transparent;
 input[type=range].mp-range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#FFD700;border:3px solid #120826}
 #miningAmtInput::placeholder{color:rgba(185,170,215,.45)}
 
-.mp-foot{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;width:calc(100% - 24px);max-width:520px;box-sizing:border-box;padding:16px 8px 6px;z-index:150;background:linear-gradient(to top,#080010 72%,rgba(8,0,16,0));pointer-events:none}
+.mp-foot{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(122px + env(safe-area-inset-bottom,0px));width:calc(100% - 24px);max-width:520px;box-sizing:border-box;padding:16px 8px 6px;z-index:150;background:linear-gradient(to top,#080010 72%,rgba(8,0,16,0));pointer-events:none}
 .mp-foot button{pointer-events:auto}
 
 /* ปุ่มติดต่อแอดมินลอยอยู่เหนือแถบ CTA เฉพาะตอนเปิดหน้าสัญญาขุด */
@@ -1882,7 +1882,7 @@ body:has(#adminScreen.active) #contactFab{display:none}
   <div id="mpFoot" class="mp-foot">
     <button type="button" id="pvCta" onclick="startMiningInvestment()" disabled style="width:100%;height:56px;border:none;border-radius:16px;font-family:inherit;font-size:16px;font-weight:800;background:rgba(255,255,255,.1);color:#a99bc7;cursor:not-allowed">ใส่จำนวนเพื่อเริ่มลงทุน</button>
   </div>
-  <div style="height:88px;flex:none"></div>
+  <div style="height:190px;flex:none"></div>
 </div>
 
 <div class="tab-page" id="pgWallet">
