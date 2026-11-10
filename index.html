@@ -3092,6 +3092,35 @@ function stOpen(){_stTab=0;_stDet=null;switchTab(5);}
 function stTab(i){_stTab=i;_stDet=null;stRender();}
 function stDetail(sym){_stDet=sym;stRender();var r=document.getElementById('pgStock');if(r)r.scrollTop=0;}
 function stBack(){_stDet=null;stRender();}
+var _stTimer=null;
+function stAuto(){
+  var pg=document.getElementById('pgStock');
+  if(!pg||!pg.classList.contains('active')||document.hidden||_stBusy||_stTab===2||!_stOn)return;
+  if(document.getElementById('stSheet'))return;
+  var body=document.getElementById('stBody');if(!body)return;
+  var top=pg.scrollTop;
+  stMeta().then(function(){
+    if(!_stOn||_stBusy||document.getElementById('stSheet'))return;
+    if(_stDet&&_stTab<2)stDrawDetail(body,_stDet);else if(_stTab===0)stDrawMarket(body);else if(_stTab===1)stDrawPort(body);
+    pg.scrollTop=top;
+  }).catch(function(){});
+}
+var _stLive=false;
+function stLive(){
+  if(_stLive||!window._db)return;_stLive=true;
+  window._db.ref('stocks').on('value',function(sn){
+    var pg=document.getElementById('pgStock');
+    if(!pg||!pg.classList.contains('active')||document.hidden||_stBusy||_stTab===2||!_stOn)return;
+    if(document.getElementById('stSheet'))return;
+    var body=document.getElementById('stBody');if(!body)return;
+    _stList=sn.exists()?sn.val():{};
+    var top=pg.scrollTop;
+    if(_stDet&&_stTab<2)stDrawDetail(body,_stDet);else if(_stTab===0)stDrawMarket(body);else if(_stTab===1)stDrawPort(body);
+    pg.scrollTop=top;
+  },function(){_stLive=false;});
+}
+if(!_stTimer)_stTimer=setInterval(stAuto,30000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)stAuto();});
 function stActive(){
   return Object.keys(_stList).filter(function(k){var s=_stList[k];return s&&s.on!==false&&(+s.price)>0;}).sort();
 }
@@ -3099,6 +3128,7 @@ function stRender(){
   var body=document.getElementById('stBody');if(!body)return;
   [0,1,2].forEach(function(j){var b=document.getElementById('stT'+j);if(b)b.classList.toggle('on',j===_stTab);});
   body.innerHTML='<div class="st-note">⏳ กำลังโหลด...</div>';
+  stLive();
   stMeta().then(function(){
     if(!_stOn){body.innerHTML='<div class="st-empty">ขณะนี้ยังไม่เปิดให้บริการซื้อหุ้น</div>';return;}
     if(_stTab===2)_stDet=null;
@@ -3148,7 +3178,7 @@ function stChart(h,lab){
     +'<div class="st-line" style="margin-top:6px"><span>'+(lab?'ปิดก่อนหน้า':fd(d0))+'</span><span>'+(lab?'ล่าสุด':fd(d1))+'</span></div>'
     +'<div class="st-line"><span>ต่ำสุด <b class="rg-num">$'+stFm(lo,2)+'</b></span><span>สูงสุด <b class="rg-num">$'+stFm(hi,2)+'</b></span></div>';
 }
-var ST_API=(/vercel\.app$/.test(location.hostname)?'':'https://cloud-mining-black.vercel.app')+'/api/chart',_stRange='1mo',_stCache={};
+var ST_API='',/* ใส่ URL ของ api/chart เพื่อเปิดกราฟจากตลาด (ตอนนี้ปิดไว้) */_stRange='1mo',_stCache={};
 var ST_RG=[['1d','1D'],['5d','5D'],['1mo','1M'],['6mo','6M'],['1y','1Y']];
 function stRangeTabs(f){
   if(!ST_API||!f)return ''; // แสดงปุ่มช่วงเวลาเมื่อโหลดข้อมูลตลาดสำเร็จแล้วเท่านั้น
@@ -3236,13 +3266,13 @@ function stDrawDetail(body,sym){
   if(!s||s.on===false||!((+s.price)>0)){_stDet=null;stDrawMarket(body);return;}
   var ud=getUD()||{},h=(ud.stocks||{})[sym],px=+s.price,ch=stChg(s),e=escHtml(sym);
   var hist=stHist(s),lab=false;
-  if(hist.length<2&&(+s.prev)>0){hist=[[0,+s.prev],[s.updated||0,px]];lab=true;}
   var o='<div class="st-dh"><button type="button" class="st-back" onclick="stBack()" aria-label="back">‹</button>'+stIcon(sym)
     +'<div class="st-mid"><div class="st-nm" style="white-space:normal">'+escHtml(s.name||sym)+'</div><div class="st-sub">'+e+'</div></div></div>'
     +'<div class="st-card"><div class="st-sub">ราคาล่าสุด</div><div class="st-big rg-num">$'+stFm(px,2)+'</div>'
     +(ch?'<div class="st-ch rg-num '+(ch.diff>=0?'st-up':'st-dn')+'">'+(ch.diff>=0?'+':'')+stFm(ch.diff,2)+' ('+(ch.pct>=0?'+':'')+stFm(ch.pct,2)+'%)</div>':'')+'</div>'
-    +'<div class="st-card"><div class="st-sub" style="margin-bottom:6px">ราคาย้อนหลัง</div>'+stRangeTabs()+'<div id="stChBox">'+stChart(hist,lab)+(lab?'<div class="st-sub" style="margin-top:4px">กราฟจะยาวขึ้นเมื่อแอดมินอัปเดตราคา</div>':'')+'</div></div>'
-    +'<div class="st-card">'
+    +(false?'<div class="st-card"><div class="st-sub" style="margin-bottom:6px">ราคาย้อนหลัง</div>'+stRangeTabs()+'<div id="stChBox">'+stChart(hist,lab)+'</div></div>':'')
+    +'<div class="st-card"><div class="st-sub" style="margin-bottom:2px">ข้อมูลหุ้น</div>'
+    +'<div class="st-line"><span>สัญลักษณ์</span><b>'+e+'</b></div>'
     +(s.cap?'<div class="st-line"><span>มูลค่าตลาด</span><b class="rg-num">$'+escHtml(String(s.cap))+'</b></div>':'')
     +((+s.prev>0)?'<div class="st-line"><span>ราคาปิดก่อนหน้า</span><b class="rg-num">$'+stFm(s.prev,2)+'</b></div>':'')
     +'<div class="st-line"><span>อัปเดตล่าสุด</span><b class="rg-num">'+(s.updated?stTime(s.updated):'-')+'</b></div></div>';
@@ -6937,6 +6967,7 @@ Object.assign(TRD,{"ขณะนี้ยังไม่เปิดให้บ
 Object.assign(TRD,{"ราคาล่าสุด": ["ລາຄາຫຼ້າສຸດ", "Latest price"], "อัปเดตล่าสุด": ["ອັບເດດຫຼ້າສຸດ", "Last updated"], "มูลค่าตลาด": ["ມູນຄ່າຕະຫຼາດ", "Market cap"], "ราคาย้อนหลัง": ["ລາຄາຍ້ອນຫຼັງ", "Price history"], "ราคาย้อนหลังจะแสดงเมื่อแอดมินอัปเดตราคาอย่างน้อยสองครั้ง": ["ລາຄາຍ້ອນຫຼັງຈະສະແດງເມື່ອແອັດມິນອັບເດດລາຄາຢ່າງໜ້ອຍສອງຄັ້ງ", "Price history appears after the admin updates the price at least twice"], "หุ้นของฉัน": ["ຮຸ້ນຂອງຂ້ອຍ", "My holding"], "ผลกำไรขาดทุน": ["ກຳໄລ/ຂາດທຶນ", "Profit/Loss"], "ต่ำสุด": ["ຕ່ຳສຸດ", "Low"], "สูงสุด": ["ສູງສຸດ", "High"]});
 Object.assign(TRD,{"ราคาปิดก่อนหน้า":["ລາຄາປິດກ່ອນໜ້າ","Previous close"]});
 Object.assign(TRD,{"ปิดก่อนหน้า":["ປິດກ່ອນໜ້າ","Prev. close"],"ล่าสุด":["ຫຼ້າສຸດ","Latest"],"กราฟจะยาวขึ้นเมื่อแอดมินอัปเดตราคา":["ກຣາຟຈະຍາວຂຶ້ນເມື່ອແອັດມິນອັບເດດລາຄາ","The chart grows as the admin updates prices"]});
+Object.assign(TRD,{"ข้อมูลหุ้น":["ຂໍ້ມູນຮຸ້ນ","Stock info"],"สัญลักษณ์":["ສັນຍາລັກ","Symbol"]});
 Object.assign(TRD,{"ข้อมูลกราฟจากตลาด ราคาซื้อขายจริงตามที่แอดมินกำหนด":["ຂໍ້ມູນກຣາຟຈາກຕະຫຼາດ ລາຄາຊື້ຂາຍຈິງຕາມທີ່ແອັດມິນກຳນົດ","Chart data is from the market. Actual trade prices are set by the admin."]});
 Object.assign(TRD,{"กำไรประมาณการต่อวัน": ["ກຳໄລປະມານຕໍ່ມື້", "Estimated daily profit"], "กำไรสะสม วันที่": ["ກຳໄລສະສົມ ວັນທີ", "Accumulated profit · day"], "ขาดอีก": ["ຂາດອີກ", "short by"], "ตอนนี้": ["ຕອນນີ້", "current"], "ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง": ["ຕົວເລກເປັນການປະມານຕາມສູດຂອງລະບົບ ບໍ່ແມ່ນການຮັບປະກັນຜົນຕອບແທນ ການລົງທຶນມີຄວາມສ່ຽງ", "Figures are estimates from the system formula, not a guaranteed return. Investing carries risk."], "ท่านอยู่ระดับสูงสุดแล้ว": ["ທ່ານຢູ່ລະດັບສູງສຸດແລ້ວ", "You are at the top tier"], "ยอดคงเหลือหลังลงทุน": ["ຍອດຄົງເຫຼືອຫຼັງລົງທຶນ", "Balance after investing"], "ยอดในกระเป๋าอัปเดตแล้ว": ["ຍອດໃນກະເປົາອັບເດດແລ້ວ", "Your wallet balance is updated"], "ระดับปัจจุบันมีกรอบสีทอง": ["ລະດັບປັດຈຸບັນມີກອບສີທອງ", "the current tier has a gold frame"], "ระบบจะคำนวณกำไรให้ทันที": ["ລະບົບຈະຄຳນວນກຳໄລໃຫ້ທັນທີ", "The system calculates your profit instantly"], "รับคืนเมื่อครบสัญญา": ["ຮັບຄືນເມື່ອຄົບສັນຍາ", "Returned at contract end"], "ลงมาก อัตราต่อวันยิ่งสูง": ["ລົງຫຼາຍ ອັດຕາຕໍ່ມື້ຍິ່ງສູງ", "Invest more, higher daily rate"], "ลงเพิ่มอีก": ["ລົງເພີ່ມອີກ", "Add"], "อัตราตามจำนวนเงิน": ["ອັດຕາຕາມຈຳນວນເງິນ", "Rate by amount"], "เติมเงินก่อน": ["ເຕີມເງິນກ່ອນ", "Top up first"], "เพื่อขึ้นเป็น": ["ເພື່ອຂຶ້ນເປັນ", "to reach"], "เริ่มเพียง": ["ເລີ່ມພຽງ", "Start from"], "เลือกจำนวนเพื่อดูกำไร": ["ເລືອກຈຳນວນເພື່ອເບິ່ງກຳໄລ", "Choose an amount to see profit"], "เลื่อนดูกำไรสะสมตามวัน": ["ເລື່ອນເບິ່ງກຳໄລສະສົມຕາມວັນ", "Slide to see accumulated profit by day"], "เห็นกำไรประมาณการก่อนยืนยัน": ["ເຫັນກຳໄລປະມານກ່ອນຢືນຢັນ", "see the estimated profit before you confirm"], "ใส่จำนวนเพื่อเริ่มลงทุน": ["ໃສ່ຈຳນວນເພື່ອເລີ່ມລົງທຶນ", "Enter an amount to start"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
