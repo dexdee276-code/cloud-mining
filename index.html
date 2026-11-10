@@ -1092,6 +1092,26 @@ body.st-mode #bottomNav,body.st-mode #contactFab,body.st-mode .nav-app{display:n
 #stBal b{color:#fff;font-size:13px}
 #stTop[data-m=d] #stBal{display:none}
 #stScroll .st-row{content-visibility:auto;contain-intrinsic-size:auto 64px}
+.st-fav{flex:none;width:34px;height:34px;border:0;background:none;color:#4b5866;font-size:21px;line-height:1;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.st-fav.on{color:#fbbf24}
+.st-fav.det{position:absolute;right:0;top:2px;width:42px;height:42px;font-size:28px}
+.st-hp{position:relative}
+#stCats{margin-top:-2px}
+#stCats button{background:none!important;border:1px solid #243040!important;color:#9fb0c3!important;padding:5px 12px!important;font-size:12px!important}
+#stCats button.on{background:#e6edf3!important;color:#0a0e13!important;border-color:#e6edf3!important;font-weight:700}
+.st-pie{display:flex;align-items:center;gap:16px;margin-top:8px}
+.st-pie svg{flex:none;width:118px;height:118px}
+.st-lg{flex:1;min-width:0}
+.st-lgr{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 0}
+.st-lgr i{width:10px;height:10px;border-radius:50%;flex:none}
+.st-lgr span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-lgr b{margin-left:auto;flex:none}
+.st-tg{display:flex;gap:6px;margin-top:6px}
+.st-tg button{flex:none;border:1px solid #243040;background:none;color:#9fb0c3;font-family:inherit;font-size:12px;padding:5px 12px;border-radius:999px;cursor:pointer}
+.st-tg button.on{background:#e6edf3;color:#0a0e13;border-color:#e6edf3;font-weight:700}
+.st-dv{color:#fbbf24}
+.st-sym.st-dv{font-size:10px;line-height:1.15;text-align:center;padding:2px;word-break:break-word}
+.st-est{margin-top:2px}
 #stScroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 20px;display:flex;flex-direction:column}
 #stBody{flex:1;display:flex;flex-direction:column}
 #stBody>*{flex:none}
@@ -1793,10 +1813,12 @@ body:has(#adminScreen.active) #contactFab{display:none}
       <div class="st-srch"><span>&#128269;</span><input id="stQ" type="text" placeholder="ค้นหาหุ้น เช่น NVDA, Apple" oninput="stFilter()" autocomplete="off" autocapitalize="off"></div>
       <div class="st-chips">
         <button type="button" data-f="all" class="on" onclick="stSort('all')">ทั้งหมด</button>
+        <button type="button" data-f="fav" onclick="stSort('fav')">★ โปรด</button>
         <button type="button" data-f="up" onclick="stSort('up')">▲ ขึ้น</button>
         <button type="button" data-f="dn" onclick="stSort('dn')">▼ ลง</button>
         <button type="button" data-f="open" onclick="stSort('open')">ตลาดเปิด</button>
       </div>
+      <div class="st-chips" id="stCats"></div>
     </div>
     <div id="stBody"></div>
   </div>
@@ -3180,7 +3202,24 @@ function enterDash(user){
 // ═══════════════════════════════════════════════
 var ST_INFO={"NVDA": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["ออกแบบชิปกราฟิก (GPU) และชิปประมวลผล AI รายใหญ่ของโลก ใช้ในดาต้าเซ็นเตอร์ เกม และรถยนต์", "ອອກແບບຊິບກາຟິກ (GPU) ແລະຊິບປະມວນຜົນ AI ລາຍໃຫຍ່ຂອງໂລກ ໃຊ້ໃນດາຕ້າເຊັນເຕີ ເກມ ແລະລົດຍົນ", "Designs GPUs and AI processing chips, a world leader, used in data centers, gaming and cars"]], "AAPL": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เทคโนโลยี", "ເທັກໂນໂລຢີ", "Technology"], ["ผู้ผลิต iPhone, Mac และ iPad พร้อมบริการ App Store และ iCloud", "ຜູ້ຜະລິດ iPhone, Mac ແລະ iPad ພ້ອມບໍລິການ App Store ແລະ iCloud", "Maker of iPhone, Mac and iPad, with App Store and iCloud services"]], "MSFT": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ซอฟต์แวร์และคลาวด์", "ຊອບແວແລະຄລາວ", "Software and cloud"], ["เจ้าของ Windows, Office และ Azure คลาวด์ระดับโลก", "ເຈົ້າຂອງ Windows, Office ແລະ Azure ຄລາວລະດັບໂລກ", "Owner of Windows, Office and the Azure cloud"]], "GOOGL": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["อินเทอร์เน็ต", "ອິນເຕີເນັດ", "Internet"], ["บริษัทแม่ของ Google Search, YouTube, Android และ Google Cloud", "ບໍລິສັດແມ່ຂອງ Google Search, YouTube, Android ແລະ Google Cloud", "Parent of Google Search, YouTube, Android and Google Cloud"]], "AMZN": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["อีคอมเมิร์ซและคลาวด์", "ອີຄອມເມີສແລະຄລາວ", "E-commerce and cloud"], ["ร้านค้าออนไลน์รายใหญ่ของโลก และเจ้าของ AWS บริการคลาวด์อันดับต้นๆ", "ຮ້ານຄ້າອອນລາຍລາຍໃຫຍ່ຂອງໂລກ ແລະເຈົ້າຂອງ AWS ບໍລິການຄລາວອັນດັບຕົ້ນ", "A leading online retailer and owner of AWS, a top cloud service"]], "META": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["โซเชียลมีเดีย", "ໂຊຊຽລມີເດຍ", "Social media"], ["เจ้าของ Facebook, Instagram และ WhatsApp", "ເຈົ້າຂອງ Facebook, Instagram ແລະ WhatsApp", "Owner of Facebook, Instagram and WhatsApp"]], "TSLA": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ยานยนต์ไฟฟ้า", "ລົດຍົນໄຟຟ້າ", "Electric vehicles"], ["ผู้ผลิตรถยนต์ไฟฟ้า และระบบกักเก็บพลังงาน", "ຜູ້ຜະລິດລົດຍົນໄຟຟ້າ ແລະລະບົບເກັບພະລັງງານ", "Maker of electric vehicles and energy storage systems"]], "AVGO": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["Broadcom ผู้ผลิตชิปเครือข่าย ชิปเฉพาะทาง และซอฟต์แวร์สำหรับองค์กร", "Broadcom ຜູ້ຜະລິດຊິບເຄືອຂ່າຍ ຊິບສະເພາະທາງ ແລະຊອບແວສຳລັບອົງກອນ", "Broadcom makes networking chips, custom chips and enterprise software"]], "AMD": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["ผู้ผลิตซีพียู Ryzen และ EPYC รวมถึงชิปกราฟิกและชิป AI", "ຜູ້ຜະລິດຊີພີຢູ Ryzen ແລະ EPYC ລວມທັງຊິບກາຟິກແລະຊິບ AI", "Maker of Ryzen and EPYC CPUs, plus graphics and AI chips"]], "MU": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["Micron ผู้ผลิตหน่วยความจำ DRAM และ NAND รายใหญ่", "Micron ຜູ້ຜະລິດໜ່ວຍຄວາມຈຳ DRAM ແລະ NAND ລາຍໃຫຍ່", "Micron is a major maker of DRAM and NAND memory"]], "LLY": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ยาและสุขภาพ", "ຢາແລະສຸຂະພາບ", "Pharmaceuticals"], ["Eli Lilly บริษัทยา เด่นด้านยาเบาหวาน โรคอ้วน และมะเร็ง", "Eli Lilly ບໍລິສັດຢາ ເດັ່ນດ້ານຢາເບົາຫວານ ພະຍາດອ້ວນ ແລະມະເຣັງ", "Eli Lilly is a drug maker known for diabetes, obesity and cancer treatments"]], "JPM": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ธนาคาร", "ທະນາຄານ", "Banking"], ["JPMorgan Chase ธนาคารที่ใหญ่ที่สุดในสหรัฐฯ", "JPMorgan Chase ທະນາຄານທີ່ໃຫຍ່ທີ່ສຸດໃນສະຫະລັດ", "JPMorgan Chase is the largest bank in the United States"]], "V": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["การชำระเงิน", "ການຊຳລະເງິນ", "Payments"], ["Visa เครือข่ายชำระเงินด้วยบัตรที่ใช้ทั่วโลก", "Visa ເຄືອຂ່າຍຊຳລະເງິນດ້ວຍບັດທີ່ໃຊ້ທົ່ວໂລກ", "Visa runs a worldwide card payments network"]], "WMT": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ค้าปลีก", "ຄ້າປີກ", "Retail"], ["Walmart เครือซูเปอร์สโตร์และค้าปลีกรายใหญ่ของโลก", "Walmart ເຄືອຊຸບເປີສໂຕແລະຄ້າປີກລາຍໃຫຍ່ຂອງໂລກ", "Walmart is one of the world largest retail and supercenter chains"]], "XOM": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["พลังงาน", "ພະລັງງານ", "Energy"], ["ExxonMobil บริษัทน้ำมันและก๊าซรายใหญ่", "ExxonMobil ບໍລິສັດນ້ຳມັນແລະແກັສລາຍໃຫຍ່", "ExxonMobil is a major oil and gas company"]], "2330-TW": [["ไต้หวัน", "ໄຕ້ຫວັນ", "Taiwan"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["TSMC ผู้รับจ้างผลิตชิปรายใหญ่ที่สุดในโลก ลูกค้าได้แก่ Apple และ NVIDIA", "TSMC ຜູ້ຮັບຈ້າງຜະລິດຊິບລາຍໃຫຍ່ທີ່ສຸດໃນໂລກ ລູກຄ້າມີ Apple ແລະ NVIDIA", "TSMC is the largest contract chip maker in the world, serving Apple and NVIDIA"]], "005930-KS": [["เกาหลีใต้", "ເກົາຫຼີໃຕ້", "South Korea"], ["เทคโนโลยี", "ເທັກໂນໂລຢີ", "Technology"], ["Samsung Electronics ผู้ผลิตสมาร์ตโฟน จอแสดงผล และชิปหน่วยความจำ", "Samsung Electronics ຜູ້ຜະລິດສະມາດໂຟນ ຈໍສະແດງຜົນ ແລະຊິບໜ່ວຍຄວາມຈຳ", "Samsung Electronics makes smartphones, displays and memory chips"]], "000660-KS": [["เกาหลีใต้", "ເກົາຫຼີໃຕ້", "South Korea"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["SK hynix ผู้ผลิตหน่วยความจำ DRAM, NAND และ HBM สำหรับชิป AI", "SK hynix ຜູ້ຜະລິດໜ່ວຍຄວາມຈຳ DRAM, NAND ແລະ HBM ສຳລັບຊິບ AI", "SK hynix makes DRAM, NAND and HBM memory used in AI chips"]], "2222-SR": [["ซาอุดีอาระเบีย", "ຊາອຸດີອາຣາເບຍ", "Saudi Arabia"], ["พลังงาน", "ພະລັງງານ", "Energy"], ["Saudi Aramco บริษัทน้ำมันและก๊าซแห่งชาติของซาอุดีอาระเบีย", "Saudi Aramco ບໍລິສັດນ້ຳມັນແລະແກັສແຫ່ງຊາດຂອງຊາອຸດີອາຣາເບຍ", "Saudi Aramco is the national oil and gas company of Saudi Arabia"]]};
 function stInfoTx(a){return LANG==="en"?a[2]:(LANG==="lo"?a[1]:a[0]);}
-var _stN=20,_stMoreBusy=false;
+var _stN=20,_stMoreBusy=false,_stC='all',_stPM='s';
+var ST_CATS=[['tech','เทคโนโลยี'],['fin','การเงิน'],['energy','พลังงาน'],['health','สุขภาพ'],['cons','สินค้าและบริการ'],['ind','อุตสาหกรรม'],['auto','ยานยนต์'],['etf','ETF']];
+var ST_CAT={"AAPL": "tech", "MSFT": "tech", "NVDA": "tech", "AMD": "tech", "MU": "tech", "AVGO": "tech", "GOOGL": "tech", "META": "tech", "AMZN": "tech", "NFLX": "tech", "ORCL": "tech", "CRM": "tech", "ADBE": "tech", "INTC": "tech", "QCOM": "tech", "TXN": "tech", "CSCO": "tech", "IBM": "tech", "NOW": "tech", "INTU": "tech", "PLTR": "tech", "SNOW": "tech", "SHOP": "tech", "ASML": "tech", "TSM": "tech", "ARM": "tech", "SMCI": "tech", "DELL": "tech", "005930-KS": "tech", "000660-KS": "tech", "2330-TW": "tech", "BABA": "tech", "PDD": "tech", "JD": "tech", "BIDU": "tech", "SONY": "tech", "JPM": "fin", "V": "fin", "MA": "fin", "BAC": "fin", "WFC": "fin", "GS": "fin", "MS": "fin", "C": "fin", "AXP": "fin", "BLK": "fin", "SCHW": "fin", "PYPL": "fin", "SQ": "fin", "XYZ": "fin", "COIN": "fin", "BRK-B": "fin", "XOM": "energy", "CVX": "energy", "COP": "energy", "SLB": "energy", "OXY": "energy", "2222-SR": "energy", "LLY": "health", "JNJ": "health", "UNH": "health", "PFE": "health", "MRK": "health", "ABBV": "health", "ABT": "health", "TMO": "health", "AMGN": "health", "GILD": "health", "NVO": "health", "MRNA": "health", "WMT": "cons", "COST": "cons", "KO": "cons", "PEP": "cons", "MCD": "cons", "SBUX": "cons", "NKE": "cons", "PG": "cons", "CL": "cons", "MDLZ": "cons", "DIS": "cons", "CMCSA": "cons", "T": "cons", "VZ": "cons", "TMUS": "cons", "HD": "cons", "LOW": "cons", "TGT": "cons", "UBER": "cons", "ABNB": "cons", "BA": "ind", "GE": "ind", "CAT": "ind", "DE": "ind", "LMT": "ind", "RTX": "ind", "HON": "ind", "UPS": "ind", "FDX": "ind", "TSLA": "auto", "F": "auto", "GM": "auto", "RIVN": "auto", "NIO": "auto", "TM": "auto", "SPY": "etf", "QQQ": "etf", "VOO": "etf", "VTI": "etf", "DIA": "etf", "IWM": "etf", "GLD": "etf", "SLV": "etf", "ARKK": "etf", "SOXX": "etf"};
+function stCatOf(k){var x=_stList[k];return (x&&x.cat&&String(x.cat))||ST_CAT[k]||'';}
+function stCatName(c){for(var i=0;i<ST_CATS.length;i++)if(ST_CATS[i][0]===c)return ST_CATS[i][1];return 'อื่นๆ';}
+function stCatsDraw(){
+  var box=document.getElementById('stCats');if(!box)return;
+  var cnt={};stActive().forEach(function(k){var c=stCatOf(k);if(c)cnt[c]=(cnt[c]||0)+1;});
+  var h=ST_CATS.filter(function(c){return cnt[c[0]];}).map(function(c){
+    return '<button type="button" data-c="'+c[0]+'" class="'+(_stC===c[0]?'on':'')+'" onclick="stCatSet(this.dataset.c)">'+c[1]+'</button>';}).join('');
+  box.innerHTML=h;box.style.display=h?'':'none';
+  if(_stC!=='all'&&!cnt[_stC])_stC='all';
+}
+function stCatSet(c){
+  _stC=(_stC===c)?'all':c;_stN=20;
+  var body=document.getElementById('stBody');if(body&&_stOn&&!_stDet&&_stTab===0)stDrawMarket(body);
+  var sc=document.getElementById('stScroll');if(sc)sc.scrollTop=0;
+}
 var ST_MIN=10,_stQ='',_stF='all',_stFee=0,_stOn=false,_stList={},_stTab=0,_stBusy=false,_stDet=null;
 // ป้ายสีประจำหุ้น: ใช้สีแบรนด์โดยประมาณถ้ามี ไม่มีก็สุ่มสีคงที่จากสัญลักษณ์
 var ST_BRAND={AAPL:['#4b5563','#9ca3af'],NVDA:['#3f6212','#76b900'],MSFT:['#0369a1','#38bdf8'],GOOGL:['#1d4ed8','#ea4335'],GOOG:['#1d4ed8','#ea4335'],AMZN:['#b45309','#ff9900'],META:['#1d4ed8','#0ea5e9'],AVGO:['#991b1b','#ef4444'],TSLA:['#991b1b','#e31937'],LLY:['#9f1239','#f43f5e'],WMT:['#1d4ed8','#facc15'],JPM:['#1e3a8a','#3b82f6'],AMD:['#166534','#22c55e'],MU:['#0e7490','#06b6d4'],V:['#1e3a8a','#f59e0b'],JNJ:['#991b1b','#dc2626'],XOM:['#b91c1c','#ef4444']};
@@ -3231,8 +3270,9 @@ function stFlag(){
   }).catch(function(){});
 }
 function stOpen(){
-  _stTab=0;_stDet=null;_stQ='';_stF='all';_stN=20;
+  _stTab=0;_stDet=null;_stQ='';_stF='all';_stN=20;_stC='all';
   var q=document.getElementById('stQ');if(q)q.value='';
+  document.querySelectorAll('.st-chips button').forEach(function(b){b.classList.toggle('on',b.dataset.f==='all');});
   document.body.classList.add('st-mode');
   try{history.pushState({st:1},'','#stocks');}catch(e){}
   switchTab(5);
@@ -3271,6 +3311,32 @@ window.addEventListener('popstate',function(){
   if(_stDet){stBack();try{history.pushState({st:1},'','#stocks');}catch(e){}return;}
   stLeave();
 });
+var _stFavU=null,_stFavS={};
+function stFavLoad(){
+  var u=getSess()||'';if(_stFavU===u)return;_stFavU=u;_stFavS={};
+  try{var a=JSON.parse(localStorage.getItem('stFav_'+u)||'[]');if(Array.isArray(a))a.forEach(function(k){_stFavS[k]=1;});}catch(e){}
+}
+function stFavHas(k){stFavLoad();return !!_stFavS[k];}
+function stFavBtn(k,det){
+  var on=stFavHas(k);
+  return '<button type="button" class="st-fav'+(det?' det':'')+(on?' on':'')+'" data-s="'+escHtml(k)+'" onclick="stFavTog(this.dataset.s,event)" aria-label="favorite">'+(on?'★':'☆')+'</button>';
+}
+function stFavTog(sym,ev){
+  if(ev){ev.stopPropagation();ev.preventDefault();}
+  stFavLoad();
+  var on=!_stFavS[sym];
+  if(on)_stFavS[sym]=1;else delete _stFavS[sym];
+  try{localStorage.setItem('stFav_'+_stFavU,JSON.stringify(Object.keys(_stFavS)));}catch(e){}
+  document.querySelectorAll('.st-fav').forEach(function(b){
+    if(b.dataset.s!==sym)return;
+    b.classList.toggle('on',on);b.textContent=on?'★':'☆';
+  });
+  showToast(on?'เพิ่มในรายการโปรดแล้ว':'นำออกจากรายการโปรดแล้ว');
+  if(!on&&_stF==='fav'&&!_stDet&&_stTab===0){
+    var body=document.getElementById('stBody'),sc=document.getElementById('stScroll');
+    if(body){var t=sc?sc.scrollTop:0;stDrawMarket(body);if(sc)sc.scrollTop=t;}
+  }
+}
 function stSort(f){
   _stF=f;_stN=20;
   document.querySelectorAll('.st-chips button').forEach(function(b){b.classList.toggle('on',b.dataset.f===f);});
@@ -3291,7 +3357,7 @@ function stChrome(m,sym,s){
   if(m==='d'&&s){
     t.innerHTML=stIcon(sym)+'<div class="tx"><b>'+escHtml(s.name||sym)+'</b><small>'+escHtml(sym)+' · '+stMktTag(sym,s)+'</small></div>';
   }else{
-    var nm={m:'หุ้นต่างประเทศ',p:'พอร์ตของฉัน',o:'คำสั่งของฉัน'}[m]||'หุ้นต่างประเทศ';
+    var nm={m:'หุ้นต่างประเทศ',p:'พอร์ตของฉัน',o:'ประวัติซื้อขาย'}[m]||'หุ้นต่างประเทศ';
     t.innerHTML='<div class="tx"><b>'+nm+'</b><small></small></div>';
   }
   stBalSet();
@@ -3378,24 +3444,27 @@ function stPill(ch){
 }
 function stDrawMarket(body){
   stChrome('m');
+  stCatsDraw();
   var ks=stActive();
   if(!ks.length){body.innerHTML='<div class="st-empty">ยังไม่มีหุ้นในรายการ</div>';return;}
   ks=ks.filter(function(k){
     var s=_stList[k],ch=stChg(s);
+    if(_stC!=='all'&&stCatOf(k)!==_stC)return false;
     if(_stQ&&(k.toLowerCase().indexOf(_stQ)<0&&String(s.name||'').toLowerCase().indexOf(_stQ)<0))return false;
     if(_stF==='up')return ch&&ch.pct>0;
     if(_stF==='dn')return ch&&ch.pct<0;
+    if(_stF==='fav'&&!stFavHas(k))return false;
     if(_stF==='open')return stMktOpen(k,s);
     return true;
   });
-  if(!ks.length){body.innerHTML='<div class="st-empty">ไม่พบหุ้นที่ค้นหา</div>';return;}
-  var mv=(_stF==='all'&&!_stQ)?stMovers(ks):'';
+  if(!ks.length){body.innerHTML='<div class="st-empty">'+(_stF==='fav'&&!_stQ&&_stC==='all'?'ยังไม่มีหุ้นโปรด กดดาวที่หุ้นเพื่อเก็บไว้ที่นี่':'ไม่พบหุ้นที่ค้นหา')+'</div>';return;}
+  var mv=(_stF==='all'&&!_stQ&&_stC==='all')?stMovers(ks):'';
   var more=ks.length>_stN;
   body.innerHTML=mv+ks.slice(0,_stN).map(function(k){
     var s=_stList[k],ch=stChg(s),op=stMktOpen(k,s);
     return '<div class="st-row" style="cursor:pointer" data-s="'+escHtml(k)+'" onclick="stDetail(this.dataset.s)">'+stIcon(k)
       +'<div class="st-mid"><div class="st-nm">'+escHtml(s.name||k)+'</div><div class="st-sub"><span class="st-dot" style="background:'+(op?'#22c55e':'#6b7a8a')+'"></span>'+(op?'ตลาดเปิด':'ตลาดปิด')+' · '+escHtml(k)+'</div></div>'
-      +'<div class="st-right"><div class="st-px rg-num">$'+stFm(s.price,2)+'</div>'+stPill(ch)+'</div></div>';
+      +'<div class="st-right"><div class="st-px rg-num">$'+stFm(s.price,2)+'</div>'+stPill(ch)+'</div>'+stFavBtn(k)+'</div>';
   }).join('')+(more?'<div class="st-note" id="stMore">⏳ กำลังโหลดเพิ่ม...</div>':'');
 }
 function stMoreCheck(){
@@ -3628,7 +3697,7 @@ function stDrawDetail(body,sym){
   var ud=getUD()||{},h=(ud.stocks||{})[sym],px=+s.price,ch=stChg(s),e=escHtml(sym);
   var hist=stHist(s),lab=false;
   stChrome('d',sym,s);
-  var o='<div class="st-hp"><div class="st-big rg-num">$'+stFm(px,2)+'</div>'
+  var o='<div class="st-hp">'+stFavBtn(sym,true)+'<div class="st-big rg-num">$'+stFm(px,2)+'</div>'
     +(ch?('<span class="st-pl '+(ch.diff>0?'up':(ch.diff<0?'dn':'fl'))+'">'+(ch.diff>0?'▲ +':(ch.diff<0?'▼ ':''))+stFm(ch.diff,2)+' ('+(ch.pct>0?'+':'')+stFm(ch.pct,2)+'%)</span><span class="st-hint">เทียบราคาปิดก่อนหน้า</span>'):'')+'</div>'
     +(false?'<div class="st-card"><div class="st-sub" style="margin-bottom:6px">ราคาย้อนหลัง</div>'+stRangeTabs()+'<div id="stChBox">'+stChart(hist,lab)+'</div></div>':'')
     +stGraphCard(s)
@@ -3659,16 +3728,35 @@ function stDrawDetail(body,sym){
   stGraphBind(s);
   stLoadChart(sym);
 }
+var ST_PCOL=['#34d399','#a78bfa','#fbbf24','#60a5fa','#f472b6','#fb923c','#94a3b8'];
+function stPieMode(m){_stPM=m;var b=document.getElementById('stBody'),sc=document.getElementById('stScroll');if(b&&_stTab===1&&!_stDet){var t=sc?sc.scrollTop:0;stDrawPort(b);if(sc)sc.scrollTop=t;}}
+function stPie(items){
+  var tot=0;items.forEach(function(x){tot+=x.v;});if(!(tot>0))return '';
+  items.sort(function(a,b){return b.v-a.v;});
+  var top=items.slice(0,6),rest=0;items.slice(6).forEach(function(x){rest+=x.v;});
+  if(rest>0)top.push({n:'อื่นๆ',v:rest});
+  var C=2*Math.PI*40,off=0,segs='',lg='';
+  top.forEach(function(x,i){
+    var f=x.v/tot,len=f*C,col=ST_PCOL[i%ST_PCOL.length],gap=top.length>1?1.5:0,dl=Math.max(len-gap,0.4);
+    segs+='<circle cx="60" cy="60" r="40" fill="none" stroke="'+col+'" stroke-width="18" stroke-dasharray="'+dl.toFixed(2)+' '+(C-dl).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 60 60)"/>';
+    off+=len;
+    lg+='<div class="st-lgr"><i style="background:'+col+'"></i><span>'+escHtml(x.n)+'</span><b class="rg-num">'+stFm(f*100,1)+'%</b></div>';
+  });
+  return '<div class="st-pie"><svg viewBox="0 0 120 120">'+segs+'</svg><div class="st-lg">'+lg+'</div></div>';
+}
 function stDrawPort(body){
   stChrome('p');
   var ud=getUD()||{},h=ud.stocks||{};
   var ks=Object.keys(h).filter(function(k){return h[k]&&h[k].shares>1e-9;}).sort();
   if(!ks.length){body.innerHTML='<div class="st-empty">ยังไม่มีหุ้นในพอร์ต</div>';return;}
-  var tc=0,tv=0;
+  var tc=0,tv=0,pieItems=[],pieIdx={};
   var rows=ks.map(function(k){
     var x=h[k],s=_stList[k],px=(s&&(+s.price)>0)?(+s.price):0;
     var val=px?stR2(x.shares*px):stR2(x.cost),pl=stR2(val-x.cost);
     tc+=x.cost;tv+=val;
+    var pk=(_stPM==='c')?stCatName(stCatOf(k)):k;
+    if(pieIdx[pk]===undefined){pieIdx[pk]=pieItems.length;pieItems.push({n:pk,v:0});}
+    pieItems[pieIdx[pk]].v+=val;
     var c=pl>0?'up':(pl<0?'dn':'fl');
     return '<div class="st-row" style="cursor:pointer" data-s="'+escHtml(k)+'" onclick="stDetail(this.dataset.s)">'+stIcon(k)
       +'<div class="st-mid"><div class="st-nm">'+escHtml(x.name||k)+'</div>'
@@ -3679,34 +3767,56 @@ function stDrawPort(body){
   body.innerHTML='<div class="st-hero"><div class="st-hl">มูลค่าพอร์ตรวม</div><div class="st-hbig rg-num">$'+stFm(tv,2)+'</div>'
     +'<span class="st-pl '+tcl+'" style="font-size:13px">'+(tp>0?'▲ +':(tp<0?'▼ ':''))+stFm(tp,2)+(tc>0?' ('+(tp>0?'+':'')+stFm(tp/tc*100,2)+'%)':'')+'</span>'
     +'<div class="st-hrow"><span>ต้นทุนรวม</span><span class="rg-num">$'+stFm(tc,2)+'</span></div></div>'
+    +'<div class="st-card" style="margin-top:10px"><div class="st-sub">สัดส่วนพอร์ต</div>'
+    +'<div class="st-tg"><button type="button" class="'+(_stPM==='s'?'on':'')+'" onclick="stPieMode(\'s\')">ตามหุ้น</button><button type="button" class="'+(_stPM==='c'?'on':'')+'" onclick="stPieMode(\'c\')">ตามหมวด</button></div>'
+    +stPie(pieItems)+'</div>'
     +'<div style="height:6px"></div>'+rows;
+}
+function stOrderRow(o){
+  var buy=(o.type==='buy');
+  var main=buy?('$'+stFm(o.usd,2)):('<span class="rg-num">'+stR6(o.shares)+'</span> หุ้น');
+  var sc={pending:'#FFD700',approved:'#4ade80',rejected:'#f87171'};
+  var sl={pending:'รอดำเนินการ',approved:'สำเร็จ',rejected:'ปฏิเสธแล้ว คืนให้แล้ว'};
+  var detail='';
+  if(o.status==='approved'){
+    detail=buy?('ได้ <span class="rg-num">'+stR6(o.shares)+'</span> หุ้น ราคา $<span class="rg-num">'+stFm(o.execPrice,2)+'</span>')
+              :('ได้รับ $<span class="rg-num">'+stFm(o.proceeds,2)+'</span> ราคา $<span class="rg-num">'+stFm(o.execPrice,2)+'</span>');
+    if(+o.fee>0)detail+='<br>ค่าธรรมเนียม $<span class="rg-num">'+stFm(o.fee,2)+'</span>';
+  }else if(o.status==='pending'&&+o.feePct>0){
+    detail='ค่าธรรมเนียม <span class="rg-num">'+stFm(o.feePct,2)+'</span>%';
+  }
+  return '<div class="st-row"><div class="st-sym" style="color:'+(buy?'#4ade80':'#f87171')+'">'+(buy?'ซื้อ':'ขาย')+'</div>'
+    +'<div class="st-mid"><div class="st-nm">'+escHtml(o.sym||'')+' · <span class="rg-num">'+main+'</span></div>'
+    +'<div class="st-sub">'+stTime(o.time)+'</div>'+(detail?'<div class="st-sub">'+detail+'</div>':'')+'</div>'
+    +'<div class="st-right"><span class="st-pill" style="color:'+(sc[o.status]||'#b6a7d6')+'">'+(sl[o.status]||'')+'</span></div></div>';
+}
+function stDivRow(d){
+  return '<div class="st-row"><div class="st-sym st-dv">ปันผล</div>'
+    +'<div class="st-mid"><div class="st-nm">'+escHtml(d.sym)+(d.shares?' · <span class="rg-num">'+escHtml(d.shares)+'</span> หุ้น':'')+'</div>'
+    +'<div class="st-sub">'+stTime(d.time)+'</div></div>'
+    +'<div class="st-right"><span class="st-pill" style="color:#4ade80">+$<span class="rg-num">'+stFm(d.amt,2)+'</span></span></div></div>';
 }
 function stDrawOrders(body){
   stChrome('o');
   var u=getSess();if(!u||!window._db){body.innerHTML='';return;}
-  window._db.ref('userreqs/'+u).once('value').then(function(sn){
-    var keys=[];
-    if(sn.exists()){var v=sn.val();Object.keys(v).forEach(function(k){if(v[k]&&v[k].t==='stock')keys.push(k);});}
-    keys.sort().reverse();keys=keys.slice(0,20);
-    if(!keys.length){body.innerHTML='<div class="st-empty">ยังไม่มีคำสั่ง</div>';return null;}
+  Promise.all([window._db.ref('userreqs/'+u).once('value'),window._db.ref('credits/'+u).once('value')]).then(function(r){
+    var keys=[],divs=[];
+    if(r[0].exists()){var v=r[0].val();Object.keys(v).forEach(function(k){if(v[k]&&v[k].t==='stock')keys.push(k);});}
+    keys.sort().reverse();keys=keys.slice(0,30);
+    if(r[1].exists()){var cv=r[1].val();Object.keys(cv).forEach(function(k){
+      var m=/^div_(.+)_(\d{8})$/.exec(k);if(!m||!cv[k]||!(+cv[k].amt>0))return;
+      var sh=/([\d.]+) หุ้น/.exec(String(cv[k].desc||''));
+      divs.push({time:+cv[k].time||0,sym:m[1],amt:+cv[k].amt||0,shares:sh?sh[1]:''});
+    });}
+    divs.sort(function(a,b){return b.time-a.time;});divs=divs.slice(0,30);
     return Promise.all(keys.map(function(k){
       return window._db.ref('stock_orders/'+k).once('value').then(function(s){return s.exists()?s.val():null;});
     })).then(function(list){
-      var sc={pending:'#FFD700',approved:'#4ade80',rejected:'#f87171'};
-      var sl={pending:'รอดำเนินการ',approved:'สำเร็จ',rejected:'ปฏิเสธแล้ว คืนให้แล้ว'};
-      body.innerHTML=list.filter(Boolean).map(function(o){
-        var buy=(o.type==='buy');
-        var main=buy?('$'+stFm(o.usd,2)):('<span class="rg-num">'+stR6(o.shares)+'</span> หุ้น');
-        var detail='';
-        if(o.status==='approved'){
-          detail=buy?('ได้ <span class="rg-num">'+stR6(o.shares)+'</span> หุ้น ราคา $<span class="rg-num">'+stFm(o.execPrice,2)+'</span>')
-                    :('ได้รับ $<span class="rg-num">'+stFm(o.proceeds,2)+'</span> ราคา $<span class="rg-num">'+stFm(o.execPrice,2)+'</span>');
-        }
-        return '<div class="st-row"><div class="st-sym" style="color:'+(buy?'#4ade80':'#f87171')+'">'+(buy?'ซื้อ':'ขาย')+'</div>'
-          +'<div class="st-mid"><div class="st-nm">'+escHtml(o.sym||'')+' · <span class="rg-num">'+main+'</span></div>'
-          +'<div class="st-sub">'+stTime(o.time)+'</div>'+(detail?'<div class="st-sub">'+detail+'</div>':'')+'</div>'
-          +'<div class="st-right"><span class="st-pill" style="color:'+(sc[o.status]||'#b6a7d6')+'">'+(sl[o.status]||'')+'</span></div></div>';
-      }).join('');
+      var items=[];
+      list.filter(Boolean).forEach(function(o){items.push({t:+o.time||0,h:stOrderRow(o)});});
+      divs.forEach(function(d){items.push({t:d.time,h:stDivRow(d)});});
+      items.sort(function(a,b){return b.t-a.t;});
+      body.innerHTML=items.length?items.map(function(x){return x.h;}).join(''):'<div class="st-empty">ยังไม่มีคำสั่ง</div>';
     });
   }).catch(function(){body.innerHTML='<div class="st-empty">❌ โหลดไม่สำเร็จ กรุณาลองใหม่</div>';});
 }
@@ -3727,7 +3837,9 @@ function stBuySheet(sym){
     +'<input id="stAmt" class="st-in rg-num" type="text" inputmode="decimal" placeholder="0.00" oninput="stBuyCalc('+"'"+escHtml(sym)+"'"+')" autocomplete="off">'
     +'<div class="st-line"><span>ขั้นต่ำ</span><b class="rg-num">$'+ST_MIN+'</b></div>'
     +(_stFee>0?'<div class="st-line"><span>ค่าธรรมเนียม</span><b class="rg-num">'+stFm(_stFee,2)+'%</b></div>':'')
+    +(_stFee>0?'<div class="st-line"><span>ค่าธรรมเนียมที่หัก</span><b class="rg-num" id="stFeeAmt">-</b></div>':'')
     +'<div class="st-line"><span>ประมาณการหุ้นที่ได้</span><b class="rg-num" id="stEst">-</b></div>'
+    +((+s.dy>0)?'<div class="st-line"><span>ปันผลประมาณต่อปี</span><b class="rg-num st-dv" id="stDivEst">-</b></div>':'')
     +(stMktOpen(sym,s)?'':'<div class="st-note" style="padding:0;text-align:left;font-size:12px;color:#fbbf24">ตลาดปิดอยู่ คำสั่งจะดำเนินการหลังตลาดเปิด ราคาอาจต่างจากที่แสดง</div>')
     +'<div class="st-note" style="padding:0;text-align:left;font-size:12px">ราคาซื้อจริงอาจต่างจากที่แสดง ระบบหักยอดทันทีและคืนให้ถ้าคำสั่งถูกปฏิเสธ</div>'
     +'<div class="st-acts"><button type="button" class="no" onclick="stClose()">ยกเลิก</button><button type="button" class="go" id="stGo" onclick="stBuyGo('+"'"+escHtml(sym)+"'"+')">ยืนยันสั่งซื้อ</button></div>');
@@ -3735,8 +3847,11 @@ function stBuySheet(sym){
 }
 function stBuyCalc(sym){
   var s=_stList[sym],i=document.getElementById('stAmt'),e=document.getElementById('stEst');if(!s||!i||!e)return;
-  var a=parseFloat(i.value),px=+s.price||0;
-  e.textContent=(a>0&&px>0)?('~'+stR6(a*(1-_stFee/100)/px)):'-';
+  var a=parseFloat(i.value),px=+s.price||0,ok=(a>0&&px>0);
+  var fee=ok?stR2(a*_stFee/100):0,sh=ok?stR6((a-fee)/px):0;
+  e.textContent=ok?('~'+sh):'-';
+  var f=document.getElementById('stFeeAmt');if(f)f.textContent=ok?('$'+stFm(fee,2)):'-';
+  var d=document.getElementById('stDivEst');if(d)d.textContent=(ok&&+s.dy>0)?('~$'+stFm(sh*s.dy,2)):'-';
 }
 function stBuyGo(sym){
   if(_stBusy)return;
@@ -7396,7 +7511,7 @@ Object.assign(TRD,{"ราคาล่าสุด": ["ລາຄາຫຼ້າ�
 Object.assign(TRD,{"ราคาปิดก่อนหน้า":["ລາຄາປິດກ່ອນໜ້າ","Previous close"]});
 Object.assign(TRD,{"ปิดก่อนหน้า":["ປິດກ່ອນໜ້າ","Prev. close"],"ล่าสุด":["ຫຼ້າສຸດ","Latest"],"กราฟจะยาวขึ้นเมื่อแอดมินอัปเดตราคา":["ກຣາຟຈະຍາວຂຶ້ນເມື່ອແອັດມິນອັບເດດລາຄາ","The chart grows as the admin updates prices"]});
 Object.assign(TRD,{"ราคาย้อนหลัง":["ລາຄາຍ້ອນຫຼັງ","Price history"],"แรงสุดวันนี้":["ແຮງສຸດມື້ນີ້","Biggest movers today"],"ช่วงราคา":["ຊ່ວງລາຄາ","Price range"],"ต่ำ":["ຕ່ຳ","Low"],"สูง":["ສູງ","High"],"วันนี้":["ມື້ນີ້","Today"],"สัปดาห์":["ອາທິດ","weeks"],"สร้างกำไร":["ສ້າງກຳໄລ","Earn"],"เลือกวิธีสร้างกำไร":["ເລືອກວິທີສ້າງກຳໄລ","Choose how to earn"],"ซื้อขายหุ้นดังทั่วโลก ราคาตามตลาดจริง":["ຊື້ຂາຍຮຸ້ນດັງທົ່ວໂລກ ລາຄາຕາມຕະຫຼາດຈິງ","Trade top global stocks at real market prices"],"ลงทุนสัญญาขุด รับกำไรทุกวัน":["ລົງທຶນສັນຍາຂຸດ ຮັບກຳໄລທຸກວັນ","Invest in mining contracts and earn daily profit"],"เร็วๆ นี้":["ໄວໆ ນີ້","Coming soon"],"เกี่ยวกับบริษัท":["ກ່ຽວກັບບໍລິສັດ","About the company"],"ประเทศ":["ປະເທດ","Country"],"ภาคธุรกิจ":["ພາກທຸລະກິດ","Sector"],"ค้นหาหุ้น เช่น":["ຄົ້ນຫາຮຸ້ນ ເຊັ່ນ","Search stocks e.g."],"ทั้งหมด":["ທັງໝົດ","All"],"ขึ้น":["ຂຶ້ນ","Up"],"ลง":["ລົງ","Down"],"ไม่พบหุ้นที่ค้นหา":["ບໍ່ພົບຮຸ້ນທີ່ຄົ້ນຫາ","No stocks found"],"เทียบราคาปิดก่อนหน้า":["ທຽບລາຄາປິດກ່ອນໜ້າ","vs previous close"],"มูลค่าพอร์ตรวม":["ມູນຄ່າພອດລວມ","Total portfolio value"],"ยอดเงิน":["ຍອດເງິນ","Balance"],"พอร์ต":["ພອດ","Portfolio"],"คำสั่ง":["ຄຳສັ່ງ","Orders"],"ตลาดเปิด":["ຕະຫຼາດເປີດ","Market open"],"ตลาดปิด":["ຕະຫຼາດປິດ","Market closed"],"สถานะตลาด":["ສະຖານະຕະຫຼາດ","Market status"],"ค่าธรรมเนียม":["ຄ່າທຳນຽມ","Fee"],"ตลาดปิดอยู่ คำสั่งจะดำเนินการหลังตลาดเปิด ราคาอาจต่างจากที่แสดง":["ຕະຫຼາດປິດຢູ່ ຄຳສັ່ງຈະດຳເນີນການຫຼັງຕະຫຼາດເປີດ ລາຄາອາດຕ່າງຈາກທີ່ສະແດງ","Market is closed. Your order will be processed after the market opens and the price may differ from the one shown"],"ปันผลต่อหุ้นต่อปี ประมาณ":["ເງິນປັນຜົນຕໍ່ຮຸ້ນຕໍ່ປີ ປະມານ","Dividend per share per year (est.)"],"ข้อมูลหุ้น":["ຂໍ້ມູນຮຸ້ນ","Stock info"],"สัญลักษณ์":["ສັນຍາລັກ","Symbol"]});
-Object.assign(TRD,{"ซื้อขายหุ้นดังทั่วโลก":["ຊື້ຂາຍຮຸ້ນດັງທົ່ວໂລກ","Trade famous stocks worldwide"],"ข้อมูลกราฟจากตลาด ราคาซื้อขายจริงตามที่แอดมินกำหนด":["ຂໍ້ມູນກຣາຟຈາກຕະຫຼາດ ລາຄາຊື້ຂາຍຈິງຕາມທີ່ແອັດມິນກຳນົດ","Chart data is from the market. Actual trade prices are set by the admin."]});
+Object.assign(TRD,{"เทคโนโลยี":["ເທັກໂນໂລຢີ", "Tech"],"พลังงาน":["ພະລັງງານ", "Energy"],"สุขภาพ":["ສຸຂະພາບ", "Health"],"สินค้าและบริการ":["ສິນຄ້າແລະບໍລິການ", "Consumer"],"อุตสาหกรรม":["ອຸດສາຫະກຳ", "Industrial"],"ยานยนต์":["ຍານຍົນ", "Auto"],"อื่นๆ":["ອື່ນໆ", "Other"],"สัดส่วนพอร์ต":["ສັດສ່ວນພອດ", "Portfolio mix"],"ตามหุ้น":["ຕາມຮຸ້ນ", "By stock"],"ตามหมวด":["ຕາມໝວດ", "By category"],"การเงิน":["ການເງິນ", "Finance"],"โปรด":["ທີ່ມັກ", "Favorites"],"ยังไม่มีหุ้นโปรด กดดาวที่หุ้นเพื่อเก็บไว้ที่นี่":["ຍັງບໍ່ມີຮຸ້ນທີ່ມັກ ກົດດາວທີ່ຮຸ້ນເພື່ອເກັບໄວ້ບ່ອນນີ້", "No favorites yet. Tap the star on a stock to save it here"],"เพิ่มในรายการโปรดแล้ว":["ເພີ່ມໃນລາຍການທີ່ມັກແລ້ວ", "Added to favorites"],"นำออกจากรายการโปรดแล้ว":["ເອົາອອກຈາກລາຍການທີ່ມັກແລ້ວ", "Removed from favorites"],"ประวัติซื้อขาย":["ປະຫວັດຊື້ຂາຍ", "Trade history"],"ปันผล":["ເງິນປັນຜົນ", "Dividend"],"ปันผลประมาณต่อปี":["ເງິນປັນຜົນໂດຍປະມານຕໍ່ປີ", "Est. dividend per year"],"ค่าธรรมเนียมที่หัก":["ຄ່າທຳນຽມທີ່ຫັກ", "Fee deducted"],"ซื้อขายหุ้นดังทั่วโลก":["ຊື້ຂາຍຮຸ້ນດັງທົ່ວໂລກ","Trade famous stocks worldwide"],"ข้อมูลกราฟจากตลาด ราคาซื้อขายจริงตามที่แอดมินกำหนด":["ຂໍ້ມູນກຣາຟຈາກຕະຫຼາດ ລາຄາຊື້ຂາຍຈິງຕາມທີ່ແອັດມິນກຳນົດ","Chart data is from the market. Actual trade prices are set by the admin."]});
 Object.assign(TRD,{"กำไรประมาณการต่อวัน": ["ກຳໄລປະມານຕໍ່ມື້", "Estimated daily profit"], "กำไรสะสม วันที่": ["ກຳໄລສະສົມ ວັນທີ", "Accumulated profit · day"], "ขาดอีก": ["ຂາດອີກ", "short by"], "ตอนนี้": ["ຕອນນີ້", "current"], "ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง": ["ຕົວເລກເປັນການປະມານຕາມສູດຂອງລະບົບ ບໍ່ແມ່ນການຮັບປະກັນຜົນຕອບແທນ ການລົງທຶນມີຄວາມສ່ຽງ", "Figures are estimates from the system formula, not a guaranteed return. Investing carries risk."], "ท่านอยู่ระดับสูงสุดแล้ว": ["ທ່ານຢູ່ລະດັບສູງສຸດແລ້ວ", "You are at the top tier"], "ยอดคงเหลือหลังลงทุน": ["ຍອດຄົງເຫຼືອຫຼັງລົງທຶນ", "Balance after investing"], "ยอดในกระเป๋าอัปเดตแล้ว": ["ຍອດໃນກະເປົາອັບເດດແລ້ວ", "Your wallet balance is updated"], "ระดับปัจจุบันมีกรอบสีทอง": ["ລະດັບປັດຈຸບັນມີກອບສີທອງ", "the current tier has a gold frame"], "ระบบจะคำนวณกำไรให้ทันที": ["ລະບົບຈະຄຳນວນກຳໄລໃຫ້ທັນທີ", "The system calculates your profit instantly"], "รับคืนเมื่อครบสัญญา": ["ຮັບຄືນເມື່ອຄົບສັນຍາ", "Returned at contract end"], "ลงมาก อัตราต่อวันยิ่งสูง": ["ລົງຫຼາຍ ອັດຕາຕໍ່ມື້ຍິ່ງສູງ", "Invest more, higher daily rate"], "ลงเพิ่มอีก": ["ລົງເພີ່ມອີກ", "Add"], "อัตราตามจำนวนเงิน": ["ອັດຕາຕາມຈຳນວນເງິນ", "Rate by amount"], "เติมเงินก่อน": ["ເຕີມເງິນກ່ອນ", "Top up first"], "เพื่อขึ้นเป็น": ["ເພື່ອຂຶ້ນເປັນ", "to reach"], "เริ่มเพียง": ["ເລີ່ມພຽງ", "Start from"], "เลือกจำนวนเพื่อดูกำไร": ["ເລືອກຈຳນວນເພື່ອເບິ່ງກຳໄລ", "Choose an amount to see profit"], "เลื่อนดูกำไรสะสมตามวัน": ["ເລື່ອນເບິ່ງກຳໄລສະສົມຕາມວັນ", "Slide to see accumulated profit by day"], "เห็นกำไรประมาณการก่อนยืนยัน": ["ເຫັນກຳໄລປະມານກ່ອນຢືນຢັນ", "see the estimated profit before you confirm"], "ใส่จำนวนเพื่อเริ่มลงทุน": ["ໃສ່ຈຳນວນເພື່ອເລີ່ມລົງທຶນ", "Enter an amount to start"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
 var _TH_ANY=/[฀-๿]/;
