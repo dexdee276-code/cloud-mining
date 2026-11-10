@@ -1142,6 +1142,26 @@ body.st-mode #bottomNav,body.st-mode #contactFab,body.st-mode .nav-app{display:n
 .ch-d{font-size:12.5px;color:#c9b8e8;margin-top:3px;line-height:1.5}
 .ch-card.off{opacity:.55}
 .ch-badge{position:absolute;top:10px;right:12px;font-size:11px;font-weight:700;background:rgba(255,255,255,.14);padding:3px 9px;border-radius:999px}
+#pgStock .st-mv-h{font-size:13px;color:#8b9aab;font-weight:700;margin:6px 0 8px}
+.st-mv{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;margin:0 -16px 4px;padding-left:16px;padding-right:16px;-webkit-overflow-scrolling:touch}
+.st-mvc{flex:none;width:104px;background:#10161d;border:1px solid #18212b;border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.st-mvc .st-sym{width:38px;height:38px}
+.st-mvn{font-size:13px;font-weight:700;color:#e6edf3;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-mvc .st-pl{margin-top:0}
+.st-pr{padding:10px 0 12px;border-bottom:1px solid #161e27}.st-pr:last-child{border-bottom:0}
+.st-prh{font-size:13px;color:#8b9aab;margin-bottom:10px}
+.st-prb{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#ef4444,#fbbf24 50%,#22c55e)}
+.st-prb i{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid #0a0e13;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(255,255,255,.4)}
+.st-prv{display:flex;justify-content:space-between;margin-top:8px}
+.st-prv small{display:block;font-size:11px;color:#6b7a8a}
+.st-prv b{font-size:14px;color:#e6edf3}
+.st-gtabs{display:flex;gap:8px;margin:6px 0 10px}
+.st-gtabs button{border:0;padding:6px 14px;border-radius:999px;background:#141b23;color:#9fb0c3;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.st-gtabs button.on{background:#e6edf3;color:#0a0e13}
+.st-gv{display:flex;align-items:center;gap:10px;min-height:34px;margin-bottom:6px}
+.st-gv b{font-size:20px;color:#e6edf3}.st-gv small{font-size:12px;color:#7d8a99}
+.st-gv .st-pl{margin-top:0}
+.st-gax{display:flex;justify-content:space-between;font-size:11px;color:#6b7a8a;padding:4px 0 10px}
 #stNav{flex:none;display:flex;background:#0d1218;border-top:1px solid #18212b;padding:8px 10px calc(env(safe-area-inset-bottom,0px) + 10px)}
 #stNav button{flex:1;position:relative;background:none;border:0;color:#6b7a8a;font-family:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0 2px}
 #stNav button i{font-style:normal;font-size:20px;filter:grayscale(1) opacity(.7)}
@@ -3315,6 +3335,27 @@ function stRender(){
     if(_stDet&&_stTab<2)stDrawDetail(body,_stDet);else if(_stTab===0)stDrawMarket(body);else if(_stTab===1)stDrawPort(body);else stDrawOrders(body);
   }).catch(function(){body.innerHTML='<div class="st-empty">❌ โหลดไม่สำเร็จ กรุณาลองใหม่</div>';});
 }
+function stRangeBar(lo,hi,px,lab){
+  lo=+lo;hi=+hi;if(!(lo>0&&hi>lo))return '';
+  var pos=Math.max(0,Math.min(100,(px-lo)/(hi-lo)*100));
+  return '<div class="st-pr"><div class="st-prh"><span>'+lab+'</span></div>'
+    +'<div class="st-prb"><i style="left:'+pos.toFixed(1)+'%"></i></div>'
+    +'<div class="st-prv"><div><small>ต่ำ</small><b class="rg-num">$'+stFm(lo,2)+'</b></div><div style="text-align:right"><small>สูง</small><b class="rg-num">$'+stFm(hi,2)+'</b></div></div></div>';
+}
+function stRangeCard(s,px){
+  var a=stRangeBar(s.dl,s.dh,px,'วันนี้'),b=stRangeBar(s.wl,s.wh,px,'52 สัปดาห์');
+  if(!a&&!b)return '';
+  return '<div class="st-card"><div class="st-sub">ช่วงราคา</div>'+a+b+'</div>';
+}
+function stMovers(ks){
+  var arr=ks.map(function(k){return {k:k,s:_stList[k],ch:stChg(_stList[k])};}).filter(function(x){return x.ch;});
+  var up=arr.filter(function(x){return x.ch.pct>0;}).sort(function(a,b){return b.ch.pct-a.ch.pct;}).slice(0,3);
+  var dn=arr.filter(function(x){return x.ch.pct<0;}).sort(function(a,b){return a.ch.pct-b.ch.pct;}).slice(0,3);
+  var all=up.concat(dn);if(!all.length)return '';
+  return '<div class="st-mv-h">แรงสุดวันนี้</div><div class="st-mv">'+all.map(function(x){
+    return '<div class="st-mvc" data-s="'+escHtml(x.k)+'" onclick="stDetail(this.dataset.s)">'+stIcon(x.k)
+      +'<div class="st-mvn">'+escHtml(String(x.s.name||x.k).split(' ')[0])+'</div>'+stPill(x.ch)+'</div>';}).join('')+'</div>';
+}
 function stPill(ch){
   if(!ch)return '';
   var c=ch.pct>0?'up':(ch.pct<0?'dn':'fl');
@@ -3333,7 +3374,8 @@ function stDrawMarket(body){
     return true;
   });
   if(!ks.length){body.innerHTML='<div class="st-empty">ไม่พบหุ้นที่ค้นหา</div>';return;}
-  body.innerHTML=ks.map(function(k){
+  var mv=(_stF==='all'&&!_stQ)?stMovers(ks):'';
+  body.innerHTML=mv+ks.map(function(k){
     var s=_stList[k],ch=stChg(s),op=stMktOpen(k,s);
     return '<div class="st-row" style="cursor:pointer" data-s="'+escHtml(k)+'" onclick="stDetail(this.dataset.s)">'+stIcon(k)
       +'<div class="st-mid"><div class="st-nm">'+escHtml(s.name||k)+'</div><div class="st-sub"><span class="st-dot" style="background:'+(op?'#22c55e':'#6b7a8a')+'"></span>'+(op?'ตลาดเปิด':'ตลาดปิด')+' · '+escHtml(k)+'</div></div>'
@@ -3453,6 +3495,104 @@ function stBindChart(pts,rg){
   svg.addEventListener('pointermove',at);svg.addEventListener('pointerdown',at);
   svg.addEventListener('touchmove',at,{passive:true});svg.addEventListener('touchstart',at,{passive:true});
 }
+var _stGR=1,_stGP=null;
+function stFmD(ms){var d=new Date(ms);return d.getDate()+'/'+(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2);}
+function stFmDT(ms){var d=new Date(ms),m=d.getMinutes();return d.getDate()+'/'+(d.getMonth()+1)+' '+d.getHours()+':'+(m<10?'0':'')+m;}
+function stFmT2(ms){var d=new Date(ms),m=d.getMinutes();return d.getHours()+':'+(m<10?'0':'')+m;}
+function stIh(s){
+  var a=s&&s.ih;if(!a)return [];
+  if(!Array.isArray(a))a=Object.keys(a).map(function(k){return a[k];});
+  var o=[];a.forEach(function(q){if(q&&(+q[1])>0)o.push([+q[0]||0,+q[1]]);});
+  return o;
+}
+function stGEff(s){
+  var d=_stGR;
+  if(d<=5&&stIh(s).length<2)d=91;
+  return d;
+}
+function stDayKey(ms,tz){try{return new Intl.DateTimeFormat('en-CA',{timeZone:tz}).format(new Date(ms));}catch(e){return new Date(ms).toDateString();}}
+function stGData(s,sym){
+  var d=stGEff(s),px=+s.price;
+  if(d<=5){
+    var h=stIh(s);if(h.length<2)return [];
+    if(d===1){
+      var tz=stMkCfg(sym||'').tz,k=stDayKey(h[h.length-1][0],tz);
+      var day=h.filter(function(q){return stDayKey(q[0],tz)===k;});
+      if(day.length<4){var pk=null;for(var i=h.length-1;i>=0;i--){var kk=stDayKey(h[i][0],tz);if(kk!==k){pk=kk;break;}}
+        if(pk)day=h.filter(function(q){var kk=stDayKey(q[0],tz);return kk===pk||kk===k;});}
+      h=day.length>=2?day:h.slice(-2);
+    }
+    h=h.map(function(q){return [q[0],q[1]];});
+    if(px>0)h[h.length-1][1]=px;
+    return h;
+  }
+  var hh=stHist(s);if(hh.length<2)return [];
+  var cut=hh[hh.length-1][0]-d*864e5,r=hh.filter(function(q){return q[0]>=cut;});
+  return r.length>=2?r:hh.slice(-2);
+}
+function stGraphCard(s){
+  var hasI=stIh(s).length>=2,hasH=stHist(s).length>=2;
+  if(!hasI&&!hasH)return '';
+  var R=[[1,'1D'],[5,'5D'],[30,'1M'],[91,'3M'],[182,'6M']].filter(function(r){return r[0]>5?hasH:hasI;});
+  var eff=stGEff(s);
+  return '<div class="st-card st-gc"><div class="st-sub">ราคาย้อนหลัง</div>'
+    +'<div class="st-gtabs">'+R.map(function(r){return '<button type="button" data-d="'+r[0]+'" class="'+(r[0]===eff?'on':'')+'" onclick="stGSet(+this.dataset.d)">'+r[1]+'</button>';}).join('')+'</div>'
+    +'<div class="st-gv"><b class="rg-num" id="stGP"></b><span id="stGD"></span></div>'
+    +'<div id="stGBox" style="touch-action:pan-y"></div></div>';
+}
+function stGSet(d){
+  _stGR=d;
+  document.querySelectorAll('.st-gtabs button').forEach(function(b){b.classList.toggle('on',+b.dataset.d===d);});
+  if(_stDet&&_stList[_stDet])stGraphBind(_stList[_stDet]);
+}
+function stGHead(i){
+  var g=_stGP;if(!g)return;
+  var q=g.h[i],p=document.getElementById('stGP'),d=document.getElementById('stGD');if(!p||!d)return;
+  var f=g.intra?stFmDT:stFmD;
+  p.textContent='$'+stFm(q[1],2);
+  if(i===g.h.length-1&&!g.hov){d.innerHTML=stPill({pct:(q[1]-g.h[0][1])/g.h[0][1]*100})+' <small>'+f(g.h[0][0])+' - '+f(q[0])+'</small>';}
+  else d.innerHTML='<small>'+f(q[0])+'</small>';
+}
+function stGraphBind(s){
+  var box=document.getElementById('stGBox');if(!box)return;
+  var h=stGData(s,_stDet);if(h.length<2){box.innerHTML='';return;}
+  var intra=stGEff(s)<=5;
+  var W=340,H=170,P=8,n=h.length,mn=Infinity,mx=-Infinity;
+  h.forEach(function(q){if(q[1]<mn)mn=q[1];if(q[1]>mx)mx=q[1];});
+  var sp=(mx-mn)||Math.max(mx*0.02,0.01);mn-=sp*0.1;mx+=sp*0.1;
+  var pts=h.map(function(q,i){return [P+(W-2*P)*i/(n-1),P+(H-2*P)*(1-(q[1]-mn)/(mx-mn))];});
+  var line=pts.map(function(q,i){return (i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1);}).join(' ');
+  var area=line+' L'+pts[n-1][0].toFixed(1)+' '+H+' L'+pts[0][0].toFixed(1)+' '+H+' Z';
+  var up=h[n-1][1]>=h[0][1],col=up?'#22c55e':'#ef4444';
+  var fa=intra?(stGEff(s)===1?stFmT2:stFmDT):stFmD;
+  box.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block"><defs><linearGradient id="stGg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".3"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs>'
+    +'<path d="'+area+'" fill="url(#stGg)"/><path d="'+line+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+    +'<line id="stGL" x1="0" x2="0" y1="0" y2="'+H+'" stroke="#9fb0c3" stroke-width="1" stroke-dasharray="3 3" style="display:none"/>'
+    +'<circle id="stGO" r="4.5" cx="'+pts[n-1][0].toFixed(1)+'" cy="'+pts[n-1][1].toFixed(1)+'" fill="'+col+'" stroke="#0a0e13" stroke-width="2"/></svg>'
+    +'<div class="st-gax"><span>'+fa(h[0][0])+'</span><span>'+fa(h[n-1][0])+'</span></div>';
+  _stGP={h:h,pts:pts,W:W,hov:false,intra:intra};
+  stGHead(n-1);
+  var svg=box.querySelector('svg');
+  function at(ev){
+    var t=(ev.touches&&ev.touches[0])||ev,r=svg.getBoundingClientRect();if(!r.width)return;
+    var x=(t.clientX-r.left)/r.width*W,i=Math.round((x-P)/(W-2*P)*(n-1));i=Math.max(0,Math.min(n-1,i));
+    _stGP.hov=true;
+    var L=document.getElementById('stGL'),O=document.getElementById('stGO');
+    if(L){L.setAttribute('x1',pts[i][0]);L.setAttribute('x2',pts[i][0]);L.style.display='';}
+    if(O){O.setAttribute('cx',pts[i][0]);O.setAttribute('cy',pts[i][1]);}
+    stGHead(i);
+  }
+  function out(){
+    _stGP.hov=false;
+    var L=document.getElementById('stGL'),O=document.getElementById('stGO');
+    if(L)L.style.display='none';
+    if(O){O.setAttribute('cx',pts[n-1][0]);O.setAttribute('cy',pts[n-1][1]);}
+    stGHead(n-1);
+  }
+  svg.addEventListener('pointermove',at);svg.addEventListener('pointerdown',at);
+  svg.addEventListener('touchmove',at,{passive:true});svg.addEventListener('touchstart',at,{passive:true});
+  svg.addEventListener('pointerleave',out);svg.addEventListener('touchend',out);svg.addEventListener('pointercancel',out);
+}
 function stDrawDetail(body,sym){
   var s=_stList[sym];
   if(!s||s.on===false||!((+s.price)>0)){_stDet=null;stDrawMarket(body);return;}
@@ -3462,6 +3602,7 @@ function stDrawDetail(body,sym){
   var o='<div class="st-hp"><div class="st-big rg-num">$'+stFm(px,2)+'</div>'
     +(ch?('<span class="st-pl '+(ch.diff>0?'up':(ch.diff<0?'dn':'fl'))+'">'+(ch.diff>0?'▲ +':(ch.diff<0?'▼ ':''))+stFm(ch.diff,2)+' ('+(ch.pct>0?'+':'')+stFm(ch.pct,2)+'%)</span><span class="st-hint">เทียบราคาปิดก่อนหน้า</span>'):'')+'</div>'
     +(false?'<div class="st-card"><div class="st-sub" style="margin-bottom:6px">ราคาย้อนหลัง</div>'+stRangeTabs()+'<div id="stChBox">'+stChart(hist,lab)+'</div></div>':'')
+    +stGraphCard(s)
     +'<div class="st-card"><div class="st-sub" style="margin-bottom:2px">ข้อมูลหุ้น</div>'
     +'<div class="st-line"><span>สัญลักษณ์</span><b>'+e+'</b></div>'
     +'<div class="st-line"><span>สถานะตลาด</span><b>'+stMktTag(sym,s)+'</b></div>'
@@ -3470,6 +3611,7 @@ function stDrawDetail(body,sym){
     +((+s.prev>0)?'<div class="st-line"><span>ราคาปิดก่อนหน้า</span><b class="rg-num">$'+stFm(s.prev,2)+'</b></div>':'')
     +((+s.dy>0)?'<div class="st-line"><span>ปันผลต่อหุ้นต่อปี ประมาณ</span><b class="rg-num">$'+stFm(s.dy,2)+' ('+stFm(s.dy/px*100,2)+'%)</b></div>':'')
     +'<div class="st-line"><span>อัปเดตล่าสุด</span><b class="rg-num">'+(s.updated?stTime(s.updated):'-')+'</b></div></div>'
+    +stRangeCard(s,px)
     +(ST_INFO[sym]?('<div class="st-card"><div class="st-sub">เกี่ยวกับบริษัท</div>'
       +'<div class="st-line"><span>ประเทศ</span><b>'+escHtml(stInfoTx(ST_INFO[sym][0]))+'</b></div>'
       +'<div class="st-line"><span>ภาคธุรกิจ</span><b>'+escHtml(stInfoTx(ST_INFO[sym][1]))+'</b></div>'
@@ -3485,6 +3627,7 @@ function stDrawDetail(body,sym){
   o+='<div class="st-dacts'+(h&&h.shares>1e-9?'':' one')+'"><button type="button" class="go" data-s="'+e+'" onclick="stBuySheet(this.dataset.s)">ซื้อ</button>'
     +(h&&h.shares>1e-9?'<button type="button" class="go sell" data-s="'+e+'" onclick="stSellSheet(this.dataset.s)">ขาย</button>':'')+'</div>';
   body.innerHTML=o;
+  stGraphBind(s);
   stLoadChart(sym);
 }
 function stDrawPort(body){
@@ -7223,7 +7366,7 @@ Object.assign(TRD,{"ขณะนี้ยังไม่เปิดให้บ
 Object.assign(TRD,{"ราคาล่าสุด": ["ລາຄາຫຼ້າສຸດ", "Latest price"], "อัปเดตล่าสุด": ["ອັບເດດຫຼ້າສຸດ", "Last updated"], "มูลค่าตลาด": ["ມູນຄ່າຕະຫຼາດ", "Market cap"], "ราคาย้อนหลัง": ["ລາຄາຍ້ອນຫຼັງ", "Price history"], "ราคาย้อนหลังจะแสดงเมื่อแอดมินอัปเดตราคาอย่างน้อยสองครั้ง": ["ລາຄາຍ້ອນຫຼັງຈະສະແດງເມື່ອແອັດມິນອັບເດດລາຄາຢ່າງໜ້ອຍສອງຄັ້ງ", "Price history appears after the admin updates the price at least twice"], "หุ้นของฉัน": ["ຮຸ້ນຂອງຂ້ອຍ", "My holding"], "ผลกำไรขาดทุน": ["ກຳໄລ/ຂາດທຶນ", "Profit/Loss"], "ต่ำสุด": ["ຕ່ຳສຸດ", "Low"], "สูงสุด": ["ສູງສຸດ", "High"]});
 Object.assign(TRD,{"ราคาปิดก่อนหน้า":["ລາຄາປິດກ່ອນໜ້າ","Previous close"]});
 Object.assign(TRD,{"ปิดก่อนหน้า":["ປິດກ່ອນໜ້າ","Prev. close"],"ล่าสุด":["ຫຼ້າສຸດ","Latest"],"กราฟจะยาวขึ้นเมื่อแอดมินอัปเดตราคา":["ກຣາຟຈະຍາວຂຶ້ນເມື່ອແອັດມິນອັບເດດລາຄາ","The chart grows as the admin updates prices"]});
-Object.assign(TRD,{"สร้างกำไร":["ສ້າງກຳໄລ","Earn"],"เลือกวิธีสร้างกำไร":["ເລືອກວິທີສ້າງກຳໄລ","Choose how to earn"],"ซื้อขายหุ้นดังทั่วโลก ราคาตามตลาดจริง":["ຊື້ຂາຍຮຸ້ນດັງທົ່ວໂລກ ລາຄາຕາມຕະຫຼາດຈິງ","Trade top global stocks at real market prices"],"ลงทุนสัญญาขุด รับกำไรทุกวัน":["ລົງທຶນສັນຍາຂຸດ ຮັບກຳໄລທຸກວັນ","Invest in mining contracts and earn daily profit"],"เร็วๆ นี้":["ໄວໆ ນີ້","Coming soon"],"เกี่ยวกับบริษัท":["ກ່ຽວກັບບໍລິສັດ","About the company"],"ประเทศ":["ປະເທດ","Country"],"ภาคธุรกิจ":["ພາກທຸລະກິດ","Sector"],"ค้นหาหุ้น เช่น":["ຄົ້ນຫາຮຸ້ນ ເຊັ່ນ","Search stocks e.g."],"ทั้งหมด":["ທັງໝົດ","All"],"ขึ้น":["ຂຶ້ນ","Up"],"ลง":["ລົງ","Down"],"ไม่พบหุ้นที่ค้นหา":["ບໍ່ພົບຮຸ້ນທີ່ຄົ້ນຫາ","No stocks found"],"เทียบราคาปิดก่อนหน้า":["ທຽບລາຄາປິດກ່ອນໜ້າ","vs previous close"],"มูลค่าพอร์ตรวม":["ມູນຄ່າພອດລວມ","Total portfolio value"],"ยอดเงิน":["ຍອດເງິນ","Balance"],"พอร์ต":["ພອດ","Portfolio"],"คำสั่ง":["ຄຳສັ່ງ","Orders"],"ตลาดเปิด":["ຕະຫຼາດເປີດ","Market open"],"ตลาดปิด":["ຕະຫຼາດປິດ","Market closed"],"สถานะตลาด":["ສະຖານະຕະຫຼາດ","Market status"],"ค่าธรรมเนียม":["ຄ່າທຳນຽມ","Fee"],"ตลาดปิดอยู่ คำสั่งจะดำเนินการหลังตลาดเปิด ราคาอาจต่างจากที่แสดง":["ຕະຫຼາດປິດຢູ່ ຄຳສັ່ງຈະດຳເນີນການຫຼັງຕະຫຼາດເປີດ ລາຄາອາດຕ່າງຈາກທີ່ສະແດງ","Market is closed. Your order will be processed after the market opens and the price may differ from the one shown"],"ปันผลต่อหุ้นต่อปี ประมาณ":["ເງິນປັນຜົນຕໍ່ຮຸ້ນຕໍ່ປີ ປະມານ","Dividend per share per year (est.)"],"ข้อมูลหุ้น":["ຂໍ້ມູນຮຸ້ນ","Stock info"],"สัญลักษณ์":["ສັນຍາລັກ","Symbol"]});
+Object.assign(TRD,{"ราคาย้อนหลัง":["ລາຄາຍ້ອນຫຼັງ","Price history"],"แรงสุดวันนี้":["ແຮງສຸດມື້ນີ້","Biggest movers today"],"ช่วงราคา":["ຊ່ວງລາຄາ","Price range"],"ต่ำ":["ຕ່ຳ","Low"],"สูง":["ສູງ","High"],"วันนี้":["ມື້ນີ້","Today"],"สัปดาห์":["ອາທິດ","weeks"],"สร้างกำไร":["ສ້າງກຳໄລ","Earn"],"เลือกวิธีสร้างกำไร":["ເລືອກວິທີສ້າງກຳໄລ","Choose how to earn"],"ซื้อขายหุ้นดังทั่วโลก ราคาตามตลาดจริง":["ຊື້ຂາຍຮຸ້ນດັງທົ່ວໂລກ ລາຄາຕາມຕະຫຼາດຈິງ","Trade top global stocks at real market prices"],"ลงทุนสัญญาขุด รับกำไรทุกวัน":["ລົງທຶນສັນຍາຂຸດ ຮັບກຳໄລທຸກວັນ","Invest in mining contracts and earn daily profit"],"เร็วๆ นี้":["ໄວໆ ນີ້","Coming soon"],"เกี่ยวกับบริษัท":["ກ່ຽວກັບບໍລິສັດ","About the company"],"ประเทศ":["ປະເທດ","Country"],"ภาคธุรกิจ":["ພາກທຸລະກິດ","Sector"],"ค้นหาหุ้น เช่น":["ຄົ້ນຫາຮຸ້ນ ເຊັ່ນ","Search stocks e.g."],"ทั้งหมด":["ທັງໝົດ","All"],"ขึ้น":["ຂຶ້ນ","Up"],"ลง":["ລົງ","Down"],"ไม่พบหุ้นที่ค้นหา":["ບໍ່ພົບຮຸ້ນທີ່ຄົ້ນຫາ","No stocks found"],"เทียบราคาปิดก่อนหน้า":["ທຽບລາຄາປິດກ່ອນໜ້າ","vs previous close"],"มูลค่าพอร์ตรวม":["ມູນຄ່າພອດລວມ","Total portfolio value"],"ยอดเงิน":["ຍອດເງິນ","Balance"],"พอร์ต":["ພອດ","Portfolio"],"คำสั่ง":["ຄຳສັ່ງ","Orders"],"ตลาดเปิด":["ຕະຫຼາດເປີດ","Market open"],"ตลาดปิด":["ຕະຫຼາດປິດ","Market closed"],"สถานะตลาด":["ສະຖານະຕະຫຼາດ","Market status"],"ค่าธรรมเนียม":["ຄ່າທຳນຽມ","Fee"],"ตลาดปิดอยู่ คำสั่งจะดำเนินการหลังตลาดเปิด ราคาอาจต่างจากที่แสดง":["ຕະຫຼາດປິດຢູ່ ຄຳສັ່ງຈະດຳເນີນການຫຼັງຕະຫຼາດເປີດ ລາຄາອາດຕ່າງຈາກທີ່ສະແດງ","Market is closed. Your order will be processed after the market opens and the price may differ from the one shown"],"ปันผลต่อหุ้นต่อปี ประมาณ":["ເງິນປັນຜົນຕໍ່ຮຸ້ນຕໍ່ປີ ປະມານ","Dividend per share per year (est.)"],"ข้อมูลหุ้น":["ຂໍ້ມູນຮຸ້ນ","Stock info"],"สัญลักษณ์":["ສັນຍາລັກ","Symbol"]});
 Object.assign(TRD,{"ข้อมูลกราฟจากตลาด ราคาซื้อขายจริงตามที่แอดมินกำหนด":["ຂໍ້ມູນກຣາຟຈາກຕະຫຼາດ ລາຄາຊື້ຂາຍຈິງຕາມທີ່ແອັດມິນກຳນົດ","Chart data is from the market. Actual trade prices are set by the admin."]});
 Object.assign(TRD,{"กำไรประมาณการต่อวัน": ["ກຳໄລປະມານຕໍ່ມື້", "Estimated daily profit"], "กำไรสะสม วันที่": ["ກຳໄລສະສົມ ວັນທີ", "Accumulated profit · day"], "ขาดอีก": ["ຂາດອີກ", "short by"], "ตอนนี้": ["ຕອນນີ້", "current"], "ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง": ["ຕົວເລກເປັນການປະມານຕາມສູດຂອງລະບົບ ບໍ່ແມ່ນການຮັບປະກັນຜົນຕອບແທນ ການລົງທຶນມີຄວາມສ່ຽງ", "Figures are estimates from the system formula, not a guaranteed return. Investing carries risk."], "ท่านอยู่ระดับสูงสุดแล้ว": ["ທ່ານຢູ່ລະດັບສູງສຸດແລ້ວ", "You are at the top tier"], "ยอดคงเหลือหลังลงทุน": ["ຍອດຄົງເຫຼືອຫຼັງລົງທຶນ", "Balance after investing"], "ยอดในกระเป๋าอัปเดตแล้ว": ["ຍອດໃນກະເປົາອັບເດດແລ້ວ", "Your wallet balance is updated"], "ระดับปัจจุบันมีกรอบสีทอง": ["ລະດັບປັດຈຸບັນມີກອບສີທອງ", "the current tier has a gold frame"], "ระบบจะคำนวณกำไรให้ทันที": ["ລະບົບຈະຄຳນວນກຳໄລໃຫ້ທັນທີ", "The system calculates your profit instantly"], "รับคืนเมื่อครบสัญญา": ["ຮັບຄືນເມື່ອຄົບສັນຍາ", "Returned at contract end"], "ลงมาก อัตราต่อวันยิ่งสูง": ["ລົງຫຼາຍ ອັດຕາຕໍ່ມື້ຍິ່ງສູງ", "Invest more, higher daily rate"], "ลงเพิ่มอีก": ["ລົງເພີ່ມອີກ", "Add"], "อัตราตามจำนวนเงิน": ["ອັດຕາຕາມຈຳນວນເງິນ", "Rate by amount"], "เติมเงินก่อน": ["ເຕີມເງິນກ່ອນ", "Top up first"], "เพื่อขึ้นเป็น": ["ເພື່ອຂຶ້ນເປັນ", "to reach"], "เริ่มเพียง": ["ເລີ່ມພຽງ", "Start from"], "เลือกจำนวนเพื่อดูกำไร": ["ເລືອກຈຳນວນເພື່ອເບິ່ງກຳໄລ", "Choose an amount to see profit"], "เลื่อนดูกำไรสะสมตามวัน": ["ເລື່ອນເບິ່ງກຳໄລສະສົມຕາມວັນ", "Slide to see accumulated profit by day"], "เห็นกำไรประมาณการก่อนยืนยัน": ["ເຫັນກຳໄລປະມານກ່ອນຢືນຢັນ", "see the estimated profit before you confirm"], "ใส่จำนวนเพื่อเริ่มลงทุน": ["ໃສ່ຈຳນວນເພື່ອເລີ່ມລົງທຶນ", "Enter an amount to start"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
