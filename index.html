@@ -1527,6 +1527,13 @@ body:has(#adminScreen.active) #contactFab{display:none}
       </div>
       <div id="stAdList" style="margin-bottom:1rem;"></div>
       <div class="sec-title">📋 คำสั่งซื้อ/ขายหุ้น</div>
+      <div id="stAdDiv" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.8rem;margin-bottom:0.8rem;">
+        <div style="font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:0.5rem;">💰 จ่ายปันผลให้ผู้ถือหุ้น</div>
+        <select id="stDivSym" onchange="stDivFill()" style="width:100%;padding:0.6rem;border-radius:8px;background:#1a1030;color:#fff;border:1px solid rgba(255,255,255,0.15);margin-bottom:0.5rem;"></select>
+        <input id="stDivAmt" type="text" inputmode="decimal" placeholder="ปันผลต่อหุ้น (USDT)" style="width:100%;padding:0.6rem;border-radius:8px;background:#1a1030;color:#fff;border:1px solid rgba(255,255,255,0.15);margin-bottom:0.4rem;">
+        <div id="stDivHint" style="font-size:0.72rem;color:#b6a7d6;margin-bottom:0.5rem;"></div>
+        <button type="button" onclick="stDivPay()" style="width:100%;padding:0.7rem;border-radius:8px;border:none;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#065f46,#10b981);color:#fff;">จ่ายปันผล</button>
+      </div>
       <div id="stAdOrders"></div>
     </div>
     <div class="admin-page" id="apg7">
@@ -3274,6 +3281,7 @@ function stDrawDetail(body,sym){
     +'<div class="st-line"><span>สัญลักษณ์</span><b>'+e+'</b></div>'
     +(s.cap?'<div class="st-line"><span>มูลค่าตลาด</span><b class="rg-num">$'+escHtml(String(s.cap))+'</b></div>':'')
     +((+s.prev>0)?'<div class="st-line"><span>ราคาปิดก่อนหน้า</span><b class="rg-num">$'+stFm(s.prev,2)+'</b></div>':'')
+    +((+s.dy>0)?'<div class="st-line"><span>ปันผลต่อหุ้นต่อปี ประมาณ</span><b class="rg-num">$'+stFm(s.dy,2)+' ('+stFm(s.dy/px*100,2)+'%)</b></div>':'')
     +'<div class="st-line"><span>อัปเดตล่าสุด</span><b class="rg-num">'+(s.updated?stTime(s.updated):'-')+'</b></div></div>';
   if(h&&h.shares>1e-9){
     var val=stR2(h.shares*px),pl=stR2(val-h.cost),cls=pl>0?'st-up':(pl<0?'st-dn':'');
@@ -3445,7 +3453,46 @@ function stAdmLoad(){
       +'<div style="font-size:0.8rem;color:#fff;">สถานะบริการหุ้น: <b style="color:'+(on?'var(--green)':'var(--red-bright)')+'">'+(on?'เปิดอยู่':'ปิดอยู่')+'</b><div style="font-size:0.62rem;color:var(--text-dim);margin-top:0.2rem;">ปิดอยู่ = ลูกค้าไม่เห็นเมนูหุ้น</div></div>'
       +'<button onclick="stAdmToggle('+(on?'false':'true')+')" style="padding:0.6rem 0.9rem;border-radius:8px;border:none;font-weight:700;cursor:pointer;background:'+(on?'rgba(230,57,70,0.2)':'linear-gradient(135deg,#065f46,var(--green))')+';color:'+(on?'var(--red-bright)':'#000')+';">'+(on?'ปิดบริการ':'เปิดบริการ')+'</button></div>';
   }).catch(function(){});
-  stAdmList();stAdmOrders();
+  stAdmList();stAdmOrders();stDivInit();
+}
+function stDivFill(){
+  var sel=document.getElementById('stDivSym'),h=document.getElementById('stDivHint'),i=document.getElementById('stDivAmt');if(!sel||!h)return;
+  var st=(window._stAdmStocks||{})[sel.value]||{};
+  if(+st.dy>0){h.textContent='ปันผลย้อนหลัง 12 เดือน ประมาณ $'+(+st.dy).toFixed(4)+' ต่อหุ้นต่อปี · ไตรมาสละ ประมาณ $'+(st.dy/4).toFixed(4);if(i&&!i.value)i.value=(Math.round(st.dy/4*10000)/10000).toString();}
+  else h.textContent='ไม่มีข้อมูลปันผลของหุ้นนี้ ใส่จำนวนเอง';
+}
+function stDivInit(){
+  if(!window._db)return;
+  window._db.ref('stocks').once('value').then(function(sn){
+    var v=sn.exists()?sn.val():{};window._stAdmStocks=v;
+    var sel=document.getElementById('stDivSym');if(!sel)return;
+    sel.innerHTML=Object.keys(v).sort().map(function(k){return '<option value="'+escHtml(k)+'">'+escHtml(k)+' - '+escHtml(v[k].name||'')+'</option>';}).join('');
+    stDivFill();
+  }).catch(function(){});
+}
+function stDivPay(){
+  var sel=document.getElementById('stDivSym'),i=document.getElementById('stDivAmt');if(!sel||!i||!window._db)return;
+  var sym=sel.value,per=Math.round(parseFloat(i.value)*10000)/10000;
+  if(!sym||!(per>0)){showToast('⚠️ ใส่ปันผลต่อหุ้น');return;}
+  var tag=new Date(Date.now()+7*3600e3).toISOString().slice(0,10).replace(/-/g,'');
+  window._db.ref('users').once('value').then(function(sn){
+    var us=sn.exists()?sn.val():{},rows=[],tot=0;
+    Object.keys(us).forEach(function(u){
+      var h=us[u]&&us[u].stocks&&us[u].stocks[sym],sh=h?+h.shares:0;
+      if(sh>1e-9){var amt=Math.floor(sh*per*100)/100;if(amt>0){rows.push([u,sh,amt]);tot+=amt;}}
+    });
+    if(!rows.length){showToast('ℹ️ ไม่มีผู้ถือหุ้นตัวนี้ที่ได้รับปันผลอย่างน้อย 0.01');return;}
+    if(!confirm('จ่ายปันผล '+sym+' $'+per+' ต่อหุ้น\nผู้ถือ '+rows.length+' คน รวม $'+tot.toFixed(2)+'\n\nจ่ายซ้ำในวันเดียวกันไม่ได้ ยืนยัน?'))return;
+    window._db.ref('stock_divs/'+sym+'_'+tag).transaction(function(c){if(c===null)return {per:per,n:rows.length,total:Math.round(tot*100)/100,time:Date.now()};return;},function(err,ok){
+      if(err||!ok){showToast('⚠️ วันนี้จ่ายปันผลหุ้นตัวนี้ไปแล้ว');return;}
+      Promise.all(rows.map(function(r){return adminCredit(r[0],'div_'+sym+'_'+tag,r[2],'💰 ปันผล '+sym+' '+stR6(r[1])+' หุ้น ได้รับ $'+r[2].toFixed(2));})).then(function(){
+        showToast('✅ จ่ายปันผลแล้ว '+rows.length+' คน');
+      }).catch(function(){
+        window._db.ref('stock_divs/'+sym+'_'+tag).remove();
+        showToast('❌ จ่ายไม่ครบ ตรวจรายการแล้วลองใหม่');
+      });
+    });
+  }).catch(function(){showToast('❌ โหลดผู้ใช้ไม่สำเร็จ');});
 }
 function stAdmToggle(on){
   if(!window._db)return;
@@ -6966,7 +7013,7 @@ Object.assign(TRD,{"ขณะนี้ยังไม่เปิดให้บ
 Object.assign(TRD,{"ราคาล่าสุด": ["ລາຄາຫຼ້າສຸດ", "Latest price"], "อัปเดตล่าสุด": ["ອັບເດດຫຼ້າສຸດ", "Last updated"], "มูลค่าตลาด": ["ມູນຄ່າຕະຫຼາດ", "Market cap"], "ราคาย้อนหลัง": ["ລາຄາຍ້ອນຫຼັງ", "Price history"], "ราคาย้อนหลังจะแสดงเมื่อแอดมินอัปเดตราคาอย่างน้อยสองครั้ง": ["ລາຄາຍ້ອນຫຼັງຈະສະແດງເມື່ອແອັດມິນອັບເດດລາຄາຢ່າງໜ້ອຍສອງຄັ້ງ", "Price history appears after the admin updates the price at least twice"], "หุ้นของฉัน": ["ຮຸ້ນຂອງຂ້ອຍ", "My holding"], "ผลกำไรขาดทุน": ["ກຳໄລ/ຂາດທຶນ", "Profit/Loss"], "ต่ำสุด": ["ຕ່ຳສຸດ", "Low"], "สูงสุด": ["ສູງສຸດ", "High"]});
 Object.assign(TRD,{"ราคาปิดก่อนหน้า":["ລາຄາປິດກ່ອນໜ້າ","Previous close"]});
 Object.assign(TRD,{"ปิดก่อนหน้า":["ປິດກ່ອນໜ້າ","Prev. close"],"ล่าสุด":["ຫຼ້າສຸດ","Latest"],"กราฟจะยาวขึ้นเมื่อแอดมินอัปเดตราคา":["ກຣາຟຈະຍາວຂຶ້ນເມື່ອແອັດມິນອັບເດດລາຄາ","The chart grows as the admin updates prices"]});
-Object.assign(TRD,{"ข้อมูลหุ้น":["ຂໍ້ມູນຮຸ້ນ","Stock info"],"สัญลักษณ์":["ສັນຍາລັກ","Symbol"]});
+Object.assign(TRD,{"ปันผลต่อหุ้นต่อปี ประมาณ":["ເງິນປັນຜົນຕໍ່ຮຸ້ນຕໍ່ປີ ປະມານ","Dividend per share per year (est.)"],"ข้อมูลหุ้น":["ຂໍ້ມູນຮຸ້ນ","Stock info"],"สัญลักษณ์":["ສັນຍາລັກ","Symbol"]});
 Object.assign(TRD,{"ข้อมูลกราฟจากตลาด ราคาซื้อขายจริงตามที่แอดมินกำหนด":["ຂໍ້ມູນກຣາຟຈາກຕະຫຼາດ ລາຄາຊື້ຂາຍຈິງຕາມທີ່ແອັດມິນກຳນົດ","Chart data is from the market. Actual trade prices are set by the admin."]});
 Object.assign(TRD,{"กำไรประมาณการต่อวัน": ["ກຳໄລປະມານຕໍ່ມື້", "Estimated daily profit"], "กำไรสะสม วันที่": ["ກຳໄລສະສົມ ວັນທີ", "Accumulated profit · day"], "ขาดอีก": ["ຂາດອີກ", "short by"], "ตอนนี้": ["ຕອນນີ້", "current"], "ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง": ["ຕົວເລກເປັນການປະມານຕາມສູດຂອງລະບົບ ບໍ່ແມ່ນການຮັບປະກັນຜົນຕອບແທນ ການລົງທຶນມີຄວາມສ່ຽງ", "Figures are estimates from the system formula, not a guaranteed return. Investing carries risk."], "ท่านอยู่ระดับสูงสุดแล้ว": ["ທ່ານຢູ່ລະດັບສູງສຸດແລ້ວ", "You are at the top tier"], "ยอดคงเหลือหลังลงทุน": ["ຍອດຄົງເຫຼືອຫຼັງລົງທຶນ", "Balance after investing"], "ยอดในกระเป๋าอัปเดตแล้ว": ["ຍອດໃນກະເປົາອັບເດດແລ້ວ", "Your wallet balance is updated"], "ระดับปัจจุบันมีกรอบสีทอง": ["ລະດັບປັດຈຸບັນມີກອບສີທອງ", "the current tier has a gold frame"], "ระบบจะคำนวณกำไรให้ทันที": ["ລະບົບຈະຄຳນວນກຳໄລໃຫ້ທັນທີ", "The system calculates your profit instantly"], "รับคืนเมื่อครบสัญญา": ["ຮັບຄືນເມື່ອຄົບສັນຍາ", "Returned at contract end"], "ลงมาก อัตราต่อวันยิ่งสูง": ["ລົງຫຼາຍ ອັດຕາຕໍ່ມື້ຍິ່ງສູງ", "Invest more, higher daily rate"], "ลงเพิ่มอีก": ["ລົງເພີ່ມອີກ", "Add"], "อัตราตามจำนวนเงิน": ["ອັດຕາຕາມຈຳນວນເງິນ", "Rate by amount"], "เติมเงินก่อน": ["ເຕີມເງິນກ່ອນ", "Top up first"], "เพื่อขึ้นเป็น": ["ເພື່ອຂຶ້ນເປັນ", "to reach"], "เริ่มเพียง": ["ເລີ່ມພຽງ", "Start from"], "เลือกจำนวนเพื่อดูกำไร": ["ເລືອກຈຳນວນເພື່ອເບິ່ງກຳໄລ", "Choose an amount to see profit"], "เลื่อนดูกำไรสะสมตามวัน": ["ເລື່ອນເບິ່ງກຳໄລສະສົມຕາມວັນ", "Slide to see accumulated profit by day"], "เห็นกำไรประมาณการก่อนยืนยัน": ["ເຫັນກຳໄລປະມານກ່ອນຢືນຢັນ", "see the estimated profit before you confirm"], "ใส่จำนวนเพื่อเริ่มลงทุน": ["ໃສ່ຈຳນວນເພື່ອເລີ່ມລົງທຶນ", "Enter an amount to start"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
