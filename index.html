@@ -1129,6 +1129,19 @@ body.st-mode #bottomNav,body.st-mode #contactFab,body.st-mode .nav-app{display:n
 .st-hrow{display:flex;justify-content:space-between;margin-top:12px;font-size:12px;color:#8fb3a0}
 #pgStock .st-empty,#pgStock .st-note{color:#7d8a99}
 .st-about{padding:10px 0 12px;font-size:13.5px;line-height:1.7;color:#c3ced9}
+
+.ch-ov{position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center}
+.ch-sheet{width:100%;max-width:520px;box-sizing:border-box;background:#150b28;border:1px solid rgba(168,85,247,.4);border-radius:24px 24px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 22px);display:flex;flex-direction:column;gap:12px;color:#fff}
+.ch-h{display:flex;align-items:center;justify-content:space-between;font-size:18px;font-weight:700;margin-bottom:2px}
+.ch-x{width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:#fff;font-size:16px;cursor:pointer}
+.ch-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font-family:inherit;color:#fff;border-radius:20px;padding:16px;cursor:pointer;border:1px solid rgba(255,255,255,.12);position:relative}
+.ch-card.st{background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(15,23,42,.6))}
+.ch-card.mn{background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(255,215,0,.12))}
+.ch-ic{flex:none;width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:26px}
+.ch-t{font-size:17px;font-weight:700}
+.ch-d{font-size:12.5px;color:#c9b8e8;margin-top:3px;line-height:1.5}
+.ch-card.off{opacity:.55}
+.ch-badge{position:absolute;top:10px;right:12px;font-size:11px;font-weight:700;background:rgba(255,255,255,.14);padding:3px 9px;border-radius:999px}
 #stNav{flex:none;display:flex;background:#0d1218;border-top:1px solid #18212b;padding:8px 10px calc(env(safe-area-inset-bottom,0px) + 10px)}
 #stNav button{flex:1;position:relative;background:none;border:0;color:#6b7a8a;font-family:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 0 2px}
 #stNav button i{font-style:normal;font-size:20px;filter:grayscale(1) opacity(.7)}
@@ -1710,11 +1723,6 @@ body:has(#adminScreen.active) #contactFab{display:none}
 
   <div id="refSection"></div>
 
-  <button type="button" id="hmStock" onclick="stOpen()" style="display:none;text-align:left;width:100%;font-family:inherit;color:inherit;cursor:pointer;align-items:center;gap:14px;border-radius:20px;padding:16px;background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(124,58,237,.14));border:1px solid rgba(56,189,248,.4)">
-    <div style="width:46px;height:46px;border-radius:14px;background:rgba(56,189,248,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
-    <div style="flex-grow:1;min-width:0"><div style="font-size:15px;font-weight:700">หุ้นต่างประเทศ</div><div style="font-size:12px;color:#d9ccf2;line-height:1.5;margin-top:2px">ซื้อหุ้นต่างประเทศผ่านแอดมิน</div></div>
-    <div style="font-size:13px;color:#38bdf8;font-weight:700">ดู ›</div>
-  </button>
 
   <div style="display:flex;align-items:center;gap:14px;border-radius:20px;padding:16px;background:#150b28;border:1px solid rgba(255,255,255,.08)">
     <div style="width:46px;height:46px;border-radius:14px;background:rgba(168,85,247,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M17 11a3 3 0 1 0 0-6M22 20c0-2.8-1.8-4.8-4.5-5.6"/></svg></div>
@@ -2828,9 +2836,9 @@ box-shadow:0 4px 20px rgba(16,185,129,0.5),0 0 40px rgba(16,185,129,0.2);">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="3"/></svg>
       <span>เครื่องขุด</span>
     </button>
-    <button class="bnav-mine" id="bnPkg" onclick="switchTab(1)">
+    <button class="bnav-mine" id="bnPkg" onclick="stChoose()">
       <div class="bnav-mine-circle"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4a8 8 0 0 1 6 6M10 8l6 6M4 20l8.5-8.5"/><path d="M13 3.5L20.5 11"/></svg></div>
-      <span>สัญญาขุด</span>
+      <span>สร้างกำไร</span>
     </button>
     <button class="bnav" id="bn2" onclick="switchTab(2)">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
@@ -3201,6 +3209,30 @@ function stOpen(){
   document.body.classList.add('st-mode');
   try{history.pushState({st:1},'','#stocks');}catch(e){}
   switchTab(5);
+}
+function stChoose(){
+  var old=document.getElementById('chOv');if(old)old.remove();
+  var ov=document.createElement('div');ov.id='chOv';ov.className='ch-ov';
+  ov.innerHTML='<div class="ch-sheet"><div class="ch-h"><span>เลือกวิธีสร้างกำไร</span><button type="button" class="ch-x" onclick="stChClose()" aria-label="close">✕</button></div>'
+    +'<button type="button" class="ch-card st" id="chStock" onclick="stChGo(1)"><div class="ch-ic">📈</div><div><div class="ch-t">หุ้นต่างประเทศ</div><div class="ch-d">ซื้อขายหุ้นดังทั่วโลก ราคาตามตลาดจริง</div></div></button>'
+    +'<button type="button" class="ch-card mn" onclick="stChGo(0)"><div class="ch-ic">⛏️</div><div><div class="ch-t">ขุด ETH</div><div class="ch-d">ลงทุนสัญญาขุด รับกำไรทุกวัน</div></div></button></div>';
+  ov.addEventListener('click',function(e){if(e.target===ov)stChClose();});
+  document.body.appendChild(ov);
+  if(window._db){
+    window._db.ref('settings/stockOn').once('value').then(function(sn){
+      var c=document.getElementById('chStock');if(!c)return;
+      _stOn=(sn.val()===true);
+      if(!_stOn){c.classList.add('off');c.insertAdjacentHTML('beforeend','<span class="ch-badge">เร็วๆ นี้</span>');}
+    }).catch(function(){});
+  }
+}
+function stChClose(){var o=document.getElementById('chOv');if(o)o.remove();}
+function stChGo(k){
+  if(k===1){
+    var c=document.getElementById('chStock');
+    if(c&&c.classList.contains('off')){showToast('ขณะนี้ยังไม่เปิดให้บริการซื้อหุ้น');return;}
+    stChClose();stOpen();
+  }else{stChClose();switchTab(1);}
 }
 function stLeave(){document.body.classList.remove('st-mode');_stDet=null;switchTab(0);}
 function stExit(){
@@ -6859,7 +6891,7 @@ const I18N = {
     'top.demo':        '* Demo Mode — เติม USD ฟรีเพื่อทดสอบระบบ',
     // Bnav
     'nav.home':        'หน้าหลัก',
-    'nav.contract':    'สัญญาขุด',
+    'nav.contract':    'สร้างกำไร',
     'nav.wallet':      'กระเป๋า',
     'nav.topup':       'เติม USD',
     // Detail popup
@@ -6994,7 +7026,7 @@ const I18N = {
     'top.confirm':     '💵 Confirm Top Up USD',
     'top.demo':        '* Demo Mode — Free top up for testing',
     'nav.home':        'Home',
-    'nav.contract':    'Contracts',
+    'nav.contract':    'Earn',
     'nav.wallet':      'Wallet',
     'nav.topup':       'Top Up',
     'det.price':       '💰 Package Price',
@@ -7126,7 +7158,7 @@ const I18N = {
     'top.confirm':     '💵 ຢືນຢັນຕື່ມ USD',
     'top.demo':        '* Demo Mode — ຕື່ມ USD ຟຣີເພື່ອທົດສອບ',
     'nav.home':        'ໜ້າຫຼັກ',
-    'nav.contract':    'ສັນຍາຂຸດ',
+    'nav.contract':    'ສ້າງກຳໄລ',
     'nav.wallet':      'ກະເປົ໋າ',
     'nav.topup':       'ຕື່ມ USD',
     'det.price':       '💰 ລາຄາແພັກ',
@@ -7191,7 +7223,7 @@ Object.assign(TRD,{"ขณะนี้ยังไม่เปิดให้บ
 Object.assign(TRD,{"ราคาล่าสุด": ["ລາຄາຫຼ້າສຸດ", "Latest price"], "อัปเดตล่าสุด": ["ອັບເດດຫຼ້າສຸດ", "Last updated"], "มูลค่าตลาด": ["ມູນຄ່າຕະຫຼາດ", "Market cap"], "ราคาย้อนหลัง": ["ລາຄາຍ້ອນຫຼັງ", "Price history"], "ราคาย้อนหลังจะแสดงเมื่อแอดมินอัปเดตราคาอย่างน้อยสองครั้ง": ["ລາຄາຍ້ອນຫຼັງຈະສະແດງເມື່ອແອັດມິນອັບເດດລາຄາຢ່າງໜ້ອຍສອງຄັ້ງ", "Price history appears after the admin updates the price at least twice"], "หุ้นของฉัน": ["ຮຸ້ນຂອງຂ້ອຍ", "My holding"], "ผลกำไรขาดทุน": ["ກຳໄລ/ຂາດທຶນ", "Profit/Loss"], "ต่ำสุด": ["ຕ່ຳສຸດ", "Low"], "สูงสุด": ["ສູງສຸດ", "High"]});
 Object.assign(TRD,{"ราคาปิดก่อนหน้า":["ລາຄາປິດກ່ອນໜ້າ","Previous close"]});
 Object.assign(TRD,{"ปิดก่อนหน้า":["ປິດກ່ອນໜ້າ","Prev. close"],"ล่าสุด":["ຫຼ້າສຸດ","Latest"],"กราฟจะยาวขึ้นเมื่อแอดมินอัปเดตราคา":["ກຣາຟຈະຍາວຂຶ້ນເມື່ອແອັດມິນອັບເດດລາຄາ","The chart grows as the admin updates prices"]});
-Object.assign(TRD,{"เกี่ยวกับบริษัท":["ກ່ຽວກັບບໍລິສັດ","About the company"],"ประเทศ":["ປະເທດ","Country"],"ภาคธุรกิจ":["ພາກທຸລະກິດ","Sector"],"ค้นหาหุ้น เช่น":["ຄົ້ນຫາຮຸ້ນ ເຊັ່ນ","Search stocks e.g."],"ทั้งหมด":["ທັງໝົດ","All"],"ขึ้น":["ຂຶ້ນ","Up"],"ลง":["ລົງ","Down"],"ไม่พบหุ้นที่ค้นหา":["ບໍ່ພົບຮຸ້ນທີ່ຄົ້ນຫາ","No stocks found"],"เทียบราคาปิดก่อนหน้า":["ທຽບລາຄາປິດກ່ອນໜ້າ","vs previous close"],"มูลค่าพอร์ตรวม":["ມູນຄ່າພອດລວມ","Total portfolio value"],"ยอดเงิน":["ຍອດເງິນ","Balance"],"พอร์ต":["ພອດ","Portfolio"],"คำสั่ง":["ຄຳສັ່ງ","Orders"],"ตลาดเปิด":["ຕະຫຼາດເປີດ","Market open"],"ตลาดปิด":["ຕະຫຼາດປິດ","Market closed"],"สถานะตลาด":["ສະຖານະຕະຫຼາດ","Market status"],"ค่าธรรมเนียม":["ຄ່າທຳນຽມ","Fee"],"ตลาดปิดอยู่ คำสั่งจะดำเนินการหลังตลาดเปิด ราคาอาจต่างจากที่แสดง":["ຕະຫຼາດປິດຢູ່ ຄຳສັ່ງຈະດຳເນີນການຫຼັງຕະຫຼາດເປີດ ລາຄາອາດຕ່າງຈາກທີ່ສະແດງ","Market is closed. Your order will be processed after the market opens and the price may differ from the one shown"],"ปันผลต่อหุ้นต่อปี ประมาณ":["ເງິນປັນຜົນຕໍ່ຮຸ້ນຕໍ່ປີ ປະມານ","Dividend per share per year (est.)"],"ข้อมูลหุ้น":["ຂໍ້ມູນຮຸ້ນ","Stock info"],"สัญลักษณ์":["ສັນຍາລັກ","Symbol"]});
+Object.assign(TRD,{"สร้างกำไร":["ສ້າງກຳໄລ","Earn"],"เลือกวิธีสร้างกำไร":["ເລືອກວິທີສ້າງກຳໄລ","Choose how to earn"],"ซื้อขายหุ้นดังทั่วโลก ราคาตามตลาดจริง":["ຊື້ຂາຍຮຸ້ນດັງທົ່ວໂລກ ລາຄາຕາມຕະຫຼາດຈິງ","Trade top global stocks at real market prices"],"ลงทุนสัญญาขุด รับกำไรทุกวัน":["ລົງທຶນສັນຍາຂຸດ ຮັບກຳໄລທຸກວັນ","Invest in mining contracts and earn daily profit"],"เร็วๆ นี้":["ໄວໆ ນີ້","Coming soon"],"เกี่ยวกับบริษัท":["ກ່ຽວກັບບໍລິສັດ","About the company"],"ประเทศ":["ປະເທດ","Country"],"ภาคธุรกิจ":["ພາກທຸລະກິດ","Sector"],"ค้นหาหุ้น เช่น":["ຄົ້ນຫາຮຸ້ນ ເຊັ່ນ","Search stocks e.g."],"ทั้งหมด":["ທັງໝົດ","All"],"ขึ้น":["ຂຶ້ນ","Up"],"ลง":["ລົງ","Down"],"ไม่พบหุ้นที่ค้นหา":["ບໍ່ພົບຮຸ້ນທີ່ຄົ້ນຫາ","No stocks found"],"เทียบราคาปิดก่อนหน้า":["ທຽບລາຄາປິດກ່ອນໜ້າ","vs previous close"],"มูลค่าพอร์ตรวม":["ມູນຄ່າພອດລວມ","Total portfolio value"],"ยอดเงิน":["ຍອດເງິນ","Balance"],"พอร์ต":["ພອດ","Portfolio"],"คำสั่ง":["ຄຳສັ່ງ","Orders"],"ตลาดเปิด":["ຕະຫຼາດເປີດ","Market open"],"ตลาดปิด":["ຕະຫຼາດປິດ","Market closed"],"สถานะตลาด":["ສະຖານະຕະຫຼາດ","Market status"],"ค่าธรรมเนียม":["ຄ່າທຳນຽມ","Fee"],"ตลาดปิดอยู่ คำสั่งจะดำเนินการหลังตลาดเปิด ราคาอาจต่างจากที่แสดง":["ຕະຫຼາດປິດຢູ່ ຄຳສັ່ງຈະດຳເນີນການຫຼັງຕະຫຼາດເປີດ ລາຄາອາດຕ່າງຈາກທີ່ສະແດງ","Market is closed. Your order will be processed after the market opens and the price may differ from the one shown"],"ปันผลต่อหุ้นต่อปี ประมาณ":["ເງິນປັນຜົນຕໍ່ຮຸ້ນຕໍ່ປີ ປະມານ","Dividend per share per year (est.)"],"ข้อมูลหุ้น":["ຂໍ້ມູນຮຸ້ນ","Stock info"],"สัญลักษณ์":["ສັນຍາລັກ","Symbol"]});
 Object.assign(TRD,{"ข้อมูลกราฟจากตลาด ราคาซื้อขายจริงตามที่แอดมินกำหนด":["ຂໍ້ມູນກຣາຟຈາກຕະຫຼາດ ລາຄາຊື້ຂາຍຈິງຕາມທີ່ແອັດມິນກຳນົດ","Chart data is from the market. Actual trade prices are set by the admin."]});
 Object.assign(TRD,{"กำไรประมาณการต่อวัน": ["ກຳໄລປະມານຕໍ່ມື້", "Estimated daily profit"], "กำไรสะสม วันที่": ["ກຳໄລສະສົມ ວັນທີ", "Accumulated profit · day"], "ขาดอีก": ["ຂາດອີກ", "short by"], "ตอนนี้": ["ຕອນນີ້", "current"], "ตัวเลขเป็นประมาณการตามสูตรของระบบ ไม่ใช่การรับประกันผลตอบแทน การลงทุนมีความเสี่ยง": ["ຕົວເລກເປັນການປະມານຕາມສູດຂອງລະບົບ ບໍ່ແມ່ນການຮັບປະກັນຜົນຕອບແທນ ການລົງທຶນມີຄວາມສ່ຽງ", "Figures are estimates from the system formula, not a guaranteed return. Investing carries risk."], "ท่านอยู่ระดับสูงสุดแล้ว": ["ທ່ານຢູ່ລະດັບສູງສຸດແລ້ວ", "You are at the top tier"], "ยอดคงเหลือหลังลงทุน": ["ຍອດຄົງເຫຼືອຫຼັງລົງທຶນ", "Balance after investing"], "ยอดในกระเป๋าอัปเดตแล้ว": ["ຍອດໃນກະເປົາອັບເດດແລ້ວ", "Your wallet balance is updated"], "ระดับปัจจุบันมีกรอบสีทอง": ["ລະດັບປັດຈຸບັນມີກອບສີທອງ", "the current tier has a gold frame"], "ระบบจะคำนวณกำไรให้ทันที": ["ລະບົບຈະຄຳນວນກຳໄລໃຫ້ທັນທີ", "The system calculates your profit instantly"], "รับคืนเมื่อครบสัญญา": ["ຮັບຄືນເມື່ອຄົບສັນຍາ", "Returned at contract end"], "ลงมาก อัตราต่อวันยิ่งสูง": ["ລົງຫຼາຍ ອັດຕາຕໍ່ມື້ຍິ່ງສູງ", "Invest more, higher daily rate"], "ลงเพิ่มอีก": ["ລົງເພີ່ມອີກ", "Add"], "อัตราตามจำนวนเงิน": ["ອັດຕາຕາມຈຳນວນເງິນ", "Rate by amount"], "เติมเงินก่อน": ["ເຕີມເງິນກ່ອນ", "Top up first"], "เพื่อขึ้นเป็น": ["ເພື່ອຂຶ້ນເປັນ", "to reach"], "เริ่มเพียง": ["ເລີ່ມພຽງ", "Start from"], "เลือกจำนวนเพื่อดูกำไร": ["ເລືອກຈຳນວນເພື່ອເບິ່ງກຳໄລ", "Choose an amount to see profit"], "เลื่อนดูกำไรสะสมตามวัน": ["ເລື່ອນເບິ່ງກຳໄລສະສົມຕາມວັນ", "Slide to see accumulated profit by day"], "เห็นกำไรประมาณการก่อนยืนยัน": ["ເຫັນກຳໄລປະມານກ່ອນຢືນຢັນ", "see the estimated profit before you confirm"], "ใส่จำนวนเพื่อเริ่มลงทุน": ["ໃສ່ຈຳນວນເພື່ອເລີ່ມລົງທຶນ", "Enter an amount to start"]});
 var _TH_RUN=/[฀-๿][฀-๿ ]*[฀-๿]|[฀-๿]/g;
