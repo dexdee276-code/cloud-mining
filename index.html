@@ -1091,6 +1091,7 @@ body.st-mode #bottomNav,body.st-mode #contactFab,body.st-mode .nav-app{display:n
 #stBal{flex:none;background:#141b23;border-radius:999px;padding:7px 12px;font-size:12px;color:#9fb0c3;white-space:nowrap}
 #stBal b{color:#fff;font-size:13px}
 #stTop[data-m=d] #stBal{display:none}
+#stScroll .st-row{content-visibility:auto;contain-intrinsic-size:auto 64px}
 #stScroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 20px;display:flex;flex-direction:column}
 #stBody{flex:1;display:flex;flex-direction:column}
 #stBody>*{flex:none}
@@ -3174,6 +3175,7 @@ function enterDash(user){
 // ═══════════════════════════════════════════════
 var ST_INFO={"NVDA": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["ออกแบบชิปกราฟิก (GPU) และชิปประมวลผล AI รายใหญ่ของโลก ใช้ในดาต้าเซ็นเตอร์ เกม และรถยนต์", "ອອກແບບຊິບກາຟິກ (GPU) ແລະຊິບປະມວນຜົນ AI ລາຍໃຫຍ່ຂອງໂລກ ໃຊ້ໃນດາຕ້າເຊັນເຕີ ເກມ ແລະລົດຍົນ", "Designs GPUs and AI processing chips, a world leader, used in data centers, gaming and cars"]], "AAPL": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เทคโนโลยี", "ເທັກໂນໂລຢີ", "Technology"], ["ผู้ผลิต iPhone, Mac และ iPad พร้อมบริการ App Store และ iCloud", "ຜູ້ຜະລິດ iPhone, Mac ແລະ iPad ພ້ອມບໍລິການ App Store ແລະ iCloud", "Maker of iPhone, Mac and iPad, with App Store and iCloud services"]], "MSFT": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ซอฟต์แวร์และคลาวด์", "ຊອບແວແລະຄລາວ", "Software and cloud"], ["เจ้าของ Windows, Office และ Azure คลาวด์ระดับโลก", "ເຈົ້າຂອງ Windows, Office ແລະ Azure ຄລາວລະດັບໂລກ", "Owner of Windows, Office and the Azure cloud"]], "GOOGL": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["อินเทอร์เน็ต", "ອິນເຕີເນັດ", "Internet"], ["บริษัทแม่ของ Google Search, YouTube, Android และ Google Cloud", "ບໍລິສັດແມ່ຂອງ Google Search, YouTube, Android ແລະ Google Cloud", "Parent of Google Search, YouTube, Android and Google Cloud"]], "AMZN": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["อีคอมเมิร์ซและคลาวด์", "ອີຄອມເມີສແລະຄລາວ", "E-commerce and cloud"], ["ร้านค้าออนไลน์รายใหญ่ของโลก และเจ้าของ AWS บริการคลาวด์อันดับต้นๆ", "ຮ້ານຄ້າອອນລາຍລາຍໃຫຍ່ຂອງໂລກ ແລະເຈົ້າຂອງ AWS ບໍລິການຄລາວອັນດັບຕົ້ນ", "A leading online retailer and owner of AWS, a top cloud service"]], "META": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["โซเชียลมีเดีย", "ໂຊຊຽລມີເດຍ", "Social media"], ["เจ้าของ Facebook, Instagram และ WhatsApp", "ເຈົ້າຂອງ Facebook, Instagram ແລະ WhatsApp", "Owner of Facebook, Instagram and WhatsApp"]], "TSLA": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ยานยนต์ไฟฟ้า", "ລົດຍົນໄຟຟ້າ", "Electric vehicles"], ["ผู้ผลิตรถยนต์ไฟฟ้า และระบบกักเก็บพลังงาน", "ຜູ້ຜະລິດລົດຍົນໄຟຟ້າ ແລະລະບົບເກັບພະລັງງານ", "Maker of electric vehicles and energy storage systems"]], "AVGO": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["Broadcom ผู้ผลิตชิปเครือข่าย ชิปเฉพาะทาง และซอฟต์แวร์สำหรับองค์กร", "Broadcom ຜູ້ຜະລິດຊິບເຄືອຂ່າຍ ຊິບສະເພາະທາງ ແລະຊອບແວສຳລັບອົງກອນ", "Broadcom makes networking chips, custom chips and enterprise software"]], "AMD": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["ผู้ผลิตซีพียู Ryzen และ EPYC รวมถึงชิปกราฟิกและชิป AI", "ຜູ້ຜະລິດຊີພີຢູ Ryzen ແລະ EPYC ລວມທັງຊິບກາຟິກແລະຊິບ AI", "Maker of Ryzen and EPYC CPUs, plus graphics and AI chips"]], "MU": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["Micron ผู้ผลิตหน่วยความจำ DRAM และ NAND รายใหญ่", "Micron ຜູ້ຜະລິດໜ່ວຍຄວາມຈຳ DRAM ແລະ NAND ລາຍໃຫຍ່", "Micron is a major maker of DRAM and NAND memory"]], "LLY": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ยาและสุขภาพ", "ຢາແລະສຸຂະພາບ", "Pharmaceuticals"], ["Eli Lilly บริษัทยา เด่นด้านยาเบาหวาน โรคอ้วน และมะเร็ง", "Eli Lilly ບໍລິສັດຢາ ເດັ່ນດ້ານຢາເບົາຫວານ ພະຍາດອ້ວນ ແລະມະເຣັງ", "Eli Lilly is a drug maker known for diabetes, obesity and cancer treatments"]], "JPM": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ธนาคาร", "ທະນາຄານ", "Banking"], ["JPMorgan Chase ธนาคารที่ใหญ่ที่สุดในสหรัฐฯ", "JPMorgan Chase ທະນາຄານທີ່ໃຫຍ່ທີ່ສຸດໃນສະຫະລັດ", "JPMorgan Chase is the largest bank in the United States"]], "V": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["การชำระเงิน", "ການຊຳລະເງິນ", "Payments"], ["Visa เครือข่ายชำระเงินด้วยบัตรที่ใช้ทั่วโลก", "Visa ເຄືອຂ່າຍຊຳລະເງິນດ້ວຍບັດທີ່ໃຊ້ທົ່ວໂລກ", "Visa runs a worldwide card payments network"]], "WMT": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["ค้าปลีก", "ຄ້າປີກ", "Retail"], ["Walmart เครือซูเปอร์สโตร์และค้าปลีกรายใหญ่ของโลก", "Walmart ເຄືອຊຸບເປີສໂຕແລະຄ້າປີກລາຍໃຫຍ່ຂອງໂລກ", "Walmart is one of the world largest retail and supercenter chains"]], "XOM": [["สหรัฐอเมริกา", "ສະຫະລັດ", "United States"], ["พลังงาน", "ພະລັງງານ", "Energy"], ["ExxonMobil บริษัทน้ำมันและก๊าซรายใหญ่", "ExxonMobil ບໍລິສັດນ້ຳມັນແລະແກັສລາຍໃຫຍ່", "ExxonMobil is a major oil and gas company"]], "2330-TW": [["ไต้หวัน", "ໄຕ້ຫວັນ", "Taiwan"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["TSMC ผู้รับจ้างผลิตชิปรายใหญ่ที่สุดในโลก ลูกค้าได้แก่ Apple และ NVIDIA", "TSMC ຜູ້ຮັບຈ້າງຜະລິດຊິບລາຍໃຫຍ່ທີ່ສຸດໃນໂລກ ລູກຄ້າມີ Apple ແລະ NVIDIA", "TSMC is the largest contract chip maker in the world, serving Apple and NVIDIA"]], "005930-KS": [["เกาหลีใต้", "ເກົາຫຼີໃຕ້", "South Korea"], ["เทคโนโลยี", "ເທັກໂນໂລຢີ", "Technology"], ["Samsung Electronics ผู้ผลิตสมาร์ตโฟน จอแสดงผล และชิปหน่วยความจำ", "Samsung Electronics ຜູ້ຜະລິດສະມາດໂຟນ ຈໍສະແດງຜົນ ແລະຊິບໜ່ວຍຄວາມຈຳ", "Samsung Electronics makes smartphones, displays and memory chips"]], "000660-KS": [["เกาหลีใต้", "ເກົາຫຼີໃຕ້", "South Korea"], ["เซมิคอนดักเตอร์ (ชิป)", "ເຊມິຄອນດັກເຕີ (ຊິບ)", "Semiconductors"], ["SK hynix ผู้ผลิตหน่วยความจำ DRAM, NAND และ HBM สำหรับชิป AI", "SK hynix ຜູ້ຜະລິດໜ່ວຍຄວາມຈຳ DRAM, NAND ແລະ HBM ສຳລັບຊິບ AI", "SK hynix makes DRAM, NAND and HBM memory used in AI chips"]], "2222-SR": [["ซาอุดีอาระเบีย", "ຊາອຸດີອາຣາເບຍ", "Saudi Arabia"], ["พลังงาน", "ພະລັງງານ", "Energy"], ["Saudi Aramco บริษัทน้ำมันและก๊าซแห่งชาติของซาอุดีอาระเบีย", "Saudi Aramco ບໍລິສັດນ້ຳມັນແລະແກັສແຫ່ງຊາດຂອງຊາອຸດີອາຣາເບຍ", "Saudi Aramco is the national oil and gas company of Saudi Arabia"]]};
 function stInfoTx(a){return LANG==="en"?a[2]:(LANG==="lo"?a[1]:a[0]);}
+var _stN=20,_stMoreBusy=false;
 var ST_MIN=10,_stQ='',_stF='all',_stFee=0,_stOn=false,_stList={},_stTab=0,_stBusy=false,_stDet=null;
 // ป้ายสีประจำหุ้น: ใช้สีแบรนด์โดยประมาณถ้ามี ไม่มีก็สุ่มสีคงที่จากสัญลักษณ์
 var ST_BRAND={AAPL:['#4b5563','#9ca3af'],NVDA:['#3f6212','#76b900'],MSFT:['#0369a1','#38bdf8'],GOOGL:['#1d4ed8','#ea4335'],GOOG:['#1d4ed8','#ea4335'],AMZN:['#b45309','#ff9900'],META:['#1d4ed8','#0ea5e9'],AVGO:['#991b1b','#ef4444'],TSLA:['#991b1b','#e31937'],LLY:['#9f1239','#f43f5e'],WMT:['#1d4ed8','#facc15'],JPM:['#1e3a8a','#3b82f6'],AMD:['#166534','#22c55e'],MU:['#0e7490','#06b6d4'],V:['#1e3a8a','#f59e0b'],JNJ:['#991b1b','#dc2626'],XOM:['#b91c1c','#ef4444']};
@@ -3224,7 +3226,7 @@ function stFlag(){
   }).catch(function(){});
 }
 function stOpen(){
-  _stTab=0;_stDet=null;_stQ='';_stF='all';
+  _stTab=0;_stDet=null;_stQ='';_stF='all';_stN=20;
   var q=document.getElementById('stQ');if(q)q.value='';
   document.body.classList.add('st-mode');
   try{history.pushState({st:1},'','#stocks');}catch(e){}
@@ -3265,12 +3267,12 @@ window.addEventListener('popstate',function(){
   stLeave();
 });
 function stSort(f){
-  _stF=f;
+  _stF=f;_stN=20;
   document.querySelectorAll('.st-chips button').forEach(function(b){b.classList.toggle('on',b.dataset.f===f);});
   stFilter();
 }
 function stFilter(){
-  var i=document.getElementById('stQ');_stQ=i?i.value.trim().toLowerCase():'';
+  var i=document.getElementById('stQ');_stQ=i?i.value.trim().toLowerCase():'';_stN=20;
   var body=document.getElementById('stBody');if(body&&_stOn&&!_stDet&&_stTab===0)stDrawMarket(body);
 }
 function stBalSet(){
@@ -3298,13 +3300,23 @@ function stAuto(){
   if(!pg||!pg.classList.contains('active')||document.hidden||_stBusy||_stTab===2||!_stOn)return;
   if(document.getElementById('stSheet'))return;
   var body=document.getElementById('stBody');if(!body)return;
-  var sc0=document.getElementById('stScroll'),top=sc0?sc0.scrollTop:0;
-  stMeta().then(function(){
-    if(!_stOn||_stBusy||document.getElementById('stSheet'))return;
+  stMeta().then(function(){stPaintSoon();}).catch(function(){});
+}
+var _stScAt=0,_stPT=null;
+function stPaintSoon(){
+  if(_stPT)return;
+  _stPT=setTimeout(function(){
+    _stPT=null;
+    if(Date.now()-_stScAt<1200){stPaintSoon();return;}
+    var pg=document.getElementById('pgStock');
+    if(!pg||!pg.classList.contains('active')||document.hidden||_stBusy||_stTab===2||!_stOn||document.getElementById('stSheet'))return;
+    var body=document.getElementById('stBody');if(!body)return;
+    var sc0=document.getElementById('stScroll'),top=sc0?sc0.scrollTop:0;
     if(_stDet&&_stTab<2)stDrawDetail(body,_stDet);else if(_stTab===0)stDrawMarket(body);else if(_stTab===1)stDrawPort(body);
     if(sc0)sc0.scrollTop=top;
-  }).catch(function(){});
+  },900);
 }
+(function(){var e=document.getElementById('stScroll');if(e)e.addEventListener('scroll',function(){_stScAt=Date.now();},{passive:true});})();
 var _stLive=false;
 function stLive(){
   if(_stLive||!window._db)return;_stLive=true;
@@ -3314,9 +3326,7 @@ function stLive(){
     if(document.getElementById('stSheet'))return;
     var body=document.getElementById('stBody');if(!body)return;
     _stList=sn.exists()?sn.val():{};
-    var sc0=document.getElementById('stScroll'),top=sc0?sc0.scrollTop:0;
-    if(_stDet&&_stTab<2)stDrawDetail(body,_stDet);else if(_stTab===0)stDrawMarket(body);else if(_stTab===1)stDrawPort(body);
-    if(sc0)sc0.scrollTop=top;
+    stPaintSoon();
   },function(){_stLive=false;});
 }
 if(!_stTimer)_stTimer=setInterval(stAuto,30000);
@@ -3375,13 +3385,27 @@ function stDrawMarket(body){
   });
   if(!ks.length){body.innerHTML='<div class="st-empty">ไม่พบหุ้นที่ค้นหา</div>';return;}
   var mv=(_stF==='all'&&!_stQ)?stMovers(ks):'';
-  body.innerHTML=mv+ks.map(function(k){
+  var more=ks.length>_stN;
+  body.innerHTML=mv+ks.slice(0,_stN).map(function(k){
     var s=_stList[k],ch=stChg(s),op=stMktOpen(k,s);
     return '<div class="st-row" style="cursor:pointer" data-s="'+escHtml(k)+'" onclick="stDetail(this.dataset.s)">'+stIcon(k)
       +'<div class="st-mid"><div class="st-nm">'+escHtml(s.name||k)+'</div><div class="st-sub"><span class="st-dot" style="background:'+(op?'#22c55e':'#6b7a8a')+'"></span>'+(op?'ตลาดเปิด':'ตลาดปิด')+' · '+escHtml(k)+'</div></div>'
       +'<div class="st-right"><div class="st-px rg-num">$'+stFm(s.price,2)+'</div>'+stPill(ch)+'</div></div>';
-  }).join('');
+  }).join('')+(more?'<div class="st-note" id="stMore">⏳ กำลังโหลดเพิ่ม...</div>':'');
 }
+function stMoreCheck(){
+  var sc=document.getElementById('stScroll'),m=document.getElementById('stMore');
+  if(!sc||!m||_stMoreBusy||_stTab!==0||_stDet)return;
+  if(sc.scrollHeight-sc.scrollTop-sc.clientHeight>260)return;
+  _stMoreBusy=true;
+  setTimeout(function(){
+    _stN+=20;_stMoreBusy=false;
+    var body=document.getElementById('stBody'),sc2=document.getElementById('stScroll');
+    if(!body||!sc2||_stTab!==0||_stDet)return;
+    var top=sc2.scrollTop;stDrawMarket(body);sc2.scrollTop=top;
+  },450);
+}
+(function(){var e=document.getElementById('stScroll');if(e)e.addEventListener('scroll',stMoreCheck,{passive:true});})();
 function stHist(s){
   var a=s&&s.hist;if(!a)return [];
   if(!Array.isArray(a))a=Object.keys(a).map(function(k){return a[k];});
