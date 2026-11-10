@@ -3083,6 +3083,7 @@ function stIcon(k){
   var st=_stList[k],u=(st&&st.logo)||('https://financialmodelingprep.com/image-stock/'+encodeURIComponent(k)+'.png');
   return '<div class="st-sym" style="'+stBadge(k)+'">'+escHtml(k.split('-')[0].slice(0,5))+'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+escHtml(u)+'" onload="this.parentNode.classList.add(&quot;lg&quot;)" onerror="this.remove()"></div>';
 }
+function stPc(pl,c){return (+c>0)?' ('+(pl>0?'+':'')+stFm(pl/c*100,2)+'%)':'';}
 function stR2(n){return Math.round((+n||0)*100)/100;}
 function stR6(n){return Math.round((+n||0)*1e6)/1e6;}
 function stFm(n,d){return (+n||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
@@ -3314,7 +3315,7 @@ function stDrawDetail(body,sym){
       +'<div class="st-line"><span>หุ้นที่ถือ</span><b class="rg-num">'+stR6(h.shares)+'</b></div>'
       +'<div class="st-line"><span>ต้นทุนเฉลี่ย</span><b class="rg-num">$'+stFm(h.cost/h.shares,2)+'</b></div>'
       +'<div class="st-line"><span>มูลค่า</span><b class="rg-num">$'+stFm(val,2)+'</b></div>'
-      +'<div class="st-line"><span>ผลกำไรขาดทุน</span><b class="rg-num '+cls+'">'+(pl>0?'+':'')+stFm(pl,2)+'</b></div></div>';
+      +'<div class="st-line"><span>ผลกำไรขาดทุน</span><b class="rg-num '+cls+'">'+(pl>0?'+':'')+stFm(pl,2)+stPc(pl,h.cost)+'</b></div></div>';
   }
   o+='<div class="st-dacts'+(h&&h.shares>1e-9?'':' one')+'"><button type="button" class="go" data-s="'+e+'" onclick="stBuySheet(this.dataset.s)">ซื้อ</button>'
     +(h&&h.shares>1e-9?'<button type="button" class="go sell" data-s="'+e+'" onclick="stSellSheet(this.dataset.s)">ขาย</button>':'')+'</div>';
@@ -3334,14 +3335,14 @@ function stDrawPort(body){
     return '<div class="st-row" style="cursor:pointer" data-s="'+escHtml(k)+'" onclick="stDetail(this.dataset.s)">'+stIcon(k)+''
       +'<div class="st-mid"><div class="st-nm">'+escHtml(x.name||k)+'</div>'
       +'<div class="st-sub"><span class="rg-num">'+stR6(x.shares)+'</span> หุ้น · ต้นทุนเฉลี่ย $<span class="rg-num">'+stFm(x.cost/x.shares,2)+'</span></div>'
-      +'<div class="st-sub">มูลค่า $<span class="rg-num">'+stFm(val,2)+'</span> · <span class="rg-num '+cls+'">'+(pl>0?'+':'')+stFm(pl,2)+'</span></div></div>'
+      +'<div class="st-sub">มูลค่า $<span class="rg-num">'+stFm(val,2)+'</span> · <span class="rg-num '+cls+'">'+(pl>0?'+':'')+stFm(pl,2)+stPc(pl,x.cost)+'</span></div></div>'
       +'<div class="st-right"><button type="button" class="st-btn sell" data-s="'+escHtml(k)+'" onclick="event.stopPropagation();stSellSheet(this.dataset.s)">ขาย</button></div></div>';
   }).join('');
   var tp=stR2(tv-tc),tcls=tp>0?'st-up':(tp<0?'st-dn':'');
   body.innerHTML='<div class="st-sum">'
     +'<div><div class="l">ต้นทุนรวม</div><div class="v rg-num">$'+stFm(tc,2)+'</div></div>'
     +'<div><div class="l">มูลค่าปัจจุบัน</div><div class="v rg-num">$'+stFm(tv,2)+'</div></div>'
-    +'<div><div class="l">กำไร/ขาดทุน</div><div class="v rg-num '+tcls+'">'+(tp>0?'+':'')+stFm(tp,2)+'</div></div></div>'+rows;
+    +'<div><div class="l">กำไร/ขาดทุน</div><div class="v rg-num '+tcls+'">'+(tp>0?'+':'')+stFm(tp,2)+'</div><div class="rg-num '+tcls+'" style="font-size:11px">'+(tc>0?(tp>0?'+':'')+stFm(tp/tc*100,2)+'%':'')+'</div></div></div>'+rows;
 }
 function stDrawOrders(body){
   var u=getSess();if(!u||!window._db){body.innerHTML='';return;}
